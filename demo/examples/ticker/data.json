@@ -1,0 +1,450 @@
+[
+{
+"symbol": "AXI",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ba68c8%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EAX%3C/text%3E%3C/svg%3E",
+"description": "Cyberdyne Inc",
+"price": 90.5,
+"basePrice": 77.3
+},
+{
+"symbol": "SNB",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ba68c8%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ESN%3C/text%3E%3C/svg%3E",
+"description": "Acme Corp",
+"price": 128.98,
+"basePrice": 114.32
+},
+{
+"symbol": "RGW",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ERG%3C/text%3E%3C/svg%3E",
+"description": "Sterling Systems",
+"price": 275.58,
+"basePrice": 267.03
+},
+{
+"symbol": "YZF",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EYZ%3C/text%3E%3C/svg%3E",
+"description": "Dunder Holdings",
+"price": 200.43,
+"basePrice": 171.24
+},
+{
+"symbol": "YKD",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EYK%3C/text%3E%3C/svg%3E",
+"description": "Initech Holdings",
+"price": 63.08,
+"basePrice": 57.26
+},
+{
+"symbol": "XOR",
+"image": null,
+"description": "Umbra Holdings",
+"price": 41.81,
+"basePrice": 48.88
+},
+{
+"symbol": "SGWC",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ESG%3C/text%3E%3C/svg%3E",
+"description": "Globex Systems",
+"price": 117.12,
+"basePrice": 118.66
+},
+{
+"symbol": "MIO",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2381c784%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EMI%3C/text%3E%3C/svg%3E",
+"description": "Sterling Partners",
+"price": 192.13,
+"basePrice": 182.74
+},
+{
+"symbol": "GVIW",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%234db6ac%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EGV%3C/text%3E%3C/svg%3E",
+"description": "Abstergo Systems",
+"price": 295.84,
+"basePrice": 315.28
+},
+{
+"symbol": "FOM",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EFO%3C/text%3E%3C/svg%3E",
+"description": "Tyrell Systems",
+"price": null,
+"basePrice": 334.06
+},
+{
+"symbol": "YYBH",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ba68c8%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EYY%3C/text%3E%3C/svg%3E",
+"description": "Zorg Corp",
+"price": 373.55,
+"basePrice": 388.76
+},
+{
+"symbol": "GUPM",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2381c784%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EGU%3C/text%3E%3C/svg%3E",
+"description": "Weyland Systems",
+"price": 233.09,
+"basePrice": 226.74
+},
+{
+"symbol": "HXR",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2381c784%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EHX%3C/text%3E%3C/svg%3E",
+"description": "Aperture Labs",
+"price": 305.57,
+"basePrice": 361.6
+},
+{
+"symbol": "EQP",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23e57373%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EEQ%3C/text%3E%3C/svg%3E",
+"description": "Initech Partners",
+"price": 36.6,
+"basePrice": 34.05
+},
+{
+"symbol": "UFZ",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ffb74d%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EUF%3C/text%3E%3C/svg%3E",
+"description": "Prestige Holdings",
+"price": 252.95,
+"basePrice": 291.12
+},
+{
+"symbol": "RAVX",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ERA%3C/text%3E%3C/svg%3E",
+"description": "Umbra Systems",
+"price": 475.47,
+"basePrice": 426.08
+},
+{
+"symbol": "YUKD",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%234db6ac%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EYU%3C/text%3E%3C/svg%3E",
+"description": "Soylent Holdings",
+"price": 103.91,
+"basePrice": 86.02
+},
+{
+"symbol": "QYFQ",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2381c784%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EQY%3C/text%3E%3C/svg%3E",
+"description": "Abstergo Corp",
+"price": 421.18,
+"basePrice": 419.4
+},
+{
+"symbol": "ELY",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ba68c8%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EEL%3C/text%3E%3C/svg%3E",
+"description": "Wayne Group",
+"price": 576.1,
+"basePrice": 458.24
+},
+{
+"symbol": "PADL",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EPA%3C/text%3E%3C/svg%3E",
+"description": "Weyland Partners",
+"price": 336.46,
+"basePrice": 389.57
+},
+{
+"symbol": "HSC",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EHS%3C/text%3E%3C/svg%3E",
+"description": "Initech Systems",
+"price": 287.17,
+"basePrice": 239.44
+},
+{
+"symbol": "EVP",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EEV%3C/text%3E%3C/svg%3E",
+"description": "Aperture Inc",
+"price": 148.65,
+"basePrice": 136.05
+},
+{
+"symbol": "GRYX",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2381c784%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EGR%3C/text%3E%3C/svg%3E",
+"description": "Dunder Inc",
+"price": 291.65,
+"basePrice": 345.66
+},
+{
+"symbol": "QODH",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ba68c8%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EQO%3C/text%3E%3C/svg%3E",
+"description": "Cyberdyne Corp",
+"price": 189.8,
+"basePrice": 170.22
+},
+{
+"symbol": "SHA",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ESH%3C/text%3E%3C/svg%3E",
+"description": "Initech Systems",
+"price": 318.81,
+"basePrice": 307.36
+},
+{
+"symbol": "CQHI",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ECQ%3C/text%3E%3C/svg%3E",
+"description": "Prestige Holdings",
+"price": 143.68,
+"basePrice": 112.26
+},
+{
+"symbol": "HZPZ",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ffb74d%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EHZ%3C/text%3E%3C/svg%3E",
+"description": "Gringotts Inc",
+"price": 52.45,
+"basePrice": 56.14
+},
+{
+"symbol": "XBVU",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%234db6ac%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EXB%3C/text%3E%3C/svg%3E",
+"description": "Sterling Corp",
+"price": 36.24,
+"basePrice": 40.37
+},
+{
+"symbol": "ZDHG",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EZD%3C/text%3E%3C/svg%3E",
+"description": "Wonka Group",
+"price": 201.39,
+"basePrice": 221.95
+},
+{
+"symbol": "OZR",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ba68c8%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EOZ%3C/text%3E%3C/svg%3E",
+"description": "Umbra Corp",
+"price": 332.91,
+"basePrice": 317.2
+},
+{
+"symbol": "CYH",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23e57373%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ECY%3C/text%3E%3C/svg%3E",
+"description": "Wayne Holdings",
+"price": 246.39,
+"basePrice": 239.28
+},
+{
+"symbol": "MAM",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2381c784%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EMA%3C/text%3E%3C/svg%3E",
+"description": "Tyrell Partners",
+"price": 428.09,
+"basePrice": 379.44
+},
+{
+"symbol": "WXZR",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23e57373%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EWX%3C/text%3E%3C/svg%3E",
+"description": "Prestige Systems",
+"price": 247.81,
+"basePrice": 239.76
+},
+{
+"symbol": "XKB",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EXK%3C/text%3E%3C/svg%3E",
+"description": "Globex Group",
+"price": 255.05,
+"basePrice": 235.14
+},
+{
+"symbol": "BQC",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ffb74d%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EBQ%3C/text%3E%3C/svg%3E",
+"description": "Rekall Inc",
+"price": 54.44,
+"basePrice": 44.07
+},
+{
+"symbol": "SHS",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ffb74d%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ESH%3C/text%3E%3C/svg%3E",
+"description": "Multi Corp",
+"price": 334.21,
+"basePrice": 301.87
+},
+{
+"symbol": "IGVW",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ffb74d%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EIG%3C/text%3E%3C/svg%3E",
+"description": "Hooli Inc",
+"price": 153.68,
+"basePrice": 136.31
+},
+{
+"symbol": "YCAO",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23e57373%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EYC%3C/text%3E%3C/svg%3E",
+"description": "Multi Group",
+"price": 543.77,
+"basePrice": 478.17
+},
+{
+"symbol": "QIE",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EQI%3C/text%3E%3C/svg%3E",
+"description": "Abstergo Labs",
+"price": 462.69,
+"basePrice": 424.24
+},
+{
+"symbol": "RWJT",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%234db6ac%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ERW%3C/text%3E%3C/svg%3E",
+"description": "Virtucon Systems",
+"price": 237.25,
+"basePrice": 259.54
+},
+{
+"symbol": "VDEI",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EVD%3C/text%3E%3C/svg%3E",
+"description": "Umbra Corp",
+"price": 380.73,
+"basePrice": 359.45
+},
+{
+"symbol": "GVUI",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EGV%3C/text%3E%3C/svg%3E",
+"description": "Nakatomi Holdings",
+"price": 140.87,
+"basePrice": 129.52
+},
+{
+"symbol": "CUN",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2381c784%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ECU%3C/text%3E%3C/svg%3E",
+"description": "Zorg Labs",
+"price": 31.5,
+"basePrice": 32.63
+},
+{
+"symbol": "RADC",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ba68c8%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ERA%3C/text%3E%3C/svg%3E",
+"description": "Weyland Systems",
+"price": 460.95,
+"basePrice": 435.04
+},
+{
+"symbol": "LSR",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ELS%3C/text%3E%3C/svg%3E",
+"description": "Stark Holdings",
+"price": 64.5,
+"basePrice": 71.64
+},
+{
+"symbol": "LGV",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ELG%3C/text%3E%3C/svg%3E",
+"description": "Cyberdyne Systems",
+"price": 75.73,
+"basePrice": 60.11
+},
+{
+"symbol": "TXEH",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23e57373%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ETX%3C/text%3E%3C/svg%3E",
+"description": "Rekall Inc",
+"price": 515.76,
+"basePrice": 468.86
+},
+{
+"symbol": "XKZ",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EXK%3C/text%3E%3C/svg%3E",
+"description": "Abstergo Holdings",
+"price": 290.93,
+"basePrice": 387.45
+},
+{
+"symbol": "IFZ",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EIF%3C/text%3E%3C/svg%3E",
+"description": "Dunder Corp",
+"price": 218.22,
+"basePrice": 191.03
+},
+{
+"symbol": "LJZH",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ffb74d%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ELJ%3C/text%3E%3C/svg%3E",
+"description": "Cyberdyne Corp",
+"price": 332.24,
+"basePrice": 320.9
+},
+{
+"symbol": "ICYI",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2381c784%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EIC%3C/text%3E%3C/svg%3E",
+"description": "Pied Systems",
+"price": 223.53,
+"basePrice": 250.4
+},
+{
+"symbol": "DIF",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ba68c8%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EDI%3C/text%3E%3C/svg%3E",
+"description": "Black Labs",
+"price": 23.13,
+"basePrice": 29.9
+},
+{
+"symbol": "LXZK",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ELX%3C/text%3E%3C/svg%3E",
+"description": "Gringotts Group",
+"price": 571.06,
+"basePrice": 472.62
+},
+{
+"symbol": "BWNA",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%234db6ac%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EBW%3C/text%3E%3C/svg%3E",
+"description": "Nakatomi Partners",
+"price": 312.88,
+"basePrice": 264.0
+},
+{
+"symbol": "LNC",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2381c784%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3ELN%3C/text%3E%3C/svg%3E",
+"description": "Prestige Labs",
+"price": 293.1,
+"basePrice": 303.64
+},
+{
+"symbol": "VNKM",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EVN%3C/text%3E%3C/svg%3E",
+"description": "Dunder Labs",
+"price": 255.89,
+"basePrice": 271.47
+},
+{
+"symbol": "VMVX",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23e57373%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EVM%3C/text%3E%3C/svg%3E",
+"description": "Weyland Inc",
+"price": 284.59,
+"basePrice": 300.06
+},
+{
+"symbol": "JGNZ",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ffb74d%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EJG%3C/text%3E%3C/svg%3E",
+"description": "Black Group",
+"price": 367.91,
+"basePrice": 318.4
+},
+{
+"symbol": "OVGQ",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23e57373%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EOV%3C/text%3E%3C/svg%3E",
+"description": "Massive Partners",
+"price": 443.56,
+"basePrice": 433.75
+},
+{
+"symbol": "QVUT",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EQV%3C/text%3E%3C/svg%3E",
+"description": "Hooli Corp",
+"price": 365.0,
+"basePrice": 395.02
+},
+{
+"symbol": "VJH",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ba68c8%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EVJ%3C/text%3E%3C/svg%3E",
+"description": "Virtucon Inc",
+"price": 109.95,
+"basePrice": 80.96
+},
+{
+"symbol": "ONU",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23ffb74d%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EON%3C/text%3E%3C/svg%3E",
+"description": "Black Inc",
+"price": 385.44,
+"basePrice": 348.19
+},
+{
+"symbol": "MHEU",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%23f06292%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EMH%3C/text%3E%3C/svg%3E",
+"description": "Dunder Corp",
+"price": 504.14,
+"basePrice": 429.76
+},
+{
+"symbol": "HFZW",
+"image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2220%22%20height%3D%2220%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%224%22%20fill%3D%22%2364b5f6%22/%3E%3Ctext%20x%3D%2210%22%20y%3D%2214%22%20font-size%3D%229%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3EHF%3C/text%3E%3C/svg%3E",
+"description": "Nakatomi Holdings",
+"price": 28.11,
+"basePrice": 35.5
+}
+]

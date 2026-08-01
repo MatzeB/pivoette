@@ -1,0 +1,10802 @@
+[
+{
+"app": "drift-0000",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3998.9
+},
+{
+"app": "drift-0000",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3865.3
+},
+{
+"app": "drift-0000",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4508.6
+},
+{
+"app": "drift-0000",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4529.5
+},
+{
+"app": "drift-0000",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4794.1
+},
+{
+"app": "drift-0000",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4169.9
+},
+{
+"app": "drift-0000",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4598.5
+},
+{
+"app": "drift-0000",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4657.2
+},
+{
+"app": "drift-0000",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4814.4
+},
+{
+"app": "drift-0000",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4754.6
+},
+{
+"app": "drift-0000",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4270.5
+},
+{
+"app": "drift-0000",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3790.3
+},
+{
+"app": "drift-0000",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3807.8
+},
+{
+"app": "drift-0000",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3870.8
+},
+{
+"app": "drift-0000",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3630.2
+},
+{
+"app": "drift-0000",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4225.3
+},
+{
+"app": "drift-0000",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3905.4
+},
+{
+"app": "drift-0000",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3829.1
+},
+{
+"app": "drift-0000",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4151.4
+},
+{
+"app": "drift-0000",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4030.2
+},
+{
+"app": "drift-0000",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1790.0
+},
+{
+"app": "drift-0000",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1595.2
+},
+{
+"app": "drift-0000",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1636.0
+},
+{
+"app": "drift-0000",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1677.8
+},
+{
+"app": "drift-0000",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1866.2
+},
+{
+"app": "drift-0000",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 2087.8
+},
+{
+"app": "drift-0000",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 2142.2
+},
+{
+"app": "drift-0000",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 2054.2
+},
+{
+"app": "drift-0000",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 2068.8
+},
+{
+"app": "drift-0000",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 2212.4
+},
+{
+"app": "beacon-0001",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 5561.8
+},
+{
+"app": "beacon-0001",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4973.2
+},
+{
+"app": "beacon-0001",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4920.5
+},
+{
+"app": "beacon-0001",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4737.3
+},
+{
+"app": "beacon-0001",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 5020.3
+},
+{
+"app": "beacon-0001",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 5188.7
+},
+{
+"app": "beacon-0001",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 5403.1
+},
+{
+"app": "beacon-0001",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 5161.7
+},
+{
+"app": "beacon-0001",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4479.9
+},
+{
+"app": "beacon-0001",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 5282.2
+},
+{
+"app": "beacon-0001",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 5043.3
+},
+{
+"app": "beacon-0001",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4594.9
+},
+{
+"app": "beacon-0001",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4582.2
+},
+{
+"app": "beacon-0001",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4741.1
+},
+{
+"app": "beacon-0001",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 5175.1
+},
+{
+"app": "beacon-0001",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2276.8
+},
+{
+"app": "beacon-0001",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2813.5
+},
+{
+"app": "beacon-0001",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2676.6
+},
+{
+"app": "beacon-0001",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2765.8
+},
+{
+"app": "beacon-0001",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2532.3
+},
+{
+"app": "beacon-0001",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1989.2
+},
+{
+"app": "beacon-0001",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 2046.2
+},
+{
+"app": "beacon-0001",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1842.3
+},
+{
+"app": "beacon-0001",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 2263.7
+},
+{
+"app": "beacon-0001",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1998.5
+},
+{
+"app": "beacon-0001",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1337.0
+},
+{
+"app": "beacon-0001",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1379.3
+},
+{
+"app": "beacon-0001",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1416.6
+},
+{
+"app": "beacon-0001",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1515.8
+},
+{
+"app": "beacon-0001",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1432.7
+},
+{
+"app": "cipher-0002",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3704.1
+},
+{
+"app": "cipher-0002",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3829.6
+},
+{
+"app": "cipher-0002",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3441.0
+},
+{
+"app": "cipher-0002",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3294.7
+},
+{
+"app": "cipher-0002",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3573.6
+},
+{
+"app": "cipher-0002",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2818.2
+},
+{
+"app": "cipher-0002",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3659.7
+},
+{
+"app": "cipher-0002",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3686.5
+},
+{
+"app": "cipher-0002",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3292.9
+},
+{
+"app": "cipher-0002",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3553.1
+},
+{
+"app": "cipher-0002",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3234.2
+},
+{
+"app": "cipher-0002",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3195.6
+},
+{
+"app": "cipher-0002",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3439.7
+},
+{
+"app": "cipher-0002",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3782.3
+},
+{
+"app": "cipher-0002",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2994.4
+},
+{
+"app": "cipher-0002",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2583.8
+},
+{
+"app": "cipher-0002",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2799.8
+},
+{
+"app": "cipher-0002",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2735.4
+},
+{
+"app": "cipher-0002",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2690.4
+},
+{
+"app": "cipher-0002",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2719.5
+},
+{
+"app": "cipher-0002",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1289.2
+},
+{
+"app": "cipher-0002",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1364.9
+},
+{
+"app": "cipher-0002",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1411.1
+},
+{
+"app": "cipher-0002",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1420.0
+},
+{
+"app": "cipher-0002",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1504.3
+},
+{
+"app": "cipher-0002",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 973.6
+},
+{
+"app": "cipher-0002",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 926.0
+},
+{
+"app": "cipher-0002",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 900.1
+},
+{
+"app": "cipher-0002",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 900.9
+},
+{
+"app": "cipher-0002",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 831.8
+},
+{
+"app": "pulse-0003",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4421.3
+},
+{
+"app": "pulse-0003",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4497.4
+},
+{
+"app": "pulse-0003",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4764.3
+},
+{
+"app": "pulse-0003",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4096.7
+},
+{
+"app": "pulse-0003",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4359.9
+},
+{
+"app": "pulse-0003",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3316.3
+},
+{
+"app": "pulse-0003",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3161.8
+},
+{
+"app": "pulse-0003",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2738.2
+},
+{
+"app": "pulse-0003",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3346.5
+},
+{
+"app": "pulse-0003",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3634.8
+},
+{
+"app": "pulse-0003",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3789.8
+},
+{
+"app": "pulse-0003",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3911.3
+},
+{
+"app": "pulse-0003",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4064.0
+},
+{
+"app": "pulse-0003",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4609.5
+},
+{
+"app": "pulse-0003",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4159.1
+},
+{
+"app": "pulse-0003",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4161.7
+},
+{
+"app": "pulse-0003",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4519.8
+},
+{
+"app": "pulse-0003",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4113.2
+},
+{
+"app": "pulse-0003",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4595.1
+},
+{
+"app": "pulse-0003",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3963.6
+},
+{
+"app": "pulse-0003",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1819.1
+},
+{
+"app": "pulse-0003",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1892.8
+},
+{
+"app": "pulse-0003",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1812.1
+},
+{
+"app": "pulse-0003",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1775.3
+},
+{
+"app": "pulse-0003",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1553.1
+},
+{
+"app": "pulse-0003",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1350.0
+},
+{
+"app": "pulse-0003",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1358.6
+},
+{
+"app": "pulse-0003",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1365.1
+},
+{
+"app": "pulse-0003",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1459.9
+},
+{
+"app": "pulse-0003",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1381.9
+},
+{
+"app": "quasar-0004",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 544.7
+},
+{
+"app": "quasar-0004",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 556.8
+},
+{
+"app": "quasar-0004",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 539.4
+},
+{
+"app": "quasar-0004",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 447.8
+},
+{
+"app": "quasar-0004",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 515.3
+},
+{
+"app": "quasar-0004",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 428.3
+},
+{
+"app": "quasar-0004",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 424.3
+},
+{
+"app": "quasar-0004",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 395.5
+},
+{
+"app": "quasar-0004",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 423.7
+},
+{
+"app": "quasar-0004",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 413.6
+},
+{
+"app": "quasar-0004",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 526.4
+},
+{
+"app": "quasar-0004",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 476.5
+},
+{
+"app": "quasar-0004",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 518.9
+},
+{
+"app": "quasar-0004",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 474.0
+},
+{
+"app": "quasar-0004",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 473.5
+},
+{
+"app": "quasar-0004",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 355.8
+},
+{
+"app": "quasar-0004",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 369.1
+},
+{
+"app": "quasar-0004",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 347.8
+},
+{
+"app": "quasar-0004",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 348.8
+},
+{
+"app": "quasar-0004",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 345.5
+},
+{
+"app": "quasar-0004",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 219.2
+},
+{
+"app": "quasar-0004",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 225.4
+},
+{
+"app": "quasar-0004",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 218.9
+},
+{
+"app": "quasar-0004",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 210.2
+},
+{
+"app": "quasar-0004",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 215.6
+},
+{
+"app": "quasar-0004",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 197.1
+},
+{
+"app": "quasar-0004",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 173.9
+},
+{
+"app": "quasar-0004",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 199.9
+},
+{
+"app": "quasar-0004",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 201.0
+},
+{
+"app": "quasar-0004",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 178.3
+},
+{
+"app": "falcon-0005",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4718.5
+},
+{
+"app": "falcon-0005",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4319.8
+},
+{
+"app": "falcon-0005",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4660.5
+},
+{
+"app": "falcon-0005",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3999.8
+},
+{
+"app": "falcon-0005",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4182.9
+},
+{
+"app": "falcon-0005",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4064.3
+},
+{
+"app": "falcon-0005",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3973.6
+},
+{
+"app": "falcon-0005",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4446.6
+},
+{
+"app": "falcon-0005",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4140.7
+},
+{
+"app": "falcon-0005",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4155.5
+},
+{
+"app": "falcon-0005",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3555.0
+},
+{
+"app": "falcon-0005",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4455.6
+},
+{
+"app": "falcon-0005",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3885.8
+},
+{
+"app": "falcon-0005",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3851.0
+},
+{
+"app": "falcon-0005",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4424.6
+},
+{
+"app": "falcon-0005",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2262.0
+},
+{
+"app": "falcon-0005",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2321.9
+},
+{
+"app": "falcon-0005",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2429.1
+},
+{
+"app": "falcon-0005",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2346.3
+},
+{
+"app": "falcon-0005",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2397.4
+},
+{
+"app": "falcon-0005",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1709.6
+},
+{
+"app": "falcon-0005",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1735.7
+},
+{
+"app": "falcon-0005",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1830.4
+},
+{
+"app": "falcon-0005",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1976.4
+},
+{
+"app": "falcon-0005",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1659.7
+},
+{
+"app": "falcon-0005",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1527.9
+},
+{
+"app": "falcon-0005",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1587.5
+},
+{
+"app": "falcon-0005",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1492.0
+},
+{
+"app": "falcon-0005",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1603.0
+},
+{
+"app": "falcon-0005",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1531.2
+},
+{
+"app": "matrix-0006",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2540.6
+},
+{
+"app": "matrix-0006",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2859.9
+},
+{
+"app": "matrix-0006",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2608.0
+},
+{
+"app": "matrix-0006",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2697.1
+},
+{
+"app": "matrix-0006",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2852.4
+},
+{
+"app": "matrix-0006",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2373.7
+},
+{
+"app": "matrix-0006",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2576.5
+},
+{
+"app": "matrix-0006",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2453.5
+},
+{
+"app": "matrix-0006",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2149.1
+},
+{
+"app": "matrix-0006",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2404.8
+},
+{
+"app": "matrix-0006",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2536.7
+},
+{
+"app": "matrix-0006",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2801.3
+},
+{
+"app": "matrix-0006",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2493.1
+},
+{
+"app": "matrix-0006",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2550.5
+},
+{
+"app": "matrix-0006",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2286.6
+},
+{
+"app": "matrix-0006",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2670.6
+},
+{
+"app": "matrix-0006",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2472.8
+},
+{
+"app": "matrix-0006",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2434.9
+},
+{
+"app": "matrix-0006",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2689.4
+},
+{
+"app": "matrix-0006",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2388.3
+},
+{
+"app": "matrix-0006",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1122.7
+},
+{
+"app": "matrix-0006",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1184.0
+},
+{
+"app": "matrix-0006",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1020.6
+},
+{
+"app": "matrix-0006",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1017.5
+},
+{
+"app": "matrix-0006",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1127.9
+},
+{
+"app": "matrix-0006",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1036.0
+},
+{
+"app": "matrix-0006",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 993.3
+},
+{
+"app": "matrix-0006",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1134.3
+},
+{
+"app": "matrix-0006",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1008.2
+},
+{
+"app": "matrix-0006",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1032.2
+},
+{
+"app": "sigma-0007",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4789.2
+},
+{
+"app": "sigma-0007",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4496.2
+},
+{
+"app": "sigma-0007",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4185.0
+},
+{
+"app": "sigma-0007",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4292.4
+},
+{
+"app": "sigma-0007",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4402.9
+},
+{
+"app": "sigma-0007",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4924.1
+},
+{
+"app": "sigma-0007",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 5197.2
+},
+{
+"app": "sigma-0007",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 5229.0
+},
+{
+"app": "sigma-0007",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 5536.4
+},
+{
+"app": "sigma-0007",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 5067.9
+},
+{
+"app": "sigma-0007",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4171.5
+},
+{
+"app": "sigma-0007",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4365.0
+},
+{
+"app": "sigma-0007",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4137.6
+},
+{
+"app": "sigma-0007",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3715.9
+},
+{
+"app": "sigma-0007",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4151.2
+},
+{
+"app": "sigma-0007",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3361.1
+},
+{
+"app": "sigma-0007",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3257.7
+},
+{
+"app": "sigma-0007",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3895.4
+},
+{
+"app": "sigma-0007",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3496.0
+},
+{
+"app": "sigma-0007",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3656.5
+},
+{
+"app": "sigma-0007",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1762.5
+},
+{
+"app": "sigma-0007",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1769.8
+},
+{
+"app": "sigma-0007",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1591.6
+},
+{
+"app": "sigma-0007",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1784.8
+},
+{
+"app": "sigma-0007",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1792.0
+},
+{
+"app": "sigma-0007",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1908.1
+},
+{
+"app": "sigma-0007",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1733.1
+},
+{
+"app": "sigma-0007",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1969.0
+},
+{
+"app": "sigma-0007",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1678.9
+},
+{
+"app": "sigma-0007",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1809.8
+},
+{
+"app": "raster-0008",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1825.6
+},
+{
+"app": "raster-0008",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2337.4
+},
+{
+"app": "raster-0008",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2240.5
+},
+{
+"app": "raster-0008",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2077.5
+},
+{
+"app": "raster-0008",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2023.8
+},
+{
+"app": "raster-0008",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1853.4
+},
+{
+"app": "raster-0008",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2064.5
+},
+{
+"app": "raster-0008",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2115.1
+},
+{
+"app": "raster-0008",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1952.7
+},
+{
+"app": "raster-0008",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1789.9
+},
+{
+"app": "raster-0008",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2002.0
+},
+{
+"app": "raster-0008",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1656.6
+},
+{
+"app": "raster-0008",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1758.7
+},
+{
+"app": "raster-0008",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1959.6
+},
+{
+"app": "raster-0008",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1973.4
+},
+{
+"app": "raster-0008",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1575.7
+},
+{
+"app": "raster-0008",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1494.4
+},
+{
+"app": "raster-0008",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1330.0
+},
+{
+"app": "raster-0008",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1430.6
+},
+{
+"app": "raster-0008",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1384.0
+},
+{
+"app": "raster-0008",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 752.9
+},
+{
+"app": "raster-0008",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 897.1
+},
+{
+"app": "raster-0008",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 826.7
+},
+{
+"app": "raster-0008",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 846.7
+},
+{
+"app": "raster-0008",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 792.9
+},
+{
+"app": "raster-0008",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1121.5
+},
+{
+"app": "raster-0008",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 955.3
+},
+{
+"app": "raster-0008",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1005.0
+},
+{
+"app": "raster-0008",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1040.5
+},
+{
+"app": "raster-0008",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 947.7
+},
+{
+"app": "sigma-0009",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2812.7
+},
+{
+"app": "sigma-0009",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2589.0
+},
+{
+"app": "sigma-0009",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2791.2
+},
+{
+"app": "sigma-0009",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2646.8
+},
+{
+"app": "sigma-0009",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2603.9
+},
+{
+"app": "sigma-0009",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2525.3
+},
+{
+"app": "sigma-0009",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2428.5
+},
+{
+"app": "sigma-0009",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2332.4
+},
+{
+"app": "sigma-0009",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2513.4
+},
+{
+"app": "sigma-0009",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2549.9
+},
+{
+"app": "sigma-0009",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2071.9
+},
+{
+"app": "sigma-0009",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2210.7
+},
+{
+"app": "sigma-0009",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2022.4
+},
+{
+"app": "sigma-0009",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1994.7
+},
+{
+"app": "sigma-0009",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2352.5
+},
+{
+"app": "sigma-0009",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2016.1
+},
+{
+"app": "sigma-0009",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1987.7
+},
+{
+"app": "sigma-0009",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1850.0
+},
+{
+"app": "sigma-0009",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1929.1
+},
+{
+"app": "sigma-0009",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1923.2
+},
+{
+"app": "sigma-0009",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 899.7
+},
+{
+"app": "sigma-0009",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 999.1
+},
+{
+"app": "sigma-0009",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 966.9
+},
+{
+"app": "sigma-0009",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 996.5
+},
+{
+"app": "sigma-0009",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 929.4
+},
+{
+"app": "sigma-0009",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 731.8
+},
+{
+"app": "sigma-0009",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 701.0
+},
+{
+"app": "sigma-0009",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 662.1
+},
+{
+"app": "sigma-0009",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 741.7
+},
+{
+"app": "sigma-0009",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 592.1
+},
+{
+"app": "sigma-0010",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3159.4
+},
+{
+"app": "sigma-0010",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2709.0
+},
+{
+"app": "sigma-0010",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2945.5
+},
+{
+"app": "sigma-0010",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3410.7
+},
+{
+"app": "sigma-0010",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3031.5
+},
+{
+"app": "sigma-0010",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2595.7
+},
+{
+"app": "sigma-0010",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2745.7
+},
+{
+"app": "sigma-0010",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2829.8
+},
+{
+"app": "sigma-0010",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2560.2
+},
+{
+"app": "sigma-0010",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2509.0
+},
+{
+"app": "sigma-0010",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2899.8
+},
+{
+"app": "sigma-0010",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2795.8
+},
+{
+"app": "sigma-0010",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2364.5
+},
+{
+"app": "sigma-0010",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2924.9
+},
+{
+"app": "sigma-0010",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2828.7
+},
+{
+"app": "sigma-0010",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2370.4
+},
+{
+"app": "sigma-0010",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2349.0
+},
+{
+"app": "sigma-0010",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2436.4
+},
+{
+"app": "sigma-0010",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2179.1
+},
+{
+"app": "sigma-0010",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2532.0
+},
+{
+"app": "sigma-0010",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1133.0
+},
+{
+"app": "sigma-0010",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1161.2
+},
+{
+"app": "sigma-0010",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1222.2
+},
+{
+"app": "sigma-0010",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1061.1
+},
+{
+"app": "sigma-0010",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1071.3
+},
+{
+"app": "sigma-0010",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1288.0
+},
+{
+"app": "sigma-0010",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1293.0
+},
+{
+"app": "sigma-0010",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1248.8
+},
+{
+"app": "sigma-0010",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1208.6
+},
+{
+"app": "sigma-0010",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1217.5
+},
+{
+"app": "helix-0011",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3682.3
+},
+{
+"app": "helix-0011",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3932.2
+},
+{
+"app": "helix-0011",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3382.1
+},
+{
+"app": "helix-0011",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3673.9
+},
+{
+"app": "helix-0011",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3857.4
+},
+{
+"app": "helix-0011",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3790.5
+},
+{
+"app": "helix-0011",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3987.4
+},
+{
+"app": "helix-0011",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3692.5
+},
+{
+"app": "helix-0011",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4102.1
+},
+{
+"app": "helix-0011",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4027.3
+},
+{
+"app": "helix-0011",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3098.5
+},
+{
+"app": "helix-0011",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3191.2
+},
+{
+"app": "helix-0011",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3211.8
+},
+{
+"app": "helix-0011",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3543.8
+},
+{
+"app": "helix-0011",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3190.3
+},
+{
+"app": "helix-0011",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2358.3
+},
+{
+"app": "helix-0011",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2435.0
+},
+{
+"app": "helix-0011",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2159.2
+},
+{
+"app": "helix-0011",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2289.3
+},
+{
+"app": "helix-0011",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2542.8
+},
+{
+"app": "helix-0011",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1412.8
+},
+{
+"app": "helix-0011",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1410.7
+},
+{
+"app": "helix-0011",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1519.6
+},
+{
+"app": "helix-0011",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1578.1
+},
+{
+"app": "helix-0011",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1514.2
+},
+{
+"app": "helix-0011",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1621.2
+},
+{
+"app": "helix-0011",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1674.5
+},
+{
+"app": "helix-0011",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1598.3
+},
+{
+"app": "helix-0011",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1834.5
+},
+{
+"app": "helix-0011",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1782.5
+},
+{
+"app": "pulse-0012",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3787.3
+},
+{
+"app": "pulse-0012",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3801.9
+},
+{
+"app": "pulse-0012",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3486.2
+},
+{
+"app": "pulse-0012",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3716.1
+},
+{
+"app": "pulse-0012",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3576.3
+},
+{
+"app": "pulse-0012",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2988.8
+},
+{
+"app": "pulse-0012",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3399.2
+},
+{
+"app": "pulse-0012",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3359.2
+},
+{
+"app": "pulse-0012",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3244.6
+},
+{
+"app": "pulse-0012",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3054.3
+},
+{
+"app": "pulse-0012",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3491.4
+},
+{
+"app": "pulse-0012",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3372.7
+},
+{
+"app": "pulse-0012",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3049.8
+},
+{
+"app": "pulse-0012",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3380.3
+},
+{
+"app": "pulse-0012",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3082.9
+},
+{
+"app": "pulse-0012",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1961.6
+},
+{
+"app": "pulse-0012",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1981.6
+},
+{
+"app": "pulse-0012",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2006.6
+},
+{
+"app": "pulse-0012",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1990.3
+},
+{
+"app": "pulse-0012",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1984.9
+},
+{
+"app": "pulse-0012",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1441.1
+},
+{
+"app": "pulse-0012",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1429.8
+},
+{
+"app": "pulse-0012",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1454.2
+},
+{
+"app": "pulse-0012",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1498.9
+},
+{
+"app": "pulse-0012",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1529.8
+},
+{
+"app": "pulse-0012",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1148.4
+},
+{
+"app": "pulse-0012",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 884.6
+},
+{
+"app": "pulse-0012",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1071.0
+},
+{
+"app": "pulse-0012",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1033.4
+},
+{
+"app": "pulse-0012",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1188.6
+},
+{
+"app": "ember-0013",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 600.6
+},
+{
+"app": "ember-0013",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 592.0
+},
+{
+"app": "ember-0013",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 543.7
+},
+{
+"app": "ember-0013",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 586.8
+},
+{
+"app": "ember-0013",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 580.7
+},
+{
+"app": "ember-0013",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 616.8
+},
+{
+"app": "ember-0013",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 577.2
+},
+{
+"app": "ember-0013",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 576.4
+},
+{
+"app": "ember-0013",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 595.0
+},
+{
+"app": "ember-0013",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 618.1
+},
+{
+"app": "ember-0013",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 550.2
+},
+{
+"app": "ember-0013",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 564.7
+},
+{
+"app": "ember-0013",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 506.4
+},
+{
+"app": "ember-0013",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 573.1
+},
+{
+"app": "ember-0013",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 558.1
+},
+{
+"app": "ember-0013",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 410.5
+},
+{
+"app": "ember-0013",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 424.6
+},
+{
+"app": "ember-0013",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 443.0
+},
+{
+"app": "ember-0013",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 372.6
+},
+{
+"app": "ember-0013",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 464.8
+},
+{
+"app": "ember-0013",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 220.9
+},
+{
+"app": "ember-0013",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 225.2
+},
+{
+"app": "ember-0013",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 218.2
+},
+{
+"app": "ember-0013",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 222.6
+},
+{
+"app": "ember-0013",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 229.9
+},
+{
+"app": "ember-0013",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 149.8
+},
+{
+"app": "ember-0013",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 169.0
+},
+{
+"app": "ember-0013",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 167.8
+},
+{
+"app": "ember-0013",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 169.2
+},
+{
+"app": "ember-0013",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 176.0
+},
+{
+"app": "pulse-0014",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4218.1
+},
+{
+"app": "pulse-0014",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4553.2
+},
+{
+"app": "pulse-0014",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4046.1
+},
+{
+"app": "pulse-0014",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4144.4
+},
+{
+"app": "pulse-0014",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4745.0
+},
+{
+"app": "pulse-0014",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4954.9
+},
+{
+"app": "pulse-0014",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4832.0
+},
+{
+"app": "pulse-0014",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4680.4
+},
+{
+"app": "pulse-0014",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4729.0
+},
+{
+"app": "pulse-0014",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4471.9
+},
+{
+"app": "pulse-0014",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4014.6
+},
+{
+"app": "pulse-0014",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4016.2
+},
+{
+"app": "pulse-0014",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4489.3
+},
+{
+"app": "pulse-0014",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4017.7
+},
+{
+"app": "pulse-0014",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3951.8
+},
+{
+"app": "pulse-0014",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4670.5
+},
+{
+"app": "pulse-0014",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4053.0
+},
+{
+"app": "pulse-0014",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4208.3
+},
+{
+"app": "pulse-0014",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3490.0
+},
+{
+"app": "pulse-0014",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 5055.1
+},
+{
+"app": "pulse-0014",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1670.4
+},
+{
+"app": "pulse-0014",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1823.7
+},
+{
+"app": "pulse-0014",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1499.7
+},
+{
+"app": "pulse-0014",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1949.2
+},
+{
+"app": "pulse-0014",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1822.7
+},
+{
+"app": "pulse-0014",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1317.8
+},
+{
+"app": "pulse-0014",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1261.2
+},
+{
+"app": "pulse-0014",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1301.3
+},
+{
+"app": "pulse-0014",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1336.9
+},
+{
+"app": "pulse-0014",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1348.0
+},
+{
+"app": "atlas-0015",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1428.4
+},
+{
+"app": "atlas-0015",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1519.0
+},
+{
+"app": "atlas-0015",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1354.3
+},
+{
+"app": "atlas-0015",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1418.5
+},
+{
+"app": "atlas-0015",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1275.1
+},
+{
+"app": "atlas-0015",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1443.7
+},
+{
+"app": "atlas-0015",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1543.0
+},
+{
+"app": "atlas-0015",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1521.6
+},
+{
+"app": "atlas-0015",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1397.5
+},
+{
+"app": "atlas-0015",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1378.2
+},
+{
+"app": "atlas-0015",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1152.9
+},
+{
+"app": "atlas-0015",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1183.7
+},
+{
+"app": "atlas-0015",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1448.8
+},
+{
+"app": "atlas-0015",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1166.9
+},
+{
+"app": "atlas-0015",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1464.3
+},
+{
+"app": "atlas-0015",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 966.2
+},
+{
+"app": "atlas-0015",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 869.0
+},
+{
+"app": "atlas-0015",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 875.3
+},
+{
+"app": "atlas-0015",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 890.0
+},
+{
+"app": "atlas-0015",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 878.2
+},
+{
+"app": "atlas-0015",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 552.4
+},
+{
+"app": "atlas-0015",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 594.2
+},
+{
+"app": "atlas-0015",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 537.4
+},
+{
+"app": "atlas-0015",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 568.9
+},
+{
+"app": "atlas-0015",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 566.6
+},
+{
+"app": "atlas-0015",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 579.6
+},
+{
+"app": "atlas-0015",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 483.5
+},
+{
+"app": "atlas-0015",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 466.2
+},
+{
+"app": "atlas-0015",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 561.6
+},
+{
+"app": "atlas-0015",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 518.5
+},
+{
+"app": "nimbus-0016",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3398.3
+},
+{
+"app": "nimbus-0016",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3398.2
+},
+{
+"app": "nimbus-0016",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3293.4
+},
+{
+"app": "nimbus-0016",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3032.9
+},
+{
+"app": "nimbus-0016",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3392.1
+},
+{
+"app": "nimbus-0016",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2210.2
+},
+{
+"app": "nimbus-0016",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2114.3
+},
+{
+"app": "nimbus-0016",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2258.0
+},
+{
+"app": "nimbus-0016",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2138.9
+},
+{
+"app": "nimbus-0016",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2210.3
+},
+{
+"app": "nimbus-0016",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2981.2
+},
+{
+"app": "nimbus-0016",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2924.8
+},
+{
+"app": "nimbus-0016",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3244.8
+},
+{
+"app": "nimbus-0016",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3168.3
+},
+{
+"app": "nimbus-0016",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3063.4
+},
+{
+"app": "nimbus-0016",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2247.1
+},
+{
+"app": "nimbus-0016",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2388.2
+},
+{
+"app": "nimbus-0016",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2262.8
+},
+{
+"app": "nimbus-0016",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2276.5
+},
+{
+"app": "nimbus-0016",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2245.9
+},
+{
+"app": "nimbus-0016",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1314.7
+},
+{
+"app": "nimbus-0016",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1342.3
+},
+{
+"app": "nimbus-0016",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1239.4
+},
+{
+"app": "nimbus-0016",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1337.0
+},
+{
+"app": "nimbus-0016",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1356.4
+},
+{
+"app": "nimbus-0016",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1097.4
+},
+{
+"app": "nimbus-0016",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1106.1
+},
+{
+"app": "nimbus-0016",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 982.6
+},
+{
+"app": "nimbus-0016",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1001.8
+},
+{
+"app": "nimbus-0016",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1030.5
+},
+{
+"app": "pulse-0017",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4751.8
+},
+{
+"app": "pulse-0017",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4562.3
+},
+{
+"app": "pulse-0017",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 5229.3
+},
+{
+"app": "pulse-0017",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 5169.5
+},
+{
+"app": "pulse-0017",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4858.4
+},
+{
+"app": "pulse-0017",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3286.2
+},
+{
+"app": "pulse-0017",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3471.7
+},
+{
+"app": "pulse-0017",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3712.3
+},
+{
+"app": "pulse-0017",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3470.0
+},
+{
+"app": "pulse-0017",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3325.7
+},
+{
+"app": "pulse-0017",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4187.6
+},
+{
+"app": "pulse-0017",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4394.4
+},
+{
+"app": "pulse-0017",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4219.9
+},
+{
+"app": "pulse-0017",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4395.6
+},
+{
+"app": "pulse-0017",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 5126.4
+},
+{
+"app": "pulse-0017",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3409.6
+},
+{
+"app": "pulse-0017",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2889.9
+},
+{
+"app": "pulse-0017",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3145.2
+},
+{
+"app": "pulse-0017",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3097.8
+},
+{
+"app": "pulse-0017",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3056.2
+},
+{
+"app": "pulse-0017",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1871.0
+},
+{
+"app": "pulse-0017",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1871.8
+},
+{
+"app": "pulse-0017",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1866.1
+},
+{
+"app": "pulse-0017",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1897.6
+},
+{
+"app": "pulse-0017",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 2056.3
+},
+{
+"app": "pulse-0017",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 2070.9
+},
+{
+"app": "pulse-0017",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1819.5
+},
+{
+"app": "pulse-0017",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1926.3
+},
+{
+"app": "pulse-0017",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1884.0
+},
+{
+"app": "pulse-0017",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 2075.6
+},
+{
+"app": "kernel-0018",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1825.7
+},
+{
+"app": "kernel-0018",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1958.1
+},
+{
+"app": "kernel-0018",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1679.7
+},
+{
+"app": "kernel-0018",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1631.4
+},
+{
+"app": "kernel-0018",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1889.7
+},
+{
+"app": "kernel-0018",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1537.2
+},
+{
+"app": "kernel-0018",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1331.0
+},
+{
+"app": "kernel-0018",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1322.2
+},
+{
+"app": "kernel-0018",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1508.3
+},
+{
+"app": "kernel-0018",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1420.0
+},
+{
+"app": "kernel-0018",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1786.9
+},
+{
+"app": "kernel-0018",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1835.1
+},
+{
+"app": "kernel-0018",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1609.2
+},
+{
+"app": "kernel-0018",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1630.1
+},
+{
+"app": "kernel-0018",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1688.4
+},
+{
+"app": "kernel-0018",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1392.3
+},
+{
+"app": "kernel-0018",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1623.3
+},
+{
+"app": "kernel-0018",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1693.4
+},
+{
+"app": "kernel-0018",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1476.4
+},
+{
+"app": "kernel-0018",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1517.2
+},
+{
+"app": "kernel-0018",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 778.4
+},
+{
+"app": "kernel-0018",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 677.8
+},
+{
+"app": "kernel-0018",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 753.0
+},
+{
+"app": "kernel-0018",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 748.9
+},
+{
+"app": "kernel-0018",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 684.7
+},
+{
+"app": "kernel-0018",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 582.5
+},
+{
+"app": "kernel-0018",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 576.1
+},
+{
+"app": "kernel-0018",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 552.1
+},
+{
+"app": "kernel-0018",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 651.5
+},
+{
+"app": "kernel-0018",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 537.7
+},
+{
+"app": "glide-0019",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3617.9
+},
+{
+"app": "glide-0019",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3511.0
+},
+{
+"app": "glide-0019",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3809.5
+},
+{
+"app": "glide-0019",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3842.5
+},
+{
+"app": "glide-0019",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3648.3
+},
+{
+"app": "glide-0019",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2568.1
+},
+{
+"app": "glide-0019",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2912.4
+},
+{
+"app": "glide-0019",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2895.0
+},
+{
+"app": "glide-0019",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2390.7
+},
+{
+"app": "glide-0019",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2568.1
+},
+{
+"app": "glide-0019",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3220.0
+},
+{
+"app": "glide-0019",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3046.8
+},
+{
+"app": "glide-0019",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3524.7
+},
+{
+"app": "glide-0019",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3325.7
+},
+{
+"app": "glide-0019",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3552.8
+},
+{
+"app": "glide-0019",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3568.2
+},
+{
+"app": "glide-0019",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4356.2
+},
+{
+"app": "glide-0019",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4167.5
+},
+{
+"app": "glide-0019",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3911.5
+},
+{
+"app": "glide-0019",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3874.9
+},
+{
+"app": "glide-0019",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1414.1
+},
+{
+"app": "glide-0019",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1539.1
+},
+{
+"app": "glide-0019",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1427.7
+},
+{
+"app": "glide-0019",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1509.7
+},
+{
+"app": "glide-0019",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1326.8
+},
+{
+"app": "glide-0019",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1395.3
+},
+{
+"app": "glide-0019",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1295.3
+},
+{
+"app": "glide-0019",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1414.3
+},
+{
+"app": "glide-0019",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1405.9
+},
+{
+"app": "glide-0019",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1435.3
+},
+{
+"app": "ember-0020",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4483.6
+},
+{
+"app": "ember-0020",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4096.9
+},
+{
+"app": "ember-0020",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4395.6
+},
+{
+"app": "ember-0020",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3797.4
+},
+{
+"app": "ember-0020",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4143.6
+},
+{
+"app": "ember-0020",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3625.4
+},
+{
+"app": "ember-0020",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3528.2
+},
+{
+"app": "ember-0020",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4138.0
+},
+{
+"app": "ember-0020",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3983.7
+},
+{
+"app": "ember-0020",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3892.3
+},
+{
+"app": "ember-0020",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4422.1
+},
+{
+"app": "ember-0020",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4270.2
+},
+{
+"app": "ember-0020",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4156.9
+},
+{
+"app": "ember-0020",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4013.1
+},
+{
+"app": "ember-0020",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3983.4
+},
+{
+"app": "ember-0020",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3253.1
+},
+{
+"app": "ember-0020",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3328.7
+},
+{
+"app": "ember-0020",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3046.8
+},
+{
+"app": "ember-0020",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3340.4
+},
+{
+"app": "ember-0020",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3477.6
+},
+{
+"app": "ember-0020",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1642.9
+},
+{
+"app": "ember-0020",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1781.1
+},
+{
+"app": "ember-0020",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1665.3
+},
+{
+"app": "ember-0020",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1625.0
+},
+{
+"app": "ember-0020",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 2009.1
+},
+{
+"app": "ember-0020",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1537.7
+},
+{
+"app": "ember-0020",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1491.5
+},
+{
+"app": "ember-0020",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1441.6
+},
+{
+"app": "ember-0020",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1554.4
+},
+{
+"app": "ember-0020",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1534.8
+},
+{
+"app": "beacon-0021",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4046.2
+},
+{
+"app": "beacon-0021",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3814.7
+},
+{
+"app": "beacon-0021",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4057.9
+},
+{
+"app": "beacon-0021",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3839.3
+},
+{
+"app": "beacon-0021",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4051.6
+},
+{
+"app": "beacon-0021",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2217.2
+},
+{
+"app": "beacon-0021",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2113.3
+},
+{
+"app": "beacon-0021",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2133.5
+},
+{
+"app": "beacon-0021",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2129.0
+},
+{
+"app": "beacon-0021",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2154.8
+},
+{
+"app": "beacon-0021",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3832.9
+},
+{
+"app": "beacon-0021",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3664.2
+},
+{
+"app": "beacon-0021",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3446.7
+},
+{
+"app": "beacon-0021",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3684.5
+},
+{
+"app": "beacon-0021",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3783.1
+},
+{
+"app": "beacon-0021",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3943.1
+},
+{
+"app": "beacon-0021",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3834.0
+},
+{
+"app": "beacon-0021",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3800.9
+},
+{
+"app": "beacon-0021",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4218.7
+},
+{
+"app": "beacon-0021",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3952.8
+},
+{
+"app": "beacon-0021",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1386.9
+},
+{
+"app": "beacon-0021",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1560.1
+},
+{
+"app": "beacon-0021",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1515.9
+},
+{
+"app": "beacon-0021",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1584.0
+},
+{
+"app": "beacon-0021",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1711.2
+},
+{
+"app": "beacon-0021",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1706.9
+},
+{
+"app": "beacon-0021",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1823.9
+},
+{
+"app": "beacon-0021",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1803.2
+},
+{
+"app": "beacon-0021",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1628.5
+},
+{
+"app": "beacon-0021",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1846.8
+},
+{
+"app": "helix-0022",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 749.4
+},
+{
+"app": "helix-0022",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 727.9
+},
+{
+"app": "helix-0022",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 790.2
+},
+{
+"app": "helix-0022",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 696.1
+},
+{
+"app": "helix-0022",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 704.3
+},
+{
+"app": "helix-0022",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 678.2
+},
+{
+"app": "helix-0022",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 695.1
+},
+{
+"app": "helix-0022",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 696.8
+},
+{
+"app": "helix-0022",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 724.7
+},
+{
+"app": "helix-0022",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 646.3
+},
+{
+"app": "helix-0022",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 682.5
+},
+{
+"app": "helix-0022",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 622.4
+},
+{
+"app": "helix-0022",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 658.4
+},
+{
+"app": "helix-0022",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 747.0
+},
+{
+"app": "helix-0022",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 695.2
+},
+{
+"app": "helix-0022",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 680.7
+},
+{
+"app": "helix-0022",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 599.7
+},
+{
+"app": "helix-0022",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 669.6
+},
+{
+"app": "helix-0022",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 670.9
+},
+{
+"app": "helix-0022",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 703.7
+},
+{
+"app": "helix-0022",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 301.6
+},
+{
+"app": "helix-0022",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 294.1
+},
+{
+"app": "helix-0022",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 272.5
+},
+{
+"app": "helix-0022",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 268.1
+},
+{
+"app": "helix-0022",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 285.1
+},
+{
+"app": "helix-0022",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 344.1
+},
+{
+"app": "helix-0022",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 417.9
+},
+{
+"app": "helix-0022",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 345.5
+},
+{
+"app": "helix-0022",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 341.0
+},
+{
+"app": "helix-0022",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 378.0
+},
+{
+"app": "spark-0023",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2363.3
+},
+{
+"app": "spark-0023",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2508.2
+},
+{
+"app": "spark-0023",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2463.8
+},
+{
+"app": "spark-0023",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2256.2
+},
+{
+"app": "spark-0023",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2371.0
+},
+{
+"app": "spark-0023",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2034.3
+},
+{
+"app": "spark-0023",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2297.0
+},
+{
+"app": "spark-0023",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1978.6
+},
+{
+"app": "spark-0023",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2245.4
+},
+{
+"app": "spark-0023",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2256.6
+},
+{
+"app": "spark-0023",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2064.2
+},
+{
+"app": "spark-0023",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2331.7
+},
+{
+"app": "spark-0023",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2226.7
+},
+{
+"app": "spark-0023",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2209.6
+},
+{
+"app": "spark-0023",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2250.6
+},
+{
+"app": "spark-0023",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1671.7
+},
+{
+"app": "spark-0023",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1596.1
+},
+{
+"app": "spark-0023",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1686.6
+},
+{
+"app": "spark-0023",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1689.4
+},
+{
+"app": "spark-0023",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1534.3
+},
+{
+"app": "spark-0023",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1011.1
+},
+{
+"app": "spark-0023",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 888.4
+},
+{
+"app": "spark-0023",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1025.7
+},
+{
+"app": "spark-0023",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 990.9
+},
+{
+"app": "spark-0023",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 879.3
+},
+{
+"app": "spark-0023",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 702.4
+},
+{
+"app": "spark-0023",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 743.6
+},
+{
+"app": "spark-0023",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 719.4
+},
+{
+"app": "spark-0023",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 738.9
+},
+{
+"app": "spark-0023",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 777.1
+},
+{
+"app": "drift-0024",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1176.7
+},
+{
+"app": "drift-0024",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1275.0
+},
+{
+"app": "drift-0024",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1314.1
+},
+{
+"app": "drift-0024",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1177.0
+},
+{
+"app": "drift-0024",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1257.9
+},
+{
+"app": "drift-0024",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 883.0
+},
+{
+"app": "drift-0024",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 864.4
+},
+{
+"app": "drift-0024",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 765.9
+},
+{
+"app": "drift-0024",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 860.9
+},
+{
+"app": "drift-0024",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 795.4
+},
+{
+"app": "drift-0024",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1156.6
+},
+{
+"app": "drift-0024",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1145.2
+},
+{
+"app": "drift-0024",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 936.3
+},
+{
+"app": "drift-0024",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1145.5
+},
+{
+"app": "drift-0024",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1150.7
+},
+{
+"app": "drift-0024",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1077.2
+},
+{
+"app": "drift-0024",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1234.6
+},
+{
+"app": "drift-0024",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1171.9
+},
+{
+"app": "drift-0024",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1153.9
+},
+{
+"app": "drift-0024",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1116.7
+},
+{
+"app": "drift-0024",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 467.6
+},
+{
+"app": "drift-0024",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 569.0
+},
+{
+"app": "drift-0024",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 486.0
+},
+{
+"app": "drift-0024",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 486.1
+},
+{
+"app": "drift-0024",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 461.5
+},
+{
+"app": "drift-0024",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 336.2
+},
+{
+"app": "drift-0024",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 337.6
+},
+{
+"app": "drift-0024",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 330.6
+},
+{
+"app": "drift-0024",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 367.5
+},
+{
+"app": "drift-0024",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 343.5
+},
+{
+"app": "anvil-0025",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2961.8
+},
+{
+"app": "anvil-0025",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2924.6
+},
+{
+"app": "anvil-0025",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2807.6
+},
+{
+"app": "anvil-0025",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2924.8
+},
+{
+"app": "anvil-0025",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2816.4
+},
+{
+"app": "anvil-0025",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3024.5
+},
+{
+"app": "anvil-0025",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2651.2
+},
+{
+"app": "anvil-0025",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2942.0
+},
+{
+"app": "anvil-0025",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2734.0
+},
+{
+"app": "anvil-0025",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2951.1
+},
+{
+"app": "anvil-0025",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2769.2
+},
+{
+"app": "anvil-0025",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2788.8
+},
+{
+"app": "anvil-0025",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2801.6
+},
+{
+"app": "anvil-0025",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2682.0
+},
+{
+"app": "anvil-0025",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2731.1
+},
+{
+"app": "anvil-0025",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2943.5
+},
+{
+"app": "anvil-0025",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2805.4
+},
+{
+"app": "anvil-0025",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2741.6
+},
+{
+"app": "anvil-0025",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2690.3
+},
+{
+"app": "anvil-0025",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3243.8
+},
+{
+"app": "anvil-0025",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1038.6
+},
+{
+"app": "anvil-0025",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1194.5
+},
+{
+"app": "anvil-0025",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1077.0
+},
+{
+"app": "anvil-0025",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1254.2
+},
+{
+"app": "anvil-0025",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1180.5
+},
+{
+"app": "anvil-0025",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1095.7
+},
+{
+"app": "anvil-0025",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1122.3
+},
+{
+"app": "anvil-0025",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1148.1
+},
+{
+"app": "anvil-0025",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1084.2
+},
+{
+"app": "anvil-0025",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1040.4
+},
+{
+"app": "beacon-0026",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2929.5
+},
+{
+"app": "beacon-0026",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3051.2
+},
+{
+"app": "beacon-0026",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3498.0
+},
+{
+"app": "beacon-0026",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3207.9
+},
+{
+"app": "beacon-0026",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3747.5
+},
+{
+"app": "beacon-0026",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2588.2
+},
+{
+"app": "beacon-0026",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2688.8
+},
+{
+"app": "beacon-0026",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2764.7
+},
+{
+"app": "beacon-0026",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2841.6
+},
+{
+"app": "beacon-0026",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2518.7
+},
+{
+"app": "beacon-0026",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2979.6
+},
+{
+"app": "beacon-0026",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3087.4
+},
+{
+"app": "beacon-0026",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2913.2
+},
+{
+"app": "beacon-0026",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3014.2
+},
+{
+"app": "beacon-0026",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2904.6
+},
+{
+"app": "beacon-0026",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2661.3
+},
+{
+"app": "beacon-0026",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2649.3
+},
+{
+"app": "beacon-0026",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2751.9
+},
+{
+"app": "beacon-0026",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2809.1
+},
+{
+"app": "beacon-0026",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3014.7
+},
+{
+"app": "beacon-0026",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1267.8
+},
+{
+"app": "beacon-0026",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1333.3
+},
+{
+"app": "beacon-0026",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1445.1
+},
+{
+"app": "beacon-0026",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1396.2
+},
+{
+"app": "beacon-0026",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1275.0
+},
+{
+"app": "beacon-0026",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 936.3
+},
+{
+"app": "beacon-0026",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 847.2
+},
+{
+"app": "beacon-0026",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 949.7
+},
+{
+"app": "beacon-0026",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 886.7
+},
+{
+"app": "beacon-0026",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 878.5
+},
+{
+"app": "falcon-0027",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2915.2
+},
+{
+"app": "falcon-0027",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2816.8
+},
+{
+"app": "falcon-0027",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3119.2
+},
+{
+"app": "falcon-0027",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2894.5
+},
+{
+"app": "falcon-0027",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2878.0
+},
+{
+"app": "falcon-0027",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2390.4
+},
+{
+"app": "falcon-0027",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2449.4
+},
+{
+"app": "falcon-0027",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2360.8
+},
+{
+"app": "falcon-0027",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2520.4
+},
+{
+"app": "falcon-0027",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2272.4
+},
+{
+"app": "falcon-0027",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2651.6
+},
+{
+"app": "falcon-0027",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2697.4
+},
+{
+"app": "falcon-0027",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3087.2
+},
+{
+"app": "falcon-0027",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3031.5
+},
+{
+"app": "falcon-0027",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2714.8
+},
+{
+"app": "falcon-0027",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1867.8
+},
+{
+"app": "falcon-0027",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1880.0
+},
+{
+"app": "falcon-0027",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1957.9
+},
+{
+"app": "falcon-0027",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1830.4
+},
+{
+"app": "falcon-0027",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1983.1
+},
+{
+"app": "falcon-0027",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1066.7
+},
+{
+"app": "falcon-0027",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1127.0
+},
+{
+"app": "falcon-0027",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1222.2
+},
+{
+"app": "falcon-0027",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1269.3
+},
+{
+"app": "falcon-0027",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1203.0
+},
+{
+"app": "falcon-0027",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 971.6
+},
+{
+"app": "falcon-0027",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1037.3
+},
+{
+"app": "falcon-0027",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1119.1
+},
+{
+"app": "falcon-0027",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1043.5
+},
+{
+"app": "falcon-0027",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 933.2
+},
+{
+"app": "omega-0028",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3419.9
+},
+{
+"app": "omega-0028",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3583.1
+},
+{
+"app": "omega-0028",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3611.7
+},
+{
+"app": "omega-0028",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3840.6
+},
+{
+"app": "omega-0028",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3694.8
+},
+{
+"app": "omega-0028",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4033.7
+},
+{
+"app": "omega-0028",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4121.2
+},
+{
+"app": "omega-0028",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3966.7
+},
+{
+"app": "omega-0028",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4066.4
+},
+{
+"app": "omega-0028",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3903.6
+},
+{
+"app": "omega-0028",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3630.1
+},
+{
+"app": "omega-0028",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3639.2
+},
+{
+"app": "omega-0028",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3586.7
+},
+{
+"app": "omega-0028",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3493.8
+},
+{
+"app": "omega-0028",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3594.6
+},
+{
+"app": "omega-0028",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3051.5
+},
+{
+"app": "omega-0028",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3415.2
+},
+{
+"app": "omega-0028",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3167.7
+},
+{
+"app": "omega-0028",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3273.3
+},
+{
+"app": "omega-0028",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3368.7
+},
+{
+"app": "omega-0028",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1693.4
+},
+{
+"app": "omega-0028",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1633.0
+},
+{
+"app": "omega-0028",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1470.1
+},
+{
+"app": "omega-0028",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1469.4
+},
+{
+"app": "omega-0028",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1573.0
+},
+{
+"app": "omega-0028",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1126.7
+},
+{
+"app": "omega-0028",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1025.6
+},
+{
+"app": "omega-0028",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1153.2
+},
+{
+"app": "omega-0028",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1016.5
+},
+{
+"app": "omega-0028",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1086.2
+},
+{
+"app": "orbit-0029",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4216.8
+},
+{
+"app": "orbit-0029",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4491.1
+},
+{
+"app": "orbit-0029",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4007.2
+},
+{
+"app": "orbit-0029",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4789.2
+},
+{
+"app": "orbit-0029",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4505.9
+},
+{
+"app": "orbit-0029",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3763.5
+},
+{
+"app": "orbit-0029",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3623.6
+},
+{
+"app": "orbit-0029",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3225.8
+},
+{
+"app": "orbit-0029",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3662.6
+},
+{
+"app": "orbit-0029",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3399.0
+},
+{
+"app": "orbit-0029",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3967.7
+},
+{
+"app": "orbit-0029",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4102.1
+},
+{
+"app": "orbit-0029",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4128.7
+},
+{
+"app": "orbit-0029",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4375.3
+},
+{
+"app": "orbit-0029",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4374.0
+},
+{
+"app": "orbit-0029",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3463.8
+},
+{
+"app": "orbit-0029",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3682.4
+},
+{
+"app": "orbit-0029",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4008.9
+},
+{
+"app": "orbit-0029",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3795.4
+},
+{
+"app": "orbit-0029",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3524.8
+},
+{
+"app": "orbit-0029",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1780.2
+},
+{
+"app": "orbit-0029",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1920.8
+},
+{
+"app": "orbit-0029",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1821.7
+},
+{
+"app": "orbit-0029",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1859.0
+},
+{
+"app": "orbit-0029",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 2059.3
+},
+{
+"app": "orbit-0029",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1437.3
+},
+{
+"app": "orbit-0029",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1471.5
+},
+{
+"app": "orbit-0029",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1404.0
+},
+{
+"app": "orbit-0029",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1417.1
+},
+{
+"app": "orbit-0029",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1647.4
+},
+{
+"app": "vector-0030",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3365.8
+},
+{
+"app": "vector-0030",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3534.6
+},
+{
+"app": "vector-0030",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3422.6
+},
+{
+"app": "vector-0030",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3599.5
+},
+{
+"app": "vector-0030",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3617.7
+},
+{
+"app": "vector-0030",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2537.3
+},
+{
+"app": "vector-0030",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2613.7
+},
+{
+"app": "vector-0030",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2620.6
+},
+{
+"app": "vector-0030",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2945.3
+},
+{
+"app": "vector-0030",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2793.4
+},
+{
+"app": "vector-0030",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2865.7
+},
+{
+"app": "vector-0030",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3125.0
+},
+{
+"app": "vector-0030",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2953.0
+},
+{
+"app": "vector-0030",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3033.0
+},
+{
+"app": "vector-0030",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3005.2
+},
+{
+"app": "vector-0030",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2617.2
+},
+{
+"app": "vector-0030",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2665.7
+},
+{
+"app": "vector-0030",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2897.3
+},
+{
+"app": "vector-0030",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2671.5
+},
+{
+"app": "vector-0030",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2861.5
+},
+{
+"app": "vector-0030",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1435.0
+},
+{
+"app": "vector-0030",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1354.2
+},
+{
+"app": "vector-0030",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1165.8
+},
+{
+"app": "vector-0030",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1373.2
+},
+{
+"app": "vector-0030",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1477.7
+},
+{
+"app": "vector-0030",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1371.9
+},
+{
+"app": "vector-0030",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1355.0
+},
+{
+"app": "vector-0030",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1316.0
+},
+{
+"app": "vector-0030",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1532.4
+},
+{
+"app": "vector-0030",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1394.1
+},
+{
+"app": "matrix-0031",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2793.8
+},
+{
+"app": "matrix-0031",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3161.8
+},
+{
+"app": "matrix-0031",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2996.1
+},
+{
+"app": "matrix-0031",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2723.2
+},
+{
+"app": "matrix-0031",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2653.5
+},
+{
+"app": "matrix-0031",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2631.5
+},
+{
+"app": "matrix-0031",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2494.9
+},
+{
+"app": "matrix-0031",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2356.3
+},
+{
+"app": "matrix-0031",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2125.9
+},
+{
+"app": "matrix-0031",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2524.8
+},
+{
+"app": "matrix-0031",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2867.0
+},
+{
+"app": "matrix-0031",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2566.7
+},
+{
+"app": "matrix-0031",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2383.0
+},
+{
+"app": "matrix-0031",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2685.1
+},
+{
+"app": "matrix-0031",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2803.0
+},
+{
+"app": "matrix-0031",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1864.6
+},
+{
+"app": "matrix-0031",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1858.4
+},
+{
+"app": "matrix-0031",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1728.0
+},
+{
+"app": "matrix-0031",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1914.0
+},
+{
+"app": "matrix-0031",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1660.1
+},
+{
+"app": "matrix-0031",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1086.1
+},
+{
+"app": "matrix-0031",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1221.8
+},
+{
+"app": "matrix-0031",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1071.1
+},
+{
+"app": "matrix-0031",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1098.5
+},
+{
+"app": "matrix-0031",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 922.4
+},
+{
+"app": "matrix-0031",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 953.9
+},
+{
+"app": "matrix-0031",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 999.0
+},
+{
+"app": "matrix-0031",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 947.5
+},
+{
+"app": "matrix-0031",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 974.5
+},
+{
+"app": "matrix-0031",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1000.6
+},
+{
+"app": "lumen-0032",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2570.5
+},
+{
+"app": "lumen-0032",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2704.5
+},
+{
+"app": "lumen-0032",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2562.8
+},
+{
+"app": "lumen-0032",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2613.9
+},
+{
+"app": "lumen-0032",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2429.5
+},
+{
+"app": "lumen-0032",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2675.3
+},
+{
+"app": "lumen-0032",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2808.2
+},
+{
+"app": "lumen-0032",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2756.7
+},
+{
+"app": "lumen-0032",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2807.0
+},
+{
+"app": "lumen-0032",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2960.4
+},
+{
+"app": "lumen-0032",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2320.8
+},
+{
+"app": "lumen-0032",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2423.8
+},
+{
+"app": "lumen-0032",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2459.8
+},
+{
+"app": "lumen-0032",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2269.9
+},
+{
+"app": "lumen-0032",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2394.1
+},
+{
+"app": "lumen-0032",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2146.6
+},
+{
+"app": "lumen-0032",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1756.9
+},
+{
+"app": "lumen-0032",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1764.1
+},
+{
+"app": "lumen-0032",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1936.9
+},
+{
+"app": "lumen-0032",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1939.9
+},
+{
+"app": "lumen-0032",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 955.5
+},
+{
+"app": "lumen-0032",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1061.0
+},
+{
+"app": "lumen-0032",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1007.8
+},
+{
+"app": "lumen-0032",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1011.5
+},
+{
+"app": "lumen-0032",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 941.0
+},
+{
+"app": "lumen-0032",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 878.4
+},
+{
+"app": "lumen-0032",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 893.4
+},
+{
+"app": "lumen-0032",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 866.2
+},
+{
+"app": "lumen-0032",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 988.9
+},
+{
+"app": "lumen-0032",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 790.5
+},
+{
+"app": "cipher-0033",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3062.5
+},
+{
+"app": "cipher-0033",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2962.1
+},
+{
+"app": "cipher-0033",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2800.6
+},
+{
+"app": "cipher-0033",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3157.7
+},
+{
+"app": "cipher-0033",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2916.1
+},
+{
+"app": "cipher-0033",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1679.9
+},
+{
+"app": "cipher-0033",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1668.7
+},
+{
+"app": "cipher-0033",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1543.5
+},
+{
+"app": "cipher-0033",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1695.4
+},
+{
+"app": "cipher-0033",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1831.1
+},
+{
+"app": "cipher-0033",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2623.5
+},
+{
+"app": "cipher-0033",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2798.5
+},
+{
+"app": "cipher-0033",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2919.5
+},
+{
+"app": "cipher-0033",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2860.9
+},
+{
+"app": "cipher-0033",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2796.4
+},
+{
+"app": "cipher-0033",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2483.9
+},
+{
+"app": "cipher-0033",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2924.8
+},
+{
+"app": "cipher-0033",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2708.9
+},
+{
+"app": "cipher-0033",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3019.8
+},
+{
+"app": "cipher-0033",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2576.4
+},
+{
+"app": "cipher-0033",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1102.9
+},
+{
+"app": "cipher-0033",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1217.5
+},
+{
+"app": "cipher-0033",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1231.6
+},
+{
+"app": "cipher-0033",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1205.9
+},
+{
+"app": "cipher-0033",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1254.8
+},
+{
+"app": "cipher-0033",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 886.2
+},
+{
+"app": "cipher-0033",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 821.2
+},
+{
+"app": "cipher-0033",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 812.2
+},
+{
+"app": "cipher-0033",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 852.2
+},
+{
+"app": "cipher-0033",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 793.4
+},
+{
+"app": "cobalt-0034",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1716.0
+},
+{
+"app": "cobalt-0034",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1603.1
+},
+{
+"app": "cobalt-0034",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1607.3
+},
+{
+"app": "cobalt-0034",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1680.3
+},
+{
+"app": "cobalt-0034",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1827.7
+},
+{
+"app": "cobalt-0034",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1863.4
+},
+{
+"app": "cobalt-0034",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1802.5
+},
+{
+"app": "cobalt-0034",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1739.6
+},
+{
+"app": "cobalt-0034",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1771.6
+},
+{
+"app": "cobalt-0034",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1786.6
+},
+{
+"app": "cobalt-0034",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1637.4
+},
+{
+"app": "cobalt-0034",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1413.9
+},
+{
+"app": "cobalt-0034",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1646.5
+},
+{
+"app": "cobalt-0034",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1593.4
+},
+{
+"app": "cobalt-0034",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1514.4
+},
+{
+"app": "cobalt-0034",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1725.2
+},
+{
+"app": "cobalt-0034",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1701.4
+},
+{
+"app": "cobalt-0034",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1667.0
+},
+{
+"app": "cobalt-0034",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1503.0
+},
+{
+"app": "cobalt-0034",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1683.6
+},
+{
+"app": "cobalt-0034",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 675.2
+},
+{
+"app": "cobalt-0034",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 612.6
+},
+{
+"app": "cobalt-0034",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 695.7
+},
+{
+"app": "cobalt-0034",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 706.4
+},
+{
+"app": "cobalt-0034",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 684.5
+},
+{
+"app": "cobalt-0034",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 669.1
+},
+{
+"app": "cobalt-0034",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 638.7
+},
+{
+"app": "cobalt-0034",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 626.7
+},
+{
+"app": "cobalt-0034",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 673.0
+},
+{
+"app": "cobalt-0034",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 638.5
+},
+{
+"app": "nimbus-0035",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3346.5
+},
+{
+"app": "nimbus-0035",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2907.7
+},
+{
+"app": "nimbus-0035",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3331.0
+},
+{
+"app": "nimbus-0035",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3350.3
+},
+{
+"app": "nimbus-0035",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3763.2
+},
+{
+"app": "nimbus-0035",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3394.3
+},
+{
+"app": "nimbus-0035",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3072.8
+},
+{
+"app": "nimbus-0035",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3181.7
+},
+{
+"app": "nimbus-0035",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3165.5
+},
+{
+"app": "nimbus-0035",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3302.8
+},
+{
+"app": "nimbus-0035",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3043.2
+},
+{
+"app": "nimbus-0035",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3208.6
+},
+{
+"app": "nimbus-0035",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3297.1
+},
+{
+"app": "nimbus-0035",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2653.6
+},
+{
+"app": "nimbus-0035",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2870.2
+},
+{
+"app": "nimbus-0035",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3802.4
+},
+{
+"app": "nimbus-0035",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3529.6
+},
+{
+"app": "nimbus-0035",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4231.6
+},
+{
+"app": "nimbus-0035",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3575.4
+},
+{
+"app": "nimbus-0035",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3953.1
+},
+{
+"app": "nimbus-0035",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1509.3
+},
+{
+"app": "nimbus-0035",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1235.4
+},
+{
+"app": "nimbus-0035",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1403.8
+},
+{
+"app": "nimbus-0035",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1464.3
+},
+{
+"app": "nimbus-0035",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1467.8
+},
+{
+"app": "nimbus-0035",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1181.4
+},
+{
+"app": "nimbus-0035",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1162.1
+},
+{
+"app": "nimbus-0035",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1282.8
+},
+{
+"app": "nimbus-0035",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1185.9
+},
+{
+"app": "nimbus-0035",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1084.3
+},
+{
+"app": "anvil-0036",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1242.1
+},
+{
+"app": "anvil-0036",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1008.7
+},
+{
+"app": "anvil-0036",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1305.5
+},
+{
+"app": "anvil-0036",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1166.1
+},
+{
+"app": "anvil-0036",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1096.7
+},
+{
+"app": "anvil-0036",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 942.1
+},
+{
+"app": "anvil-0036",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 979.1
+},
+{
+"app": "anvil-0036",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1003.2
+},
+{
+"app": "anvil-0036",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 964.3
+},
+{
+"app": "anvil-0036",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 897.7
+},
+{
+"app": "anvil-0036",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1173.8
+},
+{
+"app": "anvil-0036",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1136.0
+},
+{
+"app": "anvil-0036",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1125.8
+},
+{
+"app": "anvil-0036",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1198.6
+},
+{
+"app": "anvil-0036",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1226.4
+},
+{
+"app": "anvil-0036",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1050.2
+},
+{
+"app": "anvil-0036",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1091.2
+},
+{
+"app": "anvil-0036",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1160.4
+},
+{
+"app": "anvil-0036",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1186.7
+},
+{
+"app": "anvil-0036",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1225.7
+},
+{
+"app": "anvil-0036",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 530.5
+},
+{
+"app": "anvil-0036",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 481.1
+},
+{
+"app": "anvil-0036",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 428.3
+},
+{
+"app": "anvil-0036",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 517.6
+},
+{
+"app": "anvil-0036",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 495.1
+},
+{
+"app": "anvil-0036",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 346.2
+},
+{
+"app": "anvil-0036",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 358.7
+},
+{
+"app": "anvil-0036",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 366.7
+},
+{
+"app": "anvil-0036",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 340.2
+},
+{
+"app": "anvil-0036",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 356.1
+},
+{
+"app": "cobalt-0037",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1561.4
+},
+{
+"app": "cobalt-0037",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1578.8
+},
+{
+"app": "cobalt-0037",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1696.1
+},
+{
+"app": "cobalt-0037",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1760.7
+},
+{
+"app": "cobalt-0037",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1697.8
+},
+{
+"app": "cobalt-0037",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1189.6
+},
+{
+"app": "cobalt-0037",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1088.5
+},
+{
+"app": "cobalt-0037",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1197.6
+},
+{
+"app": "cobalt-0037",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1126.7
+},
+{
+"app": "cobalt-0037",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1077.0
+},
+{
+"app": "cobalt-0037",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1495.1
+},
+{
+"app": "cobalt-0037",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1434.1
+},
+{
+"app": "cobalt-0037",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1545.2
+},
+{
+"app": "cobalt-0037",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1644.8
+},
+{
+"app": "cobalt-0037",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1400.4
+},
+{
+"app": "cobalt-0037",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1074.3
+},
+{
+"app": "cobalt-0037",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1131.3
+},
+{
+"app": "cobalt-0037",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1202.0
+},
+{
+"app": "cobalt-0037",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1210.6
+},
+{
+"app": "cobalt-0037",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1128.0
+},
+{
+"app": "cobalt-0037",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 622.9
+},
+{
+"app": "cobalt-0037",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 699.9
+},
+{
+"app": "cobalt-0037",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 709.2
+},
+{
+"app": "cobalt-0037",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 719.7
+},
+{
+"app": "cobalt-0037",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 659.5
+},
+{
+"app": "cobalt-0037",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 574.8
+},
+{
+"app": "cobalt-0037",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 679.9
+},
+{
+"app": "cobalt-0037",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 621.8
+},
+{
+"app": "cobalt-0037",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 615.0
+},
+{
+"app": "cobalt-0037",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 563.0
+},
+{
+"app": "verve-0038",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 5025.1
+},
+{
+"app": "verve-0038",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4266.6
+},
+{
+"app": "verve-0038",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4014.6
+},
+{
+"app": "verve-0038",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4748.5
+},
+{
+"app": "verve-0038",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4462.6
+},
+{
+"app": "verve-0038",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4206.0
+},
+{
+"app": "verve-0038",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4198.6
+},
+{
+"app": "verve-0038",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4050.6
+},
+{
+"app": "verve-0038",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4393.5
+},
+{
+"app": "verve-0038",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4515.8
+},
+{
+"app": "verve-0038",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4101.8
+},
+{
+"app": "verve-0038",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4505.8
+},
+{
+"app": "verve-0038",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4214.8
+},
+{
+"app": "verve-0038",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4389.6
+},
+{
+"app": "verve-0038",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4006.2
+},
+{
+"app": "verve-0038",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4119.6
+},
+{
+"app": "verve-0038",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4140.1
+},
+{
+"app": "verve-0038",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4269.0
+},
+{
+"app": "verve-0038",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3971.0
+},
+{
+"app": "verve-0038",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4069.2
+},
+{
+"app": "verve-0038",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1941.8
+},
+{
+"app": "verve-0038",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1930.0
+},
+{
+"app": "verve-0038",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1963.4
+},
+{
+"app": "verve-0038",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1802.4
+},
+{
+"app": "verve-0038",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1710.6
+},
+{
+"app": "verve-0038",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1459.3
+},
+{
+"app": "verve-0038",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1447.1
+},
+{
+"app": "verve-0038",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1400.2
+},
+{
+"app": "verve-0038",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1517.9
+},
+{
+"app": "verve-0038",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1547.7
+},
+{
+"app": "cobalt-0039",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2068.7
+},
+{
+"app": "cobalt-0039",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1926.8
+},
+{
+"app": "cobalt-0039",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1962.1
+},
+{
+"app": "cobalt-0039",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1763.7
+},
+{
+"app": "cobalt-0039",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2039.5
+},
+{
+"app": "cobalt-0039",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1900.8
+},
+{
+"app": "cobalt-0039",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1838.6
+},
+{
+"app": "cobalt-0039",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1985.4
+},
+{
+"app": "cobalt-0039",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1826.5
+},
+{
+"app": "cobalt-0039",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2086.4
+},
+{
+"app": "cobalt-0039",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1745.9
+},
+{
+"app": "cobalt-0039",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1773.8
+},
+{
+"app": "cobalt-0039",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1917.0
+},
+{
+"app": "cobalt-0039",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1871.9
+},
+{
+"app": "cobalt-0039",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1832.9
+},
+{
+"app": "cobalt-0039",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1908.0
+},
+{
+"app": "cobalt-0039",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1851.5
+},
+{
+"app": "cobalt-0039",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1961.6
+},
+{
+"app": "cobalt-0039",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1946.0
+},
+{
+"app": "cobalt-0039",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1775.7
+},
+{
+"app": "cobalt-0039",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 820.9
+},
+{
+"app": "cobalt-0039",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 811.2
+},
+{
+"app": "cobalt-0039",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 752.8
+},
+{
+"app": "cobalt-0039",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 816.0
+},
+{
+"app": "cobalt-0039",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 850.7
+},
+{
+"app": "cobalt-0039",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 655.2
+},
+{
+"app": "cobalt-0039",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 683.5
+},
+{
+"app": "cobalt-0039",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 606.5
+},
+{
+"app": "cobalt-0039",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 656.8
+},
+{
+"app": "cobalt-0039",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 709.5
+},
+{
+"app": "falcon-0040",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 5044.6
+},
+{
+"app": "falcon-0040",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4949.2
+},
+{
+"app": "falcon-0040",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 5328.4
+},
+{
+"app": "falcon-0040",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4890.7
+},
+{
+"app": "falcon-0040",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4902.1
+},
+{
+"app": "falcon-0040",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4320.0
+},
+{
+"app": "falcon-0040",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4510.1
+},
+{
+"app": "falcon-0040",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4606.5
+},
+{
+"app": "falcon-0040",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4905.2
+},
+{
+"app": "falcon-0040",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4381.5
+},
+{
+"app": "falcon-0040",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4252.6
+},
+{
+"app": "falcon-0040",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4254.5
+},
+{
+"app": "falcon-0040",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4845.1
+},
+{
+"app": "falcon-0040",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3877.8
+},
+{
+"app": "falcon-0040",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4373.6
+},
+{
+"app": "falcon-0040",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3426.6
+},
+{
+"app": "falcon-0040",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3398.5
+},
+{
+"app": "falcon-0040",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3158.5
+},
+{
+"app": "falcon-0040",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3205.7
+},
+{
+"app": "falcon-0040",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2974.3
+},
+{
+"app": "falcon-0040",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1677.0
+},
+{
+"app": "falcon-0040",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1987.0
+},
+{
+"app": "falcon-0040",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1894.0
+},
+{
+"app": "falcon-0040",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1857.4
+},
+{
+"app": "falcon-0040",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1861.5
+},
+{
+"app": "falcon-0040",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1351.8
+},
+{
+"app": "falcon-0040",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1395.5
+},
+{
+"app": "falcon-0040",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1395.9
+},
+{
+"app": "falcon-0040",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1566.4
+},
+{
+"app": "falcon-0040",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1366.0
+},
+{
+"app": "tensor-0041",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1868.0
+},
+{
+"app": "tensor-0041",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1688.7
+},
+{
+"app": "tensor-0041",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1920.0
+},
+{
+"app": "tensor-0041",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1701.0
+},
+{
+"app": "tensor-0041",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2152.8
+},
+{
+"app": "tensor-0041",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1648.2
+},
+{
+"app": "tensor-0041",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1725.3
+},
+{
+"app": "tensor-0041",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1604.2
+},
+{
+"app": "tensor-0041",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1730.2
+},
+{
+"app": "tensor-0041",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1563.6
+},
+{
+"app": "tensor-0041",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1755.8
+},
+{
+"app": "tensor-0041",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1703.8
+},
+{
+"app": "tensor-0041",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1707.2
+},
+{
+"app": "tensor-0041",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1685.8
+},
+{
+"app": "tensor-0041",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1794.7
+},
+{
+"app": "tensor-0041",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1415.7
+},
+{
+"app": "tensor-0041",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1627.4
+},
+{
+"app": "tensor-0041",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1512.2
+},
+{
+"app": "tensor-0041",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1470.4
+},
+{
+"app": "tensor-0041",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1478.0
+},
+{
+"app": "tensor-0041",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 763.3
+},
+{
+"app": "tensor-0041",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 748.4
+},
+{
+"app": "tensor-0041",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 794.9
+},
+{
+"app": "tensor-0041",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 750.7
+},
+{
+"app": "tensor-0041",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 752.9
+},
+{
+"app": "tensor-0041",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 591.6
+},
+{
+"app": "tensor-0041",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 650.1
+},
+{
+"app": "tensor-0041",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 593.6
+},
+{
+"app": "tensor-0041",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 640.5
+},
+{
+"app": "tensor-0041",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 640.8
+},
+{
+"app": "sigma-0042",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4213.2
+},
+{
+"app": "sigma-0042",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3960.6
+},
+{
+"app": "sigma-0042",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3892.1
+},
+{
+"app": "sigma-0042",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4062.0
+},
+{
+"app": "sigma-0042",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4082.9
+},
+{
+"app": "sigma-0042",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3489.6
+},
+{
+"app": "sigma-0042",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3686.7
+},
+{
+"app": "sigma-0042",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4103.0
+},
+{
+"app": "sigma-0042",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3953.7
+},
+{
+"app": "sigma-0042",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3882.2
+},
+{
+"app": "sigma-0042",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3570.1
+},
+{
+"app": "sigma-0042",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3557.2
+},
+{
+"app": "sigma-0042",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4333.9
+},
+{
+"app": "sigma-0042",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3450.2
+},
+{
+"app": "sigma-0042",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4058.9
+},
+{
+"app": "sigma-0042",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2815.9
+},
+{
+"app": "sigma-0042",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2773.2
+},
+{
+"app": "sigma-0042",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2770.4
+},
+{
+"app": "sigma-0042",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2677.9
+},
+{
+"app": "sigma-0042",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2997.1
+},
+{
+"app": "sigma-0042",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1616.4
+},
+{
+"app": "sigma-0042",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1607.5
+},
+{
+"app": "sigma-0042",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1638.1
+},
+{
+"app": "sigma-0042",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1510.8
+},
+{
+"app": "sigma-0042",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1588.9
+},
+{
+"app": "sigma-0042",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1491.0
+},
+{
+"app": "sigma-0042",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1603.9
+},
+{
+"app": "sigma-0042",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1602.2
+},
+{
+"app": "sigma-0042",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1378.4
+},
+{
+"app": "sigma-0042",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1527.4
+},
+{
+"app": "beacon-0043",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4103.0
+},
+{
+"app": "beacon-0043",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3846.3
+},
+{
+"app": "beacon-0043",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3773.2
+},
+{
+"app": "beacon-0043",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3599.6
+},
+{
+"app": "beacon-0043",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3914.4
+},
+{
+"app": "beacon-0043",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3847.5
+},
+{
+"app": "beacon-0043",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4026.8
+},
+{
+"app": "beacon-0043",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4076.5
+},
+{
+"app": "beacon-0043",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4141.2
+},
+{
+"app": "beacon-0043",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3901.7
+},
+{
+"app": "beacon-0043",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3571.9
+},
+{
+"app": "beacon-0043",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3545.1
+},
+{
+"app": "beacon-0043",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3601.6
+},
+{
+"app": "beacon-0043",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3454.9
+},
+{
+"app": "beacon-0043",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3516.0
+},
+{
+"app": "beacon-0043",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2769.1
+},
+{
+"app": "beacon-0043",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2768.7
+},
+{
+"app": "beacon-0043",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2893.9
+},
+{
+"app": "beacon-0043",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3061.6
+},
+{
+"app": "beacon-0043",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2777.5
+},
+{
+"app": "beacon-0043",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1581.7
+},
+{
+"app": "beacon-0043",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1560.2
+},
+{
+"app": "beacon-0043",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1612.0
+},
+{
+"app": "beacon-0043",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1499.6
+},
+{
+"app": "beacon-0043",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1601.5
+},
+{
+"app": "beacon-0043",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1525.1
+},
+{
+"app": "beacon-0043",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1192.0
+},
+{
+"app": "beacon-0043",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1530.1
+},
+{
+"app": "beacon-0043",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1551.5
+},
+{
+"app": "beacon-0043",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1670.7
+},
+{
+"app": "falcon-0044",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 376.0
+},
+{
+"app": "falcon-0044",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 340.3
+},
+{
+"app": "falcon-0044",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 348.9
+},
+{
+"app": "falcon-0044",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 324.6
+},
+{
+"app": "falcon-0044",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 327.5
+},
+{
+"app": "falcon-0044",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 271.0
+},
+{
+"app": "falcon-0044",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 281.7
+},
+{
+"app": "falcon-0044",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 268.1
+},
+{
+"app": "falcon-0044",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 283.1
+},
+{
+"app": "falcon-0044",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 278.4
+},
+{
+"app": "falcon-0044",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 331.5
+},
+{
+"app": "falcon-0044",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 323.6
+},
+{
+"app": "falcon-0044",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 355.2
+},
+{
+"app": "falcon-0044",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 289.1
+},
+{
+"app": "falcon-0044",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 297.4
+},
+{
+"app": "falcon-0044",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 222.0
+},
+{
+"app": "falcon-0044",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 226.5
+},
+{
+"app": "falcon-0044",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 229.9
+},
+{
+"app": "falcon-0044",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 222.3
+},
+{
+"app": "falcon-0044",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 225.2
+},
+{
+"app": "falcon-0044",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 145.4
+},
+{
+"app": "falcon-0044",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 149.1
+},
+{
+"app": "falcon-0044",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 144.8
+},
+{
+"app": "falcon-0044",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 142.4
+},
+{
+"app": "falcon-0044",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 135.0
+},
+{
+"app": "falcon-0044",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 81.7
+},
+{
+"app": "falcon-0044",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 92.4
+},
+{
+"app": "falcon-0044",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 77.2
+},
+{
+"app": "falcon-0044",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 81.5
+},
+{
+"app": "falcon-0044",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 74.3
+},
+{
+"app": "atlas-0045",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4157.8
+},
+{
+"app": "atlas-0045",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4754.0
+},
+{
+"app": "atlas-0045",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4187.3
+},
+{
+"app": "atlas-0045",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 5021.2
+},
+{
+"app": "atlas-0045",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4665.7
+},
+{
+"app": "atlas-0045",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3903.3
+},
+{
+"app": "atlas-0045",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4058.1
+},
+{
+"app": "atlas-0045",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4087.2
+},
+{
+"app": "atlas-0045",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3881.1
+},
+{
+"app": "atlas-0045",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3649.9
+},
+{
+"app": "atlas-0045",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 5114.8
+},
+{
+"app": "atlas-0045",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4120.1
+},
+{
+"app": "atlas-0045",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4115.3
+},
+{
+"app": "atlas-0045",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4281.3
+},
+{
+"app": "atlas-0045",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4407.0
+},
+{
+"app": "atlas-0045",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3301.7
+},
+{
+"app": "atlas-0045",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3231.9
+},
+{
+"app": "atlas-0045",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3447.7
+},
+{
+"app": "atlas-0045",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3604.2
+},
+{
+"app": "atlas-0045",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3488.2
+},
+{
+"app": "atlas-0045",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1942.8
+},
+{
+"app": "atlas-0045",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1947.7
+},
+{
+"app": "atlas-0045",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1905.8
+},
+{
+"app": "atlas-0045",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1977.5
+},
+{
+"app": "atlas-0045",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1938.2
+},
+{
+"app": "atlas-0045",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1814.3
+},
+{
+"app": "atlas-0045",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1740.1
+},
+{
+"app": "atlas-0045",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1751.1
+},
+{
+"app": "atlas-0045",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1703.6
+},
+{
+"app": "atlas-0045",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1751.1
+},
+{
+"app": "atlas-0046",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1683.5
+},
+{
+"app": "atlas-0046",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1803.7
+},
+{
+"app": "atlas-0046",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1950.1
+},
+{
+"app": "atlas-0046",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1667.7
+},
+{
+"app": "atlas-0046",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1901.3
+},
+{
+"app": "atlas-0046",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1031.6
+},
+{
+"app": "atlas-0046",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1007.8
+},
+{
+"app": "atlas-0046",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 780.2
+},
+{
+"app": "atlas-0046",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 965.8
+},
+{
+"app": "atlas-0046",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 917.0
+},
+{
+"app": "atlas-0046",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1587.3
+},
+{
+"app": "atlas-0046",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1545.8
+},
+{
+"app": "atlas-0046",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1582.6
+},
+{
+"app": "atlas-0046",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1746.9
+},
+{
+"app": "atlas-0046",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1684.1
+},
+{
+"app": "atlas-0046",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1625.0
+},
+{
+"app": "atlas-0046",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1691.1
+},
+{
+"app": "atlas-0046",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1738.4
+},
+{
+"app": "atlas-0046",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1709.3
+},
+{
+"app": "atlas-0046",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1649.5
+},
+{
+"app": "atlas-0046",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 666.7
+},
+{
+"app": "atlas-0046",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 679.4
+},
+{
+"app": "atlas-0046",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 674.6
+},
+{
+"app": "atlas-0046",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 632.1
+},
+{
+"app": "atlas-0046",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 638.9
+},
+{
+"app": "atlas-0046",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 574.6
+},
+{
+"app": "atlas-0046",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 509.9
+},
+{
+"app": "atlas-0046",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 503.6
+},
+{
+"app": "atlas-0046",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 544.8
+},
+{
+"app": "atlas-0046",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 593.1
+},
+{
+"app": "ember-0047",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2037.2
+},
+{
+"app": "ember-0047",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2347.2
+},
+{
+"app": "ember-0047",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2160.1
+},
+{
+"app": "ember-0047",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2292.4
+},
+{
+"app": "ember-0047",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2254.4
+},
+{
+"app": "ember-0047",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2438.4
+},
+{
+"app": "ember-0047",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2607.3
+},
+{
+"app": "ember-0047",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2362.6
+},
+{
+"app": "ember-0047",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2334.8
+},
+{
+"app": "ember-0047",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2485.4
+},
+{
+"app": "ember-0047",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2122.3
+},
+{
+"app": "ember-0047",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2039.1
+},
+{
+"app": "ember-0047",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2250.3
+},
+{
+"app": "ember-0047",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2064.3
+},
+{
+"app": "ember-0047",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2196.0
+},
+{
+"app": "ember-0047",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1904.2
+},
+{
+"app": "ember-0047",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1905.6
+},
+{
+"app": "ember-0047",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1812.6
+},
+{
+"app": "ember-0047",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1987.5
+},
+{
+"app": "ember-0047",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2250.5
+},
+{
+"app": "ember-0047",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 919.6
+},
+{
+"app": "ember-0047",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 800.0
+},
+{
+"app": "ember-0047",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 944.6
+},
+{
+"app": "ember-0047",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 940.2
+},
+{
+"app": "ember-0047",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1003.8
+},
+{
+"app": "ember-0047",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 879.3
+},
+{
+"app": "ember-0047",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 941.4
+},
+{
+"app": "ember-0047",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 945.7
+},
+{
+"app": "ember-0047",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 957.8
+},
+{
+"app": "ember-0047",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 950.0
+},
+{
+"app": "lambda-0048",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 475.9
+},
+{
+"app": "lambda-0048",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 510.9
+},
+{
+"app": "lambda-0048",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 566.8
+},
+{
+"app": "lambda-0048",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 474.7
+},
+{
+"app": "lambda-0048",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 522.0
+},
+{
+"app": "lambda-0048",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 546.7
+},
+{
+"app": "lambda-0048",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 516.9
+},
+{
+"app": "lambda-0048",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 524.1
+},
+{
+"app": "lambda-0048",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 577.8
+},
+{
+"app": "lambda-0048",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 569.0
+},
+{
+"app": "lambda-0048",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 477.8
+},
+{
+"app": "lambda-0048",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 438.4
+},
+{
+"app": "lambda-0048",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 472.9
+},
+{
+"app": "lambda-0048",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 520.8
+},
+{
+"app": "lambda-0048",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 500.0
+},
+{
+"app": "lambda-0048",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 416.9
+},
+{
+"app": "lambda-0048",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 397.5
+},
+{
+"app": "lambda-0048",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 435.8
+},
+{
+"app": "lambda-0048",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 458.4
+},
+{
+"app": "lambda-0048",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 438.9
+},
+{
+"app": "lambda-0048",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 208.7
+},
+{
+"app": "lambda-0048",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 215.5
+},
+{
+"app": "lambda-0048",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 207.1
+},
+{
+"app": "lambda-0048",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 219.8
+},
+{
+"app": "lambda-0048",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 187.0
+},
+{
+"app": "lambda-0048",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 175.3
+},
+{
+"app": "lambda-0048",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 174.9
+},
+{
+"app": "lambda-0048",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 155.3
+},
+{
+"app": "lambda-0048",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 183.4
+},
+{
+"app": "lambda-0048",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 154.2
+},
+{
+"app": "verve-0049",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 596.4
+},
+{
+"app": "verve-0049",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 586.6
+},
+{
+"app": "verve-0049",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 585.7
+},
+{
+"app": "verve-0049",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 709.6
+},
+{
+"app": "verve-0049",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 670.9
+},
+{
+"app": "verve-0049",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 407.8
+},
+{
+"app": "verve-0049",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 437.9
+},
+{
+"app": "verve-0049",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 412.8
+},
+{
+"app": "verve-0049",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 429.3
+},
+{
+"app": "verve-0049",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 378.5
+},
+{
+"app": "verve-0049",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 505.0
+},
+{
+"app": "verve-0049",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 561.1
+},
+{
+"app": "verve-0049",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 554.1
+},
+{
+"app": "verve-0049",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 588.6
+},
+{
+"app": "verve-0049",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 630.7
+},
+{
+"app": "verve-0049",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 644.8
+},
+{
+"app": "verve-0049",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 664.8
+},
+{
+"app": "verve-0049",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 650.6
+},
+{
+"app": "verve-0049",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 629.3
+},
+{
+"app": "verve-0049",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 619.7
+},
+{
+"app": "verve-0049",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 240.3
+},
+{
+"app": "verve-0049",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 240.6
+},
+{
+"app": "verve-0049",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 255.2
+},
+{
+"app": "verve-0049",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 249.8
+},
+{
+"app": "verve-0049",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 256.1
+},
+{
+"app": "verve-0049",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 277.2
+},
+{
+"app": "verve-0049",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 271.8
+},
+{
+"app": "verve-0049",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 234.9
+},
+{
+"app": "verve-0049",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 255.7
+},
+{
+"app": "verve-0049",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 259.5
+},
+{
+"app": "sigma-0050",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2114.1
+},
+{
+"app": "sigma-0050",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2084.9
+},
+{
+"app": "sigma-0050",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2281.5
+},
+{
+"app": "sigma-0050",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2354.3
+},
+{
+"app": "sigma-0050",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2194.3
+},
+{
+"app": "sigma-0050",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2090.2
+},
+{
+"app": "sigma-0050",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2027.9
+},
+{
+"app": "sigma-0050",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2025.6
+},
+{
+"app": "sigma-0050",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2067.3
+},
+{
+"app": "sigma-0050",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2189.6
+},
+{
+"app": "sigma-0050",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2172.9
+},
+{
+"app": "sigma-0050",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1912.5
+},
+{
+"app": "sigma-0050",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1783.2
+},
+{
+"app": "sigma-0050",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2140.0
+},
+{
+"app": "sigma-0050",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1904.5
+},
+{
+"app": "sigma-0050",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1735.0
+},
+{
+"app": "sigma-0050",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1544.5
+},
+{
+"app": "sigma-0050",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1566.9
+},
+{
+"app": "sigma-0050",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1724.1
+},
+{
+"app": "sigma-0050",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1670.3
+},
+{
+"app": "sigma-0050",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 952.3
+},
+{
+"app": "sigma-0050",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 938.4
+},
+{
+"app": "sigma-0050",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 882.9
+},
+{
+"app": "sigma-0050",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 868.2
+},
+{
+"app": "sigma-0050",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 820.0
+},
+{
+"app": "sigma-0050",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 761.3
+},
+{
+"app": "sigma-0050",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 806.6
+},
+{
+"app": "sigma-0050",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 825.0
+},
+{
+"app": "sigma-0050",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 831.2
+},
+{
+"app": "sigma-0050",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 759.2
+},
+{
+"app": "prism-0051",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 741.6
+},
+{
+"app": "prism-0051",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 641.5
+},
+{
+"app": "prism-0051",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 738.0
+},
+{
+"app": "prism-0051",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 726.9
+},
+{
+"app": "prism-0051",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 662.8
+},
+{
+"app": "prism-0051",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 723.8
+},
+{
+"app": "prism-0051",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 717.2
+},
+{
+"app": "prism-0051",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 707.8
+},
+{
+"app": "prism-0051",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 771.6
+},
+{
+"app": "prism-0051",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 726.1
+},
+{
+"app": "prism-0051",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 525.6
+},
+{
+"app": "prism-0051",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 665.8
+},
+{
+"app": "prism-0051",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 563.8
+},
+{
+"app": "prism-0051",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 623.8
+},
+{
+"app": "prism-0051",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 615.5
+},
+{
+"app": "prism-0051",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 480.1
+},
+{
+"app": "prism-0051",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 472.3
+},
+{
+"app": "prism-0051",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 432.9
+},
+{
+"app": "prism-0051",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 463.6
+},
+{
+"app": "prism-0051",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 459.0
+},
+{
+"app": "prism-0051",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 276.6
+},
+{
+"app": "prism-0051",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 279.3
+},
+{
+"app": "prism-0051",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 280.4
+},
+{
+"app": "prism-0051",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 258.9
+},
+{
+"app": "prism-0051",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 278.6
+},
+{
+"app": "prism-0051",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 248.0
+},
+{
+"app": "prism-0051",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 234.6
+},
+{
+"app": "prism-0051",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 233.9
+},
+{
+"app": "prism-0051",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 251.1
+},
+{
+"app": "prism-0051",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 230.8
+},
+{
+"app": "kernel-0052",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2590.2
+},
+{
+"app": "kernel-0052",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2779.6
+},
+{
+"app": "kernel-0052",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2515.9
+},
+{
+"app": "kernel-0052",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2921.9
+},
+{
+"app": "kernel-0052",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2848.2
+},
+{
+"app": "kernel-0052",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2251.4
+},
+{
+"app": "kernel-0052",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1962.4
+},
+{
+"app": "kernel-0052",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1886.9
+},
+{
+"app": "kernel-0052",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1761.3
+},
+{
+"app": "kernel-0052",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2099.5
+},
+{
+"app": "kernel-0052",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2635.8
+},
+{
+"app": "kernel-0052",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2439.3
+},
+{
+"app": "kernel-0052",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2588.7
+},
+{
+"app": "kernel-0052",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2365.7
+},
+{
+"app": "kernel-0052",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2550.5
+},
+{
+"app": "kernel-0052",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1959.8
+},
+{
+"app": "kernel-0052",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1728.7
+},
+{
+"app": "kernel-0052",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2028.1
+},
+{
+"app": "kernel-0052",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1909.9
+},
+{
+"app": "kernel-0052",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1833.8
+},
+{
+"app": "kernel-0052",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1117.3
+},
+{
+"app": "kernel-0052",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1184.4
+},
+{
+"app": "kernel-0052",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1056.4
+},
+{
+"app": "kernel-0052",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1271.8
+},
+{
+"app": "kernel-0052",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1207.2
+},
+{
+"app": "kernel-0052",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 752.8
+},
+{
+"app": "kernel-0052",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 762.0
+},
+{
+"app": "kernel-0052",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 773.9
+},
+{
+"app": "kernel-0052",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 836.6
+},
+{
+"app": "kernel-0052",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 729.2
+},
+{
+"app": "flux-0053",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3936.8
+},
+{
+"app": "flux-0053",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4175.7
+},
+{
+"app": "flux-0053",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 4087.6
+},
+{
+"app": "flux-0053",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3987.2
+},
+{
+"app": "flux-0053",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3644.2
+},
+{
+"app": "flux-0053",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3507.8
+},
+{
+"app": "flux-0053",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3040.9
+},
+{
+"app": "flux-0053",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3530.5
+},
+{
+"app": "flux-0053",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3746.9
+},
+{
+"app": "flux-0053",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3673.6
+},
+{
+"app": "flux-0053",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 4093.1
+},
+{
+"app": "flux-0053",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3398.4
+},
+{
+"app": "flux-0053",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3582.7
+},
+{
+"app": "flux-0053",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3287.2
+},
+{
+"app": "flux-0053",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3336.5
+},
+{
+"app": "flux-0053",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4234.4
+},
+{
+"app": "flux-0053",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3937.5
+},
+{
+"app": "flux-0053",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4131.4
+},
+{
+"app": "flux-0053",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4002.6
+},
+{
+"app": "flux-0053",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 4156.0
+},
+{
+"app": "flux-0053",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1559.9
+},
+{
+"app": "flux-0053",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1519.2
+},
+{
+"app": "flux-0053",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1550.5
+},
+{
+"app": "flux-0053",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1568.4
+},
+{
+"app": "flux-0053",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1634.2
+},
+{
+"app": "flux-0053",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1068.4
+},
+{
+"app": "flux-0053",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1121.9
+},
+{
+"app": "flux-0053",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1016.0
+},
+{
+"app": "flux-0053",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1045.8
+},
+{
+"app": "flux-0053",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1019.2
+},
+{
+"app": "beacon-0054",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1756.4
+},
+{
+"app": "beacon-0054",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1581.1
+},
+{
+"app": "beacon-0054",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1552.0
+},
+{
+"app": "beacon-0054",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1690.1
+},
+{
+"app": "beacon-0054",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1597.1
+},
+{
+"app": "beacon-0054",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1624.0
+},
+{
+"app": "beacon-0054",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1503.2
+},
+{
+"app": "beacon-0054",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1673.7
+},
+{
+"app": "beacon-0054",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1703.0
+},
+{
+"app": "beacon-0054",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1544.8
+},
+{
+"app": "beacon-0054",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1456.3
+},
+{
+"app": "beacon-0054",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1455.9
+},
+{
+"app": "beacon-0054",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1454.9
+},
+{
+"app": "beacon-0054",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1469.1
+},
+{
+"app": "beacon-0054",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1644.6
+},
+{
+"app": "beacon-0054",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1349.4
+},
+{
+"app": "beacon-0054",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1197.3
+},
+{
+"app": "beacon-0054",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1354.2
+},
+{
+"app": "beacon-0054",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1261.3
+},
+{
+"app": "beacon-0054",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1313.6
+},
+{
+"app": "beacon-0054",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 699.8
+},
+{
+"app": "beacon-0054",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 675.0
+},
+{
+"app": "beacon-0054",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 688.0
+},
+{
+"app": "beacon-0054",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 623.0
+},
+{
+"app": "beacon-0054",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 720.2
+},
+{
+"app": "beacon-0054",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 508.2
+},
+{
+"app": "beacon-0054",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 486.2
+},
+{
+"app": "beacon-0054",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 560.5
+},
+{
+"app": "beacon-0054",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 537.2
+},
+{
+"app": "beacon-0054",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 567.9
+},
+{
+"app": "glide-0055",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3509.5
+},
+{
+"app": "glide-0055",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3932.8
+},
+{
+"app": "glide-0055",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3988.1
+},
+{
+"app": "glide-0055",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3927.5
+},
+{
+"app": "glide-0055",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3614.4
+},
+{
+"app": "glide-0055",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3176.1
+},
+{
+"app": "glide-0055",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3343.6
+},
+{
+"app": "glide-0055",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3003.2
+},
+{
+"app": "glide-0055",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3135.6
+},
+{
+"app": "glide-0055",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2961.3
+},
+{
+"app": "glide-0055",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3352.0
+},
+{
+"app": "glide-0055",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3463.1
+},
+{
+"app": "glide-0055",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3515.6
+},
+{
+"app": "glide-0055",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3431.6
+},
+{
+"app": "glide-0055",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3233.1
+},
+{
+"app": "glide-0055",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3102.3
+},
+{
+"app": "glide-0055",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2925.8
+},
+{
+"app": "glide-0055",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2745.9
+},
+{
+"app": "glide-0055",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2849.1
+},
+{
+"app": "glide-0055",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3270.6
+},
+{
+"app": "glide-0055",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1460.5
+},
+{
+"app": "glide-0055",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1515.3
+},
+{
+"app": "glide-0055",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1451.3
+},
+{
+"app": "glide-0055",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1469.9
+},
+{
+"app": "glide-0055",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1436.8
+},
+{
+"app": "glide-0055",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1228.6
+},
+{
+"app": "glide-0055",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1197.5
+},
+{
+"app": "glide-0055",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1216.1
+},
+{
+"app": "glide-0055",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1222.3
+},
+{
+"app": "glide-0055",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1231.3
+},
+{
+"app": "delta-0056",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3399.6
+},
+{
+"app": "delta-0056",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3546.2
+},
+{
+"app": "delta-0056",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3364.7
+},
+{
+"app": "delta-0056",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2855.8
+},
+{
+"app": "delta-0056",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3137.9
+},
+{
+"app": "delta-0056",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3642.5
+},
+{
+"app": "delta-0056",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3636.8
+},
+{
+"app": "delta-0056",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 4010.1
+},
+{
+"app": "delta-0056",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3524.9
+},
+{
+"app": "delta-0056",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3652.2
+},
+{
+"app": "delta-0056",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3004.8
+},
+{
+"app": "delta-0056",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2832.3
+},
+{
+"app": "delta-0056",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2797.8
+},
+{
+"app": "delta-0056",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2550.3
+},
+{
+"app": "delta-0056",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3082.2
+},
+{
+"app": "delta-0056",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2603.6
+},
+{
+"app": "delta-0056",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2668.2
+},
+{
+"app": "delta-0056",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2467.7
+},
+{
+"app": "delta-0056",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2636.3
+},
+{
+"app": "delta-0056",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2480.8
+},
+{
+"app": "delta-0056",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1340.4
+},
+{
+"app": "delta-0056",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1364.2
+},
+{
+"app": "delta-0056",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1359.9
+},
+{
+"app": "delta-0056",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1310.2
+},
+{
+"app": "delta-0056",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1283.0
+},
+{
+"app": "delta-0056",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1036.9
+},
+{
+"app": "delta-0056",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1028.1
+},
+{
+"app": "delta-0056",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 919.5
+},
+{
+"app": "delta-0056",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 893.3
+},
+{
+"app": "delta-0056",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 977.6
+},
+{
+"app": "omega-0057",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3457.0
+},
+{
+"app": "omega-0057",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3431.5
+},
+{
+"app": "omega-0057",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3580.8
+},
+{
+"app": "omega-0057",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3446.2
+},
+{
+"app": "omega-0057",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 3464.4
+},
+{
+"app": "omega-0057",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3363.6
+},
+{
+"app": "omega-0057",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3375.1
+},
+{
+"app": "omega-0057",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3230.5
+},
+{
+"app": "omega-0057",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3237.2
+},
+{
+"app": "omega-0057",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 3465.7
+},
+{
+"app": "omega-0057",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2964.0
+},
+{
+"app": "omega-0057",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3328.1
+},
+{
+"app": "omega-0057",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3523.0
+},
+{
+"app": "omega-0057",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3027.3
+},
+{
+"app": "omega-0057",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 3242.4
+},
+{
+"app": "omega-0057",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3820.1
+},
+{
+"app": "omega-0057",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3483.1
+},
+{
+"app": "omega-0057",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3457.7
+},
+{
+"app": "omega-0057",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3771.7
+},
+{
+"app": "omega-0057",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 3975.9
+},
+{
+"app": "omega-0057",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1400.1
+},
+{
+"app": "omega-0057",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1419.6
+},
+{
+"app": "omega-0057",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1461.0
+},
+{
+"app": "omega-0057",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1296.8
+},
+{
+"app": "omega-0057",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1297.7
+},
+{
+"app": "omega-0057",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 1022.4
+},
+{
+"app": "omega-0057",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 925.3
+},
+{
+"app": "omega-0057",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 893.3
+},
+{
+"app": "omega-0057",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 896.7
+},
+{
+"app": "omega-0057",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 917.0
+},
+{
+"app": "vertex-0058",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2490.0
+},
+{
+"app": "vertex-0058",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2470.7
+},
+{
+"app": "vertex-0058",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2402.5
+},
+{
+"app": "vertex-0058",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2489.1
+},
+{
+"app": "vertex-0058",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 2749.2
+},
+{
+"app": "vertex-0058",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2433.6
+},
+{
+"app": "vertex-0058",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2485.0
+},
+{
+"app": "vertex-0058",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2799.7
+},
+{
+"app": "vertex-0058",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2649.8
+},
+{
+"app": "vertex-0058",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 2364.5
+},
+{
+"app": "vertex-0058",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2130.8
+},
+{
+"app": "vertex-0058",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2384.5
+},
+{
+"app": "vertex-0058",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1954.6
+},
+{
+"app": "vertex-0058",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2167.9
+},
+{
+"app": "vertex-0058",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 2434.4
+},
+{
+"app": "vertex-0058",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2325.3
+},
+{
+"app": "vertex-0058",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2306.5
+},
+{
+"app": "vertex-0058",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2419.8
+},
+{
+"app": "vertex-0058",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2412.4
+},
+{
+"app": "vertex-0058",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 2343.9
+},
+{
+"app": "vertex-0058",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1111.9
+},
+{
+"app": "vertex-0058",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1093.4
+},
+{
+"app": "vertex-0058",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 1022.9
+},
+{
+"app": "vertex-0058",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 933.2
+},
+{
+"app": "vertex-0058",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 970.9
+},
+{
+"app": "vertex-0058",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 767.4
+},
+{
+"app": "vertex-0058",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 804.1
+},
+{
+"app": "vertex-0058",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 856.7
+},
+{
+"app": "vertex-0058",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 756.5
+},
+{
+"app": "vertex-0058",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 788.1
+},
+{
+"app": "vertex-0059",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1277.8
+},
+{
+"app": "vertex-0059",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1336.8
+},
+{
+"app": "vertex-0059",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1219.4
+},
+{
+"app": "vertex-0059",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1224.5
+},
+{
+"app": "vertex-0059",
+"platform": "Intel",
+"revision": "before",
+"timeNs": 1258.0
+},
+{
+"app": "vertex-0059",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 938.7
+},
+{
+"app": "vertex-0059",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 1131.1
+},
+{
+"app": "vertex-0059",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 937.1
+},
+{
+"app": "vertex-0059",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 997.5
+},
+{
+"app": "vertex-0059",
+"platform": "Intel",
+"revision": "after",
+"timeNs": 965.1
+},
+{
+"app": "vertex-0059",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1115.6
+},
+{
+"app": "vertex-0059",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1114.3
+},
+{
+"app": "vertex-0059",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1280.5
+},
+{
+"app": "vertex-0059",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1141.0
+},
+{
+"app": "vertex-0059",
+"platform": "AMD",
+"revision": "before",
+"timeNs": 1095.4
+},
+{
+"app": "vertex-0059",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1272.6
+},
+{
+"app": "vertex-0059",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1288.0
+},
+{
+"app": "vertex-0059",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1215.7
+},
+{
+"app": "vertex-0059",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1259.0
+},
+{
+"app": "vertex-0059",
+"platform": "AMD",
+"revision": "after",
+"timeNs": 1256.9
+},
+{
+"app": "vertex-0059",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 522.9
+},
+{
+"app": "vertex-0059",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 524.9
+},
+{
+"app": "vertex-0059",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 496.0
+},
+{
+"app": "vertex-0059",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 523.8
+},
+{
+"app": "vertex-0059",
+"platform": "GPU",
+"revision": "before",
+"timeNs": 493.3
+},
+{
+"app": "vertex-0059",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 529.6
+},
+{
+"app": "vertex-0059",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 507.0
+},
+{
+"app": "vertex-0059",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 482.2
+},
+{
+"app": "vertex-0059",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 531.7
+},
+{
+"app": "vertex-0059",
+"platform": "GPU",
+"revision": "after",
+"timeNs": 449.7
+}
+]

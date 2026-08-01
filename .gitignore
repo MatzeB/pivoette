@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Python (dev-time data generators)
+__pycache__/
+*.pyc
+.venv/
+
+# Large generated stress fixture (regenerate via generate.py --stress)
+demo/examples/**/stress.json

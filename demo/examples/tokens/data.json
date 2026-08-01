@@ -1,0 +1,1352 @@
+[
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "opus-4.8",
+"inputTokens": 2487716,
+"outputTokens": 925715,
+"cachedTokens": 460171,
+"costUsd": 44.2989
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "opus-4.8",
+"inputTokens": 2535024,
+"outputTokens": 854370,
+"cachedTokens": 736236,
+"costUsd": 39.7974
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "opus-4.8",
+"inputTokens": 2542068,
+"outputTokens": 270943,
+"cachedTokens": 1064451,
+"costUsd": 26.2284
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "opus-4.8",
+"inputTokens": 1089809,
+"outputTokens": 409105,
+"cachedTokens": 104482,
+"costUsd": 20.9165
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "sonnet-4.6",
+"inputTokens": 2271008,
+"outputTokens": 1176906,
+"cachedTokens": 540900,
+"costUsd": 8.721
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "sonnet-4.6",
+"inputTokens": 2682446,
+"outputTokens": 1423067,
+"cachedTokens": 311059,
+"costUsd": 11.3834
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "sonnet-4.6",
+"inputTokens": 637950,
+"outputTokens": 340679,
+"cachedTokens": 166881,
+"costUsd": 2.4352
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "sonnet-4.6",
+"inputTokens": 3111035,
+"outputTokens": 334664,
+"cachedTokens": 1209002,
+"costUsd": 6.7101
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "sonnet-4.6",
+"inputTokens": 670571,
+"outputTokens": 321280,
+"cachedTokens": 198187,
+"costUsd": 2.381
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "sonnet-4.6",
+"inputTokens": 1265608,
+"outputTokens": 620196,
+"cachedTokens": 521158,
+"costUsd": 4.0939
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "haiku-4.5",
+"inputTokens": 1984853,
+"outputTokens": 788730,
+"cachedTokens": 913187,
+"costUsd": 1.4883
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "haiku-4.5",
+"inputTokens": 1627748,
+"outputTokens": 743986,
+"cachedTokens": 749658,
+"costUsd": 1.2977
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "haiku-4.5",
+"inputTokens": 1658596,
+"outputTokens": 769693,
+"cachedTokens": 478430,
+"costUsd": 1.5599
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "haiku-4.5",
+"inputTokens": 3926135,
+"outputTokens": 655957,
+"cachedTokens": 717539,
+"costUsd": 3.0916
+},
+{
+"team": "Platform",
+"project": "api-gateway",
+"model": "haiku-4.5",
+"inputTokens": 152519,
+"outputTokens": 25620,
+"cachedTokens": 16547,
+"costUsd": 0.1293
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "opus-4.8",
+"inputTokens": 3269247,
+"outputTokens": 1351258,
+"cachedTokens": 492064,
+"costUsd": 61.9266
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "opus-4.8",
+"inputTokens": 2129531,
+"outputTokens": 1100410,
+"cachedTokens": 611199,
+"costUsd": 39.2811
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "opus-4.8",
+"inputTokens": 2242190,
+"outputTokens": 880142,
+"cachedTokens": 655001,
+"costUsd": 37.01
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "opus-4.8",
+"inputTokens": 3794497,
+"outputTokens": 1018376,
+"cachedTokens": 1737368,
+"costUsd": 46.1326
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "opus-4.8",
+"inputTokens": 122210,
+"outputTokens": 64551,
+"cachedTokens": 60554,
+"costUsd": 1.8931
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "opus-4.8",
+"inputTokens": 2817525,
+"outputTokens": 1261638,
+"cachedTokens": 984183,
+"costUsd": 46.4247
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "sonnet-4.6",
+"inputTokens": 2274331,
+"outputTokens": 1256222,
+"cachedTokens": 647169,
+"costUsd": 8.6502
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "sonnet-4.6",
+"inputTokens": 2995965,
+"outputTokens": 1281540,
+"cachedTokens": 948186,
+"costUsd": 9.988
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "sonnet-4.6",
+"inputTokens": 2407569,
+"outputTokens": 562269,
+"cachedTokens": 149792,
+"costUsd": 8.4601
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "sonnet-4.6",
+"inputTokens": 2023660,
+"outputTokens": 1066410,
+"cachedTokens": 1001515,
+"costUsd": 6.2657
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "sonnet-4.6",
+"inputTokens": 373271,
+"outputTokens": 101544,
+"cachedTokens": 12432,
+"costUsd": 1.3871
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "haiku-4.5",
+"inputTokens": 86411,
+"outputTokens": 21338,
+"cachedTokens": 33216,
+"costUsd": 0.0596
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "haiku-4.5",
+"inputTokens": 3662650,
+"outputTokens": 584041,
+"cachedTokens": 1107930,
+"costUsd": 2.511
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "haiku-4.5",
+"inputTokens": 3196526,
+"outputTokens": 391478,
+"cachedTokens": 1148256,
+"costUsd": 1.9518
+},
+{
+"team": "Platform",
+"project": "ingest",
+"model": "haiku-4.5",
+"inputTokens": 1390122,
+"outputTokens": 521887,
+"cachedTokens": 640764,
+"costUsd": 1.017
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "opus-4.8",
+"inputTokens": 2121886,
+"outputTokens": 462519,
+"cachedTokens": 38207,
+"costUsd": 38.193
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "opus-4.8",
+"inputTokens": 32336,
+"outputTokens": 4478,
+"cachedTokens": 9696,
+"costUsd": 0.4068
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "opus-4.8",
+"inputTokens": 133607,
+"outputTokens": 76750,
+"cachedTokens": 64894,
+"costUsd": 2.1819
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "opus-4.8",
+"inputTokens": 1225111,
+"outputTokens": 496456,
+"cachedTokens": 95680,
+"costUsd": 24.3883
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "opus-4.8",
+"inputTokens": 179988,
+"outputTokens": 106182,
+"cachedTokens": 30581,
+"costUsd": 3.8338
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "sonnet-4.6",
+"inputTokens": 582181,
+"outputTokens": 319227,
+"cachedTokens": 109970,
+"costUsd": 2.3743
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "sonnet-4.6",
+"inputTokens": 1933097,
+"outputTokens": 1034102,
+"cachedTokens": 373274,
+"costUsd": 7.7818
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "sonnet-4.6",
+"inputTokens": 3637759,
+"outputTokens": 1447191,
+"cachedTokens": 1017228,
+"costUsd": 12.2032
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "sonnet-4.6",
+"inputTokens": 2602997,
+"outputTokens": 1526505,
+"cachedTokens": 1056181,
+"costUsd": 9.22
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "sonnet-4.6",
+"inputTokens": 1139917,
+"outputTokens": 359752,
+"cachedTokens": 410547,
+"costUsd": 3.2674
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "haiku-4.5",
+"inputTokens": 3929696,
+"outputTokens": 984559,
+"cachedTokens": 1921223,
+"costUsd": 2.3944
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "haiku-4.5",
+"inputTokens": 2187766,
+"outputTokens": 550215,
+"cachedTokens": 370725,
+"costUsd": 1.8938
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "haiku-4.5",
+"inputTokens": 3308774,
+"outputTokens": 1017795,
+"cachedTokens": 959486,
+"costUsd": 2.6937
+},
+{
+"team": "Platform",
+"project": "billing",
+"model": "haiku-4.5",
+"inputTokens": 86107,
+"outputTokens": 24821,
+"cachedTokens": 25367,
+"costUsd": 0.0684
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "opus-4.8",
+"inputTokens": 253995,
+"outputTokens": 105856,
+"cachedTokens": 42220,
+"costUsd": 4.7645
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "opus-4.8",
+"inputTokens": 1482236,
+"outputTokens": 651651,
+"cachedTokens": 261301,
+"costUsd": 28.0888
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "opus-4.8",
+"inputTokens": 2967164,
+"outputTokens": 710523,
+"cachedTokens": 726217,
+"costUsd": 44.2721
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "opus-4.8",
+"inputTokens": 2474026,
+"outputTokens": 322336,
+"cachedTokens": 836245,
+"costUsd": 29.4018
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "sonnet-4.6",
+"inputTokens": 1055283,
+"outputTokens": 436870,
+"cachedTokens": 157572,
+"costUsd": 4.0037
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "sonnet-4.6",
+"inputTokens": 2524683,
+"outputTokens": 656449,
+"cachedTokens": 459435,
+"costUsd": 8.1651
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "sonnet-4.6",
+"inputTokens": 1313435,
+"outputTokens": 629205,
+"cachedTokens": 554165,
+"costUsd": 4.1654
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "sonnet-4.6",
+"inputTokens": 1109871,
+"outputTokens": 277691,
+"cachedTokens": 209299,
+"costUsd": 3.5348
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "sonnet-4.6",
+"inputTokens": 3241149,
+"outputTokens": 1641734,
+"cachedTokens": 1574184,
+"costUsd": 9.9261
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "haiku-4.5",
+"inputTokens": 1302304,
+"outputTokens": 455813,
+"cachedTokens": 425673,
+"costUsd": 1.066
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "haiku-4.5",
+"inputTokens": 1131853,
+"outputTokens": 248269,
+"cachedTokens": 106051,
+"costUsd": 1.0193
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "haiku-4.5",
+"inputTokens": 1827505,
+"outputTokens": 776268,
+"cachedTokens": 88654,
+"costUsd": 2.0121
+},
+{
+"team": "Research",
+"project": "eval-harness",
+"model": "haiku-4.5",
+"inputTokens": 2521619,
+"outputTokens": 658099,
+"cachedTokens": 420799,
+"costUsd": 2.2071
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "opus-4.8",
+"inputTokens": 1840911,
+"outputTokens": 929443,
+"cachedTokens": 884273,
+"costUsd": 28.2912
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "opus-4.8",
+"inputTokens": 337327,
+"outputTokens": 90523,
+"cachedTokens": 109670,
+"costUsd": 4.7727
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "opus-4.8",
+"inputTokens": 3713532,
+"outputTokens": 1426741,
+"cachedTokens": 502440,
+"costUsd": 69.5675
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "opus-4.8",
+"inputTokens": 3302946,
+"outputTokens": 529989,
+"cachedTokens": 874665,
+"costUsd": 44.3741
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "sonnet-4.6",
+"inputTokens": 1323796,
+"outputTokens": 666383,
+"cachedTokens": 554985,
+"costUsd": 4.3056
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "sonnet-4.6",
+"inputTokens": 772016,
+"outputTokens": 410607,
+"cachedTokens": 131285,
+"costUsd": 3.154
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "sonnet-4.6",
+"inputTokens": 3474659,
+"outputTokens": 1462722,
+"cachedTokens": 1400735,
+"costUsd": 10.6099
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "sonnet-4.6",
+"inputTokens": 1450221,
+"outputTokens": 572460,
+"cachedTokens": 305469,
+"costUsd": 5.1516
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "haiku-4.5",
+"inputTokens": 1951180,
+"outputTokens": 533017,
+"cachedTokens": 406729,
+"costUsd": 1.662
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "haiku-4.5",
+"inputTokens": 1762647,
+"outputTokens": 677149,
+"cachedTokens": 31325,
+"costUsd": 1.9268
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "haiku-4.5",
+"inputTokens": 1735361,
+"outputTokens": 308892,
+"cachedTokens": 4044,
+"costUsd": 1.6322
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "haiku-4.5",
+"inputTokens": 3958352,
+"outputTokens": 2043577,
+"cachedTokens": 1232354,
+"costUsd": 3.8157
+},
+{
+"team": "Research",
+"project": "fine-tune",
+"model": "haiku-4.5",
+"inputTokens": 2141685,
+"outputTokens": 679291,
+"cachedTokens": 1017472,
+"costUsd": 1.4428
+},
+{
+"team": "Research",
+"project": "agents",
+"model": "opus-4.8",
+"inputTokens": 137552,
+"outputTokens": 65029,
+"cachedTokens": 57544,
+"costUsd": 2.1756
+},
+{
+"team": "Research",
+"project": "agents",
+"model": "opus-4.8",
+"inputTokens": 2782769,
+"outputTokens": 1319052,
+"cachedTokens": 1340412,
+"costUsd": 41.4211
+},
+{
+"team": "Research",
+"project": "agents",
+"model": "opus-4.8",
+"inputTokens": 2283118,
+"outputTokens": 617661,
+"cachedTokens": 259666,
+"costUsd": 39.6167
+},
+{
+"team": "Research",
+"project": "agents",
+"model": "opus-4.8",
+"inputTokens": 287496,
+"outputTokens": 152082,
+"cachedTokens": 139574,
+"costUsd": 4.5001
+},
+{
+"team": "Research",
+"project": "agents",
+"model": "sonnet-4.6",
+"inputTokens": 3400191,
+"outputTokens": 755750,
+"cachedTokens": 59748,
+"costUsd": 12.2886
+},
+{
+"team": "Research",
+"project": "agents",
+"model": "sonnet-4.6",
+"inputTokens": 3369831,
+"outputTokens": 1505818,
+"cachedTokens": 1556617,
+"costUsd": 9.9571
+},
+{
+"team": "Research",
+"project": "agents",
+"model": "sonnet-4.6",
+"inputTokens": 3762475,
+"outputTokens": 2038434,
+"cachedTokens": 808719,
+"costUsd": 14.9766
+},
+{
+"team": "Research",
+"project": "agents",
+"model": "haiku-4.5",
+"inputTokens": 57132,
+"outputTokens": 19454,
+"cachedTokens": 3451,
+"costUsd": 0.0585
+},
+{
+"team": "Research",
+"project": "agents",
+"model": "haiku-4.5",
+"inputTokens": 2112519,
+"outputTokens": 528011,
+"cachedTokens": 700190,
+"costUsd": 1.5523
+},
+{
+"team": "Research",
+"project": "agents",
+"model": "haiku-4.5",
+"inputTokens": 2203859,
+"outputTokens": 812118,
+"cachedTokens": 58674,
+"costUsd": 2.3658
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "opus-4.8",
+"inputTokens": 1433736,
+"outputTokens": 233272,
+"cachedTokens": 696788,
+"costUsd": 14.5533
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "opus-4.8",
+"inputTokens": 2271037,
+"outputTokens": 768970,
+"cachedTokens": 888344,
+"costUsd": 32.2749
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "opus-4.8",
+"inputTokens": 1477730,
+"outputTokens": 310916,
+"cachedTokens": 90304,
+"costUsd": 25.4751
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "sonnet-4.6",
+"inputTokens": 720493,
+"outputTokens": 158312,
+"cachedTokens": 98620,
+"costUsd": 2.3406
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "sonnet-4.6",
+"inputTokens": 3733392,
+"outputTokens": 1877991,
+"cachedTokens": 1537221,
+"costUsd": 12.2225
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "sonnet-4.6",
+"inputTokens": 33477,
+"outputTokens": 11507,
+"cachedTokens": 9555,
+"costUsd": 0.1063
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "haiku-4.5",
+"inputTokens": 211429,
+"outputTokens": 101114,
+"cachedTokens": 26244,
+"costUsd": 0.229
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "haiku-4.5",
+"inputTokens": 2594453,
+"outputTokens": 943428,
+"cachedTokens": 548706,
+"costUsd": 2.3913
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "haiku-4.5",
+"inputTokens": 1985486,
+"outputTokens": 519319,
+"cachedTokens": 813578,
+"costUsd": 1.353
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "haiku-4.5",
+"inputTokens": 3596612,
+"outputTokens": 458268,
+"cachedTokens": 228139,
+"costUsd": 3.0614
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "haiku-4.5",
+"inputTokens": 524720,
+"outputTokens": 65546,
+"cachedTokens": 126670,
+"costUsd": 0.3709
+},
+{
+"team": "Growth",
+"project": "copywriter",
+"model": "haiku-4.5",
+"inputTokens": 140458,
+"outputTokens": 74052,
+"cachedTokens": 6048,
+"costUsd": 0.1668
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "opus-4.8",
+"inputTokens": 1326964,
+"outputTokens": 236890,
+"cachedTokens": 47621,
+"costUsd": 22.7435
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "opus-4.8",
+"inputTokens": 1620150,
+"outputTokens": 686063,
+"cachedTokens": 475200,
+"costUsd": 27.4652
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "opus-4.8",
+"inputTokens": 1515449,
+"outputTokens": 352289,
+"cachedTokens": 748649,
+"costUsd": 16.7863
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "opus-4.8",
+"inputTokens": 1800096,
+"outputTokens": 291395,
+"cachedTokens": 500000,
+"costUsd": 23.8724
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "opus-4.8",
+"inputTokens": 3005301,
+"outputTokens": 1387005,
+"cachedTokens": 1195046,
+"costUsd": 47.9589
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "opus-4.8",
+"inputTokens": 2379055,
+"outputTokens": 450302,
+"cachedTokens": 444020,
+"costUsd": 35.7801
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "sonnet-4.6",
+"inputTokens": 2672414,
+"outputTokens": 1337758,
+"cachedTokens": 832358,
+"costUsd": 9.5334
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "sonnet-4.6",
+"inputTokens": 1812234,
+"outputTokens": 229306,
+"cachedTokens": 568537,
+"costUsd": 4.419
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "sonnet-4.6",
+"inputTokens": 3189853,
+"outputTokens": 1440028,
+"cachedTokens": 670688,
+"costUsd": 11.8776
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "sonnet-4.6",
+"inputTokens": 2913363,
+"outputTokens": 900655,
+"cachedTokens": 26111,
+"costUsd": 11.3637
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "sonnet-4.6",
+"inputTokens": 919080,
+"outputTokens": 338146,
+"cachedTokens": 319458,
+"costUsd": 2.8133
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "sonnet-4.6",
+"inputTokens": 302232,
+"outputTokens": 151590,
+"cachedTokens": 33916,
+"costUsd": 1.2597
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "haiku-4.5",
+"inputTokens": 3691600,
+"outputTokens": 421016,
+"cachedTokens": 600927,
+"costUsd": 2.8094
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "haiku-4.5",
+"inputTokens": 3767873,
+"outputTokens": 1430049,
+"cachedTokens": 1639686,
+"costUsd": 2.8466
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "haiku-4.5",
+"inputTokens": 511402,
+"outputTokens": 169822,
+"cachedTokens": 31488,
+"costUsd": 0.5198
+},
+{
+"team": "Growth",
+"project": "seo-bot",
+"model": "haiku-4.5",
+"inputTokens": 3412899,
+"outputTokens": 1589604,
+"cachedTokens": 1450126,
+"costUsd": 2.8419
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "opus-4.8",
+"inputTokens": 2801956,
+"outputTokens": 432383,
+"cachedTokens": 446057,
+"costUsd": 41.8242
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "opus-4.8",
+"inputTokens": 2233249,
+"outputTokens": 338486,
+"cachedTokens": 656305,
+"costUsd": 28.7314
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "opus-4.8",
+"inputTokens": 22557,
+"outputTokens": 7596,
+"cachedTokens": 2661,
+"costUsd": 0.4124
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "opus-4.8",
+"inputTokens": 1632214,
+"outputTokens": 199385,
+"cachedTokens": 74917,
+"costUsd": 26.3502
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "opus-4.8",
+"inputTokens": 418492,
+"outputTokens": 179785,
+"cachedTokens": 78626,
+"costUsd": 7.7948
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "opus-4.8",
+"inputTokens": 3439007,
+"outputTokens": 384287,
+"cachedTokens": 1447023,
+"costUsd": 35.6441
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "sonnet-4.6",
+"inputTokens": 108818,
+"outputTokens": 56799,
+"cachedTokens": 36646,
+"costUsd": 0.3869
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "sonnet-4.6",
+"inputTokens": 3509201,
+"outputTokens": 1572734,
+"cachedTokens": 499174,
+"costUsd": 13.7483
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "sonnet-4.6",
+"inputTokens": 1257699,
+"outputTokens": 628061,
+"cachedTokens": 22807,
+"costUsd": 5.5889
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "haiku-4.5",
+"inputTokens": 449715,
+"outputTokens": 169646,
+"cachedTokens": 22466,
+"costUsd": 0.4775
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "haiku-4.5",
+"inputTokens": 2322790,
+"outputTokens": 303286,
+"cachedTokens": 376578,
+"costUsd": 1.7996
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "haiku-4.5",
+"inputTokens": 2367492,
+"outputTokens": 450323,
+"cachedTokens": 91548,
+"costUsd": 2.181
+},
+{
+"team": "Growth",
+"project": "ads",
+"model": "haiku-4.5",
+"inputTokens": 756020,
+"outputTokens": 319786,
+"cachedTokens": 171669,
+"costUsd": 0.7233
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "opus-4.8",
+"inputTokens": 1062722,
+"outputTokens": 301532,
+"cachedTokens": 210758,
+"costUsd": 17.3024
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "opus-4.8",
+"inputTokens": 1471199,
+"outputTokens": 556583,
+"cachedTokens": 710820,
+"costUsd": 19.7544
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "opus-4.8",
+"inputTokens": 1576225,
+"outputTokens": 551922,
+"cachedTokens": 766877,
+"costUsd": 20.419
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "opus-4.8",
+"inputTokens": 1733540,
+"outputTokens": 904563,
+"cachedTokens": 838245,
+"costUsd": 26.9979
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "opus-4.8",
+"inputTokens": 1743772,
+"outputTokens": 776709,
+"cachedTokens": 659246,
+"costUsd": 27.9185
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "opus-4.8",
+"inputTokens": 2828356,
+"outputTokens": 1589440,
+"cachedTokens": 969502,
+"costUsd": 51.7244
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "sonnet-4.6",
+"inputTokens": 2698740,
+"outputTokens": 811041,
+"cachedTokens": 1197640,
+"costUsd": 6.9364
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "sonnet-4.6",
+"inputTokens": 683924,
+"outputTokens": 101173,
+"cachedTokens": 255840,
+"costUsd": 1.5878
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "sonnet-4.6",
+"inputTokens": 3846559,
+"outputTokens": 1728333,
+"cachedTokens": 1828446,
+"costUsd": 11.2393
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "sonnet-4.6",
+"inputTokens": 2461825,
+"outputTokens": 1131098,
+"cachedTokens": 229086,
+"costUsd": 10.0915
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "haiku-4.5",
+"inputTokens": 3156336,
+"outputTokens": 629972,
+"cachedTokens": 924202,
+"costUsd": 2.2897
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "haiku-4.5",
+"inputTokens": 1322566,
+"outputTokens": 750416,
+"cachedTokens": 563076,
+"costUsd": 1.2079
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "haiku-4.5",
+"inputTokens": 2258680,
+"outputTokens": 1302609,
+"cachedTokens": 334130,
+"costUsd": 2.5817
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "haiku-4.5",
+"inputTokens": 2960382,
+"outputTokens": 1562036,
+"cachedTokens": 881046,
+"costUsd": 2.9131
+},
+{
+"team": "Support",
+"project": "helpdesk",
+"model": "haiku-4.5",
+"inputTokens": 2453880,
+"outputTokens": 962716,
+"cachedTokens": 327805,
+"costUsd": 2.471
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "opus-4.8",
+"inputTokens": 1290604,
+"outputTokens": 143982,
+"cachedTokens": 309415,
+"costUsd": 16.8776
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "opus-4.8",
+"inputTokens": 1607370,
+"outputTokens": 321975,
+"cachedTokens": 458011,
+"costUsd": 22.07
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "opus-4.8",
+"inputTokens": 1003706,
+"outputTokens": 261988,
+"cachedTokens": 388536,
+"costUsd": 13.1574
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "opus-4.8",
+"inputTokens": 604344,
+"outputTokens": 186868,
+"cachedTokens": 210780,
+"costUsd": 8.7065
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "sonnet-4.6",
+"inputTokens": 1965156,
+"outputTokens": 766918,
+"cachedTokens": 886044,
+"costUsd": 5.5381
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "sonnet-4.6",
+"inputTokens": 2738349,
+"outputTokens": 1036631,
+"cachedTokens": 658982,
+"costUsd": 9.348
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "sonnet-4.6",
+"inputTokens": 3024872,
+"outputTokens": 411949,
+"cachedTokens": 1433116,
+"costUsd": 6.0111
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "sonnet-4.6",
+"inputTokens": 3286622,
+"outputTokens": 1534176,
+"cachedTokens": 1578003,
+"costUsd": 9.7284
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "haiku-4.5",
+"inputTokens": 3822561,
+"outputTokens": 821088,
+"cachedTokens": 448727,
+"costUsd": 3.3559
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "haiku-4.5",
+"inputTokens": 3012203,
+"outputTokens": 1471962,
+"cachedTokens": 104319,
+"costUsd": 3.5039
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "haiku-4.5",
+"inputTokens": 913723,
+"outputTokens": 481477,
+"cachedTokens": 110602,
+"costUsd": 1.0277
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "haiku-4.5",
+"inputTokens": 797337,
+"outputTokens": 389021,
+"cachedTokens": 54808,
+"costUsd": 0.9052
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "haiku-4.5",
+"inputTokens": 2610471,
+"outputTokens": 1180891,
+"cachedTokens": 1120669,
+"costUsd": 2.1366
+},
+{
+"team": "Support",
+"project": "triage",
+"model": "haiku-4.5",
+"inputTokens": 3775866,
+"outputTokens": 2140494,
+"cachedTokens": 320400,
+"costUsd": 4.4768
+}
+]
