@@ -41,6 +41,7 @@ const EXAMPLES: Example[] = [
     data: benchmarkData as Row[],
     display: {
       frameless: true,
+      hideRules: true,
       zebra: true,
       groupSpacing: 14,
       footer: [

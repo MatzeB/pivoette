@@ -120,6 +120,9 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
         value = evalExpression(def.compute, { ...inputs, inputs });
       } else if (def.source) {
         value = fieldValues(def.source, r);
+      } else if (def.composite) {
+        // Composite renders from inputs; its sortable value is the sort key.
+        value = fieldValues(def.composite.sortKey, r);
       } else {
         value = null;
       }

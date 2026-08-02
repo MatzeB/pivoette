@@ -27,6 +27,8 @@ export interface DataTableDisplay {
   indexColumns?: number;
   /** Alternate (even/odd) row background shading. */
   zebra?: boolean;
+  /** Remove the header rule and footer double line (rely on spacing/shading). */
+  hideRules?: boolean;
   /** Highlight the hovered cell's column header + ancestors (default true). */
   highlightHeaders?: boolean;
   /** Extra footer rows summarizing each column's displayed values. */
@@ -168,6 +170,7 @@ export function DataTable({
     rowGroupSpacing = 0,
     indexColumns = 0,
     zebra = false,
+    hideRules = false,
     highlightHeaders = true,
     footer = [],
   } = display;
@@ -257,18 +260,32 @@ export function DataTable({
     leafW.reduce((a, b, i) => a + b + gapAfter[i]!, 0) +
     bodyLeadGap;
 
-  // Sorting.
+  // Sorting. A leaf (value) sort flattens the rows; an index-level sort keeps
+  // the hierarchy — it only reorders that level within each parent group.
   const rows = useMemo(() => {
     if (!sort) return result.rows;
     const dir = sort.dir === 'desc' ? -1 : 1;
-    const get = (r: ResultRow) =>
-      sort.key.kind === 'leaf'
-        ? r.cells[sort.key.index]?.value
-        : r.path[sort.key.level];
-    return [...result.rows].sort((a, b) => compareValues(get(a), get(b)) * dir);
+    if (sort.key.kind === 'leaf') {
+      const idx = sort.key.index;
+      return [...result.rows].sort(
+        (a, b) => compareValues(a.cells[idx]?.value, b.cells[idx]?.value) * dir,
+      );
+    }
+    const L = sort.key.level;
+    const indexed = result.rows.map((r, i) => ({ r, i }));
+    indexed.sort((A, B) => {
+      // Keep parent groups (levels < L) in their original order.
+      for (let l = 0; l < L; l++)
+        if (A.r.path[l] !== B.r.path[l]) return A.i - B.i;
+      if (A.r.path[L] !== B.r.path[L])
+        return compareValues(A.r.path[L], B.r.path[L]) * dir;
+      return A.i - B.i; // stable within the sorted level
+    });
+    return indexed.map((x) => x.r);
   }, [result.rows, sort]);
 
-  const grouped = sort === null; // only show grouped (blanked) row labels unsorted
+  // Index-level sorts preserve the grouped (blanked/merged) display.
+  const grouped = sort === null || sort.key.kind === 'index';
   const nLevels = rowLevels.length;
 
   // Extra top space for the first row of a higher-level row-index block.
@@ -448,13 +465,15 @@ export function DataTable({
             </tr>
           ))}
           {/* One contiguous rule under the whole header (spans the gaps). */}
-          <tr aria-hidden="true">
-            <td
-              colSpan={totalCols}
-              className={styles.headerRule}
-              style={{ top: depth * HEADER_H }}
-            />
-          </tr>
+          {!hideRules && (
+            <tr aria-hidden="true">
+              <td
+                colSpan={totalCols}
+                className={styles.headerRule}
+                style={{ top: depth * HEADER_H }}
+              />
+            </tr>
+          )}
         </thead>
 
         <tbody className={styles.body}>
@@ -506,31 +525,23 @@ export function DataTable({
                 ...(summary ? [{ label: 'Total', cells: summary }] : []),
               ];
               const contentBottom = lines.length * ROW_HEIGHT;
-              return [
-                // Space between the body and the footer.
-                <tr key="fspace" aria-hidden="true">
+              // Lineless: a small background gap; otherwise a contiguous
+              // accountant-style double line directly against the data.
+              const separator = (
+                <tr key="fsep" aria-hidden="true">
                   <td
                     colSpan={totalCols}
-                    className={styles.footSpace}
-                    style={{
-                      position: 'sticky',
-                      bottom: contentBottom + 4,
-                      zIndex: 4,
-                    }}
-                  />
-                </tr>,
-                // Contiguous accountant-style double line before the totals.
-                <tr key="fdouble" aria-hidden="true">
-                  <td
-                    colSpan={totalCols}
-                    className={styles.footDouble}
+                    className={hideRules ? styles.footSpace : styles.footDouble}
                     style={{
                       position: 'sticky',
                       bottom: contentBottom,
                       zIndex: 4,
                     }}
                   />
-                </tr>,
+                </tr>
+              );
+              return [
+                separator,
                 ...lines.map((fr, fi) => (
                   <FooterRow
                     key={`f${fi}`}

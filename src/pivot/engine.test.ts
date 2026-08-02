@@ -110,6 +110,8 @@ describe('flat mode — computed columns & composite sort', () => {
     ]);
     // pl for Alpha row = 8 - 10 = -2
     expect(res.rows[0]!.cells[1]!.value).toBe(-2);
+    // composite cell carries its sort-key as the (sortable) value
+    expect(res.rows[0]!.cells[0]!.value).toBe('Alpha');
   });
 });
 
