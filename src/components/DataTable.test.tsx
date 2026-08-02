@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { DataTable } from './DataTable';
+import type { DataTableDisplay } from './DataTable';
 import type { PivotSpec, TableSpec } from '../pivot/spec';
 
 // react-dom needs this flag; @tanstack/react-virtual needs ResizeObserver.
@@ -113,5 +114,116 @@ describe('<DataTable> smoke', () => {
     const el = await render(<DataTable data={data} view={view} />);
     expect(el.querySelector('thead')!.textContent).toContain('Name');
     expect(el.querySelector('table')).toBeTruthy();
+  });
+});
+
+describe('<DataTable> unit decoration', () => {
+  const rows = [{ host: 'a', latency: 1.5, bandwidth: 12, cpu: 5 }];
+  const meta = {
+    latency: { displayName: 'Latency', siUnit: 'second', siScale: 'milli' },
+    bandwidth: {
+      displayName: 'Bandwidth',
+      siUnit: ['byte', '1/second'],
+      siScale: ['mega', null],
+    },
+    cpu: { displayName: 'CPU', siScale: 'percent' },
+  };
+  const view: TableSpec = {
+    mode: 'flat',
+    columns: [
+      { id: 'host', source: 'host' },
+      {
+        id: 'latency',
+        source: 'latency',
+        format: { name: 'number', options: { decimals: 2 } },
+      },
+      {
+        id: 'bandwidth',
+        source: 'bandwidth',
+        format: { name: 'number', options: { decimals: 1 } },
+      },
+      { id: 'cpu', source: 'cpu' },
+    ],
+  };
+
+  // Body rows are virtualized away under jsdom, so value decoration is read off
+  // the footer — it runs through the same per-leaf formatter.
+  async function renderWith(display: DataTableDisplay) {
+    const el = await render(
+      <DataTable
+        data={{ meta, rows }}
+        view={view}
+        display={{ footer: [{ label: 'sum', agg: 'sum' }], ...display }}
+      />,
+    );
+    return {
+      head: el.querySelector('thead')!.textContent ?? '',
+      values: el.querySelector('tfoot')!.textContent ?? '',
+    };
+  }
+
+  it('leaves everything undecorated by default', async () => {
+    const { head, values } = await renderWith({});
+    expect(values).toContain('1.50');
+    expect(values).not.toContain('1.50 ms');
+    expect(head).not.toContain('(');
+  });
+
+  it('puts the whole label on the value', async () => {
+    const { values } = await renderWith({
+      unitPlacement: 'value',
+      scalePlacement: 'value',
+    });
+    expect(values).toContain('1.50 ms');
+    // A bare percent hugs its number.
+    expect(values).toContain('5%');
+  });
+
+  it('puts the whole label in the header', async () => {
+    const { head, values } = await renderWith({
+      unitPlacement: 'header',
+      scalePlacement: 'header',
+    });
+    expect(head).toContain('Latency (ms)');
+    expect(head).toContain('CPU (%)');
+    expect(values).toContain('1.50');
+    expect(values).not.toContain('1.50 ms');
+  });
+
+  it('splits scale onto the value and unit into the header', async () => {
+    const { head, values } = await renderWith({
+      unitPlacement: 'header',
+      scalePlacement: 'value',
+    });
+    expect(head).toContain('Latency (s)');
+    expect(values).toContain('1.50 m');
+    expect(values).not.toContain('1.50 ms');
+  });
+
+  it('moves a compound label atomically, ignoring scalePlacement', async () => {
+    const header = await renderWith({
+      unitPlacement: 'header',
+      scalePlacement: 'value',
+    });
+    expect(header.head).toContain('Bandwidth (MB/s)');
+    // The scale did not leak onto the value alongside the header label.
+    expect(header.values).toContain('12.0');
+    expect(header.values).not.toContain('12.0 M');
+
+    const value = await renderWith({
+      unitPlacement: 'value',
+      scalePlacement: 'header',
+    });
+    expect(value.values).toContain('12.0 MB/s');
+    expect(value.head).not.toContain('Bandwidth (M)');
+  });
+
+  it('leaves unitless columns alone', async () => {
+    const { head } = await renderWith({
+      unitPlacement: 'header',
+      scalePlacement: 'header',
+    });
+    expect(head).toContain('host');
+    expect(head).not.toContain('host (');
   });
 });

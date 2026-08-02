@@ -43,8 +43,18 @@ function alignFor(type: ColumnType | undefined, format?: FormatSpec): Align {
   return 'left';
 }
 
-function label(field: string, labels?: Record<string, string>): string {
-  return labels?.[field] ?? field;
+/**
+ * Header text for a data field: an explicit `spec.labels` entry wins, then the
+ * column's metadata `displayName`, then the raw field name.
+ */
+function label(
+  frame: DataFrame,
+  field: string,
+  labels?: Record<string, string>,
+): string {
+  return (
+    labels?.[field] ?? frame.columnByName.get(field)?.meta.displayName ?? field
+  );
 }
 
 function makeLeaf(args: {
@@ -76,14 +86,18 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
     frame.columnByName.get(name)?.values[row] ?? null;
 
   const leaves: ResolvedLeaf[] = spec.columns.map((def) => {
-    const type = def.source
-      ? frame.columnByName.get(def.source)?.type
-      : undefined;
+    const source = def.source ? frame.columnByName.get(def.source) : undefined;
     const column: ResolvedColumn = {
       id: def.id,
-      label: def.label ?? label(def.source ?? def.id, spec.labels),
-      align: alignFor(type, def.format),
+      label: def.label ?? label(frame, def.source ?? def.id, spec.labels),
+      align: alignFor(source?.type, def.format),
       def,
+      meta: source?.meta,
+      sources: def.composite
+        ? def.composite.fields
+            .map((f) => frame.columnByName.get(f)?.meta)
+            .filter((m): m is NonNullable<typeof m> => m !== undefined)
+        : undefined,
     };
     return makeLeaf({
       id: def.id,
@@ -358,6 +372,7 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
         label: d.measure.label ?? d.measure.id,
         align: alignFor('float', d.measure.format),
         value: d.measure,
+        meta: frame.columnByName.get(d.measure.field)?.meta,
       };
       return makeLeaf({
         id: `${d.colPath.join('')}#${i}`,
@@ -434,7 +449,7 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     });
   }
 
-  const rowLevels = spec.rows.map((f) => label(f, spec.labels));
+  const rowLevels = spec.rows.map((f) => label(frame, f, spec.labels));
   const { forest, depth } = buildHeader(leaves);
   return {
     mode: 'pivot',
@@ -560,7 +575,10 @@ function pivotMeasuresOnRows(
     });
   }
 
-  const rowLevels = [...spec.rows.map((f) => label(f, spec.labels)), 'Measure'];
+  const rowLevels = [
+    ...spec.rows.map((f) => label(frame, f, spec.labels)),
+    'Measure',
+  ];
   const { forest, depth } = buildHeader(leaves);
   return {
     mode: 'pivot',

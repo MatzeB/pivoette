@@ -1,0 +1,881 @@
+{
+"meta": {
+"host": {
+"displayName": "Host"
+},
+"region": {
+"displayName": "Region"
+},
+"role": {
+"displayName": "Role"
+},
+"memory": {
+"displayName": "Memory",
+"kind": [
+"memory"
+],
+"siUnit": [
+"byte"
+],
+"siScale": [
+"mega"
+]
+},
+"latency": {
+"displayName": "Latency",
+"kind": [
+"duration"
+],
+"siUnit": [
+"second"
+],
+"siScale": [
+"milli"
+]
+},
+"cpu": {
+"displayName": "CPU",
+"kind": [
+"percentage"
+],
+"siScale": [
+"percent"
+]
+},
+"throughput": {
+"displayName": "Throughput",
+"kind": [
+"count",
+"1/duration"
+],
+"siUnit": [
+"token",
+"1/second"
+],
+"siScale": [
+"kilo",
+null
+]
+},
+"bandwidth": {
+"displayName": "Bandwidth",
+"kind": [
+"memory",
+"1/duration"
+],
+"siUnit": [
+"byte",
+"1/second"
+],
+"siScale": [
+"mega",
+null
+]
+},
+"floorArea": {
+"displayName": "Rack Area",
+"kind": [
+"length",
+"length"
+],
+"siUnit": [
+"meter",
+"meter"
+]
+}
+},
+"rows": [
+{
+"host": "cache-us-east-00",
+"region": "us-east",
+"role": "cache",
+"memory": 29145.1,
+"latency": 189.76,
+"cpu": 6.6,
+"throughput": 52.6,
+"bandwidth": 89.8,
+"floorArea": 1.65
+},
+{
+"host": "worker-us-west-01",
+"region": "us-west",
+"role": "worker",
+"memory": 1644.7,
+"latency": 208.38,
+"cpu": 8.7,
+"throughput": 5.99,
+"bandwidth": 399.9,
+"floorArea": 2.09
+},
+{
+"host": "api-eu-central-02",
+"region": "eu-central",
+"role": "api",
+"memory": 29132.6,
+"latency": 302.85,
+"cpu": 58.0,
+"throughput": 4.15,
+"bandwidth": 551.0,
+"floorArea": 0.69
+},
+{
+"host": "worker-ap-south-03",
+"region": "ap-south",
+"role": "worker",
+"memory": 1919.2,
+"latency": null,
+"cpu": 29.8,
+"throughput": 9.4,
+"bandwidth": 112.0,
+"floorArea": 1.16
+},
+{
+"host": "worker-us-east-04",
+"region": "us-east",
+"role": "worker",
+"memory": 3625.1,
+"latency": 274.35,
+"cpu": 20.0,
+"throughput": 6.42,
+"bandwidth": 669.8,
+"floorArea": 1.62
+},
+{
+"host": "worker-us-west-05",
+"region": "us-west",
+"role": "worker",
+"memory": 15507.7,
+"latency": 255.41,
+"cpu": 76.6,
+"throughput": 29.91,
+"bandwidth": 868.1,
+"floorArea": 1.25
+},
+{
+"host": "worker-eu-central-06",
+"region": "eu-central",
+"role": "worker",
+"memory": 24508.6,
+"latency": 335.64,
+"cpu": 25.4,
+"throughput": 36.85,
+"bandwidth": 494.4,
+"floorArea": 2.18
+},
+{
+"host": "ingest-ap-south-07",
+"region": "ap-south",
+"role": "ingest",
+"memory": 9210.0,
+"latency": 470.49,
+"cpu": 13.3,
+"throughput": 26.88,
+"bandwidth": 712.1,
+"floorArea": 0.87
+},
+{
+"host": "ingest-us-east-08",
+"region": "us-east",
+"role": "ingest",
+"memory": 13250.7,
+"latency": 461.78,
+"cpu": 9.5,
+"throughput": 35.81,
+"bandwidth": 742.1,
+"floorArea": 2.07
+},
+{
+"host": "cache-us-west-09",
+"region": "us-west",
+"role": "cache",
+"memory": 21515.5,
+"latency": 285.46,
+"cpu": 57.7,
+"throughput": 29.31,
+"bandwidth": 789.8,
+"floorArea": 2.3
+},
+{
+"host": "ingest-eu-central-10",
+"region": "eu-central",
+"role": "ingest",
+"memory": 21568.2,
+"latency": 31.57,
+"cpu": 72.2,
+"throughput": 19.95,
+"bandwidth": 543.9,
+"floorArea": 1.83
+},
+{
+"host": "ingest-ap-south-11",
+"region": "ap-south",
+"role": "ingest",
+"memory": 9109.1,
+"latency": 185.43,
+"cpu": 66.2,
+"throughput": null,
+"bandwidth": 434.8,
+"floorArea": 0.9
+},
+{
+"host": "api-us-east-12",
+"region": "us-east",
+"role": "api",
+"memory": 15425.5,
+"latency": 105.05,
+"cpu": 29.6,
+"throughput": 47.31,
+"bandwidth": 374.9,
+"floorArea": 2.25
+},
+{
+"host": "ingest-us-west-13",
+"region": "us-west",
+"role": "ingest",
+"memory": 2946.2,
+"latency": 215.83,
+"cpu": 54.7,
+"throughput": 56.56,
+"bandwidth": 770.4,
+"floorArea": 2.16
+},
+{
+"host": "cache-eu-central-14",
+"region": "eu-central",
+"role": "cache",
+"memory": 21850.8,
+"latency": 473.51,
+"cpu": 67.5,
+"throughput": 24.47,
+"bandwidth": 218.1,
+"floorArea": 0.75
+},
+{
+"host": "worker-ap-south-15",
+"region": "ap-south",
+"role": "worker",
+"memory": 7519.0,
+"latency": 112.31,
+"cpu": 48.6,
+"throughput": 37.79,
+"bandwidth": 248.1,
+"floorArea": 0.61
+},
+{
+"host": "ingest-us-east-16",
+"region": "us-east",
+"role": "ingest",
+"memory": 16660.9,
+"latency": 292.87,
+"cpu": 32.6,
+"throughput": 8.21,
+"bandwidth": 807.9,
+"floorArea": 2.31
+},
+{
+"host": "api-us-west-17",
+"region": "us-west",
+"role": "api",
+"memory": 14306.3,
+"latency": 418.12,
+"cpu": 93.4,
+"throughput": 43.62,
+"bandwidth": 526.4,
+"floorArea": 1.32
+},
+{
+"host": "ingest-eu-central-18",
+"region": "eu-central",
+"role": "ingest",
+"memory": 3639.6,
+"latency": 304.61,
+"cpu": 8.0,
+"throughput": 4.5,
+"bandwidth": 197.4,
+"floorArea": 0.89
+},
+{
+"host": "cache-ap-south-19",
+"region": "ap-south",
+"role": "cache",
+"memory": 18658.8,
+"latency": 49.5,
+"cpu": 56.4,
+"throughput": 34.44,
+"bandwidth": 892.1,
+"floorArea": 1.7
+},
+{
+"host": "api-us-east-20",
+"region": "us-east",
+"role": "api",
+"memory": 26923.8,
+"latency": 294.91,
+"cpu": 16.3,
+"throughput": 16.29,
+"bandwidth": 327.5,
+"floorArea": 1.26
+},
+{
+"host": "api-us-west-21",
+"region": "us-west",
+"role": "api",
+"memory": 3996.6,
+"latency": 234.48,
+"cpu": 95.9,
+"throughput": 30.85,
+"bandwidth": 294.2,
+"floorArea": 0.86
+},
+{
+"host": "cache-eu-central-22",
+"region": "eu-central",
+"role": "cache",
+"memory": 22876.5,
+"latency": 229.95,
+"cpu": 68.4,
+"throughput": 33.14,
+"bandwidth": 194.1,
+"floorArea": 2.31
+},
+{
+"host": "cache-ap-south-23",
+"region": "ap-south",
+"role": "cache",
+"memory": 4940.6,
+"latency": 260.91,
+"cpu": 4.6,
+"throughput": 33.89,
+"bandwidth": 919.8,
+"floorArea": 2.15
+},
+{
+"host": "cache-us-east-24",
+"region": "us-east",
+"role": "cache",
+"memory": 16171.7,
+"latency": 436.0,
+"cpu": 36.1,
+"throughput": 14.41,
+"bandwidth": 509.8,
+"floorArea": 1.5
+},
+{
+"host": "worker-us-west-25",
+"region": "us-west",
+"role": "worker",
+"memory": 19036.4,
+"latency": 378.52,
+"cpu": 74.8,
+"throughput": 12.65,
+"bandwidth": 226.2,
+"floorArea": 1.32
+},
+{
+"host": "worker-eu-central-26",
+"region": "eu-central",
+"role": "worker",
+"memory": 6551.1,
+"latency": 236.74,
+"cpu": 72.2,
+"throughput": 63.34,
+"bandwidth": 743.0,
+"floorArea": 1.45
+},
+{
+"host": "worker-ap-south-27",
+"region": "ap-south",
+"role": "worker",
+"memory": 21431.7,
+"latency": 459.14,
+"cpu": 44.9,
+"throughput": 59.98,
+"bandwidth": 928.8,
+"floorArea": 2.32
+},
+{
+"host": "cache-us-east-28",
+"region": "us-east",
+"role": "cache",
+"memory": 2944.9,
+"latency": 49.39,
+"cpu": 47.1,
+"throughput": 21.75,
+"bandwidth": 454.5,
+"floorArea": 2.37
+},
+{
+"host": "api-us-west-29",
+"region": "us-west",
+"role": "api",
+"memory": 14995.9,
+"latency": 313.57,
+"cpu": 78.8,
+"throughput": 5.61,
+"bandwidth": 621.5,
+"floorArea": 2.24
+},
+{
+"host": "worker-eu-central-30",
+"region": "eu-central",
+"role": "worker",
+"memory": 14952.4,
+"latency": 86.02,
+"cpu": 77.8,
+"throughput": 21.41,
+"bandwidth": 753.1,
+"floorArea": 2.35
+},
+{
+"host": "ingest-ap-south-31",
+"region": "ap-south",
+"role": "ingest",
+"memory": 14503.2,
+"latency": 356.91,
+"cpu": 10.2,
+"throughput": 10.34,
+"bandwidth": 933.5,
+"floorArea": 0.65
+},
+{
+"host": "ingest-us-east-32",
+"region": "us-east",
+"role": "ingest",
+"memory": 24874.8,
+"latency": 70.51,
+"cpu": 81.3,
+"throughput": 62.74,
+"bandwidth": 618.3,
+"floorArea": 1.23
+},
+{
+"host": "worker-us-west-33",
+"region": "us-west",
+"role": "worker",
+"memory": 1158.4,
+"latency": 383.77,
+"cpu": 71.7,
+"throughput": 6.76,
+"bandwidth": 704.9,
+"floorArea": 0.85
+},
+{
+"host": "worker-eu-central-34",
+"region": "eu-central",
+"role": "worker",
+"memory": 25468.5,
+"latency": 101.62,
+"cpu": 26.2,
+"throughput": 18.89,
+"bandwidth": 227.2,
+"floorArea": 1.66
+},
+{
+"host": "cache-ap-south-35",
+"region": "ap-south",
+"role": "cache",
+"memory": 16955.8,
+"latency": 400.48,
+"cpu": 7.8,
+"throughput": 47.41,
+"bandwidth": 844.0,
+"floorArea": 1.79
+},
+{
+"host": "ingest-us-east-36",
+"region": "us-east",
+"role": "ingest",
+"memory": 25498.2,
+"latency": 421.57,
+"cpu": 14.6,
+"throughput": 9.89,
+"bandwidth": 480.6,
+"floorArea": 2.17
+},
+{
+"host": "worker-us-west-37",
+"region": "us-west",
+"role": "worker",
+"memory": 18895.2,
+"latency": 372.59,
+"cpu": 16.4,
+"throughput": 9.23,
+"bandwidth": 582.5,
+"floorArea": 0.82
+},
+{
+"host": "api-eu-central-38",
+"region": "eu-central",
+"role": "api",
+"memory": 10359.3,
+"latency": 249.0,
+"cpu": 55.3,
+"throughput": 50.24,
+"bandwidth": 101.1,
+"floorArea": 1.61
+},
+{
+"host": "worker-ap-south-39",
+"region": "ap-south",
+"role": "worker",
+"memory": 6291.0,
+"latency": 20.64,
+"cpu": 11.4,
+"throughput": 29.05,
+"bandwidth": 27.7,
+"floorArea": 2.21
+},
+{
+"host": "api-us-east-40",
+"region": "us-east",
+"role": "api",
+"memory": 13901.6,
+"latency": 294.17,
+"cpu": 50.5,
+"throughput": 32.88,
+"bandwidth": 651.6,
+"floorArea": 1.41
+},
+{
+"host": "ingest-us-west-41",
+"region": "us-west",
+"role": "ingest",
+"memory": 15850.2,
+"latency": 119.18,
+"cpu": 52.2,
+"throughput": 56.09,
+"bandwidth": 872.2,
+"floorArea": 2.26
+},
+{
+"host": "worker-eu-central-42",
+"region": "eu-central",
+"role": "worker",
+"memory": 25886.7,
+"latency": 66.17,
+"cpu": 13.7,
+"throughput": 28.41,
+"bandwidth": 69.6,
+"floorArea": 1.03
+},
+{
+"host": "api-ap-south-43",
+"region": "ap-south",
+"role": "api",
+"memory": 6936.9,
+"latency": 145.61,
+"cpu": 13.7,
+"throughput": 49.77,
+"bandwidth": 883.2,
+"floorArea": 1.76
+},
+{
+"host": "cache-us-east-44",
+"region": "us-east",
+"role": "cache",
+"memory": 4831.1,
+"latency": 423.81,
+"cpu": 94.9,
+"throughput": 14.21,
+"bandwidth": 895.4,
+"floorArea": 1.32
+},
+{
+"host": "ingest-us-west-45",
+"region": "us-west",
+"role": "ingest",
+"memory": 5429.7,
+"latency": 320.69,
+"cpu": 23.5,
+"throughput": 45.26,
+"bandwidth": 934.4,
+"floorArea": 1.33
+},
+{
+"host": "ingest-eu-central-46",
+"region": "eu-central",
+"role": "ingest",
+"memory": 6425.1,
+"latency": 153.16,
+"cpu": 71.3,
+"throughput": 1.44,
+"bandwidth": 521.5,
+"floorArea": 1.39
+},
+{
+"host": "api-ap-south-47",
+"region": "ap-south",
+"role": "api",
+"memory": 12122.3,
+"latency": 248.56,
+"cpu": 30.4,
+"throughput": 61.5,
+"bandwidth": 107.4,
+"floorArea": 2.25
+},
+{
+"host": "worker-us-east-48",
+"region": "us-east",
+"role": "worker",
+"memory": 29865.0,
+"latency": 50.65,
+"cpu": 27.5,
+"throughput": 2.73,
+"bandwidth": 732.6,
+"floorArea": 1.09
+},
+{
+"host": "worker-us-west-49",
+"region": "us-west",
+"role": "worker",
+"memory": 25275.8,
+"latency": 407.86,
+"cpu": 66.9,
+"throughput": 60.55,
+"bandwidth": 382.5,
+"floorArea": 1.57
+},
+{
+"host": "ingest-eu-central-50",
+"region": "eu-central",
+"role": "ingest",
+"memory": 21670.2,
+"latency": 43.31,
+"cpu": 7.5,
+"throughput": 44.11,
+"bandwidth": 400.7,
+"floorArea": 0.73
+},
+{
+"host": "api-ap-south-51",
+"region": "ap-south",
+"role": "api",
+"memory": 19677.1,
+"latency": 384.86,
+"cpu": 10.0,
+"throughput": 54.83,
+"bandwidth": 64.0,
+"floorArea": 2.15
+},
+{
+"host": "ingest-us-east-52",
+"region": "us-east",
+"role": "ingest",
+"memory": 860.8,
+"latency": 477.27,
+"cpu": 42.1,
+"throughput": 58.6,
+"bandwidth": 585.0,
+"floorArea": 0.68
+},
+{
+"host": "worker-us-west-53",
+"region": "us-west",
+"role": "worker",
+"memory": 28850.9,
+"latency": 465.23,
+"cpu": 27.1,
+"throughput": 11.76,
+"bandwidth": 876.4,
+"floorArea": 1.73
+},
+{
+"host": "worker-eu-central-54",
+"region": "eu-central",
+"role": "worker",
+"memory": 9271.1,
+"latency": 240.24,
+"cpu": 19.1,
+"throughput": 22.34,
+"bandwidth": 18.5,
+"floorArea": 1.05
+},
+{
+"host": "api-ap-south-55",
+"region": "ap-south",
+"role": "api",
+"memory": 1068.9,
+"latency": 242.91,
+"cpu": 95.9,
+"throughput": 33.01,
+"bandwidth": 232.1,
+"floorArea": 1.4
+},
+{
+"host": "ingest-us-east-56",
+"region": "us-east",
+"role": "ingest",
+"memory": 20343.8,
+"latency": 262.22,
+"cpu": 87.3,
+"throughput": 62.11,
+"bandwidth": 290.4,
+"floorArea": 0.99
+},
+{
+"host": "worker-us-west-57",
+"region": "us-west",
+"role": "worker",
+"memory": 10864.4,
+"latency": 399.56,
+"cpu": 69.8,
+"throughput": 40.78,
+"bandwidth": 381.3,
+"floorArea": 1.23
+},
+{
+"host": "api-eu-central-58",
+"region": "eu-central",
+"role": "api",
+"memory": 25795.7,
+"latency": 7.24,
+"cpu": 62.0,
+"throughput": 56.33,
+"bandwidth": 405.8,
+"floorArea": 0.7
+},
+{
+"host": "ingest-ap-south-59",
+"region": "ap-south",
+"role": "ingest",
+"memory": 26809.2,
+"latency": 321.99,
+"cpu": 29.1,
+"throughput": 15.65,
+"bandwidth": 276.5,
+"floorArea": 1.43
+},
+{
+"host": "worker-us-east-60",
+"region": "us-east",
+"role": "worker",
+"memory": 8639.1,
+"latency": 2.14,
+"cpu": 37.0,
+"throughput": 21.19,
+"bandwidth": 925.8,
+"floorArea": 1.18
+},
+{
+"host": "api-us-west-61",
+"region": "us-west",
+"role": "api",
+"memory": 29682.9,
+"latency": 148.86,
+"cpu": 36.2,
+"throughput": 0.27,
+"bandwidth": 359.7,
+"floorArea": 1.45
+},
+{
+"host": "worker-eu-central-62",
+"region": "eu-central",
+"role": "worker",
+"memory": 8009.0,
+"latency": 372.68,
+"cpu": 10.7,
+"throughput": 52.33,
+"bandwidth": 136.5,
+"floorArea": 1.66
+},
+{
+"host": "ingest-ap-south-63",
+"region": "ap-south",
+"role": "ingest",
+"memory": 1191.5,
+"latency": 146.32,
+"cpu": 24.3,
+"throughput": 37.56,
+"bandwidth": 498.1,
+"floorArea": 1.95
+},
+{
+"host": "ingest-us-east-64",
+"region": "us-east",
+"role": "ingest",
+"memory": 23600.3,
+"latency": 346.04,
+"cpu": 49.4,
+"throughput": 18.33,
+"bandwidth": 582.2,
+"floorArea": 0.86
+},
+{
+"host": "ingest-us-west-65",
+"region": "us-west",
+"role": "ingest",
+"memory": 22680.2,
+"latency": 389.94,
+"cpu": 15.4,
+"throughput": 33.62,
+"bandwidth": 474.9,
+"floorArea": 2.1
+},
+{
+"host": "api-eu-central-66",
+"region": "eu-central",
+"role": "api",
+"memory": 25476.2,
+"latency": 280.52,
+"cpu": 87.7,
+"throughput": 43.77,
+"bandwidth": 652.2,
+"floorArea": 1.01
+},
+{
+"host": "api-ap-south-67",
+"region": "ap-south",
+"role": "api",
+"memory": 1776.6,
+"latency": 305.96,
+"cpu": 94.1,
+"throughput": 24.23,
+"bandwidth": 425.1,
+"floorArea": 0.69
+},
+{
+"host": "api-us-east-68",
+"region": "us-east",
+"role": "api",
+"memory": 19429.0,
+"latency": 326.85,
+"cpu": 49.0,
+"throughput": 0.41,
+"bandwidth": 750.1,
+"floorArea": 1.95
+},
+{
+"host": "api-us-west-69",
+"region": "us-west",
+"role": "api",
+"memory": 20428.1,
+"latency": 32.08,
+"cpu": 72.7,
+"throughput": 16.29,
+"bandwidth": 71.4,
+"floorArea": 1.08
+},
+{
+"host": "worker-eu-central-70",
+"region": "eu-central",
+"role": "worker",
+"memory": 7482.1,
+"latency": 312.11,
+"cpu": 46.2,
+"throughput": 54.14,
+"bandwidth": 73.5,
+"floorArea": 2.24
+},
+{
+"host": "cache-ap-south-71",
+"region": "ap-south",
+"role": "cache",
+"memory": 23680.6,
+"latency": 296.3,
+"cpu": 63.7,
+"throughput": 5.14,
+"bandwidth": 139.9,
+"floorArea": 1.06
+}
+]
+}

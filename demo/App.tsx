@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { DataTable } from '../src';
-import type { DataTableDisplay, ViewSpec } from '../src';
+import type {
+  DataTableDisplay,
+  DatasetJson,
+  UnitPlacement,
+  ViewSpec,
+} from '../src';
 
 import { view as tickerView } from './examples/ticker/view';
 import tickerData from './examples/ticker/data.json';
@@ -10,6 +15,8 @@ import { view as regressionView } from './examples/regression/view';
 import regressionData from './examples/regression/data.json';
 import { view as tokensView } from './examples/tokens/view';
 import tokensData from './examples/tokens/data.json';
+import { view as metricsView } from './examples/metrics/view';
+import metricsData from './examples/metrics/data.json';
 
 type Row = Record<string, unknown>;
 
@@ -18,7 +25,8 @@ interface Example {
   title: string;
   blurb: string;
   view: ViewSpec;
-  data: Row[];
+  /** Rows, or the `{meta, rows}` wire form carrying column metadata. */
+  data: Row[] | DatasetJson;
   display?: DataTableDisplay;
 }
 
@@ -69,6 +77,19 @@ const EXAMPLES: Example[] = [
     data: tokensData as Row[],
     display: { rowGroupSpacing: 10 },
   },
+  {
+    id: 'metrics',
+    title: '5 · Fleet metrics (column metadata)',
+    blurb:
+      'Headers and units come from column metadata shipped with the data. Compound units (ktok/s, MB/s, m²) move as one label; simple ones (ms, MB) can split scale onto the value and unit into the header.',
+    view: metricsView,
+    data: metricsData as DatasetJson,
+    display: {
+      indexColumns: 2,
+      zebra: true,
+      footer: [{ label: 'median', agg: 'median' }],
+    },
+  },
 ];
 
 type Theme = 'auto' | 'light' | 'dark';
@@ -83,11 +104,73 @@ function initialExample(): string {
   return EXAMPLES.some((e) => e.id === ex) ? ex! : EXAMPLES[0]!.id;
 }
 
+/**
+ * True when a dataset declares a unit or scale on any column — the placement
+ * controls do nothing without one, so they only appear for such examples.
+ */
+function hasUnitMeta(data: Row[] | DatasetJson): boolean {
+  if (Array.isArray(data) || !data.meta) return false;
+  return Object.values(data.meta).some(
+    (m) => m.siUnit ?? m.siScale ?? m.siUnitShort ?? m.siScaleShort,
+  );
+}
+
+const PLACEMENTS: UnitPlacement[] = ['off', 'value', 'header'];
+
+/** Where a metadata-supplied unit/scale label is rendered. */
+function PlacementSelect({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: UnitPlacement;
+  onChange: (v: UnitPlacement) => void;
+}) {
+  return (
+    <label
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        fontSize: 12,
+        color: 'var(--page-muted)',
+      }}
+    >
+      {label}
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value as UnitPlacement)}
+        style={{
+          padding: '4px 6px',
+          borderRadius: 6,
+          border: '1px solid var(--btn-border)',
+          background: 'var(--btn-bg)',
+          color: 'var(--btn-fg)',
+          fontSize: 12,
+        }}
+      >
+        {PLACEMENTS.map((p) => (
+          <option key={p} value={p}>
+            {p}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 export function App() {
   const [selected, setSelected] = useState(initialExample);
   const [stress, setStress] = useState(false);
   const [stressData, setStressData] = useState<Row[] | null>(null);
   const [theme, setTheme] = useState<Theme>(initialTheme);
+  // The library defaults to 'off' (units are opt-in); the demo starts them in
+  // the header so the metrics example shows its labels without touching a
+  // control. Only columns carrying unit metadata react, so examples 1–4 are
+  // unaffected either way.
+  const [unitPlacement, setUnitPlacement] = useState<UnitPlacement>('header');
+  const [scalePlacement, setScalePlacement] = useState<UnitPlacement>('header');
 
   const example = EXAMPLES.find((e) => e.id === selected)!;
   const isRegression = example.id === 'regression';
@@ -109,6 +192,7 @@ export function App() {
   }, [theme]);
 
   const data = isRegression && stress && stressData ? stressData : example.data;
+  const rowCount = Array.isArray(data) ? data.length : data.rows.length;
 
   return (
     <div
@@ -207,17 +291,39 @@ export function App() {
         </label>
       )}
 
+      {hasUnitMeta(data) && (
+        <div
+          style={{
+            display: 'flex',
+            gap: 12,
+            alignItems: 'center',
+            marginBottom: 10,
+          }}
+        >
+          <PlacementSelect
+            label="unit"
+            value={unitPlacement}
+            onChange={setUnitPlacement}
+          />
+          <PlacementSelect
+            label="scale"
+            value={scalePlacement}
+            onChange={setScalePlacement}
+          />
+        </div>
+      )}
+
       <DataTable
         key={example.id + (stress ? '-stress' : '')}
         data={data}
         view={example.view}
         height={560}
         theme={theme}
-        display={example.display}
+        display={{ ...example.display, unitPlacement, scalePlacement }}
       />
 
       <p style={{ color: 'var(--page-muted)', fontSize: 12, marginTop: 10 }}>
-        {data.length.toLocaleString()} source rows.
+        {rowCount.toLocaleString()} source rows.
       </p>
     </div>
   );

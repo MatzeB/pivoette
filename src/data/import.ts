@@ -1,5 +1,12 @@
 import { makeFrame } from './frame';
-import type { CellValue, ColumnType, DataColumn, DataFrame } from './types';
+import type { ColumnMeta, ColumnMetaInput } from './meta';
+import type {
+  CellValue,
+  ColumnType,
+  DataColumnInput,
+  DataFrame,
+  DatasetJson,
+} from './types';
 
 /** True if a JS number has no fractional part (and is finite). */
 function isInteger(n: number): boolean {
@@ -47,8 +54,14 @@ function normalize(v: unknown): CellValue {
 /**
  * Build a `DataFrame` from an array of row objects (rows of dicts). The column
  * set is the union of all keys, in first-seen order. Missing keys become null.
+ *
+ * `meta` supplies per-column metadata keyed by field name; anything omitted
+ * (including whole columns) is deduced from the scan.
  */
-export function fromRows(rows: Record<string, unknown>[]): DataFrame {
+export function fromRows(
+  rows: Record<string, unknown>[],
+  meta?: Record<string, ColumnMetaInput>,
+): DataFrame {
   const fieldOrder: string[] = [];
   const seen = new Set<string>();
   for (const row of rows) {
@@ -60,14 +73,36 @@ export function fromRows(rows: Record<string, unknown>[]): DataFrame {
     }
   }
 
-  const columns: DataColumn[] = fieldOrder.map((name) => {
+  const columns: DataColumnInput[] = fieldOrder.map((name) => {
     const values: CellValue[] = rows.map((row) =>
       Object.prototype.hasOwnProperty.call(row, name)
         ? normalize(row[name])
         : null,
     );
-    return { name, type: inferType(values), values };
+    return { name, type: inferType(values), values, meta: meta?.[name] };
   });
 
   return makeFrame(columns);
+}
+
+/**
+ * Build a `DataFrame` from a JSON dataset — either the `{ meta, rows }` wrapper
+ * that carries metadata alongside the data, or a bare row array.
+ */
+export function fromDataset(
+  input: DatasetJson | Record<string, unknown>[],
+): DataFrame {
+  return Array.isArray(input)
+    ? fromRows(input)
+    : fromRows(input.rows, input.meta);
+}
+
+/**
+ * Extract a frame's metadata in wire form. `ColumnMeta` is plain JSON, so
+ * `JSON.stringify({ meta: datasetMeta(frame), rows })` is the whole serializer.
+ */
+export function datasetMeta(frame: DataFrame): Record<string, ColumnMeta> {
+  const out: Record<string, ColumnMeta> = {};
+  for (const col of frame.columns) out[col.name] = col.meta;
+  return out;
 }

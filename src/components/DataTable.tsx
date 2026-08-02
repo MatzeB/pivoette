@@ -2,8 +2,10 @@ import { useMemo, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { CellCtx } from '../format/context';
-import type { CellValue, DataFrame } from '../data/types';
-import { fromRows } from '../data/import';
+import type { CellValue, DataFrame, DatasetJson } from '../data/types';
+import type { ColumnMeta } from '../data/meta';
+import { unitLabels } from '../data/meta';
+import { fromDataset } from '../data/import';
 import { computeView } from '../pivot/engine';
 import { getAggregation } from '../pivot/aggregations';
 import type { Cell, ResolvedLeaf, ResultRow } from '../pivot/result';
@@ -34,10 +36,17 @@ export interface DataTableDisplay {
   highlightHeaders?: boolean;
   /** Extra footer rows summarizing each column's displayed values. */
   footer?: { label: string; agg: string }[];
+  /** Where a column's unit label appears (default 'off'). */
+  unitPlacement?: UnitPlacement;
+  /** Where a column's scale label appears (default 'off'). Honored only for
+   * simple single-factor units; a compound unit moves as one atomic label. */
+  scalePlacement?: UnitPlacement;
 }
 
+export type UnitPlacement = 'value' | 'header' | 'off';
+
 export interface DataTableProps {
-  data: Record<string, unknown>[] | DataFrame;
+  data: Record<string, unknown>[] | DatasetJson | DataFrame;
   view: ViewSpec;
   height?: number | string;
   theme?: 'auto' | 'light' | 'dark';
@@ -149,6 +158,44 @@ function widthOf(text: string, bold = false): number {
   return ctx ? ctx.measureText(text).width : text.length * (bold ? 8 : 7.5);
 }
 
+// --- unit decoration --------------------------------------------------------
+
+/**
+ * Split a column's unit label across the value and header slots. A *simple*
+ * unit (one un-inverted factor) places its scale and unit halves independently,
+ * so `{scale:'value', unit:'header'}` gives `1.20 m` under `Latency (s)`. A
+ * compound unit (`ktok/s`, `m²`) is atomic: it follows `unitPlacement` whole and
+ * ignores `scalePlacement`, since the halves no longer decompose.
+ */
+function unitAffixes(
+  meta: ColumnMeta | undefined,
+  unitPlacement: UnitPlacement,
+  scalePlacement: UnitPlacement,
+): { value: string; header: string } {
+  const out = { value: '', header: '' };
+  const labels = unitLabels(meta);
+  if (!labels.full) return out;
+  if (!labels.simple) {
+    if (unitPlacement !== 'off') out[unitPlacement] += labels.full;
+    return out;
+  }
+  if (scalePlacement !== 'off') out[scalePlacement] += labels.scalePart;
+  if (unitPlacement !== 'off') out[unitPlacement] += labels.unitPart;
+  return out;
+}
+
+/** Unit labels follow a number with a space — except a bare `%`, which hugs. */
+function valueSuffix(text: string): string {
+  if (!text) return '';
+  return text === '%' ? text : ` ${text}`;
+}
+
+function isFrame(
+  data: Record<string, unknown>[] | DatasetJson | DataFrame,
+): data is DataFrame {
+  return !Array.isArray(data) && 'columnByName' in data;
+}
+
 // ---------------------------------------------------------------------------
 
 export function DataTable({
@@ -170,15 +217,47 @@ export function DataTable({
     hideRules = false,
     highlightHeaders = true,
     footer = [],
+    unitPlacement = 'off',
+    scalePlacement = 'off',
   } = display;
 
-  const result = useMemo(() => {
-    const frame = Array.isArray(data) ? fromRows(data) : data;
-    return computeView(frame, view);
-  }, [data, view]);
+  const result = useMemo(
+    () => computeView(isFrame(data) ? data : fromDataset(data), view),
+    [data, view],
+  );
 
-  const { rowLevels, leaves, summary, frame } = result;
+  const { rowLevels, summary, frame } = result;
   const depth = result.columnHeaderDepth;
+
+  // Unit decoration: wrap each leaf's formatter with its value suffix, and keep
+  // the header suffixes to append to the innermost header cells.
+  const { leaves, headerSuffix } = useMemo(() => {
+    const headerSuffix = result.leaves.map(() => '');
+    if (unitPlacement === 'off' && scalePlacement === 'off') {
+      return { leaves: result.leaves, headerSuffix };
+    }
+    const leaves = result.leaves.map((leaf, i) => {
+      const affix = unitAffixes(
+        leaf.column.meta,
+        unitPlacement,
+        scalePlacement,
+      );
+      headerSuffix[i] = affix.header ? ` (${affix.header})` : '';
+      const suffix = valueSuffix(affix.value);
+      // Tier-3 cells own their whole rendering; metadata is on `CellCtx` if
+      // they want it.
+      if (!suffix || leaf.render) return leaf;
+      const base = leaf.format;
+      return {
+        ...leaf,
+        format: (ctx: CellCtx) => {
+          const text = base(ctx);
+          return text ? text + suffix : text;
+        },
+      };
+    });
+    return { leaves, headerSuffix };
+  }, [result.leaves, unitPlacement, scalePlacement]);
 
   const [sort, setSort] = useState<SortState | null>(null);
   // Hovered cell: row index + leaf index (leaf = -1 when hovering an index cell).
@@ -186,10 +265,17 @@ export function DataTable({
     null,
   );
 
-  const headerRows = useMemo(
-    () => headerRowsRanged(result.columnHeader, depth),
-    [result, depth],
-  );
+  const headerRows = useMemo(() => {
+    const rows = headerRowsRanged(result.columnHeader, depth);
+    for (const hrow of rows) {
+      for (const hc of hrow) {
+        // Innermost (single-leaf) header cells carry the unit label.
+        if (hc.leafStart === hc.leafEnd)
+          hc.label += headerSuffix[hc.leafStart] ?? '';
+      }
+    }
+    return rows;
+  }, [result, depth, headerSuffix]);
 
   // Column footers (over the displayed cell values); reused for width sizing.
   const footerRows = useMemo(
@@ -211,7 +297,7 @@ export function DataTable({
     const sample = result.rows.slice(0, 200);
     const leafW = leaves.map((leaf, li) => {
       if (leaf.render) return 200;
-      let w = widthOf(leaf.column.label);
+      let w = widthOf(leaf.column.label + (headerSuffix[li] ?? ''));
       for (const r of sample) {
         const text = leaf.format(makeCtx(leaf, r.cells[li]!, r.path, frame));
         w = Math.max(w, widthOf(text));
@@ -256,6 +342,7 @@ export function DataTable({
   }, [
     result,
     leaves,
+    headerSuffix,
     rowLevels,
     frame,
     groupSpacing,

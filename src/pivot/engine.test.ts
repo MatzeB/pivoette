@@ -318,3 +318,68 @@ describe('derived column placement', () => {
     );
   });
 });
+
+describe('column metadata wiring', () => {
+  const rows = [
+    { host: 'a', image: 'a.png', desc: 'Alpha', latency: 1.5 },
+    { host: 'b', image: 'b.png', desc: 'Beta', latency: 2.5 },
+  ];
+  const meta = {
+    host: { displayName: 'Host' },
+    latency: {
+      displayName: 'Latency',
+      siUnit: 'second',
+      siScale: 'milli',
+    },
+  };
+
+  it('exposes source metadata on flat leaves, incl. composite sources', () => {
+    const frame = fromRows(rows, meta);
+    const res = computeView(frame, {
+      mode: 'flat',
+      columns: [
+        {
+          id: 'asset',
+          composite: { fields: ['image', 'desc'], sortKey: 'desc' },
+        },
+        { id: 'latency', source: 'latency' },
+        { id: 'double', compute: 'latency * 2' },
+      ],
+    } satisfies TableSpec);
+
+    const [asset, latency, double] = res.leaves;
+    expect(latency!.column.meta!.displayName).toBe('Latency');
+    expect(latency!.column.meta!.siUnitShort).toEqual(['s']);
+    expect(asset!.column.sources!.map((m) => m.dataName)).toEqual([
+      'image',
+      'desc',
+    ]);
+    // A computed column has no source field, so no metadata.
+    expect(double!.column.meta).toBeUndefined();
+  });
+
+  it('falls back to displayName for flat headers, letting labels win', () => {
+    const frame = fromRows(rows, meta);
+    const res = computeView(frame, {
+      mode: 'flat',
+      labels: { latency: 'Explicit' },
+      columns: [
+        { id: 'host', source: 'host' },
+        { id: 'latency', source: 'latency' },
+      ],
+    } satisfies TableSpec);
+    expect(res.leaves.map((l) => l.column.label)).toEqual(['Host', 'Explicit']);
+  });
+
+  it('exposes the aggregated field metadata on pivot measure leaves', () => {
+    const frame = fromRows(rows, meta);
+    const res = computeView(frame, {
+      rows: ['host'],
+      columns: [],
+      values: [{ id: 'mean', field: 'latency', agg: 'mean', label: 'mean' }],
+    } satisfies PivotSpec);
+    expect(res.leaves[0]!.column.meta!.dataName).toBe('latency');
+    // Row-level headers pick up displayName too.
+    expect(res.rowLevels).toEqual(['Host']);
+  });
+});

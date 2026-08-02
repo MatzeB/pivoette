@@ -5,6 +5,7 @@
  */
 import type { CSSProperties, ReactNode } from 'react';
 import type { DataFrame } from '../data/types';
+import type { ColumnMeta } from '../data/meta';
 import type { ColumnDef, ValueSpec } from '../pivot/spec';
 
 export type Align = 'left' | 'right' | 'center';
@@ -18,6 +19,10 @@ export interface ResolvedColumn {
   def?: ColumnDef;
   /** Present for measure columns. */
   value?: ValueSpec;
+  /** Metadata of the source field behind this column (flat source / measure). */
+  meta?: ColumnMeta;
+  /** Metadata of every source field, for composite multi-field columns. */
+  sources?: ColumnMeta[];
 }
 
 export interface CellCtx {

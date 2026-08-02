@@ -2,18 +2,41 @@
 
 // Component
 export { DataTable } from './components/DataTable';
-export type { DataTableProps, DataTableDisplay } from './components/DataTable';
+export type {
+  DataTableProps,
+  DataTableDisplay,
+  UnitPlacement,
+} from './components/DataTable';
 
 // Data model
-export { fromRows } from './data/import';
+export { datasetMeta, fromDataset, fromRows } from './data/import';
 export { makeFrame, requireColumn } from './data/frame';
 export type {
   CellValue,
   ColumnType,
   DataColumn,
+  DataColumnInput,
   DataFrame,
+  DatasetJson,
   JsonValue,
 } from './data/types';
+
+// Column metadata (display name, category, compound units)
+export {
+  ColumnKind,
+  deduceCategory,
+  kindId,
+  normalizeMeta,
+  SCALE_SHORT,
+  UNIT_SHORT,
+  unitLabels,
+} from './data/meta';
+export type {
+  ColumnCategory,
+  ColumnMeta,
+  ColumnMetaInput,
+  UnitLabels,
+} from './data/meta';
 
 // Engine
 export { computeView } from './pivot/engine';
