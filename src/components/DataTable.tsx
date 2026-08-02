@@ -16,6 +16,12 @@ import type {
 } from '../pivot/result';
 import type { ViewSpec } from '../pivot/spec';
 import { compareValues } from '../util';
+import { aggregationIds } from '../pivot/aggregations';
+import { isFlat } from '../pivot/spec';
+import { AddMenu } from '../editor/AddMenu';
+import type { AddOption } from '../editor/AddMenu';
+import { addField, addFooterRow, addValue, moveField } from '../editor/ops';
+import type { FieldRef } from '../editor/ops';
 import styles from './DataTable.module.css';
 
 export interface DataTableDisplay {
@@ -53,6 +59,12 @@ export type UnitPlacement = 'value' | 'header' | 'off';
 export interface DataTableProps {
   data: Record<string, unknown>[] | DatasetJson | DataFrame;
   view: ViewSpec;
+  /** Show the editing affordances. Needs `onViewChange` to do anything. */
+  editing?: boolean;
+  /** Emitted when an edit changes the spec; the host owns the state. */
+  onViewChange?: (next: ViewSpec) => void;
+  /** Emitted when an edit changes presentation (the footer rows). */
+  onDisplayChange?: (next: DataTableDisplay) => void;
   height?: number | string;
   theme?: 'auto' | 'light' | 'dark';
   display?: DataTableDisplay;
@@ -62,6 +74,9 @@ export interface DataTableProps {
 /** Stable identity: a fresh `[]` default would invalidate the width memo (and
  * so re-measure every column) on every render, including each hover. */
 const NO_FOOTER: { label: string; agg: string }[] = [];
+
+/** Width of the narrow `+` columns shown in edit mode. */
+const EDIT_COL_W = 26;
 
 const ROW_HEIGHT = 30;
 const HEADER_H = 28;
@@ -237,6 +252,9 @@ function isFrame(
 export function DataTable({
   data,
   view,
+  editing = false,
+  onViewChange,
+  onDisplayChange,
   height = 480,
   theme = 'auto',
   display = {},
@@ -474,7 +492,88 @@ export function DataTable({
   const paddingTop = items.length > 0 ? items[0]!.start : 0;
   const paddingBottom =
     items.length > 0 ? totalSize - items[items.length - 1]!.end : 0;
-  const totalCols = rowLevels.length + leaves.length;
+  // --- editing -------------------------------------------------------------
+  // Chrome appears only when the host can actually receive the change.
+  const editable = editing && !!onViewChange && !isFlat(view);
+  const spec = isFlat(view) ? undefined : view;
+  /** Two extra columns in edit mode: the row `+` and the value `+`. */
+  const editCols = editable ? 2 : 0;
+  const [pendingValueField, setPendingValueField] = useState<string | null>(
+    null,
+  );
+
+  /** Columns not yet placed on an axis, split by what they can be used for. */
+  const { indexOptions, dataOptions } = useMemo(() => {
+    const placed = new Set([...(spec?.rows ?? []), ...(spec?.columns ?? [])]);
+    const index: AddOption[] = [];
+    const data: AddOption[] = [];
+    for (const col of frame.columns) {
+      const option = { id: col.name, label: col.meta.displayName };
+      if (col.meta.category === 'index') {
+        if (!placed.has(col.name)) index.push(option);
+      } else {
+        data.push(option);
+      }
+    }
+    index.push({ id: '__custom__', label: 'Custom…', hint: 'soon' });
+    return { indexOptions: index, dataOptions: data };
+  }, [frame, spec?.rows, spec?.columns]);
+
+  const aggOptions = useMemo<AddOption[]>(
+    () => aggregationIds().map((id) => ({ id, label: id })),
+    [],
+  );
+
+  function addTo(zone: 'rows' | 'columns', field: string) {
+    if (field === '__custom__' || !spec) return;
+    onViewChange?.(addField(spec, zone, field));
+  }
+
+  /** Two-step: pick the field, then the aggregation. */
+  function pickValue(id: string): boolean | void {
+    if (!spec) return;
+    if (pendingValueField === null) {
+      setPendingValueField(id);
+      return true; // keep the menu open for the aggregation
+    }
+    onViewChange?.(addValue(spec, pendingValueField, id));
+    setPendingValueField(null);
+  }
+
+  /** Drag state: which field is in flight, so drops know the source. */
+  const dragged = useRef<FieldRef | null>(null);
+
+  function onFieldDrop(to: FieldRef) {
+    const from = dragged.current;
+    dragged.current = null;
+    if (!spec || !from) return;
+    if (from.zone === to.zone && from.index === to.index) return;
+    onViewChange?.(moveField(spec, from, to));
+  }
+
+  /** Props shared by every draggable field handle. */
+  function dragProps(ref: FieldRef) {
+    if (!editable) return {};
+    return {
+      draggable: true,
+      onDragStart: (e: React.DragEvent) => {
+        dragged.current = ref;
+        e.dataTransfer.effectAllowed = 'move';
+        // Firefox needs data set for a drag to start at all.
+        e.dataTransfer.setData('text/plain', ref.zone + ':' + ref.index);
+      },
+      onDragOver: (e: React.DragEvent) => {
+        if (dragged.current) e.preventDefault();
+      },
+      onDrop: (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onFieldDrop(ref);
+      },
+    };
+  }
+
+  const totalCols = rowLevels.length + leaves.length + editCols;
   const wrapperCls = cls(
     styles.wrapper,
     frameless && styles.frameless,
@@ -512,6 +611,7 @@ export function DataTable({
           {indexW.map((w, i) => (
             <col key={`i${i}`} style={{ width: w }} />
           ))}
+          {editable && <col key="e-rows" style={{ width: EDIT_COL_W }} />}
           {leafW.map((w, i) => (
             <col
               key={`l${i}`}
@@ -520,6 +620,7 @@ export function DataTable({
               }}
             />
           ))}
+          {editable && <col key="e-vals" style={{ width: EDIT_COL_W }} />}
         </colgroup>
 
         <thead onMouseOver={() => setHover(null)}>
@@ -543,11 +644,31 @@ export function DataTable({
                       }}
                       onClick={() => cycleSort({ kind: 'index', level: i })}
                     >
-                      {lvl}
+                      <span {...dragProps({ zone: 'rows', index: i })}>
+                        {lvl}
+                      </span>
                       {sortArrow(active)}
                     </th>
                   );
                 })}
+              {level === 0 && editable && (
+                <th
+                  key="e-rows"
+                  rowSpan={depth}
+                  className={`${styles.corner} ${styles.rowHeaderCell} ${styles.indexTint} ${styles.editCell}`}
+                  style={{ top: 0 }}
+                  onDragOver={(e) => dragged.current && e.preventDefault()}
+                  onDrop={() =>
+                    onFieldDrop({ zone: 'rows', index: rowLevels.length })
+                  }
+                >
+                  <AddMenu
+                    title="Add a row field"
+                    options={indexOptions}
+                    onPick={(id) => addTo('rows', id)}
+                  />
+                </th>
+              )}
               {hrow.map((hc, ci) => {
                 const isLeafCol = hc.leafStart === hc.leafEnd;
                 const active =
@@ -580,8 +701,65 @@ export function DataTable({
                   </th>
                 );
               })}
+              {level === 0 && editable && (
+                <th
+                  key="e-vals"
+                  rowSpan={depth}
+                  className={styles.editCell}
+                  style={{ top: 0 }}
+                >
+                  <AddMenu
+                    title="Add a measure"
+                    options={
+                      pendingValueField === null ? dataOptions : aggOptions
+                    }
+                    onPick={pickValue}
+                    onClose={() => setPendingValueField(null)}
+                  />
+                </th>
+              )}
             </tr>
           ))}
+          {/* Column fields have no visible handle otherwise: the headers above
+              show members (Sun, Mon), never the field name. */}
+          {editable && (
+            <tr key="colfields" style={{ height: HEADER_H }}>
+              <th
+                colSpan={rowLevels.length + 1}
+                className={`${styles.rowHeaderCell} ${styles.indexTint} ${styles.left}`}
+                style={{ top: depth * HEADER_H, left: 0 }}
+              >
+                <span className={styles.zoneLabel}>columns</span>
+              </th>
+              <td
+                colSpan={leaves.length + 1}
+                className={styles.fieldStrip}
+                style={{ top: depth * HEADER_H }}
+                onDragOver={(e) => dragged.current && e.preventDefault()}
+                onDrop={() =>
+                  onFieldDrop({
+                    zone: 'columns',
+                    index: spec?.columns.length ?? 0,
+                  })
+                }
+              >
+                {(spec?.columns ?? []).map((field, i) => (
+                  <span
+                    key={field}
+                    className={styles.chip}
+                    {...dragProps({ zone: 'columns', index: i })}
+                  >
+                    {frame.columnByName.get(field)?.meta.displayName ?? field}
+                  </span>
+                ))}
+                <AddMenu
+                  title="Add a column field"
+                  options={indexOptions}
+                  onPick={(id) => addTo('columns', id)}
+                />
+              </td>
+            </tr>
+          )}
           {/* One contiguous rule under the whole header (spans the gaps). */}
           {!hideRules && (
             <tr aria-hidden="true">
@@ -623,6 +801,7 @@ export function DataTable({
                 indexColumns={indexColumns}
                 extraTop={extraTop[item.index] ?? 0}
                 zebra={zebra}
+                editCols={editCols}
                 hover={hover}
                 hoverPath={hover ? rows[hover.row]?.path : undefined}
                 onHover={setHover}
@@ -636,8 +815,43 @@ export function DataTable({
           )}
         </tbody>
 
-        {footerLines.length > 0 && (
+        {(footerLines.length > 0 || editable) && (
           <tfoot>
+            {editable && (
+              <tr style={{ height: HEADER_H }}>
+                <th
+                  colSpan={rowLevels.length + 1}
+                  className={`${styles.rowHeaderCell} ${styles.indexTint} ${styles.left}`}
+                  style={{
+                    position: 'sticky',
+                    bottom: footerBottom + HEADER_H,
+                  }}
+                >
+                  <span className={styles.zoneLabel}>totals</span>
+                </th>
+                <td
+                  colSpan={leaves.length + 1}
+                  className={styles.fieldStrip}
+                  style={{
+                    position: 'sticky',
+                    bottom: footerBottom + HEADER_H,
+                  }}
+                >
+                  {footer.map((f, i) => (
+                    <span key={`${f.agg}${i}`} className={styles.chip}>
+                      {f.label}
+                    </span>
+                  ))}
+                  <AddMenu
+                    title="Add a footer row"
+                    options={aggOptions}
+                    onPick={(id) =>
+                      onDisplayChange?.(addFooterRow(display, id))
+                    }
+                  />
+                </td>
+              </tr>
+            )}
             {/* Lineless: a small background gap; otherwise a contiguous
                 accountant-style double line directly against the data. */}
             <tr aria-hidden="true">
@@ -661,6 +875,7 @@ export function DataTable({
                 bodyLeadGap={bodyLeadGap}
                 bottom={(footerLines.length - 1 - fi) * ROW_HEIGHT}
                 leftOffset={leftOffset}
+                editCols={editCols}
                 onHover={setHover}
               />
             ))}
@@ -712,6 +927,8 @@ interface RowProps {
   indexColumns: number;
   extraTop: number;
   zebra: boolean;
+  /** 0, or 2 in edit mode: one cell after the index group, one at the end. */
+  editCols: number;
   hover: { row: number; leaf: number } | null;
   hoverPath: unknown[] | undefined;
   onHover: (h: { row: number; leaf: number } | null) => void;
@@ -733,6 +950,7 @@ function Row({
   indexColumns,
   extraTop,
   zebra,
+  editCols,
   hover,
   hoverPath,
   onHover,
@@ -780,6 +998,9 @@ function Row({
           </th>
         );
       })}
+      {editCols > 0 && (
+        <td className={styles.editCell} style={gapTop} aria-hidden="true" />
+      )}
       {row.cells.map((cell, i) => {
         const leaf = leaves[i]!;
         const ctx = makeCtx(leaf, cell, row.path, frame);
@@ -809,6 +1030,9 @@ function Row({
           </td>
         );
       })}
+      {editCols > 0 && (
+        <td className={styles.editCell} style={gapTop} aria-hidden="true" />
+      )}
     </tr>
   );
 }
@@ -823,6 +1047,7 @@ interface FooterRowProps {
   bodyLeadGap: number;
   bottom: number;
   leftOffset: number[];
+  editCols: number;
   onHover: (h: { row: number; leaf: number } | null) => void;
 }
 
@@ -836,6 +1061,7 @@ function FooterRow({
   bodyLeadGap,
   bottom,
   leftOffset,
+  editCols,
   onHover,
 }: FooterRowProps) {
   const sticky: CSSProperties = { position: 'sticky', bottom, zIndex: 1 };
@@ -850,6 +1076,9 @@ function FooterRow({
         >
           {label}
         </th>
+      )}
+      {editCols > 0 && (
+        <td className={styles.editCell} style={sticky} aria-hidden="true" />
       )}
       {cells.map((cell, i) => {
         const leaf = leaves[i]!;
@@ -873,6 +1102,9 @@ function FooterRow({
           </td>
         );
       })}
+      {editCols > 0 && (
+        <td className={styles.editCell} style={sticky} aria-hidden="true" />
+      )}
     </tr>
   );
 }

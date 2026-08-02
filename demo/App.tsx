@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { DataTable, isFlat, normalizeMeta, unitLabels } from '../src';
+import {
+  DataTable,
+  ViewEditor,
+  isFlat,
+  normalizeMeta,
+  unitLabels,
+} from '../src';
 import type {
   ColumnMetaInput,
   UnitLabels,
@@ -329,17 +335,32 @@ export function App() {
   const example = EXAMPLES.find((e) => e.id === selected)!;
   const isRegression = example.id === 'regression';
 
+  // Editing makes the spec state rather than a constant. Seeded from the
+  // example and reset whenever it changes, so switching examples starts clean.
+  const [editing, setEditing] = useState(false);
+  const [edited, setEdited] = useState<ViewSpec | null>(null);
+  const [editedDisplay, setEditedDisplay] = useState<DataTableDisplay | null>(
+    null,
+  );
+  useEffect(() => {
+    setEdited(null);
+    setEditedDisplay(null);
+  }, [selected]);
+
   // Overriding the view's locale changes number separators and, for currency
   // units, where the symbol sits and how many decimals it takes. Memoized so
   // the engine is not re-run on unrelated renders.
+  const baseView = edited ?? example.view;
   const view = useMemo(() => {
-    if (!locale && !timeZone) return example.view;
+    if (!locale && !timeZone) return baseView;
     return {
-      ...example.view,
+      ...baseView,
       ...(locale ? { locale } : {}),
       ...(timeZone ? { timeZone } : {}),
     };
-  }, [example.view, locale, timeZone]);
+  }, [baseView, locale, timeZone]);
+
+  const display = editedDisplay ?? example.display ?? {};
 
   // Only a view that derives something can be affected by the zone.
   const usesTime = view.derive !== undefined;
@@ -431,6 +452,20 @@ export function App() {
               onChange={setTimeZone}
             />
           )}
+          <button
+            onClick={() => setEditing((v) => !v)}
+            style={{
+              padding: '5px 10px',
+              borderRadius: 6,
+              border: '1px solid var(--btn-border)',
+              cursor: 'pointer',
+              background: editing ? 'var(--btn-active-bg)' : 'var(--btn-bg)',
+              color: editing ? 'var(--btn-active-fg)' : 'var(--btn-fg)',
+              fontSize: 12,
+            }}
+          >
+            {editing ? 'Done' : 'Edit'}
+          </button>
           {(['auto', 'light', 'dark'] as Theme[]).map((t) => (
             <button
               key={t}
@@ -537,14 +572,53 @@ export function App() {
         </div>
       )}
 
-      <DataTable
-        key={example.id + (stress ? '-stress' : '')}
-        data={data}
-        view={view}
-        height={560}
-        theme={theme}
-        display={{ ...example.display, unitPlacement, scalePlacement }}
-      />
+      <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+        <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+          <DataTable
+            key={example.id + (stress ? '-stress' : '')}
+            data={data}
+            view={view}
+            height={560}
+            theme={theme}
+            display={{ ...display, unitPlacement, scalePlacement }}
+            editing={editing}
+            onViewChange={setEdited}
+            onDisplayChange={setEditedDisplay}
+          />
+        </div>
+        {editing && (
+          <div style={{ flex: '0 0 auto' }}>
+            {/* No `frame`: the panel shows the spec, so raw field names are
+                the right identifiers here — they are what the config says. */}
+            <ViewEditor
+              view={view}
+              display={display}
+              onViewChange={setEdited}
+              onDisplayChange={setEditedDisplay}
+            />
+            {(edited || editedDisplay) && (
+              <button
+                onClick={() => {
+                  setEdited(null);
+                  setEditedDisplay(null);
+                }}
+                style={{
+                  marginTop: 10,
+                  padding: '5px 10px',
+                  borderRadius: 6,
+                  border: '1px solid var(--btn-border)',
+                  background: 'var(--btn-bg)',
+                  color: 'var(--btn-fg)',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                }}
+              >
+                Reset to the example
+              </button>
+            )}
+          </div>
+        )}
+      </div>
 
       <p style={{ color: 'var(--page-muted)', fontSize: 12, marginTop: 10 }}>
         {rowCount.toLocaleString()} source rows.

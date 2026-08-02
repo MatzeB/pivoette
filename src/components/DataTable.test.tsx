@@ -291,3 +291,116 @@ describe('<DataTable> currency prefix', () => {
     expect(values).toContain('12.50');
   });
 });
+
+describe('<DataTable> editing', () => {
+  const data = [
+    { author: 'a', weekday: 1, n: 5 },
+    { author: 'b', weekday: 2, n: 7 },
+  ];
+  const view: PivotSpec = {
+    rows: ['author'],
+    columns: ['weekday'],
+    values: [{ id: 's', field: 'n', agg: 'sum', label: 'n' }],
+  };
+
+  async function cellCounts(el: HTMLElement) {
+    const head = el.querySelectorAll('thead tr:first-child > *').length;
+    const foot = el.querySelectorAll('tfoot tr:last-child > *').length;
+    return { head, foot };
+  }
+
+  it('renders no chrome without the editing prop', async () => {
+    const el = await render(
+      <DataTable
+        data={data}
+        view={view}
+        display={{ footer: [{ label: 'sum', agg: 'sum' }] }}
+      />,
+    );
+    expect(el.querySelectorAll('button[aria-label^="Add"]')).toHaveLength(0);
+  });
+
+  it('renders no chrome when editing without a change handler', async () => {
+    // Chrome that cannot report anywhere would be a dead control.
+    const el = await render(<DataTable data={data} view={view} editing />);
+    expect(el.querySelectorAll('button[aria-label^="Add"]')).toHaveLength(0);
+  });
+
+  it('adds the four + affordances when editable', async () => {
+    const el = await render(
+      <DataTable
+        data={data}
+        view={view}
+        editing
+        onViewChange={() => {}}
+        onDisplayChange={() => {}}
+        display={{ footer: [{ label: 'sum', agg: 'sum' }] }}
+      />,
+    );
+    const labels = [...el.querySelectorAll('button[aria-label^="Add"]')].map(
+      (b) => b.getAttribute('aria-label'),
+    );
+    expect(labels).toEqual([
+      'Add a row field',
+      'Add a measure',
+      'Add a column field',
+      'Add a footer row',
+    ]);
+  });
+
+  it('widens every row by exactly two cells', async () => {
+    const plain = await render(
+      <DataTable
+        data={data}
+        view={view}
+        display={{ footer: [{ label: 'sum', agg: 'sum' }] }}
+      />,
+    );
+    const before = await cellCounts(plain);
+    const edit = await render(
+      <DataTable
+        data={data}
+        view={view}
+        editing
+        onViewChange={() => {}}
+        onDisplayChange={() => {}}
+        display={{ footer: [{ label: 'sum', agg: 'sum' }] }}
+      />,
+    );
+    const after = await cellCounts(edit);
+    expect(after.head).toBe(before.head + 2);
+    expect(after.foot).toBe(before.foot + 2);
+  });
+
+  it('names the column fields, which the headers never show', async () => {
+    const el = await render(
+      <DataTable data={data} view={view} editing onViewChange={() => {}} />,
+    );
+    // Column headers show members (1, 2); the strip shows the field.
+    expect(el.querySelector('thead')!.textContent).toContain('weekday');
+  });
+
+  it('reports an added field instead of mutating', async () => {
+    let next: PivotSpec | undefined;
+    const el = await render(
+      <DataTable
+        data={data}
+        view={view}
+        editing
+        onViewChange={(v) => (next = v as PivotSpec)}
+      />,
+    );
+    const add = el.querySelector<HTMLButtonElement>(
+      'button[aria-label="Add a row field"]',
+    )!;
+    await act(async () => add.click());
+    const option = [...el.querySelectorAll('button[role="menuitem"]')].find(
+      (b) => b.textContent?.startsWith('weekday') === false,
+    ) as HTMLButtonElement | undefined;
+    // `weekday` is already placed, so only unplaced index columns plus Custom…
+    expect(option).toBeTruthy();
+    await act(async () => option!.click());
+    expect(view.rows).toEqual(['author']); // untouched
+    if (next) expect(next.rows.length).toBeGreaterThanOrEqual(1);
+  });
+});

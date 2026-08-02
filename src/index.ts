@@ -85,6 +85,22 @@ export type {
   ViewSpec,
 } from './pivot/spec';
 
+// Editing
+export { ViewEditor } from './editor/ViewEditor';
+export type { ViewEditorProps } from './editor/ViewEditor';
+export {
+  addField,
+  addFooterRow,
+  addValue,
+  moveField,
+  moveValue,
+  removeField,
+  removeFooterRow,
+  removeValue,
+  setValueAgg,
+} from './editor/ops';
+export type { FieldRef, FieldZone } from './editor/ops';
+
 // Registries (built-ins + extension points)
 export {
   aggregationIds,

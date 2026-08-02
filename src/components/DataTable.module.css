@@ -215,3 +215,50 @@
   border-right: none;
   border-bottom: none;
 }
+
+/* --- editing chrome ------------------------------------------------------ */
+
+/* The two narrow `+` columns, and their spacer cells in every body row. */
+.editCell {
+  padding: 0;
+  text-align: center;
+  background: var(--pv-bg);
+  border-bottom: 0;
+}
+
+/* The column-field and footer strips: a row of draggable chips plus a `+`. */
+.fieldStrip {
+  position: sticky;
+  z-index: 3;
+  padding: 3px 8px;
+  background: var(--pv-bg);
+  border-bottom: 1px solid var(--pv-border);
+  white-space: nowrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--pv-border);
+  background: var(--pv-hover);
+  color: var(--pv-text);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: grab;
+}
+
+.chip:active {
+  cursor: grabbing;
+}
+
+/* Names the zone a strip belongs to, in the index gutter beside it. */
+.zoneLabel {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pv-muted);
+}
