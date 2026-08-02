@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { DataTable } from '../src';
+import { DataTable, isFlat } from '../src';
 import type {
+  ColumnMetaInput,
   DataTableDisplay,
   DatasetJson,
   UnitPlacement,
@@ -35,7 +36,7 @@ const EXAMPLES: Example[] = [
     id: 'ticker',
     title: '1 · Stock ticker (flat)',
     blurb:
-      'Flat detail table: composite asset cell (image + description, sorted by description), computed P/L $ and %, currency + sign formatting, red/green by sign.',
+      'Flat detail table: composite asset cell (image + description, sorted by description), computed P/L, red/green by sign. Column metadata is declared in the view over plain JSON rows — the 2-decimal money format is deduced from kind `price`, and the `$` follows the placement toggle (leading the number, inside the sign).',
     view: tickerView,
     data: tickerData as Row[],
     display: { indexColumns: 1 },
@@ -104,15 +105,23 @@ function initialExample(): string {
   return EXAMPLES.some((e) => e.id === ex) ? ex! : EXAMPLES[0]!.id;
 }
 
+/** True if this metadata declares a unit or scale. */
+function declaresUnit(m: ColumnMetaInput | undefined): boolean {
+  return !!(m && (m.unit ?? m.scale ?? m.unitShort ?? m.scaleShort));
+}
+
 /**
- * True when a dataset declares a unit or scale on any column — the placement
- * controls do nothing without one, so they only appear for such examples.
+ * True when any column carries a unit, from either source: the data (metrics
+ * ships a `{meta, rows}` document) or the view (ticker annotates plain rows,
+ * including a computed column's own `meta`). The placement controls do nothing
+ * without one, so they only appear for such examples.
  */
-function hasUnitMeta(data: Row[] | DatasetJson): boolean {
-  if (Array.isArray(data) || !data.meta) return false;
-  return Object.values(data.meta).some(
-    (m) => m.unit ?? m.scale ?? m.unitShort ?? m.scaleShort,
-  );
+function hasUnitMeta(data: Row[] | DatasetJson, view: ViewSpec): boolean {
+  if (!Array.isArray(data) && Object.values(data.meta ?? {}).some(declaresUnit))
+    return true;
+  if (Object.values(view.meta ?? {}).some(declaresUnit)) return true;
+  const defs = isFlat(view) ? view.columns : (view.computed ?? []);
+  return defs.some((def) => declaresUnit(def.meta));
 }
 
 const PLACEMENTS: UnitPlacement[] = ['off', 'value', 'header'];
@@ -291,7 +300,7 @@ export function App() {
         </label>
       )}
 
-      {hasUnitMeta(data) && (
+      {hasUnitMeta(data, example.view) && (
         <div
           style={{
             display: 'flex',
