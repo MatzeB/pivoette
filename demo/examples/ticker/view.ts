@@ -4,7 +4,7 @@ import type { ViewSpec } from '../../../src';
 const green = 'light-dark(#137333, #30d158)';
 const red = 'light-dark(#c5221f, #ff453a)';
 
-const money = { kind: ['price'], unit: ['dollar'] };
+const dollar = { kind: ['price'], unit: ['dollar'] };
 
 /**
  * Flat detail table: composite asset column, computed P/L, sign coloring.
@@ -12,7 +12,7 @@ const money = { kind: ['price'], unit: ['dollar'] };
  * `data.json` here is a plain row array — the typical case, where the data
  * comes from somewhere that knows nothing about presentation — so the column
  * metadata is declared in the view instead and layered on at load. From it the
- * headers and the 2-decimal money format are both deduced; the `$` itself comes
+ * headers and the 2-decimal dollar format are both deduced; the `$` itself comes
  * from the unit placement, which is why no column names `currency`.
  *
  * Columns with neither `compute` nor `composite` omit `source`: it defaults to
@@ -23,8 +23,8 @@ export const view: ViewSpec = {
   meta: {
     symbol: { displayName: 'Symbol' },
     description: { displayName: 'Asset' },
-    price: { displayName: 'Price', ...money },
-    basePrice: { displayName: 'Base', ...money },
+    price: { displayName: 'Price', ...dollar },
+    basePrice: { displayName: 'Base', ...dollar },
   },
   columns: [
     {
@@ -52,7 +52,7 @@ export const view: ViewSpec = {
       label: 'P/L',
       compute: 'price - basePrice',
       // A computed column has no source field, so it declares its own unit.
-      meta: money,
+      meta: dollar,
       format: {
         name: 'number',
         options: { decimals: 2, signDisplay: 'exceptZero' },
