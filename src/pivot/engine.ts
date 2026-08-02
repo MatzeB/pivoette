@@ -309,23 +309,48 @@ function keyOf(tuple: CellValue[]): string {
   return JSON.stringify(tuple);
 }
 
+/**
+ * Order index keys so the multi-level index actually nests.
+ *
+ * *Every* level takes part in the comparison, outermost first: a level named by
+ * `sort` uses that direction, and any other keeps the order its members were
+ * first encountered in. Comparing all levels lexicographically is what
+ * guarantees keys sharing a prefix end up adjacent — which the merged index
+ * cells assume, and which neither source order nor a partial sort provides.
+ * (Before this, grouping by `team > project` only looked right because the
+ * source rows happened to arrive grouped that way.)
+ */
 function sortTuples(
   keys: CellValue[][],
   fields: string[],
   sort?: SortSpec[],
 ): CellValue[][] {
-  if (!sort || sort.length === 0) return keys;
-  const specs = sort
-    .map((s) => ({
-      level: fields.indexOf(s.field),
-      dir: s.direction === 'desc' ? -1 : 1,
-    }))
-    .filter((s) => s.level >= 0);
-  if (specs.length === 0) return keys;
+  if (fields.length === 0) return keys;
+
+  const direction = new Map<number, number>();
+  for (const s of sort ?? []) {
+    const level = fields.indexOf(s.field);
+    if (level >= 0) direction.set(level, s.direction === 'desc' ? -1 : 1);
+  }
+
+  // Encounter order of each level's members, used where no sort was asked for.
+  const firstSeen = fields.map(() => new Map<string, number>());
+  for (const key of keys) {
+    for (let i = 0; i < fields.length; i++) {
+      const seen = firstSeen[i]!;
+      const member = String(key[i]);
+      if (!seen.has(member)) seen.set(member, seen.size);
+    }
+  }
+
   return [...keys].sort((a, b) => {
-    for (const { level, dir } of specs) {
-      const cmp = compareValues(a[level], b[level]);
-      if (cmp !== 0) return cmp * dir;
+    for (let i = 0; i < fields.length; i++) {
+      const dir = direction.get(i);
+      const cmp =
+        dir !== undefined
+          ? compareValues(a[i], b[i]) * dir
+          : firstSeen[i]!.get(String(a[i]))! - firstSeen[i]!.get(String(b[i]))!;
+      if (cmp !== 0) return cmp;
     }
     return 0;
   });

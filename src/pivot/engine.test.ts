@@ -607,3 +607,70 @@ describe('factor and compute inputs', () => {
     expect(res.rows[0]!.cells[0]!.value).toBe(60);
   });
 });
+
+describe('multi-level index nesting', () => {
+  /** Deliberately un-grouped input: no two adjacent rows share a team. */
+  const scrambled = [
+    { team: 'A', project: 'p1', n: 1 },
+    { team: 'B', project: 'p3', n: 2 },
+    { team: 'A', project: 'p2', n: 4 },
+    { team: 'B', project: 'p4', n: 8 },
+    { team: 'A', project: 'p1', n: 16 },
+  ];
+  const spec: PivotSpec = {
+    rows: ['team', 'project'],
+    columns: [],
+    values: [{ id: 's', field: 'n', agg: 'sum', label: 'n' }],
+  };
+
+  /** Merged index cells assume keys sharing a prefix are adjacent. */
+  function outerBlocks(paths: unknown[][]) {
+    let n = paths.length > 0 ? 1 : 0;
+    for (let i = 1; i < paths.length; i++) {
+      if (paths[i]![0] !== paths[i - 1]![0]) n++;
+    }
+    return n;
+  }
+
+  it('groups by the outer level even when the source rows do not', () => {
+    const res = computeView(fromRows(scrambled), spec);
+    const paths = res.rows.map((r) => r.path);
+    expect(paths.map((p) => p[0])).toEqual(['A', 'A', 'B', 'B']);
+    // One block per team, not one per row.
+    expect(outerBlocks(paths)).toBe(2);
+  });
+
+  it('keeps encounter order within each level', () => {
+    const res = computeView(fromRows(scrambled), spec);
+    expect(res.rows.map((r) => r.path.join('>'))).toEqual([
+      'A>p1',
+      'A>p2',
+      'B>p3',
+      'B>p4',
+    ]);
+  });
+
+  it('still nests when only an inner level is sorted', () => {
+    const res = computeView(fromRows(scrambled), {
+      ...spec,
+      rowSort: [{ field: 'project', direction: 'desc' }],
+    });
+    const paths = res.rows.map((r) => r.path);
+    // The outer level is untouched but must still block together.
+    expect(outerBlocks(paths)).toBe(2);
+    expect(res.rows.map((r) => r.path.join('>'))).toEqual([
+      'A>p2',
+      'A>p1',
+      'B>p4',
+      'B>p3',
+    ]);
+  });
+
+  it('honors an explicit outer sort', () => {
+    const res = computeView(fromRows(scrambled), {
+      ...spec,
+      rowSort: [{ field: 'team', direction: 'desc' }],
+    });
+    expect(res.rows.map((r) => r.path[0])).toEqual(['B', 'B', 'A', 'A']);
+  });
+});
