@@ -47,3 +47,23 @@ export function deduceFormat(
   if (!meta) return undefined;
   return KIND_RULES[kindId(meta)] ?? UNIT_RULES[unitLabels(meta).full];
 }
+
+/**
+ * Combine a view's explicit format with the deduced one. Naming the *same*
+ * built-in merges their options, so a column can override one setting and
+ * inherit the rest — `{ name: 'number', options: { signDisplay: 'exceptZero' } }`
+ * on a percentage keeps the deduced 1 decimal. Naming a different built-in (or
+ * supplying an inline fn/expression) replaces the deduction outright.
+ */
+export function resolveFormatSpec(
+  explicit: FormatSpec | undefined,
+  deduced: FormatSpec | undefined,
+): FormatSpec | undefined {
+  if (!explicit || !deduced) return explicit ?? deduced;
+  if (!('name' in explicit) || !('name' in deduced)) return explicit;
+  if (explicit.name !== deduced.name) return explicit;
+  return {
+    name: explicit.name,
+    options: { ...deduced.options, ...explicit.options },
+  };
+}

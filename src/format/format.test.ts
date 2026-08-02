@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { deduceFormat } from './deduce';
+import { deduceFormat, resolveFormatSpec } from './deduce';
 import { normalizeMeta } from '../data/meta';
 import type { ColumnMetaInput } from '../data/meta';
 import { resolveFormat } from './format';
@@ -106,5 +106,46 @@ describe('deduceFormat', () => {
     expect(
       deduceFormat(meta({ kind: ['price', '1/duration'] })),
     ).toBeUndefined();
+  });
+});
+
+describe('resolveFormatSpec', () => {
+  const deduced = { name: 'number', options: { decimals: 1 } };
+
+  it('merges options when both name the same built-in', () => {
+    expect(
+      resolveFormatSpec(
+        { name: 'number', options: { signDisplay: 'exceptZero' } },
+        deduced,
+      ),
+    ).toEqual({
+      name: 'number',
+      options: { decimals: 1, signDisplay: 'exceptZero' },
+    });
+  });
+
+  it('lets the explicit option win on a conflict', () => {
+    expect(
+      resolveFormatSpec({ name: 'number', options: { decimals: 3 } }, deduced),
+    ).toEqual({ name: 'number', options: { decimals: 3 } });
+  });
+
+  it('replaces outright when the built-ins differ', () => {
+    expect(resolveFormatSpec({ name: 'integer' }, deduced)).toEqual({
+      name: 'integer',
+    });
+  });
+
+  it('replaces outright for an inline fn or expression', () => {
+    const spec = { expression: 'String(value)' };
+    expect(resolveFormatSpec(spec, deduced)).toBe(spec);
+  });
+
+  it('passes either side through when the other is absent', () => {
+    expect(resolveFormatSpec(undefined, deduced)).toBe(deduced);
+    expect(resolveFormatSpec({ name: 'integer' }, undefined)).toEqual({
+      name: 'integer',
+    });
+    expect(resolveFormatSpec(undefined, undefined)).toBeUndefined();
   });
 });

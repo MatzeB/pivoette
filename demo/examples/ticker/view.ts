@@ -53,10 +53,8 @@ export const view: ViewSpec = {
       compute: 'price - basePrice',
       // A computed column has no source field, so it declares its own unit.
       meta: dollar,
-      format: {
-        name: 'number',
-        options: { decimals: 2, signDisplay: 'exceptZero' },
-      },
+      // Only the sign is overridden; the 2 decimals come from kind `price`.
+      format: { name: 'number', options: { signDisplay: 'exceptZero' } },
       style: {
         name: 'signColors',
         options: { positive: green, negative: red },
@@ -72,10 +70,8 @@ export const view: ViewSpec = {
       // metrics example's `cpu` column.
       compute: 'basePrice ? ((price - basePrice) / basePrice) * 100 : null',
       meta: { kind: ['percentage'], scale: ['percent'] },
-      format: {
-        name: 'number',
-        options: { decimals: 2, signDisplay: 'exceptZero' },
-      },
+      // Likewise: 1 decimal is deduced from kind `percentage`.
+      format: { name: 'number', options: { signDisplay: 'exceptZero' } },
       style: {
         name: 'signColors',
         options: { positive: green, negative: red },

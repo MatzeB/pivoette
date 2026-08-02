@@ -8,7 +8,7 @@ import type { ColumnMeta } from '../data/meta';
 import { normalizeMeta } from '../data/meta';
 import { requireColumn } from '../data/frame';
 import type { Align, ResolvedColumn } from '../format/context';
-import { deduceFormat } from '../format/deduce';
+import { deduceFormat, resolveFormatSpec } from '../format/deduce';
 import { resolveFormat } from '../format/format';
 import { resolveStyle } from '../format/style';
 import { resolveRender } from '../format/render';
@@ -123,8 +123,8 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
     const sourceName = sourceField(def);
     const source = sourceName ? frame.columnByName.get(sourceName) : undefined;
     const meta = columnMeta(frame, def, sourceName);
-    // An explicit format wins; otherwise the column's kind may imply one.
-    const format = def.format ?? deduceFormat(meta);
+    // An explicit format wins, merging over any the column's kind implies.
+    const format = resolveFormatSpec(def.format, deduceFormat(meta));
     const column: ResolvedColumn = {
       id: def.id,
       // def.label > spec.labels > metadata displayName > the field name.
@@ -413,7 +413,7 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     if (d.kind === 'measure') {
       baseIndexByKey.set(d.baseKey, i);
       const meta = frame.columnByName.get(d.measure.field)?.meta;
-      const format = d.measure.format ?? deduceFormat(meta);
+      const format = resolveFormatSpec(d.measure.format, deduceFormat(meta));
       const column: ResolvedColumn = {
         id: d.baseKey,
         label: d.measure.label ?? d.measure.id,
@@ -432,7 +432,7 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     }
     // A derived column has no source field; only its own `meta` applies.
     const meta = columnMeta(frame, d.def, undefined);
-    const format = d.def.format ?? deduceFormat(meta);
+    const format = resolveFormatSpec(d.def.format, deduceFormat(meta));
     const column: ResolvedColumn = {
       id: d.def.id,
       label: d.def.label ?? d.def.id,
