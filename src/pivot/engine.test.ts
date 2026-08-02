@@ -577,3 +577,33 @@ describe('factor', () => {
     );
   });
 });
+
+describe('factor and compute inputs', () => {
+  it('a derived column sees a referenced measure in display units', () => {
+    const res = computeView(fromRows([{ g: 'A', c: 'x', v: 0.5 }]), {
+      rows: ['g'],
+      columns: ['c'],
+      values: [{ id: 'm', field: 'v', agg: 'sum', label: 'm', factor: 100 }],
+      computed: [
+        {
+          id: 'd',
+          label: 'D',
+          inputs: { m: { colPath: ['x'], value: 'm' } },
+          compute: 'm',
+        },
+      ],
+    } satisfies PivotSpec);
+    const cells = res.rows[0]!.cells;
+    expect(cells[0]!.value).toBe(50);
+    // Not 0.5: the measure was factored when its own cell was built.
+    expect(cells[1]!.inputs?.m).toBe(50);
+  });
+
+  it("a column's own factor applies after its compute runs", () => {
+    const res = computeView(fromRows([{ a: 2 }]), {
+      mode: 'flat',
+      columns: [{ id: 'd', compute: 'a * 3', factor: 10 }],
+    } satisfies TableSpec);
+    expect(res.rows[0]!.cells[0]!.value).toBe(60);
+  });
+});

@@ -26,9 +26,15 @@ export interface ResolvedColumn {
 }
 
 export interface CellCtx {
-  /** This cell's value. */
+  /**
+   * This cell's value, in display units: the column's `factor` is already
+   * applied, so `value > 50` means 50%. The label is separate — `column.meta`.
+   */
   value: unknown;
-  /** Resolved compute inputs (sibling ids / cell-ref aliases). */
+  /**
+   * Resolved compute inputs (sibling ids / cell-ref aliases). A referenced
+   * measure is already factored; this column's own factor applies after.
+   */
   inputs: Record<string, unknown>;
   /** This row's index path (multi-level). */
   rowPath: unknown[];

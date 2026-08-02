@@ -12,6 +12,8 @@ import type {
 } from '../format/context';
 
 export interface Cell {
+  /** In display units: `factor` is applied here, so formatting, sorting, and
+   * footer aggregates all read the same number. */
   value: unknown;
   /** Resolved compute inputs (for computed columns); usually absent. */
   inputs?: Record<string, unknown>;
