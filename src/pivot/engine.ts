@@ -6,9 +6,10 @@
 import type { CellValue, ColumnType, DataFrame } from '../data/types';
 import type { ColumnMeta } from '../data/meta';
 import { mergeMeta, normalizeMeta } from '../data/meta';
-import { requireColumn } from '../data/frame';
+import { requireColumn, withMeta } from '../data/frame';
+import { deriveColumns } from '../data/derive';
 import type { Align, ResolvedColumn } from '../format/context';
-import { columnFormat } from '../format/deduce';
+import { columnFormat, deduceFormat } from '../format/deduce';
 import { Format, Render } from '../format/builtins';
 import { resolveFormat } from '../format/format';
 import { resolveStyle } from '../format/style';
@@ -25,7 +26,13 @@ import type {
   ViewSpec,
 } from './spec';
 import { isFlat } from './spec';
-import type { Cell, ResolvedLeaf, ResultRow, ViewResult } from './result';
+import type {
+  Cell,
+  MemberFormat,
+  ResolvedLeaf,
+  ResultRow,
+  ViewResult,
+} from './result';
 import { buildHeader } from './result';
 import { asNumber, compareValues, isNumericType } from '../util';
 
@@ -87,6 +94,55 @@ function columnMeta(
     base ?? { dataName: def.id, type: 'float', category: 'data' },
     mergeMeta(base, def.meta),
   );
+}
+
+/**
+ * How an index member (a row or column key value) is rendered. Grouping keeps
+ * the raw value — a weekday stays the integer that sorts correctly — while the
+ * label comes from the field's own metadata, through the same deduction the
+ * leaf columns use.
+ */
+function memberFormat(
+  frame: DataFrame,
+  field: string,
+  locale: string | undefined,
+): MemberFormat {
+  const meta = frame.columnByName.get(field)?.meta;
+  const spec = deduceFormat(meta, locale);
+  if (!spec) return (v: CellValue) => String(v ?? '');
+  const fn = resolveFormat(withLocaleOption(spec, locale));
+  const column: ResolvedColumn = {
+    id: field,
+    label: field,
+    align: 'left',
+    meta,
+  };
+  return (v: CellValue) =>
+    v === null || v === undefined
+      ? ''
+      : fn({
+          value: v,
+          inputs: {},
+          rowPath: [],
+          colPath: [],
+          column,
+          frame,
+        });
+}
+
+/** Stamp the view locale onto a named format that did not set one. */
+function withLocaleOption(
+  format: FormatSpec,
+  locale: string | undefined,
+): FormatSpec {
+  if (
+    !locale ||
+    !('fnName' in format) ||
+    format.options?.locale !== undefined
+  ) {
+    return format;
+  }
+  return { ...format, options: { ...format.options, locale } };
 }
 
 function makeLeaf(args: {
@@ -197,6 +253,7 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
   return {
     mode: 'flat',
     rowLevels: [],
+    rowMemberFormats: [],
     leaves,
     columnHeader: forest,
     columnHeaderDepth: depth,
@@ -368,6 +425,14 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
   const emptyDisplay = spec.emptyDisplay ?? '';
   const placement = spec.valuePlacement?.axis ?? 'columns';
   const g = group(frame, spec.rows, spec.columns);
+  // Index members keep their raw value for grouping and sorting; these render
+  // them. A weekday column groups on 0..6 and displays Mon..Sun.
+  const colMember = spec.columns.map((f) =>
+    memberFormat(frame, f, spec.locale),
+  );
+  const rowMemberFormats = spec.rows.map((f) =>
+    memberFormat(frame, f, spec.locale),
+  );
   const rowKeys = sortTuples(g.rowKeys, spec.rows, spec.rowSort);
   const colKeys = sortTuples(g.colKeys, spec.columns, spec.columnSort);
 
@@ -383,7 +448,7 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
   // Build base measure descriptors in colKey × measure order.
   const baseDescs: BaseDesc[] = [];
   for (const colKey of colKeys) {
-    const colStrs = colKey.map((v) => String(v));
+    const colStrs = colKey.map((v, i) => colMember[i]!(v));
     const colKeyStr = keyOf(colKey);
     spec.values.forEach((measure, measureIndex) => {
       const measLabel = measure.label ?? measure.id;
@@ -524,6 +589,7 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
   return {
     mode: 'pivot',
     rowLevels,
+    rowMemberFormats,
     leaves,
     columnHeader: forest,
     columnHeaderDepth: depth,
@@ -617,8 +683,11 @@ function pivotMeasuresOnRows(
     (m) => requireColumn(frame, m.field).values,
   );
 
+  const colMember = spec.columns.map((f) =>
+    memberFormat(frame, f, spec.locale),
+  );
   const leaves: ResolvedLeaf[] = colKeys.map((colKey, i) => {
-    const colStrs = colKey.map(String);
+    const colStrs = colKey.map((v, l) => colMember[l]!(v));
     const column: ResolvedColumn = {
       id: colStrs.join('') || 'value',
       label: colStrs[colStrs.length - 1] ?? 'Value',
@@ -651,10 +720,16 @@ function pivotMeasuresOnRows(
     ...spec.rows.map((f) => fieldLabel(frame, f, spec.labels)),
     'Measure',
   ];
+  const rowMemberFormats = [
+    ...spec.rows.map((f) => memberFormat(frame, f, spec.locale)),
+    // the measure level is already a label
+    (v: CellValue) => String(v ?? ''),
+  ];
   const { forest, depth } = buildHeader(leaves);
   return {
     mode: 'pivot',
     rowLevels,
+    rowMemberFormats,
     leaves,
     columnHeader: forest,
     columnHeaderDepth: depth,
@@ -665,6 +740,24 @@ function pivotMeasuresOnRows(
 
 // ---------------------------------------------------------------------------
 
+/**
+ * Prepare the frame the spec describes: layer the view's metadata over whatever
+ * the data supplied, then add its derived columns so `rows`/`columns` can name
+ * them. Done here rather than in the component so `computeView` is usable
+ * standalone.
+ */
+function prepare(frame: DataFrame, spec: ViewSpec): DataFrame {
+  return deriveColumns(
+    withMeta(frame, spec.meta),
+    spec.derive,
+    spec.locale,
+    spec.timeZone,
+  );
+}
+
 export function computeView(frame: DataFrame, spec: ViewSpec): ViewResult {
-  return isFlat(spec) ? computeFlat(frame, spec) : computePivot(frame, spec);
+  const prepared = prepare(frame, spec);
+  return isFlat(spec)
+    ? computeFlat(prepared, spec)
+    : computePivot(prepared, spec);
 }

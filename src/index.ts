@@ -22,6 +22,17 @@ export type {
 } from './data/types';
 
 // Column metadata (display name, category, compound units)
+export { deriveColumns } from './data/derive';
+export {
+  decodeTime,
+  firstDayOfWeek,
+  isTimestamp,
+  parseTime,
+  resolveTimeZone,
+  temporalHelpers,
+  timeParts,
+} from './data/temporal';
+export type { TimeParts } from './data/temporal';
 export { currencyFacts } from './data/currency';
 export type { CurrencyFacts } from './data/currency';
 export {
@@ -47,6 +58,7 @@ export { buildHeader } from './pivot/result';
 export type {
   Cell,
   HeaderNode,
+  MemberFormat,
   ResolvedLeaf,
   ResultRow,
   ViewResult,
@@ -57,6 +69,7 @@ export { isFlat } from './pivot/spec';
 export type {
   CellRef,
   ColumnDef,
+  DerivedField,
   FormatOptionsSpec,
   CompositeSpec,
   Direction,

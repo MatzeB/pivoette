@@ -6,6 +6,7 @@
 import type { CellCtx, FormatFn } from './context';
 import type { FormatSpec } from '../pivot/spec';
 import { Format } from './builtins';
+import { ordinalToIsoDay } from '../data/temporal';
 import { evalExpression } from './expression';
 import { asNumber } from '../util';
 
@@ -105,6 +106,58 @@ registry.set('duration', (options) => {
     const scaled = abs / chosen.ns;
     const body = `${neg ? '-' : ''}${sig3(scaled)} ${chosen.suffix}`;
     return affix(options, body);
+  };
+});
+
+// --- calendar names ---------------------------------------------------------
+
+/** 2024-01-01 was a Monday, so `Date.UTC(2024, 0, isoDay)` is that ISO day. */
+const REF_WEEK = (isoDay: number) => Date.UTC(2024, 0, isoDay);
+const REF_MONTH = (month: number) => Date.UTC(2024, month - 1, 1);
+
+type NameWidth = 'short' | 'long' | 'narrow';
+
+const nameCache = new Map<string, Intl.DateTimeFormat>();
+
+function nameFormat(
+  locale: string | undefined,
+  field: 'weekday' | 'month',
+  width: NameWidth,
+): Intl.DateTimeFormat {
+  const key = `${locale ?? ''}|${field}|${width}`;
+  let fmt = nameCache.get(key);
+  if (!fmt) {
+    // UTC so the reference date cannot drift a day under a negative offset.
+    fmt = new Intl.DateTimeFormat(locale, { [field]: width, timeZone: 'UTC' });
+    nameCache.set(key, fmt);
+  }
+  return fmt;
+}
+
+/**
+ * Weekday name from a *locale ordinal* (0 = the locale's first day), the shape
+ * `temporalHelpers().weekday` produces. Reads the same `firstDayOfWeek` the
+ * helper did, so the two cannot disagree.
+ */
+registry.set('weekday', (options) => {
+  const locale = opt<string>(options, 'locale');
+  const width = opt<NameWidth>(options, 'width') ?? 'short';
+  return (ctx) => {
+    const n = asNumber(ctx.value);
+    if (n === null) return String(ctx.value);
+    const ms = REF_WEEK(ordinalToIsoDay(n, locale));
+    return nameFormat(locale, 'weekday', width).format(ms);
+  };
+});
+
+/** Month name from a 1..12 number. */
+registry.set('month', (options) => {
+  const locale = opt<string>(options, 'locale');
+  const width = opt<NameWidth>(options, 'width') ?? 'short';
+  return (ctx) => {
+    const n = asNumber(ctx.value);
+    if (n === null || n < 1 || n > 12) return String(ctx.value);
+    return nameFormat(locale, 'month', width).format(REF_MONTH(n));
   };
 });
 

@@ -33,6 +33,10 @@ const KIND_RULES: Record<string, FormatSpec> = {
   price: TWO_DECIMALS,
   percentage: ONE_DECIMAL,
   count: { fnName: Format.Integer },
+  // These print names rather than numbers, so like `duration` they are
+  // self-labelling and the column carries no unit metadata.
+  weekday: { fnName: Format.Weekday },
+  month: { fnName: Format.Month },
 };
 
 /**

@@ -120,8 +120,25 @@ export interface ValuePlacement {
   level?: number; // omitted = innermost
 }
 
+/** A virtual column computed from the others, usable as a grouping field. */
+export interface DerivedField {
+  /** Expression over the source fields, plus the temporal helpers (`weekday`,
+   * `month`, `isoWeek`, …). A field whose metadata declares a timestamp arrives
+   * already decoded to epoch millis. */
+  compute: string;
+  /** Metadata for the derived column; its `kind` drives labels and format. */
+  meta?: ColumnMetaInput;
+}
+
 /** Options that mean the same thing in either mode. */
 export interface ViewSpecBase {
+  /** Virtual columns added before grouping, so `rows`/`columns` may name them.
+   * Evaluated in declaration order, so one may reference an earlier one. */
+  derive?: Record<string, DerivedField>;
+  /** IANA zone for the temporal helpers, or `'auto'` (the default) for the
+   * runtime's. The zone decides which calendar day an instant falls on, so it
+   * changes the grouping, not just the display. */
+  timeZone?: string;
   /** Placeholder for empty groups (default ''). */
   emptyDisplay?: string;
   /** data field name -> display header label. */

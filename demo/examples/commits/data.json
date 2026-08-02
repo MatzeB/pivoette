@@ -1,0 +1,5425 @@
+{
+"meta": {
+"committedAt": {
+"displayName": "Committed",
+"encoding": "rfc3339"
+},
+"author": {
+"displayName": "Author"
+},
+"linesAdded": {
+"displayName": "Added",
+"kind": [
+"count"
+]
+},
+"linesRemoved": {
+"displayName": "Removed",
+"kind": [
+"count"
+]
+}
+},
+"rows": [
+{
+"committedAt": "2026-01-05T09:12:00Z",
+"author": "Alan Turing",
+"linesAdded": 189,
+"linesRemoved": 158
+},
+{
+"committedAt": "2026-01-05T10:20:00Z",
+"author": "Alan Turing",
+"linesAdded": 260,
+"linesRemoved": 229
+},
+{
+"committedAt": "2026-01-05T13:16:00Z",
+"author": "Alan Turing",
+"linesAdded": 394,
+"linesRemoved": 5
+},
+{
+"committedAt": "2026-01-05T14:08:00Z",
+"author": "Grace Hopper",
+"linesAdded": 114,
+"linesRemoved": 212
+},
+{
+"committedAt": "2026-01-05T15:39:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 15,
+"linesRemoved": 99
+},
+{
+"committedAt": "2026-01-05T17:40:00Z",
+"author": "Donald Knuth",
+"linesAdded": 252,
+"linesRemoved": 115
+},
+{
+"committedAt": "2026-01-05T18:30:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 260,
+"linesRemoved": 13
+},
+{
+"committedAt": "2026-01-06T08:24:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 34,
+"linesRemoved": 217
+},
+{
+"committedAt": "2026-01-06T10:13:00Z",
+"author": "Ken Thompson",
+"linesAdded": 316,
+"linesRemoved": 176
+},
+{
+"committedAt": "2026-01-06T11:40:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 81,
+"linesRemoved": 209
+},
+{
+"committedAt": "2026-01-06T11:47:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 378,
+"linesRemoved": 192
+},
+{
+"committedAt": "2026-01-06T13:43:00Z",
+"author": "Alan Turing",
+"linesAdded": 314,
+"linesRemoved": 103
+},
+{
+"committedAt": "2026-01-06T16:02:00Z",
+"author": "Ken Thompson",
+"linesAdded": 98,
+"linesRemoved": 123
+},
+{
+"committedAt": "2026-01-07T08:14:00Z",
+"author": "Grace Hopper",
+"linesAdded": 7,
+"linesRemoved": 145
+},
+{
+"committedAt": "2026-01-07T08:28:00Z",
+"author": "Ken Thompson",
+"linesAdded": 275,
+"linesRemoved": 83
+},
+{
+"committedAt": "2026-01-07T11:49:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 315,
+"linesRemoved": 248
+},
+{
+"committedAt": "2026-01-07T12:02:00Z",
+"author": "Alan Turing",
+"linesAdded": 332,
+"linesRemoved": 20
+},
+{
+"committedAt": "2026-01-07T12:10:00Z",
+"author": "Radia Perlman",
+"linesAdded": 155,
+"linesRemoved": 232
+},
+{
+"committedAt": "2026-01-07T18:13:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 27,
+"linesRemoved": 240
+},
+{
+"committedAt": "2026-01-07T18:19:00Z",
+"author": "Donald Knuth",
+"linesAdded": 178,
+"linesRemoved": 91
+},
+{
+"committedAt": "2026-01-08T09:34:00Z",
+"author": "Donald Knuth",
+"linesAdded": 288,
+"linesRemoved": 56
+},
+{
+"committedAt": "2026-01-08T10:10:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 156,
+"linesRemoved": 21
+},
+{
+"committedAt": "2026-01-08T10:23:00Z",
+"author": "Radia Perlman",
+"linesAdded": 373,
+"linesRemoved": 6
+},
+{
+"committedAt": "2026-01-08T10:43:00Z",
+"author": "Grace Hopper",
+"linesAdded": 39,
+"linesRemoved": 138
+},
+{
+"committedAt": "2026-01-08T11:39:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 335,
+"linesRemoved": 32
+},
+{
+"committedAt": "2026-01-08T12:39:00Z",
+"author": "Donald Knuth",
+"linesAdded": 340,
+"linesRemoved": 112
+},
+{
+"committedAt": "2026-01-08T12:40:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 8,
+"linesRemoved": 183
+},
+{
+"committedAt": "2026-01-08T13:25:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 319,
+"linesRemoved": 184
+},
+{
+"committedAt": "2026-01-08T15:37:00Z",
+"author": "Ken Thompson",
+"linesAdded": 101,
+"linesRemoved": 119
+},
+{
+"committedAt": "2026-01-08T16:32:00Z",
+"author": "Alan Turing",
+"linesAdded": 239,
+"linesRemoved": 5
+},
+{
+"committedAt": "2026-01-08T17:42:00Z",
+"author": "Alan Turing",
+"linesAdded": 325,
+"linesRemoved": 79
+},
+{
+"committedAt": "2026-01-08T18:08:00Z",
+"author": "Ken Thompson",
+"linesAdded": 126,
+"linesRemoved": 244
+},
+{
+"committedAt": "2026-01-08T18:43:00Z",
+"author": "Alan Turing",
+"linesAdded": 49,
+"linesRemoved": 248
+},
+{
+"committedAt": "2026-01-08T22:00:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 415,
+"linesRemoved": 152
+},
+{
+"committedAt": "2026-01-09T08:09:00Z",
+"author": "Ken Thompson",
+"linesAdded": 45,
+"linesRemoved": 23
+},
+{
+"committedAt": "2026-01-09T08:44:00Z",
+"author": "Ken Thompson",
+"linesAdded": 160,
+"linesRemoved": 17
+},
+{
+"committedAt": "2026-01-09T09:30:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 388,
+"linesRemoved": 127
+},
+{
+"committedAt": "2026-01-09T09:34:00Z",
+"author": "Donald Knuth",
+"linesAdded": 16,
+"linesRemoved": 100
+},
+{
+"committedAt": "2026-01-09T10:07:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 292,
+"linesRemoved": 207
+},
+{
+"committedAt": "2026-01-09T10:47:00Z",
+"author": "Alan Turing",
+"linesAdded": 84,
+"linesRemoved": 242
+},
+{
+"committedAt": "2026-01-09T11:05:00Z",
+"author": "Radia Perlman",
+"linesAdded": 351,
+"linesRemoved": 257
+},
+{
+"committedAt": "2026-01-09T11:36:00Z",
+"author": "Alan Turing",
+"linesAdded": 230,
+"linesRemoved": 92
+},
+{
+"committedAt": "2026-01-09T13:36:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 153,
+"linesRemoved": 134
+},
+{
+"committedAt": "2026-01-09T14:43:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 360,
+"linesRemoved": 253
+},
+{
+"committedAt": "2026-01-09T14:53:00Z",
+"author": "Radia Perlman",
+"linesAdded": 107,
+"linesRemoved": 118
+},
+{
+"committedAt": "2026-01-09T16:47:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 361,
+"linesRemoved": 200
+},
+{
+"committedAt": "2026-01-09T18:40:00Z",
+"author": "Grace Hopper",
+"linesAdded": 385,
+"linesRemoved": 38
+},
+{
+"committedAt": "2026-01-10T09:07:00Z",
+"author": "Donald Knuth",
+"linesAdded": 231,
+"linesRemoved": 241
+},
+{
+"committedAt": "2026-01-10T10:33:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 293,
+"linesRemoved": 67
+},
+{
+"committedAt": "2026-01-10T13:36:00Z",
+"author": "Donald Knuth",
+"linesAdded": 272,
+"linesRemoved": 154
+},
+{
+"committedAt": "2026-01-10T17:56:00Z",
+"author": "Radia Perlman",
+"linesAdded": 337,
+"linesRemoved": 129
+},
+{
+"committedAt": "2026-01-10T18:16:00Z",
+"author": "Alan Turing",
+"linesAdded": 374,
+"linesRemoved": 216
+},
+{
+"committedAt": "2026-01-10T18:17:00Z",
+"author": "Radia Perlman",
+"linesAdded": 133,
+"linesRemoved": 217
+},
+{
+"committedAt": "2026-01-10T22:22:00Z",
+"author": "Grace Hopper",
+"linesAdded": 17,
+"linesRemoved": 40
+},
+{
+"committedAt": "2026-01-11T10:28:00Z",
+"author": "Radia Perlman",
+"linesAdded": 72,
+"linesRemoved": 238
+},
+{
+"committedAt": "2026-01-11T12:11:00Z",
+"author": "Ken Thompson",
+"linesAdded": 206,
+"linesRemoved": 108
+},
+{
+"committedAt": "2026-01-11T12:45:00Z",
+"author": "Ken Thompson",
+"linesAdded": 74,
+"linesRemoved": 217
+},
+{
+"committedAt": "2026-01-11T12:59:00Z",
+"author": "Ken Thompson",
+"linesAdded": 254,
+"linesRemoved": 53
+},
+{
+"committedAt": "2026-01-11T14:31:00Z",
+"author": "Ken Thompson",
+"linesAdded": 143,
+"linesRemoved": 91
+},
+{
+"committedAt": "2026-01-11T18:18:00Z",
+"author": "Donald Knuth",
+"linesAdded": 228,
+"linesRemoved": 146
+},
+{
+"committedAt": "2026-01-11T18:42:00Z",
+"author": "Radia Perlman",
+"linesAdded": 240,
+"linesRemoved": 248
+},
+{
+"committedAt": "2026-01-11T21:46:00Z",
+"author": "Alan Turing",
+"linesAdded": 172,
+"linesRemoved": 180
+},
+{
+"committedAt": "2026-01-12T08:32:00Z",
+"author": "Radia Perlman",
+"linesAdded": 375,
+"linesRemoved": 249
+},
+{
+"committedAt": "2026-01-12T08:34:00Z",
+"author": "Alan Turing",
+"linesAdded": 26,
+"linesRemoved": 53
+},
+{
+"committedAt": "2026-01-12T12:26:00Z",
+"author": "Grace Hopper",
+"linesAdded": 219,
+"linesRemoved": 64
+},
+{
+"committedAt": "2026-01-12T13:13:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 268,
+"linesRemoved": 249
+},
+{
+"committedAt": "2026-01-12T15:06:00Z",
+"author": "Radia Perlman",
+"linesAdded": 244,
+"linesRemoved": 99
+},
+{
+"committedAt": "2026-01-12T16:17:00Z",
+"author": "Alan Turing",
+"linesAdded": 238,
+"linesRemoved": 224
+},
+{
+"committedAt": "2026-01-12T17:01:00Z",
+"author": "Grace Hopper",
+"linesAdded": 197,
+"linesRemoved": 37
+},
+{
+"committedAt": "2026-01-12T18:14:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 52,
+"linesRemoved": 15
+},
+{
+"committedAt": "2026-01-12T18:46:00Z",
+"author": "Alan Turing",
+"linesAdded": 367,
+"linesRemoved": 207
+},
+{
+"committedAt": "2026-01-12T20:01:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 386,
+"linesRemoved": 249
+},
+{
+"committedAt": "2026-01-12T23:42:00Z",
+"author": "Ken Thompson",
+"linesAdded": 319,
+"linesRemoved": 129
+},
+{
+"committedAt": "2026-01-13T08:17:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 280,
+"linesRemoved": 149
+},
+{
+"committedAt": "2026-01-13T09:57:00Z",
+"author": "Grace Hopper",
+"linesAdded": 387,
+"linesRemoved": 239
+},
+{
+"committedAt": "2026-01-13T10:16:00Z",
+"author": "Alan Turing",
+"linesAdded": 266,
+"linesRemoved": 178
+},
+{
+"committedAt": "2026-01-13T11:15:00Z",
+"author": "Ken Thompson",
+"linesAdded": 258,
+"linesRemoved": 203
+},
+{
+"committedAt": "2026-01-13T11:42:00Z",
+"author": "Radia Perlman",
+"linesAdded": 63,
+"linesRemoved": 191
+},
+{
+"committedAt": "2026-01-13T11:49:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 210,
+"linesRemoved": 102
+},
+{
+"committedAt": "2026-01-13T12:13:00Z",
+"author": "Ken Thompson",
+"linesAdded": 287,
+"linesRemoved": 176
+},
+{
+"committedAt": "2026-01-13T16:42:00Z",
+"author": "Grace Hopper",
+"linesAdded": 248,
+"linesRemoved": 16
+},
+{
+"committedAt": "2026-01-13T17:06:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 149,
+"linesRemoved": 197
+},
+{
+"committedAt": "2026-01-13T17:21:00Z",
+"author": "Radia Perlman",
+"linesAdded": 229,
+"linesRemoved": 93
+},
+{
+"committedAt": "2026-01-13T19:16:00Z",
+"author": "Grace Hopper",
+"linesAdded": 415,
+"linesRemoved": 125
+},
+{
+"committedAt": "2026-01-13T21:26:00Z",
+"author": "Grace Hopper",
+"linesAdded": 289,
+"linesRemoved": 84
+},
+{
+"committedAt": "2026-01-13T21:50:00Z",
+"author": "Grace Hopper",
+"linesAdded": 306,
+"linesRemoved": 253
+},
+{
+"committedAt": "2026-01-13T23:01:00Z",
+"author": "Donald Knuth",
+"linesAdded": 49,
+"linesRemoved": 165
+},
+{
+"committedAt": "2026-01-14T08:59:00Z",
+"author": "Donald Knuth",
+"linesAdded": 173,
+"linesRemoved": 93
+},
+{
+"committedAt": "2026-01-14T09:41:00Z",
+"author": "Donald Knuth",
+"linesAdded": 171,
+"linesRemoved": 240
+},
+{
+"committedAt": "2026-01-14T11:11:00Z",
+"author": "Ken Thompson",
+"linesAdded": 287,
+"linesRemoved": 51
+},
+{
+"committedAt": "2026-01-14T11:24:00Z",
+"author": "Donald Knuth",
+"linesAdded": 304,
+"linesRemoved": 115
+},
+{
+"committedAt": "2026-01-14T13:32:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 162,
+"linesRemoved": 245
+},
+{
+"committedAt": "2026-01-14T15:02:00Z",
+"author": "Donald Knuth",
+"linesAdded": 391,
+"linesRemoved": 246
+},
+{
+"committedAt": "2026-01-14T15:38:00Z",
+"author": "Donald Knuth",
+"linesAdded": 315,
+"linesRemoved": 87
+},
+{
+"committedAt": "2026-01-14T16:38:00Z",
+"author": "Ken Thompson",
+"linesAdded": 301,
+"linesRemoved": 145
+},
+{
+"committedAt": "2026-01-14T18:23:00Z",
+"author": "Grace Hopper",
+"linesAdded": 314,
+"linesRemoved": 209
+},
+{
+"committedAt": "2026-01-14T18:42:00Z",
+"author": "Alan Turing",
+"linesAdded": 202,
+"linesRemoved": 236
+},
+{
+"committedAt": "2026-01-14T19:57:00Z",
+"author": "Grace Hopper",
+"linesAdded": 34,
+"linesRemoved": 77
+},
+{
+"committedAt": "2026-01-14T19:59:00Z",
+"author": "Grace Hopper",
+"linesAdded": 337,
+"linesRemoved": 36
+},
+{
+"committedAt": "2026-01-14T21:45:00Z",
+"author": "Alan Turing",
+"linesAdded": 58,
+"linesRemoved": 60
+},
+{
+"committedAt": "2026-01-14T22:08:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 332,
+"linesRemoved": 105
+},
+{
+"committedAt": "2026-01-14T22:53:00Z",
+"author": "Donald Knuth",
+"linesAdded": 394,
+"linesRemoved": 109
+},
+{
+"committedAt": "2026-01-14T22:55:00Z",
+"author": "Ken Thompson",
+"linesAdded": 88,
+"linesRemoved": 73
+},
+{
+"committedAt": "2026-01-15T10:07:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 364,
+"linesRemoved": 100
+},
+{
+"committedAt": "2026-01-15T10:43:00Z",
+"author": "Radia Perlman",
+"linesAdded": 316,
+"linesRemoved": 79
+},
+{
+"committedAt": "2026-01-15T11:20:00Z",
+"author": "Grace Hopper",
+"linesAdded": 241,
+"linesRemoved": 46
+},
+{
+"committedAt": "2026-01-15T12:37:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 205,
+"linesRemoved": 21
+},
+{
+"committedAt": "2026-01-15T12:41:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 146,
+"linesRemoved": 12
+},
+{
+"committedAt": "2026-01-15T13:11:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 260,
+"linesRemoved": 126
+},
+{
+"committedAt": "2026-01-15T13:50:00Z",
+"author": "Ken Thompson",
+"linesAdded": 33,
+"linesRemoved": 143
+},
+{
+"committedAt": "2026-01-15T14:18:00Z",
+"author": "Ken Thompson",
+"linesAdded": 370,
+"linesRemoved": 24
+},
+{
+"committedAt": "2026-01-15T14:48:00Z",
+"author": "Alan Turing",
+"linesAdded": 247,
+"linesRemoved": 5
+},
+{
+"committedAt": "2026-01-15T16:05:00Z",
+"author": "Donald Knuth",
+"linesAdded": 338,
+"linesRemoved": 23
+},
+{
+"committedAt": "2026-01-15T16:36:00Z",
+"author": "Alan Turing",
+"linesAdded": 291,
+"linesRemoved": 248
+},
+{
+"committedAt": "2026-01-15T20:12:00Z",
+"author": "Ken Thompson",
+"linesAdded": 236,
+"linesRemoved": 18
+},
+{
+"committedAt": "2026-01-15T22:38:00Z",
+"author": "Alan Turing",
+"linesAdded": 98,
+"linesRemoved": 258
+},
+{
+"committedAt": "2026-01-16T08:58:00Z",
+"author": "Grace Hopper",
+"linesAdded": 181,
+"linesRemoved": 46
+},
+{
+"committedAt": "2026-01-16T09:10:00Z",
+"author": "Ken Thompson",
+"linesAdded": 64,
+"linesRemoved": 222
+},
+{
+"committedAt": "2026-01-16T12:23:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 340,
+"linesRemoved": 223
+},
+{
+"committedAt": "2026-01-16T12:26:00Z",
+"author": "Alan Turing",
+"linesAdded": 389,
+"linesRemoved": 60
+},
+{
+"committedAt": "2026-01-16T14:22:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 296,
+"linesRemoved": 175
+},
+{
+"committedAt": "2026-01-16T15:14:00Z",
+"author": "Grace Hopper",
+"linesAdded": 265,
+"linesRemoved": 29
+},
+{
+"committedAt": "2026-01-16T16:06:00Z",
+"author": "Grace Hopper",
+"linesAdded": 58,
+"linesRemoved": 152
+},
+{
+"committedAt": "2026-01-16T16:18:00Z",
+"author": "Grace Hopper",
+"linesAdded": 181,
+"linesRemoved": 125
+},
+{
+"committedAt": "2026-01-16T16:39:00Z",
+"author": "Alan Turing",
+"linesAdded": 314,
+"linesRemoved": 82
+},
+{
+"committedAt": "2026-01-16T16:39:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 128,
+"linesRemoved": 89
+},
+{
+"committedAt": "2026-01-16T16:55:00Z",
+"author": "Ken Thompson",
+"linesAdded": 26,
+"linesRemoved": 61
+},
+{
+"committedAt": "2026-01-16T19:25:00Z",
+"author": "Grace Hopper",
+"linesAdded": 232,
+"linesRemoved": 80
+},
+{
+"committedAt": "2026-01-16T19:29:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 212,
+"linesRemoved": 206
+},
+{
+"committedAt": "2026-01-16T20:15:00Z",
+"author": "Donald Knuth",
+"linesAdded": 324,
+"linesRemoved": 191
+},
+{
+"committedAt": "2026-01-16T21:17:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 414,
+"linesRemoved": 217
+},
+{
+"committedAt": "2026-01-16T22:10:00Z",
+"author": "Ken Thompson",
+"linesAdded": 154,
+"linesRemoved": 162
+},
+{
+"committedAt": "2026-01-17T09:12:00Z",
+"author": "Grace Hopper",
+"linesAdded": 410,
+"linesRemoved": 148
+},
+{
+"committedAt": "2026-01-17T09:49:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 151,
+"linesRemoved": 137
+},
+{
+"committedAt": "2026-01-17T10:43:00Z",
+"author": "Alan Turing",
+"linesAdded": 293,
+"linesRemoved": 165
+},
+{
+"committedAt": "2026-01-17T11:52:00Z",
+"author": "Ken Thompson",
+"linesAdded": 216,
+"linesRemoved": 254
+},
+{
+"committedAt": "2026-01-17T12:47:00Z",
+"author": "Ken Thompson",
+"linesAdded": 93,
+"linesRemoved": 108
+},
+{
+"committedAt": "2026-01-17T13:27:00Z",
+"author": "Donald Knuth",
+"linesAdded": 264,
+"linesRemoved": 181
+},
+{
+"committedAt": "2026-01-17T14:21:00Z",
+"author": "Ken Thompson",
+"linesAdded": 419,
+"linesRemoved": 148
+},
+{
+"committedAt": "2026-01-17T15:38:00Z",
+"author": "Ken Thompson",
+"linesAdded": 362,
+"linesRemoved": 58
+},
+{
+"committedAt": "2026-01-17T15:50:00Z",
+"author": "Ken Thompson",
+"linesAdded": 187,
+"linesRemoved": 8
+},
+{
+"committedAt": "2026-01-17T17:43:00Z",
+"author": "Radia Perlman",
+"linesAdded": 237,
+"linesRemoved": 39
+},
+{
+"committedAt": "2026-01-17T18:40:00Z",
+"author": "Alan Turing",
+"linesAdded": 41,
+"linesRemoved": 44
+},
+{
+"committedAt": "2026-01-17T18:55:00Z",
+"author": "Grace Hopper",
+"linesAdded": 175,
+"linesRemoved": 128
+},
+{
+"committedAt": "2026-01-17T21:17:00Z",
+"author": "Alan Turing",
+"linesAdded": 282,
+"linesRemoved": 106
+},
+{
+"committedAt": "2026-01-17T21:24:00Z",
+"author": "Ken Thompson",
+"linesAdded": 326,
+"linesRemoved": 59
+},
+{
+"committedAt": "2026-01-17T23:07:00Z",
+"author": "Donald Knuth",
+"linesAdded": 35,
+"linesRemoved": 121
+},
+{
+"committedAt": "2026-01-18T08:30:00Z",
+"author": "Ken Thompson",
+"linesAdded": 191,
+"linesRemoved": 185
+},
+{
+"committedAt": "2026-01-18T09:40:00Z",
+"author": "Ken Thompson",
+"linesAdded": 314,
+"linesRemoved": 77
+},
+{
+"committedAt": "2026-01-18T10:43:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 273,
+"linesRemoved": 21
+},
+{
+"committedAt": "2026-01-18T12:39:00Z",
+"author": "Grace Hopper",
+"linesAdded": 111,
+"linesRemoved": 71
+},
+{
+"committedAt": "2026-01-18T13:40:00Z",
+"author": "Alan Turing",
+"linesAdded": 335,
+"linesRemoved": 73
+},
+{
+"committedAt": "2026-01-18T13:46:00Z",
+"author": "Alan Turing",
+"linesAdded": 398,
+"linesRemoved": 184
+},
+{
+"committedAt": "2026-01-18T17:07:00Z",
+"author": "Grace Hopper",
+"linesAdded": 414,
+"linesRemoved": 228
+},
+{
+"committedAt": "2026-01-18T18:18:00Z",
+"author": "Radia Perlman",
+"linesAdded": 153,
+"linesRemoved": 149
+},
+{
+"committedAt": "2026-01-18T19:11:00Z",
+"author": "Donald Knuth",
+"linesAdded": 284,
+"linesRemoved": 139
+},
+{
+"committedAt": "2026-01-19T08:36:00Z",
+"author": "Radia Perlman",
+"linesAdded": 349,
+"linesRemoved": 38
+},
+{
+"committedAt": "2026-01-19T09:30:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 216,
+"linesRemoved": 112
+},
+{
+"committedAt": "2026-01-19T10:23:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 194,
+"linesRemoved": 125
+},
+{
+"committedAt": "2026-01-19T13:36:00Z",
+"author": "Radia Perlman",
+"linesAdded": 241,
+"linesRemoved": 169
+},
+{
+"committedAt": "2026-01-19T14:14:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 103,
+"linesRemoved": 81
+},
+{
+"committedAt": "2026-01-20T14:01:00Z",
+"author": "Donald Knuth",
+"linesAdded": 190,
+"linesRemoved": 187
+},
+{
+"committedAt": "2026-01-20T14:07:00Z",
+"author": "Radia Perlman",
+"linesAdded": 316,
+"linesRemoved": 55
+},
+{
+"committedAt": "2026-01-20T15:57:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 292,
+"linesRemoved": 32
+},
+{
+"committedAt": "2026-01-20T17:04:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 272,
+"linesRemoved": 47
+},
+{
+"committedAt": "2026-01-20T18:55:00Z",
+"author": "Radia Perlman",
+"linesAdded": 194,
+"linesRemoved": 243
+},
+{
+"committedAt": "2026-01-20T20:18:00Z",
+"author": "Alan Turing",
+"linesAdded": 266,
+"linesRemoved": 18
+},
+{
+"committedAt": "2026-01-20T22:05:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 348,
+"linesRemoved": 77
+},
+{
+"committedAt": "2026-01-20T23:34:00Z",
+"author": "Ken Thompson",
+"linesAdded": 418,
+"linesRemoved": 226
+},
+{
+"committedAt": "2026-01-21T09:11:00Z",
+"author": "Donald Knuth",
+"linesAdded": 320,
+"linesRemoved": 129
+},
+{
+"committedAt": "2026-01-21T09:33:00Z",
+"author": "Ken Thompson",
+"linesAdded": 243,
+"linesRemoved": 29
+},
+{
+"committedAt": "2026-01-21T09:56:00Z",
+"author": "Ken Thompson",
+"linesAdded": 361,
+"linesRemoved": 158
+},
+{
+"committedAt": "2026-01-21T10:02:00Z",
+"author": "Grace Hopper",
+"linesAdded": 67,
+"linesRemoved": 142
+},
+{
+"committedAt": "2026-01-21T11:32:00Z",
+"author": "Alan Turing",
+"linesAdded": 159,
+"linesRemoved": 259
+},
+{
+"committedAt": "2026-01-21T13:43:00Z",
+"author": "Radia Perlman",
+"linesAdded": 243,
+"linesRemoved": 39
+},
+{
+"committedAt": "2026-01-21T16:11:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 178,
+"linesRemoved": 54
+},
+{
+"committedAt": "2026-01-21T22:50:00Z",
+"author": "Donald Knuth",
+"linesAdded": 382,
+"linesRemoved": 125
+},
+{
+"committedAt": "2026-01-21T23:29:00Z",
+"author": "Ken Thompson",
+"linesAdded": 1,
+"linesRemoved": 151
+},
+{
+"committedAt": "2026-01-22T08:41:00Z",
+"author": "Alan Turing",
+"linesAdded": 411,
+"linesRemoved": 70
+},
+{
+"committedAt": "2026-01-22T09:34:00Z",
+"author": "Alan Turing",
+"linesAdded": 189,
+"linesRemoved": 22
+},
+{
+"committedAt": "2026-01-22T12:49:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 150,
+"linesRemoved": 98
+},
+{
+"committedAt": "2026-01-22T14:01:00Z",
+"author": "Radia Perlman",
+"linesAdded": 394,
+"linesRemoved": 136
+},
+{
+"committedAt": "2026-01-22T14:51:00Z",
+"author": "Radia Perlman",
+"linesAdded": 61,
+"linesRemoved": 227
+},
+{
+"committedAt": "2026-01-22T15:44:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 250,
+"linesRemoved": 15
+},
+{
+"committedAt": "2026-01-22T16:38:00Z",
+"author": "Donald Knuth",
+"linesAdded": 246,
+"linesRemoved": 38
+},
+{
+"committedAt": "2026-01-22T19:04:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 228,
+"linesRemoved": 81
+},
+{
+"committedAt": "2026-01-22T20:34:00Z",
+"author": "Ken Thompson",
+"linesAdded": 277,
+"linesRemoved": 250
+},
+{
+"committedAt": "2026-01-22T20:57:00Z",
+"author": "Radia Perlman",
+"linesAdded": 371,
+"linesRemoved": 225
+},
+{
+"committedAt": "2026-01-23T08:01:00Z",
+"author": "Alan Turing",
+"linesAdded": 212,
+"linesRemoved": 73
+},
+{
+"committedAt": "2026-01-23T08:02:00Z",
+"author": "Ken Thompson",
+"linesAdded": 357,
+"linesRemoved": 160
+},
+{
+"committedAt": "2026-01-23T08:06:00Z",
+"author": "Grace Hopper",
+"linesAdded": 323,
+"linesRemoved": 188
+},
+{
+"committedAt": "2026-01-23T09:47:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 359,
+"linesRemoved": 157
+},
+{
+"committedAt": "2026-01-23T09:56:00Z",
+"author": "Grace Hopper",
+"linesAdded": 253,
+"linesRemoved": 115
+},
+{
+"committedAt": "2026-01-23T11:00:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 396,
+"linesRemoved": 168
+},
+{
+"committedAt": "2026-01-23T12:33:00Z",
+"author": "Ken Thompson",
+"linesAdded": 353,
+"linesRemoved": 110
+},
+{
+"committedAt": "2026-01-23T13:27:00Z",
+"author": "Grace Hopper",
+"linesAdded": 12,
+"linesRemoved": 4
+},
+{
+"committedAt": "2026-01-23T14:58:00Z",
+"author": "Donald Knuth",
+"linesAdded": 212,
+"linesRemoved": 7
+},
+{
+"committedAt": "2026-01-23T15:37:00Z",
+"author": "Radia Perlman",
+"linesAdded": 309,
+"linesRemoved": 214
+},
+{
+"committedAt": "2026-01-23T16:47:00Z",
+"author": "Alan Turing",
+"linesAdded": 407,
+"linesRemoved": 42
+},
+{
+"committedAt": "2026-01-23T17:26:00Z",
+"author": "Grace Hopper",
+"linesAdded": 317,
+"linesRemoved": 60
+},
+{
+"committedAt": "2026-01-23T17:34:00Z",
+"author": "Donald Knuth",
+"linesAdded": 145,
+"linesRemoved": 75
+},
+{
+"committedAt": "2026-01-23T18:34:00Z",
+"author": "Radia Perlman",
+"linesAdded": 131,
+"linesRemoved": 250
+},
+{
+"committedAt": "2026-01-23T22:21:00Z",
+"author": "Alan Turing",
+"linesAdded": 319,
+"linesRemoved": 80
+},
+{
+"committedAt": "2026-01-23T23:04:00Z",
+"author": "Ken Thompson",
+"linesAdded": 188,
+"linesRemoved": 236
+},
+{
+"committedAt": "2026-01-24T08:43:00Z",
+"author": "Alan Turing",
+"linesAdded": 237,
+"linesRemoved": 108
+},
+{
+"committedAt": "2026-01-24T09:08:00Z",
+"author": "Ken Thompson",
+"linesAdded": 342,
+"linesRemoved": 213
+},
+{
+"committedAt": "2026-01-24T12:16:00Z",
+"author": "Donald Knuth",
+"linesAdded": 197,
+"linesRemoved": 161
+},
+{
+"committedAt": "2026-01-24T12:48:00Z",
+"author": "Donald Knuth",
+"linesAdded": 252,
+"linesRemoved": 24
+},
+{
+"committedAt": "2026-01-24T13:36:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 292,
+"linesRemoved": 73
+},
+{
+"committedAt": "2026-01-24T16:16:00Z",
+"author": "Alan Turing",
+"linesAdded": 378,
+"linesRemoved": 160
+},
+{
+"committedAt": "2026-01-24T17:23:00Z",
+"author": "Ken Thompson",
+"linesAdded": 246,
+"linesRemoved": 141
+},
+{
+"committedAt": "2026-01-24T17:38:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 118,
+"linesRemoved": 75
+},
+{
+"committedAt": "2026-01-24T18:29:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 400,
+"linesRemoved": 147
+},
+{
+"committedAt": "2026-01-24T19:31:00Z",
+"author": "Alan Turing",
+"linesAdded": 413,
+"linesRemoved": 222
+},
+{
+"committedAt": "2026-01-24T22:47:00Z",
+"author": "Ken Thompson",
+"linesAdded": 153,
+"linesRemoved": 172
+},
+{
+"committedAt": "2026-01-25T09:18:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 183,
+"linesRemoved": 61
+},
+{
+"committedAt": "2026-01-25T12:35:00Z",
+"author": "Ken Thompson",
+"linesAdded": 120,
+"linesRemoved": 180
+},
+{
+"committedAt": "2026-01-25T13:58:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 415,
+"linesRemoved": 67
+},
+{
+"committedAt": "2026-01-25T14:49:00Z",
+"author": "Grace Hopper",
+"linesAdded": 86,
+"linesRemoved": 179
+},
+{
+"committedAt": "2026-01-25T14:54:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 254,
+"linesRemoved": 29
+},
+{
+"committedAt": "2026-01-25T17:41:00Z",
+"author": "Ken Thompson",
+"linesAdded": 412,
+"linesRemoved": 216
+},
+{
+"committedAt": "2026-01-25T18:20:00Z",
+"author": "Grace Hopper",
+"linesAdded": 105,
+"linesRemoved": 199
+},
+{
+"committedAt": "2026-01-25T18:53:00Z",
+"author": "Radia Perlman",
+"linesAdded": 253,
+"linesRemoved": 110
+},
+{
+"committedAt": "2026-01-25T20:20:00Z",
+"author": "Ken Thompson",
+"linesAdded": 415,
+"linesRemoved": 11
+},
+{
+"committedAt": "2026-01-25T20:22:00Z",
+"author": "Ken Thompson",
+"linesAdded": 66,
+"linesRemoved": 47
+},
+{
+"committedAt": "2026-01-26T13:06:00Z",
+"author": "Ken Thompson",
+"linesAdded": 404,
+"linesRemoved": 148
+},
+{
+"committedAt": "2026-01-26T13:57:00Z",
+"author": "Ken Thompson",
+"linesAdded": 124,
+"linesRemoved": 167
+},
+{
+"committedAt": "2026-01-26T15:10:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 70,
+"linesRemoved": 58
+},
+{
+"committedAt": "2026-01-26T16:09:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 194,
+"linesRemoved": 49
+},
+{
+"committedAt": "2026-01-26T16:55:00Z",
+"author": "Grace Hopper",
+"linesAdded": 87,
+"linesRemoved": 134
+},
+{
+"committedAt": "2026-01-26T18:05:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 150,
+"linesRemoved": 62
+},
+{
+"committedAt": "2026-01-26T18:42:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 416,
+"linesRemoved": 242
+},
+{
+"committedAt": "2026-01-26T20:37:00Z",
+"author": "Donald Knuth",
+"linesAdded": 207,
+"linesRemoved": 80
+},
+{
+"committedAt": "2026-01-26T23:15:00Z",
+"author": "Radia Perlman",
+"linesAdded": 150,
+"linesRemoved": 63
+},
+{
+"committedAt": "2026-01-27T08:40:00Z",
+"author": "Grace Hopper",
+"linesAdded": 407,
+"linesRemoved": 13
+},
+{
+"committedAt": "2026-01-27T09:56:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 250,
+"linesRemoved": 221
+},
+{
+"committedAt": "2026-01-27T10:00:00Z",
+"author": "Alan Turing",
+"linesAdded": 228,
+"linesRemoved": 118
+},
+{
+"committedAt": "2026-01-27T12:10:00Z",
+"author": "Ken Thompson",
+"linesAdded": 50,
+"linesRemoved": 240
+},
+{
+"committedAt": "2026-01-27T12:11:00Z",
+"author": "Grace Hopper",
+"linesAdded": 405,
+"linesRemoved": 77
+},
+{
+"committedAt": "2026-01-27T13:24:00Z",
+"author": "Donald Knuth",
+"linesAdded": 376,
+"linesRemoved": 114
+},
+{
+"committedAt": "2026-01-27T13:40:00Z",
+"author": "Ken Thompson",
+"linesAdded": 37,
+"linesRemoved": 178
+},
+{
+"committedAt": "2026-01-27T14:06:00Z",
+"author": "Grace Hopper",
+"linesAdded": 330,
+"linesRemoved": 220
+},
+{
+"committedAt": "2026-01-27T14:18:00Z",
+"author": "Alan Turing",
+"linesAdded": 368,
+"linesRemoved": 15
+},
+{
+"committedAt": "2026-01-27T19:06:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 297,
+"linesRemoved": 164
+},
+{
+"committedAt": "2026-01-27T21:08:00Z",
+"author": "Radia Perlman",
+"linesAdded": 212,
+"linesRemoved": 141
+},
+{
+"committedAt": "2026-01-27T22:51:00Z",
+"author": "Grace Hopper",
+"linesAdded": 273,
+"linesRemoved": 251
+},
+{
+"committedAt": "2026-01-27T23:50:00Z",
+"author": "Ken Thompson",
+"linesAdded": 246,
+"linesRemoved": 241
+},
+{
+"committedAt": "2026-01-28T11:50:00Z",
+"author": "Alan Turing",
+"linesAdded": 140,
+"linesRemoved": 190
+},
+{
+"committedAt": "2026-01-28T12:48:00Z",
+"author": "Radia Perlman",
+"linesAdded": 85,
+"linesRemoved": 29
+},
+{
+"committedAt": "2026-01-28T12:58:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 388,
+"linesRemoved": 159
+},
+{
+"committedAt": "2026-01-28T13:44:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 53,
+"linesRemoved": 116
+},
+{
+"committedAt": "2026-01-28T13:57:00Z",
+"author": "Ken Thompson",
+"linesAdded": 407,
+"linesRemoved": 20
+},
+{
+"committedAt": "2026-01-28T14:04:00Z",
+"author": "Donald Knuth",
+"linesAdded": 409,
+"linesRemoved": 174
+},
+{
+"committedAt": "2026-01-28T14:24:00Z",
+"author": "Ken Thompson",
+"linesAdded": 250,
+"linesRemoved": 60
+},
+{
+"committedAt": "2026-01-28T15:55:00Z",
+"author": "Radia Perlman",
+"linesAdded": 261,
+"linesRemoved": 88
+},
+{
+"committedAt": "2026-01-28T16:32:00Z",
+"author": "Ken Thompson",
+"linesAdded": 255,
+"linesRemoved": 109
+},
+{
+"committedAt": "2026-01-28T17:32:00Z",
+"author": "Grace Hopper",
+"linesAdded": 77,
+"linesRemoved": 17
+},
+{
+"committedAt": "2026-01-28T18:39:00Z",
+"author": "Donald Knuth",
+"linesAdded": 175,
+"linesRemoved": 185
+},
+{
+"committedAt": "2026-01-28T19:48:00Z",
+"author": "Alan Turing",
+"linesAdded": 386,
+"linesRemoved": 176
+},
+{
+"committedAt": "2026-01-28T20:17:00Z",
+"author": "Grace Hopper",
+"linesAdded": 373,
+"linesRemoved": 148
+},
+{
+"committedAt": "2026-01-28T23:12:00Z",
+"author": "Alan Turing",
+"linesAdded": 278,
+"linesRemoved": 134
+},
+{
+"committedAt": "2026-01-28T23:14:00Z",
+"author": "Grace Hopper",
+"linesAdded": 150,
+"linesRemoved": 45
+},
+{
+"committedAt": "2026-01-29T08:04:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 43,
+"linesRemoved": 7
+},
+{
+"committedAt": "2026-01-29T08:48:00Z",
+"author": "Grace Hopper",
+"linesAdded": 398,
+"linesRemoved": 249
+},
+{
+"committedAt": "2026-01-29T09:08:00Z",
+"author": "Grace Hopper",
+"linesAdded": 373,
+"linesRemoved": 45
+},
+{
+"committedAt": "2026-01-29T10:11:00Z",
+"author": "Grace Hopper",
+"linesAdded": 81,
+"linesRemoved": 144
+},
+{
+"committedAt": "2026-01-29T10:28:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 391,
+"linesRemoved": 205
+},
+{
+"committedAt": "2026-01-29T11:56:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 372,
+"linesRemoved": 232
+},
+{
+"committedAt": "2026-01-29T12:03:00Z",
+"author": "Radia Perlman",
+"linesAdded": 357,
+"linesRemoved": 14
+},
+{
+"committedAt": "2026-01-29T12:36:00Z",
+"author": "Alan Turing",
+"linesAdded": 372,
+"linesRemoved": 24
+},
+{
+"committedAt": "2026-01-29T13:38:00Z",
+"author": "Alan Turing",
+"linesAdded": 298,
+"linesRemoved": 124
+},
+{
+"committedAt": "2026-01-29T14:50:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 226,
+"linesRemoved": 106
+},
+{
+"committedAt": "2026-01-29T15:12:00Z",
+"author": "Grace Hopper",
+"linesAdded": 38,
+"linesRemoved": 86
+},
+{
+"committedAt": "2026-01-29T16:29:00Z",
+"author": "Alan Turing",
+"linesAdded": 16,
+"linesRemoved": 182
+},
+{
+"committedAt": "2026-01-29T17:23:00Z",
+"author": "Ken Thompson",
+"linesAdded": 51,
+"linesRemoved": 18
+},
+{
+"committedAt": "2026-01-29T17:32:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 406,
+"linesRemoved": 7
+},
+{
+"committedAt": "2026-01-29T17:34:00Z",
+"author": "Donald Knuth",
+"linesAdded": 80,
+"linesRemoved": 90
+},
+{
+"committedAt": "2026-01-29T17:35:00Z",
+"author": "Alan Turing",
+"linesAdded": 264,
+"linesRemoved": 23
+},
+{
+"committedAt": "2026-01-29T18:27:00Z",
+"author": "Alan Turing",
+"linesAdded": 181,
+"linesRemoved": 29
+},
+{
+"committedAt": "2026-01-29T21:32:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 195,
+"linesRemoved": 91
+},
+{
+"committedAt": "2026-01-29T22:34:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 80,
+"linesRemoved": 38
+},
+{
+"committedAt": "2026-01-30T10:23:00Z",
+"author": "Donald Knuth",
+"linesAdded": 379,
+"linesRemoved": 189
+},
+{
+"committedAt": "2026-01-30T11:11:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 366,
+"linesRemoved": 5
+},
+{
+"committedAt": "2026-01-30T11:32:00Z",
+"author": "Alan Turing",
+"linesAdded": 255,
+"linesRemoved": 54
+},
+{
+"committedAt": "2026-01-30T13:54:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 384,
+"linesRemoved": 69
+},
+{
+"committedAt": "2026-01-30T14:26:00Z",
+"author": "Grace Hopper",
+"linesAdded": 180,
+"linesRemoved": 202
+},
+{
+"committedAt": "2026-01-30T14:37:00Z",
+"author": "Alan Turing",
+"linesAdded": 27,
+"linesRemoved": 110
+},
+{
+"committedAt": "2026-01-30T15:54:00Z",
+"author": "Alan Turing",
+"linesAdded": 315,
+"linesRemoved": 199
+},
+{
+"committedAt": "2026-01-30T16:07:00Z",
+"author": "Grace Hopper",
+"linesAdded": 84,
+"linesRemoved": 97
+},
+{
+"committedAt": "2026-01-30T17:27:00Z",
+"author": "Alan Turing",
+"linesAdded": 168,
+"linesRemoved": 203
+},
+{
+"committedAt": "2026-01-30T20:22:00Z",
+"author": "Alan Turing",
+"linesAdded": 87,
+"linesRemoved": 13
+},
+{
+"committedAt": "2026-01-31T08:15:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 61,
+"linesRemoved": 41
+},
+{
+"committedAt": "2026-01-31T08:26:00Z",
+"author": "Grace Hopper",
+"linesAdded": 229,
+"linesRemoved": 127
+},
+{
+"committedAt": "2026-01-31T08:30:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 254,
+"linesRemoved": 154
+},
+{
+"committedAt": "2026-01-31T08:30:00Z",
+"author": "Ken Thompson",
+"linesAdded": 43,
+"linesRemoved": 177
+},
+{
+"committedAt": "2026-01-31T10:22:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 139,
+"linesRemoved": 49
+},
+{
+"committedAt": "2026-01-31T10:31:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 96,
+"linesRemoved": 85
+},
+{
+"committedAt": "2026-01-31T10:43:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 281,
+"linesRemoved": 55
+},
+{
+"committedAt": "2026-01-31T12:30:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 279,
+"linesRemoved": 69
+},
+{
+"committedAt": "2026-01-31T15:14:00Z",
+"author": "Radia Perlman",
+"linesAdded": 270,
+"linesRemoved": 28
+},
+{
+"committedAt": "2026-01-31T15:22:00Z",
+"author": "Grace Hopper",
+"linesAdded": 308,
+"linesRemoved": 138
+},
+{
+"committedAt": "2026-01-31T16:12:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 251,
+"linesRemoved": 143
+},
+{
+"committedAt": "2026-01-31T17:40:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 359,
+"linesRemoved": 20
+},
+{
+"committedAt": "2026-01-31T21:37:00Z",
+"author": "Alan Turing",
+"linesAdded": 380,
+"linesRemoved": 34
+},
+{
+"committedAt": "2026-02-01T08:26:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 247,
+"linesRemoved": 224
+},
+{
+"committedAt": "2026-02-01T09:11:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 273,
+"linesRemoved": 171
+},
+{
+"committedAt": "2026-02-01T15:28:00Z",
+"author": "Alan Turing",
+"linesAdded": 416,
+"linesRemoved": 144
+},
+{
+"committedAt": "2026-02-01T17:52:00Z",
+"author": "Ken Thompson",
+"linesAdded": 378,
+"linesRemoved": 245
+},
+{
+"committedAt": "2026-02-01T18:30:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 339,
+"linesRemoved": 225
+},
+{
+"committedAt": "2026-02-01T18:36:00Z",
+"author": "Radia Perlman",
+"linesAdded": 373,
+"linesRemoved": 178
+},
+{
+"committedAt": "2026-02-01T18:38:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 395,
+"linesRemoved": 43
+},
+{
+"committedAt": "2026-02-01T22:31:00Z",
+"author": "Alan Turing",
+"linesAdded": 345,
+"linesRemoved": 161
+},
+{
+"committedAt": "2026-02-02T11:59:00Z",
+"author": "Alan Turing",
+"linesAdded": 279,
+"linesRemoved": 201
+},
+{
+"committedAt": "2026-02-02T12:29:00Z",
+"author": "Radia Perlman",
+"linesAdded": 40,
+"linesRemoved": 225
+},
+{
+"committedAt": "2026-02-02T13:20:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 115,
+"linesRemoved": 188
+},
+{
+"committedAt": "2026-02-02T14:48:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 125,
+"linesRemoved": 23
+},
+{
+"committedAt": "2026-02-02T15:26:00Z",
+"author": "Ken Thompson",
+"linesAdded": 171,
+"linesRemoved": 144
+},
+{
+"committedAt": "2026-02-02T18:02:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 161,
+"linesRemoved": 184
+},
+{
+"committedAt": "2026-02-02T20:54:00Z",
+"author": "Ken Thompson",
+"linesAdded": 131,
+"linesRemoved": 209
+},
+{
+"committedAt": "2026-02-03T10:22:00Z",
+"author": "Ken Thompson",
+"linesAdded": 64,
+"linesRemoved": 7
+},
+{
+"committedAt": "2026-02-03T10:51:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 54,
+"linesRemoved": 128
+},
+{
+"committedAt": "2026-02-03T14:05:00Z",
+"author": "Ken Thompson",
+"linesAdded": 131,
+"linesRemoved": 29
+},
+{
+"committedAt": "2026-02-03T16:46:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 5,
+"linesRemoved": 191
+},
+{
+"committedAt": "2026-02-03T17:06:00Z",
+"author": "Ken Thompson",
+"linesAdded": 195,
+"linesRemoved": 145
+},
+{
+"committedAt": "2026-02-03T18:03:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 35,
+"linesRemoved": 236
+},
+{
+"committedAt": "2026-02-03T20:38:00Z",
+"author": "Radia Perlman",
+"linesAdded": 336,
+"linesRemoved": 232
+},
+{
+"committedAt": "2026-02-03T21:21:00Z",
+"author": "Alan Turing",
+"linesAdded": 379,
+"linesRemoved": 104
+},
+{
+"committedAt": "2026-02-03T23:39:00Z",
+"author": "Grace Hopper",
+"linesAdded": 38,
+"linesRemoved": 143
+},
+{
+"committedAt": "2026-02-04T09:53:00Z",
+"author": "Grace Hopper",
+"linesAdded": 197,
+"linesRemoved": 230
+},
+{
+"committedAt": "2026-02-04T12:32:00Z",
+"author": "Radia Perlman",
+"linesAdded": 26,
+"linesRemoved": 100
+},
+{
+"committedAt": "2026-02-04T12:43:00Z",
+"author": "Grace Hopper",
+"linesAdded": 6,
+"linesRemoved": 68
+},
+{
+"committedAt": "2026-02-04T14:05:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 202,
+"linesRemoved": 152
+},
+{
+"committedAt": "2026-02-04T14:40:00Z",
+"author": "Radia Perlman",
+"linesAdded": 343,
+"linesRemoved": 196
+},
+{
+"committedAt": "2026-02-04T15:31:00Z",
+"author": "Radia Perlman",
+"linesAdded": 82,
+"linesRemoved": 226
+},
+{
+"committedAt": "2026-02-04T16:58:00Z",
+"author": "Radia Perlman",
+"linesAdded": 217,
+"linesRemoved": 77
+},
+{
+"committedAt": "2026-02-04T19:28:00Z",
+"author": "Radia Perlman",
+"linesAdded": 404,
+"linesRemoved": 251
+},
+{
+"committedAt": "2026-02-04T21:03:00Z",
+"author": "Donald Knuth",
+"linesAdded": 307,
+"linesRemoved": 102
+},
+{
+"committedAt": "2026-02-04T22:05:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 320,
+"linesRemoved": 170
+},
+{
+"committedAt": "2026-02-04T22:14:00Z",
+"author": "Donald Knuth",
+"linesAdded": 298,
+"linesRemoved": 255
+},
+{
+"committedAt": "2026-02-05T09:29:00Z",
+"author": "Grace Hopper",
+"linesAdded": 409,
+"linesRemoved": 249
+},
+{
+"committedAt": "2026-02-05T12:07:00Z",
+"author": "Radia Perlman",
+"linesAdded": 418,
+"linesRemoved": 243
+},
+{
+"committedAt": "2026-02-05T13:29:00Z",
+"author": "Donald Knuth",
+"linesAdded": 33,
+"linesRemoved": 60
+},
+{
+"committedAt": "2026-02-05T15:21:00Z",
+"author": "Alan Turing",
+"linesAdded": 223,
+"linesRemoved": 243
+},
+{
+"committedAt": "2026-02-05T17:49:00Z",
+"author": "Radia Perlman",
+"linesAdded": 313,
+"linesRemoved": 169
+},
+{
+"committedAt": "2026-02-05T19:42:00Z",
+"author": "Alan Turing",
+"linesAdded": 176,
+"linesRemoved": 241
+},
+{
+"committedAt": "2026-02-06T09:16:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 56,
+"linesRemoved": 148
+},
+{
+"committedAt": "2026-02-06T11:01:00Z",
+"author": "Grace Hopper",
+"linesAdded": 328,
+"linesRemoved": 232
+},
+{
+"committedAt": "2026-02-06T11:44:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 338,
+"linesRemoved": 232
+},
+{
+"committedAt": "2026-02-06T11:56:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 110,
+"linesRemoved": 196
+},
+{
+"committedAt": "2026-02-06T14:10:00Z",
+"author": "Ken Thompson",
+"linesAdded": 146,
+"linesRemoved": 97
+},
+{
+"committedAt": "2026-02-06T14:27:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 317,
+"linesRemoved": 33
+},
+{
+"committedAt": "2026-02-06T14:43:00Z",
+"author": "Alan Turing",
+"linesAdded": 132,
+"linesRemoved": 135
+},
+{
+"committedAt": "2026-02-07T09:01:00Z",
+"author": "Ken Thompson",
+"linesAdded": 89,
+"linesRemoved": 129
+},
+{
+"committedAt": "2026-02-07T14:46:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 137,
+"linesRemoved": 75
+},
+{
+"committedAt": "2026-02-07T15:36:00Z",
+"author": "Donald Knuth",
+"linesAdded": 202,
+"linesRemoved": 135
+},
+{
+"committedAt": "2026-02-07T16:17:00Z",
+"author": "Donald Knuth",
+"linesAdded": 367,
+"linesRemoved": 241
+},
+{
+"committedAt": "2026-02-07T16:21:00Z",
+"author": "Grace Hopper",
+"linesAdded": 251,
+"linesRemoved": 104
+},
+{
+"committedAt": "2026-02-07T16:52:00Z",
+"author": "Donald Knuth",
+"linesAdded": 301,
+"linesRemoved": 100
+},
+{
+"committedAt": "2026-02-07T17:29:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 407,
+"linesRemoved": 161
+},
+{
+"committedAt": "2026-02-07T17:44:00Z",
+"author": "Alan Turing",
+"linesAdded": 243,
+"linesRemoved": 128
+},
+{
+"committedAt": "2026-02-07T18:13:00Z",
+"author": "Radia Perlman",
+"linesAdded": 271,
+"linesRemoved": 51
+},
+{
+"committedAt": "2026-02-07T21:09:00Z",
+"author": "Ken Thompson",
+"linesAdded": 63,
+"linesRemoved": 1
+},
+{
+"committedAt": "2026-02-07T21:21:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 272,
+"linesRemoved": 48
+},
+{
+"committedAt": "2026-02-07T22:59:00Z",
+"author": "Radia Perlman",
+"linesAdded": 333,
+"linesRemoved": 111
+},
+{
+"committedAt": "2026-02-07T23:22:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 158,
+"linesRemoved": 100
+},
+{
+"committedAt": "2026-02-08T08:32:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 78,
+"linesRemoved": 199
+},
+{
+"committedAt": "2026-02-08T09:56:00Z",
+"author": "Donald Knuth",
+"linesAdded": 94,
+"linesRemoved": 182
+},
+{
+"committedAt": "2026-02-08T10:24:00Z",
+"author": "Ken Thompson",
+"linesAdded": 319,
+"linesRemoved": 149
+},
+{
+"committedAt": "2026-02-08T10:43:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 396,
+"linesRemoved": 52
+},
+{
+"committedAt": "2026-02-08T10:54:00Z",
+"author": "Radia Perlman",
+"linesAdded": 219,
+"linesRemoved": 10
+},
+{
+"committedAt": "2026-02-08T11:01:00Z",
+"author": "Alan Turing",
+"linesAdded": 76,
+"linesRemoved": 14
+},
+{
+"committedAt": "2026-02-08T14:24:00Z",
+"author": "Alan Turing",
+"linesAdded": 348,
+"linesRemoved": 71
+},
+{
+"committedAt": "2026-02-08T16:11:00Z",
+"author": "Grace Hopper",
+"linesAdded": 171,
+"linesRemoved": 196
+},
+{
+"committedAt": "2026-02-08T18:13:00Z",
+"author": "Grace Hopper",
+"linesAdded": 338,
+"linesRemoved": 207
+},
+{
+"committedAt": "2026-02-08T23:04:00Z",
+"author": "Donald Knuth",
+"linesAdded": 347,
+"linesRemoved": 258
+},
+{
+"committedAt": "2026-02-09T11:32:00Z",
+"author": "Radia Perlman",
+"linesAdded": 335,
+"linesRemoved": 100
+},
+{
+"committedAt": "2026-02-09T11:42:00Z",
+"author": "Radia Perlman",
+"linesAdded": 41,
+"linesRemoved": 91
+},
+{
+"committedAt": "2026-02-09T12:04:00Z",
+"author": "Ken Thompson",
+"linesAdded": 129,
+"linesRemoved": 95
+},
+{
+"committedAt": "2026-02-09T12:13:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 328,
+"linesRemoved": 166
+},
+{
+"committedAt": "2026-02-09T14:43:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 246,
+"linesRemoved": 182
+},
+{
+"committedAt": "2026-02-09T16:08:00Z",
+"author": "Grace Hopper",
+"linesAdded": 198,
+"linesRemoved": 182
+},
+{
+"committedAt": "2026-02-09T21:01:00Z",
+"author": "Radia Perlman",
+"linesAdded": 266,
+"linesRemoved": 93
+},
+{
+"committedAt": "2026-02-09T23:40:00Z",
+"author": "Donald Knuth",
+"linesAdded": 280,
+"linesRemoved": 24
+},
+{
+"committedAt": "2026-02-10T09:07:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 94,
+"linesRemoved": 152
+},
+{
+"committedAt": "2026-02-10T09:39:00Z",
+"author": "Donald Knuth",
+"linesAdded": 199,
+"linesRemoved": 15
+},
+{
+"committedAt": "2026-02-10T12:49:00Z",
+"author": "Donald Knuth",
+"linesAdded": 203,
+"linesRemoved": 187
+},
+{
+"committedAt": "2026-02-10T14:11:00Z",
+"author": "Alan Turing",
+"linesAdded": 313,
+"linesRemoved": 133
+},
+{
+"committedAt": "2026-02-10T18:24:00Z",
+"author": "Ken Thompson",
+"linesAdded": 410,
+"linesRemoved": 190
+},
+{
+"committedAt": "2026-02-10T18:27:00Z",
+"author": "Grace Hopper",
+"linesAdded": 234,
+"linesRemoved": 13
+},
+{
+"committedAt": "2026-02-10T23:28:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 335,
+"linesRemoved": 204
+},
+{
+"committedAt": "2026-02-11T12:15:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 16,
+"linesRemoved": 246
+},
+{
+"committedAt": "2026-02-11T12:25:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 40,
+"linesRemoved": 212
+},
+{
+"committedAt": "2026-02-11T12:41:00Z",
+"author": "Ken Thompson",
+"linesAdded": 19,
+"linesRemoved": 242
+},
+{
+"committedAt": "2026-02-11T14:05:00Z",
+"author": "Donald Knuth",
+"linesAdded": 107,
+"linesRemoved": 124
+},
+{
+"committedAt": "2026-02-11T15:29:00Z",
+"author": "Radia Perlman",
+"linesAdded": 336,
+"linesRemoved": 142
+},
+{
+"committedAt": "2026-02-11T16:25:00Z",
+"author": "Grace Hopper",
+"linesAdded": 57,
+"linesRemoved": 252
+},
+{
+"committedAt": "2026-02-11T17:30:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 166,
+"linesRemoved": 146
+},
+{
+"committedAt": "2026-02-11T17:49:00Z",
+"author": "Grace Hopper",
+"linesAdded": 6,
+"linesRemoved": 105
+},
+{
+"committedAt": "2026-02-11T18:56:00Z",
+"author": "Grace Hopper",
+"linesAdded": 182,
+"linesRemoved": 42
+},
+{
+"committedAt": "2026-02-11T20:45:00Z",
+"author": "Radia Perlman",
+"linesAdded": 186,
+"linesRemoved": 164
+},
+{
+"committedAt": "2026-02-11T21:08:00Z",
+"author": "Radia Perlman",
+"linesAdded": 135,
+"linesRemoved": 248
+},
+{
+"committedAt": "2026-02-11T21:41:00Z",
+"author": "Donald Knuth",
+"linesAdded": 10,
+"linesRemoved": 14
+},
+{
+"committedAt": "2026-02-11T23:11:00Z",
+"author": "Ken Thompson",
+"linesAdded": 305,
+"linesRemoved": 84
+},
+{
+"committedAt": "2026-02-12T08:04:00Z",
+"author": "Grace Hopper",
+"linesAdded": 226,
+"linesRemoved": 230
+},
+{
+"committedAt": "2026-02-12T08:09:00Z",
+"author": "Donald Knuth",
+"linesAdded": 96,
+"linesRemoved": 42
+},
+{
+"committedAt": "2026-02-12T08:22:00Z",
+"author": "Radia Perlman",
+"linesAdded": 46,
+"linesRemoved": 241
+},
+{
+"committedAt": "2026-02-12T11:18:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 357,
+"linesRemoved": 58
+},
+{
+"committedAt": "2026-02-12T12:14:00Z",
+"author": "Radia Perlman",
+"linesAdded": 189,
+"linesRemoved": 43
+},
+{
+"committedAt": "2026-02-12T12:23:00Z",
+"author": "Alan Turing",
+"linesAdded": 159,
+"linesRemoved": 213
+},
+{
+"committedAt": "2026-02-12T13:10:00Z",
+"author": "Alan Turing",
+"linesAdded": 205,
+"linesRemoved": 47
+},
+{
+"committedAt": "2026-02-12T15:31:00Z",
+"author": "Ken Thompson",
+"linesAdded": 268,
+"linesRemoved": 14
+},
+{
+"committedAt": "2026-02-12T15:48:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 127,
+"linesRemoved": 49
+},
+{
+"committedAt": "2026-02-12T15:56:00Z",
+"author": "Radia Perlman",
+"linesAdded": 74,
+"linesRemoved": 112
+},
+{
+"committedAt": "2026-02-12T17:47:00Z",
+"author": "Donald Knuth",
+"linesAdded": 243,
+"linesRemoved": 232
+},
+{
+"committedAt": "2026-02-12T18:20:00Z",
+"author": "Grace Hopper",
+"linesAdded": 396,
+"linesRemoved": 255
+},
+{
+"committedAt": "2026-02-12T23:53:00Z",
+"author": "Radia Perlman",
+"linesAdded": 269,
+"linesRemoved": 26
+},
+{
+"committedAt": "2026-02-13T08:19:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 167,
+"linesRemoved": 255
+},
+{
+"committedAt": "2026-02-13T09:01:00Z",
+"author": "Grace Hopper",
+"linesAdded": 3,
+"linesRemoved": 229
+},
+{
+"committedAt": "2026-02-13T11:00:00Z",
+"author": "Ken Thompson",
+"linesAdded": 164,
+"linesRemoved": 106
+},
+{
+"committedAt": "2026-02-13T11:05:00Z",
+"author": "Radia Perlman",
+"linesAdded": 153,
+"linesRemoved": 134
+},
+{
+"committedAt": "2026-02-13T13:47:00Z",
+"author": "Alan Turing",
+"linesAdded": 369,
+"linesRemoved": 94
+},
+{
+"committedAt": "2026-02-13T15:40:00Z",
+"author": "Donald Knuth",
+"linesAdded": 348,
+"linesRemoved": 92
+},
+{
+"committedAt": "2026-02-13T16:33:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 196,
+"linesRemoved": 165
+},
+{
+"committedAt": "2026-02-13T18:10:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 170,
+"linesRemoved": 53
+},
+{
+"committedAt": "2026-02-13T18:11:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 173,
+"linesRemoved": 247
+},
+{
+"committedAt": "2026-02-13T18:59:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 109,
+"linesRemoved": 49
+},
+{
+"committedAt": "2026-02-13T19:43:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 317,
+"linesRemoved": 195
+},
+{
+"committedAt": "2026-02-13T23:39:00Z",
+"author": "Donald Knuth",
+"linesAdded": 260,
+"linesRemoved": 136
+},
+{
+"committedAt": "2026-02-14T09:39:00Z",
+"author": "Ken Thompson",
+"linesAdded": 16,
+"linesRemoved": 133
+},
+{
+"committedAt": "2026-02-14T10:39:00Z",
+"author": "Grace Hopper",
+"linesAdded": 383,
+"linesRemoved": 237
+},
+{
+"committedAt": "2026-02-14T10:56:00Z",
+"author": "Ken Thompson",
+"linesAdded": 297,
+"linesRemoved": 213
+},
+{
+"committedAt": "2026-02-14T12:21:00Z",
+"author": "Radia Perlman",
+"linesAdded": 357,
+"linesRemoved": 227
+},
+{
+"committedAt": "2026-02-14T13:11:00Z",
+"author": "Grace Hopper",
+"linesAdded": 326,
+"linesRemoved": 103
+},
+{
+"committedAt": "2026-02-14T13:22:00Z",
+"author": "Donald Knuth",
+"linesAdded": 321,
+"linesRemoved": 70
+},
+{
+"committedAt": "2026-02-14T13:53:00Z",
+"author": "Radia Perlman",
+"linesAdded": 35,
+"linesRemoved": 70
+},
+{
+"committedAt": "2026-02-14T14:44:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 111,
+"linesRemoved": 21
+},
+{
+"committedAt": "2026-02-14T15:26:00Z",
+"author": "Radia Perlman",
+"linesAdded": 252,
+"linesRemoved": 196
+},
+{
+"committedAt": "2026-02-14T16:25:00Z",
+"author": "Grace Hopper",
+"linesAdded": 240,
+"linesRemoved": 0
+},
+{
+"committedAt": "2026-02-14T16:28:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 198,
+"linesRemoved": 35
+},
+{
+"committedAt": "2026-02-14T18:19:00Z",
+"author": "Ken Thompson",
+"linesAdded": 12,
+"linesRemoved": 113
+},
+{
+"committedAt": "2026-02-14T18:33:00Z",
+"author": "Grace Hopper",
+"linesAdded": 272,
+"linesRemoved": 211
+},
+{
+"committedAt": "2026-02-14T19:40:00Z",
+"author": "Grace Hopper",
+"linesAdded": 387,
+"linesRemoved": 116
+},
+{
+"committedAt": "2026-02-14T22:41:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 374,
+"linesRemoved": 122
+},
+{
+"committedAt": "2026-02-14T22:44:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 276,
+"linesRemoved": 108
+},
+{
+"committedAt": "2026-02-15T08:26:00Z",
+"author": "Grace Hopper",
+"linesAdded": 353,
+"linesRemoved": 149
+},
+{
+"committedAt": "2026-02-15T08:39:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 66,
+"linesRemoved": 7
+},
+{
+"committedAt": "2026-02-15T08:46:00Z",
+"author": "Alan Turing",
+"linesAdded": 220,
+"linesRemoved": 245
+},
+{
+"committedAt": "2026-02-15T12:40:00Z",
+"author": "Radia Perlman",
+"linesAdded": 59,
+"linesRemoved": 3
+},
+{
+"committedAt": "2026-02-15T13:45:00Z",
+"author": "Alan Turing",
+"linesAdded": 226,
+"linesRemoved": 142
+},
+{
+"committedAt": "2026-02-15T14:03:00Z",
+"author": "Donald Knuth",
+"linesAdded": 251,
+"linesRemoved": 53
+},
+{
+"committedAt": "2026-02-15T16:09:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 141,
+"linesRemoved": 241
+},
+{
+"committedAt": "2026-02-15T17:17:00Z",
+"author": "Grace Hopper",
+"linesAdded": 230,
+"linesRemoved": 15
+},
+{
+"committedAt": "2026-02-15T19:47:00Z",
+"author": "Alan Turing",
+"linesAdded": 344,
+"linesRemoved": 40
+},
+{
+"committedAt": "2026-02-15T21:42:00Z",
+"author": "Grace Hopper",
+"linesAdded": 142,
+"linesRemoved": 186
+},
+{
+"committedAt": "2026-02-16T08:10:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 192,
+"linesRemoved": 34
+},
+{
+"committedAt": "2026-02-16T08:34:00Z",
+"author": "Alan Turing",
+"linesAdded": 298,
+"linesRemoved": 155
+},
+{
+"committedAt": "2026-02-16T09:32:00Z",
+"author": "Donald Knuth",
+"linesAdded": 389,
+"linesRemoved": 49
+},
+{
+"committedAt": "2026-02-16T09:56:00Z",
+"author": "Grace Hopper",
+"linesAdded": 260,
+"linesRemoved": 254
+},
+{
+"committedAt": "2026-02-16T11:00:00Z",
+"author": "Alan Turing",
+"linesAdded": 395,
+"linesRemoved": 123
+},
+{
+"committedAt": "2026-02-16T11:29:00Z",
+"author": "Grace Hopper",
+"linesAdded": 155,
+"linesRemoved": 226
+},
+{
+"committedAt": "2026-02-16T11:41:00Z",
+"author": "Alan Turing",
+"linesAdded": 226,
+"linesRemoved": 54
+},
+{
+"committedAt": "2026-02-16T17:07:00Z",
+"author": "Radia Perlman",
+"linesAdded": 371,
+"linesRemoved": 223
+},
+{
+"committedAt": "2026-02-16T18:39:00Z",
+"author": "Donald Knuth",
+"linesAdded": 26,
+"linesRemoved": 90
+},
+{
+"committedAt": "2026-02-16T18:50:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 43,
+"linesRemoved": 225
+},
+{
+"committedAt": "2026-02-16T20:04:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 5,
+"linesRemoved": 34
+},
+{
+"committedAt": "2026-02-16T20:40:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 336,
+"linesRemoved": 184
+},
+{
+"committedAt": "2026-02-16T20:41:00Z",
+"author": "Ken Thompson",
+"linesAdded": 312,
+"linesRemoved": 92
+},
+{
+"committedAt": "2026-02-16T22:54:00Z",
+"author": "Donald Knuth",
+"linesAdded": 201,
+"linesRemoved": 148
+},
+{
+"committedAt": "2026-02-17T08:33:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 328,
+"linesRemoved": 212
+},
+{
+"committedAt": "2026-02-17T08:36:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 197,
+"linesRemoved": 20
+},
+{
+"committedAt": "2026-02-17T10:51:00Z",
+"author": "Alan Turing",
+"linesAdded": 366,
+"linesRemoved": 163
+},
+{
+"committedAt": "2026-02-17T11:51:00Z",
+"author": "Ken Thompson",
+"linesAdded": 153,
+"linesRemoved": 65
+},
+{
+"committedAt": "2026-02-17T12:22:00Z",
+"author": "Radia Perlman",
+"linesAdded": 246,
+"linesRemoved": 57
+},
+{
+"committedAt": "2026-02-17T12:47:00Z",
+"author": "Ken Thompson",
+"linesAdded": 381,
+"linesRemoved": 81
+},
+{
+"committedAt": "2026-02-17T16:15:00Z",
+"author": "Grace Hopper",
+"linesAdded": 291,
+"linesRemoved": 170
+},
+{
+"committedAt": "2026-02-17T17:10:00Z",
+"author": "Alan Turing",
+"linesAdded": 207,
+"linesRemoved": 29
+},
+{
+"committedAt": "2026-02-17T17:29:00Z",
+"author": "Radia Perlman",
+"linesAdded": 202,
+"linesRemoved": 109
+},
+{
+"committedAt": "2026-02-17T18:35:00Z",
+"author": "Grace Hopper",
+"linesAdded": 336,
+"linesRemoved": 49
+},
+{
+"committedAt": "2026-02-17T19:07:00Z",
+"author": "Grace Hopper",
+"linesAdded": 118,
+"linesRemoved": 146
+},
+{
+"committedAt": "2026-02-17T21:13:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 356,
+"linesRemoved": 107
+},
+{
+"committedAt": "2026-02-18T08:56:00Z",
+"author": "Donald Knuth",
+"linesAdded": 238,
+"linesRemoved": 12
+},
+{
+"committedAt": "2026-02-18T09:51:00Z",
+"author": "Alan Turing",
+"linesAdded": 367,
+"linesRemoved": 106
+},
+{
+"committedAt": "2026-02-18T09:56:00Z",
+"author": "Ken Thompson",
+"linesAdded": 219,
+"linesRemoved": 123
+},
+{
+"committedAt": "2026-02-18T10:53:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 274,
+"linesRemoved": 80
+},
+{
+"committedAt": "2026-02-18T11:43:00Z",
+"author": "Radia Perlman",
+"linesAdded": 206,
+"linesRemoved": 91
+},
+{
+"committedAt": "2026-02-18T11:48:00Z",
+"author": "Alan Turing",
+"linesAdded": 235,
+"linesRemoved": 242
+},
+{
+"committedAt": "2026-02-18T12:26:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 169,
+"linesRemoved": 104
+},
+{
+"committedAt": "2026-02-18T16:47:00Z",
+"author": "Alan Turing",
+"linesAdded": 404,
+"linesRemoved": 188
+},
+{
+"committedAt": "2026-02-18T18:19:00Z",
+"author": "Radia Perlman",
+"linesAdded": 165,
+"linesRemoved": 93
+},
+{
+"committedAt": "2026-02-18T18:41:00Z",
+"author": "Ken Thompson",
+"linesAdded": 10,
+"linesRemoved": 66
+},
+{
+"committedAt": "2026-02-18T21:38:00Z",
+"author": "Grace Hopper",
+"linesAdded": 340,
+"linesRemoved": 166
+},
+{
+"committedAt": "2026-02-18T23:48:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 209,
+"linesRemoved": 144
+},
+{
+"committedAt": "2026-02-19T08:15:00Z",
+"author": "Donald Knuth",
+"linesAdded": 316,
+"linesRemoved": 115
+},
+{
+"committedAt": "2026-02-19T08:31:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 408,
+"linesRemoved": 117
+},
+{
+"committedAt": "2026-02-19T08:32:00Z",
+"author": "Grace Hopper",
+"linesAdded": 76,
+"linesRemoved": 234
+},
+{
+"committedAt": "2026-02-19T09:08:00Z",
+"author": "Radia Perlman",
+"linesAdded": 215,
+"linesRemoved": 119
+},
+{
+"committedAt": "2026-02-19T09:58:00Z",
+"author": "Alan Turing",
+"linesAdded": 81,
+"linesRemoved": 226
+},
+{
+"committedAt": "2026-02-19T10:25:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 114,
+"linesRemoved": 65
+},
+{
+"committedAt": "2026-02-19T11:06:00Z",
+"author": "Alan Turing",
+"linesAdded": 256,
+"linesRemoved": 62
+},
+{
+"committedAt": "2026-02-19T12:59:00Z",
+"author": "Alan Turing",
+"linesAdded": 106,
+"linesRemoved": 53
+},
+{
+"committedAt": "2026-02-19T16:08:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 227,
+"linesRemoved": 50
+},
+{
+"committedAt": "2026-02-19T17:49:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 164,
+"linesRemoved": 115
+},
+{
+"committedAt": "2026-02-19T20:31:00Z",
+"author": "Radia Perlman",
+"linesAdded": 171,
+"linesRemoved": 250
+},
+{
+"committedAt": "2026-02-19T21:43:00Z",
+"author": "Ken Thompson",
+"linesAdded": 372,
+"linesRemoved": 97
+},
+{
+"committedAt": "2026-02-19T23:51:00Z",
+"author": "Donald Knuth",
+"linesAdded": 39,
+"linesRemoved": 246
+},
+{
+"committedAt": "2026-02-20T08:09:00Z",
+"author": "Donald Knuth",
+"linesAdded": 142,
+"linesRemoved": 83
+},
+{
+"committedAt": "2026-02-20T08:17:00Z",
+"author": "Radia Perlman",
+"linesAdded": 286,
+"linesRemoved": 63
+},
+{
+"committedAt": "2026-02-20T08:45:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 343,
+"linesRemoved": 24
+},
+{
+"committedAt": "2026-02-20T08:59:00Z",
+"author": "Ken Thompson",
+"linesAdded": 216,
+"linesRemoved": 74
+},
+{
+"committedAt": "2026-02-20T09:03:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 194,
+"linesRemoved": 253
+},
+{
+"committedAt": "2026-02-20T09:29:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 181,
+"linesRemoved": 137
+},
+{
+"committedAt": "2026-02-20T09:32:00Z",
+"author": "Donald Knuth",
+"linesAdded": 352,
+"linesRemoved": 96
+},
+{
+"committedAt": "2026-02-20T10:02:00Z",
+"author": "Donald Knuth",
+"linesAdded": 178,
+"linesRemoved": 112
+},
+{
+"committedAt": "2026-02-20T10:42:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 376,
+"linesRemoved": 71
+},
+{
+"committedAt": "2026-02-20T11:09:00Z",
+"author": "Radia Perlman",
+"linesAdded": 184,
+"linesRemoved": 12
+},
+{
+"committedAt": "2026-02-20T11:53:00Z",
+"author": "Alan Turing",
+"linesAdded": 85,
+"linesRemoved": 95
+},
+{
+"committedAt": "2026-02-20T13:43:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 203,
+"linesRemoved": 198
+},
+{
+"committedAt": "2026-02-20T16:12:00Z",
+"author": "Ken Thompson",
+"linesAdded": 32,
+"linesRemoved": 256
+},
+{
+"committedAt": "2026-02-20T17:16:00Z",
+"author": "Radia Perlman",
+"linesAdded": 362,
+"linesRemoved": 208
+},
+{
+"committedAt": "2026-02-20T21:03:00Z",
+"author": "Grace Hopper",
+"linesAdded": 78,
+"linesRemoved": 32
+},
+{
+"committedAt": "2026-02-21T09:02:00Z",
+"author": "Grace Hopper",
+"linesAdded": 275,
+"linesRemoved": 105
+},
+{
+"committedAt": "2026-02-21T09:53:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 119,
+"linesRemoved": 208
+},
+{
+"committedAt": "2026-02-21T09:55:00Z",
+"author": "Alan Turing",
+"linesAdded": 37,
+"linesRemoved": 94
+},
+{
+"committedAt": "2026-02-21T10:58:00Z",
+"author": "Grace Hopper",
+"linesAdded": 182,
+"linesRemoved": 75
+},
+{
+"committedAt": "2026-02-21T13:07:00Z",
+"author": "Alan Turing",
+"linesAdded": 195,
+"linesRemoved": 165
+},
+{
+"committedAt": "2026-02-21T14:36:00Z",
+"author": "Radia Perlman",
+"linesAdded": 349,
+"linesRemoved": 49
+},
+{
+"committedAt": "2026-02-21T14:50:00Z",
+"author": "Ken Thompson",
+"linesAdded": 160,
+"linesRemoved": 127
+},
+{
+"committedAt": "2026-02-21T15:32:00Z",
+"author": "Radia Perlman",
+"linesAdded": 284,
+"linesRemoved": 116
+},
+{
+"committedAt": "2026-02-21T15:36:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 358,
+"linesRemoved": 74
+},
+{
+"committedAt": "2026-02-21T20:48:00Z",
+"author": "Ken Thompson",
+"linesAdded": 302,
+"linesRemoved": 28
+},
+{
+"committedAt": "2026-02-22T08:16:00Z",
+"author": "Radia Perlman",
+"linesAdded": 142,
+"linesRemoved": 174
+},
+{
+"committedAt": "2026-02-22T08:22:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 127,
+"linesRemoved": 94
+},
+{
+"committedAt": "2026-02-22T08:33:00Z",
+"author": "Ken Thompson",
+"linesAdded": 206,
+"linesRemoved": 62
+},
+{
+"committedAt": "2026-02-22T08:57:00Z",
+"author": "Grace Hopper",
+"linesAdded": 289,
+"linesRemoved": 138
+},
+{
+"committedAt": "2026-02-22T09:39:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 49,
+"linesRemoved": 67
+},
+{
+"committedAt": "2026-02-22T11:50:00Z",
+"author": "Ken Thompson",
+"linesAdded": 151,
+"linesRemoved": 52
+},
+{
+"committedAt": "2026-02-22T12:45:00Z",
+"author": "Radia Perlman",
+"linesAdded": 237,
+"linesRemoved": 31
+},
+{
+"committedAt": "2026-02-22T15:56:00Z",
+"author": "Radia Perlman",
+"linesAdded": 255,
+"linesRemoved": 99
+},
+{
+"committedAt": "2026-02-22T16:28:00Z",
+"author": "Ken Thompson",
+"linesAdded": 131,
+"linesRemoved": 40
+},
+{
+"committedAt": "2026-02-22T16:46:00Z",
+"author": "Grace Hopper",
+"linesAdded": 1,
+"linesRemoved": 58
+},
+{
+"committedAt": "2026-02-22T17:10:00Z",
+"author": "Alan Turing",
+"linesAdded": 103,
+"linesRemoved": 210
+},
+{
+"committedAt": "2026-02-22T17:54:00Z",
+"author": "Alan Turing",
+"linesAdded": 73,
+"linesRemoved": 139
+},
+{
+"committedAt": "2026-02-22T18:56:00Z",
+"author": "Radia Perlman",
+"linesAdded": 344,
+"linesRemoved": 38
+},
+{
+"committedAt": "2026-02-22T21:42:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 29,
+"linesRemoved": 154
+},
+{
+"committedAt": "2026-02-22T22:39:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 82,
+"linesRemoved": 104
+},
+{
+"committedAt": "2026-02-22T22:41:00Z",
+"author": "Ken Thompson",
+"linesAdded": 178,
+"linesRemoved": 175
+},
+{
+"committedAt": "2026-02-22T23:02:00Z",
+"author": "Grace Hopper",
+"linesAdded": 264,
+"linesRemoved": 16
+},
+{
+"committedAt": "2026-02-22T23:55:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 93,
+"linesRemoved": 149
+},
+{
+"committedAt": "2026-02-22T23:58:00Z",
+"author": "Radia Perlman",
+"linesAdded": 392,
+"linesRemoved": 153
+},
+{
+"committedAt": "2026-02-23T08:03:00Z",
+"author": "Donald Knuth",
+"linesAdded": 298,
+"linesRemoved": 163
+},
+{
+"committedAt": "2026-02-23T09:34:00Z",
+"author": "Alan Turing",
+"linesAdded": 405,
+"linesRemoved": 64
+},
+{
+"committedAt": "2026-02-23T12:50:00Z",
+"author": "Alan Turing",
+"linesAdded": 358,
+"linesRemoved": 72
+},
+{
+"committedAt": "2026-02-23T15:26:00Z",
+"author": "Radia Perlman",
+"linesAdded": 25,
+"linesRemoved": 53
+},
+{
+"committedAt": "2026-02-23T15:39:00Z",
+"author": "Grace Hopper",
+"linesAdded": 193,
+"linesRemoved": 83
+},
+{
+"committedAt": "2026-02-23T15:46:00Z",
+"author": "Grace Hopper",
+"linesAdded": 264,
+"linesRemoved": 182
+},
+{
+"committedAt": "2026-02-23T16:50:00Z",
+"author": "Grace Hopper",
+"linesAdded": 30,
+"linesRemoved": 121
+},
+{
+"committedAt": "2026-02-23T20:17:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 159,
+"linesRemoved": 253
+},
+{
+"committedAt": "2026-02-24T11:02:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 163,
+"linesRemoved": 76
+},
+{
+"committedAt": "2026-02-24T13:44:00Z",
+"author": "Ken Thompson",
+"linesAdded": 50,
+"linesRemoved": 156
+},
+{
+"committedAt": "2026-02-24T15:13:00Z",
+"author": "Radia Perlman",
+"linesAdded": 126,
+"linesRemoved": 249
+},
+{
+"committedAt": "2026-02-24T16:12:00Z",
+"author": "Donald Knuth",
+"linesAdded": 103,
+"linesRemoved": 192
+},
+{
+"committedAt": "2026-02-24T18:52:00Z",
+"author": "Radia Perlman",
+"linesAdded": 83,
+"linesRemoved": 81
+},
+{
+"committedAt": "2026-02-24T19:32:00Z",
+"author": "Radia Perlman",
+"linesAdded": 217,
+"linesRemoved": 182
+},
+{
+"committedAt": "2026-02-24T19:40:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 102,
+"linesRemoved": 138
+},
+{
+"committedAt": "2026-02-25T09:29:00Z",
+"author": "Alan Turing",
+"linesAdded": 342,
+"linesRemoved": 34
+},
+{
+"committedAt": "2026-02-25T10:42:00Z",
+"author": "Radia Perlman",
+"linesAdded": 168,
+"linesRemoved": 146
+},
+{
+"committedAt": "2026-02-25T12:42:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 396,
+"linesRemoved": 166
+},
+{
+"committedAt": "2026-02-25T17:42:00Z",
+"author": "Radia Perlman",
+"linesAdded": 312,
+"linesRemoved": 9
+},
+{
+"committedAt": "2026-02-25T18:12:00Z",
+"author": "Grace Hopper",
+"linesAdded": 292,
+"linesRemoved": 183
+},
+{
+"committedAt": "2026-02-25T20:37:00Z",
+"author": "Radia Perlman",
+"linesAdded": 108,
+"linesRemoved": 254
+},
+{
+"committedAt": "2026-02-25T21:01:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 5,
+"linesRemoved": 72
+},
+{
+"committedAt": "2026-02-25T21:44:00Z",
+"author": "Donald Knuth",
+"linesAdded": 190,
+"linesRemoved": 221
+},
+{
+"committedAt": "2026-02-26T08:44:00Z",
+"author": "Grace Hopper",
+"linesAdded": 387,
+"linesRemoved": 109
+},
+{
+"committedAt": "2026-02-26T09:39:00Z",
+"author": "Grace Hopper",
+"linesAdded": 96,
+"linesRemoved": 247
+},
+{
+"committedAt": "2026-02-26T11:07:00Z",
+"author": "Grace Hopper",
+"linesAdded": 220,
+"linesRemoved": 221
+},
+{
+"committedAt": "2026-02-26T14:29:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 101,
+"linesRemoved": 3
+},
+{
+"committedAt": "2026-02-26T19:53:00Z",
+"author": "Radia Perlman",
+"linesAdded": 183,
+"linesRemoved": 200
+},
+{
+"committedAt": "2026-02-26T21:08:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 160,
+"linesRemoved": 193
+},
+{
+"committedAt": "2026-02-26T22:21:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 225,
+"linesRemoved": 116
+},
+{
+"committedAt": "2026-02-27T09:53:00Z",
+"author": "Ken Thompson",
+"linesAdded": 238,
+"linesRemoved": 230
+},
+{
+"committedAt": "2026-02-27T11:59:00Z",
+"author": "Alan Turing",
+"linesAdded": 81,
+"linesRemoved": 234
+},
+{
+"committedAt": "2026-02-27T12:52:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 394,
+"linesRemoved": 53
+},
+{
+"committedAt": "2026-02-27T13:59:00Z",
+"author": "Ken Thompson",
+"linesAdded": 185,
+"linesRemoved": 136
+},
+{
+"committedAt": "2026-02-27T15:08:00Z",
+"author": "Ken Thompson",
+"linesAdded": 185,
+"linesRemoved": 63
+},
+{
+"committedAt": "2026-02-27T15:54:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 194,
+"linesRemoved": 234
+},
+{
+"committedAt": "2026-02-27T17:33:00Z",
+"author": "Alan Turing",
+"linesAdded": 90,
+"linesRemoved": 35
+},
+{
+"committedAt": "2026-02-27T21:25:00Z",
+"author": "Radia Perlman",
+"linesAdded": 124,
+"linesRemoved": 160
+},
+{
+"committedAt": "2026-02-27T22:00:00Z",
+"author": "Donald Knuth",
+"linesAdded": 320,
+"linesRemoved": 195
+},
+{
+"committedAt": "2026-02-27T22:24:00Z",
+"author": "Donald Knuth",
+"linesAdded": 48,
+"linesRemoved": 108
+},
+{
+"committedAt": "2026-02-27T22:29:00Z",
+"author": "Alan Turing",
+"linesAdded": 226,
+"linesRemoved": 236
+},
+{
+"committedAt": "2026-02-27T22:41:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 253,
+"linesRemoved": 49
+},
+{
+"committedAt": "2026-02-27T23:41:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 246,
+"linesRemoved": 210
+},
+{
+"committedAt": "2026-02-27T23:57:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 129,
+"linesRemoved": 214
+},
+{
+"committedAt": "2026-02-28T12:23:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 79,
+"linesRemoved": 166
+},
+{
+"committedAt": "2026-02-28T13:56:00Z",
+"author": "Ken Thompson",
+"linesAdded": 382,
+"linesRemoved": 129
+},
+{
+"committedAt": "2026-02-28T15:28:00Z",
+"author": "Radia Perlman",
+"linesAdded": 244,
+"linesRemoved": 134
+},
+{
+"committedAt": "2026-02-28T16:02:00Z",
+"author": "Ken Thompson",
+"linesAdded": 149,
+"linesRemoved": 182
+},
+{
+"committedAt": "2026-02-28T18:59:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 302,
+"linesRemoved": 225
+},
+{
+"committedAt": "2026-02-28T19:14:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 152,
+"linesRemoved": 129
+},
+{
+"committedAt": "2026-02-28T19:24:00Z",
+"author": "Donald Knuth",
+"linesAdded": 114,
+"linesRemoved": 203
+},
+{
+"committedAt": "2026-02-28T19:51:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 372,
+"linesRemoved": 208
+},
+{
+"committedAt": "2026-03-01T08:19:00Z",
+"author": "Alan Turing",
+"linesAdded": 280,
+"linesRemoved": 86
+},
+{
+"committedAt": "2026-03-01T08:41:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 311,
+"linesRemoved": 36
+},
+{
+"committedAt": "2026-03-01T11:46:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 238,
+"linesRemoved": 242
+},
+{
+"committedAt": "2026-03-01T14:06:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 282,
+"linesRemoved": 85
+},
+{
+"committedAt": "2026-03-01T17:41:00Z",
+"author": "Ken Thompson",
+"linesAdded": 176,
+"linesRemoved": 230
+},
+{
+"committedAt": "2026-03-01T17:57:00Z",
+"author": "Ken Thompson",
+"linesAdded": 123,
+"linesRemoved": 88
+},
+{
+"committedAt": "2026-03-01T23:23:00Z",
+"author": "Donald Knuth",
+"linesAdded": 342,
+"linesRemoved": 137
+},
+{
+"committedAt": "2026-03-02T09:20:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 303,
+"linesRemoved": 117
+},
+{
+"committedAt": "2026-03-02T10:57:00Z",
+"author": "Ken Thompson",
+"linesAdded": 254,
+"linesRemoved": 177
+},
+{
+"committedAt": "2026-03-02T11:35:00Z",
+"author": "Grace Hopper",
+"linesAdded": 71,
+"linesRemoved": 189
+},
+{
+"committedAt": "2026-03-02T11:58:00Z",
+"author": "Grace Hopper",
+"linesAdded": 377,
+"linesRemoved": 147
+},
+{
+"committedAt": "2026-03-02T12:01:00Z",
+"author": "Ken Thompson",
+"linesAdded": 295,
+"linesRemoved": 202
+},
+{
+"committedAt": "2026-03-02T12:07:00Z",
+"author": "Ken Thompson",
+"linesAdded": 92,
+"linesRemoved": 121
+},
+{
+"committedAt": "2026-03-02T12:29:00Z",
+"author": "Donald Knuth",
+"linesAdded": 41,
+"linesRemoved": 131
+},
+{
+"committedAt": "2026-03-02T13:49:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 141,
+"linesRemoved": 249
+},
+{
+"committedAt": "2026-03-02T14:36:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 74,
+"linesRemoved": 222
+},
+{
+"committedAt": "2026-03-02T18:25:00Z",
+"author": "Alan Turing",
+"linesAdded": 370,
+"linesRemoved": 208
+},
+{
+"committedAt": "2026-03-02T18:42:00Z",
+"author": "Ken Thompson",
+"linesAdded": 356,
+"linesRemoved": 6
+},
+{
+"committedAt": "2026-03-02T19:39:00Z",
+"author": "Ken Thompson",
+"linesAdded": 209,
+"linesRemoved": 74
+},
+{
+"committedAt": "2026-03-02T23:50:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 412,
+"linesRemoved": 114
+},
+{
+"committedAt": "2026-03-03T08:58:00Z",
+"author": "Radia Perlman",
+"linesAdded": 230,
+"linesRemoved": 39
+},
+{
+"committedAt": "2026-03-03T13:15:00Z",
+"author": "Grace Hopper",
+"linesAdded": 402,
+"linesRemoved": 79
+},
+{
+"committedAt": "2026-03-03T14:39:00Z",
+"author": "Grace Hopper",
+"linesAdded": 12,
+"linesRemoved": 210
+},
+{
+"committedAt": "2026-03-03T15:11:00Z",
+"author": "Alan Turing",
+"linesAdded": 122,
+"linesRemoved": 133
+},
+{
+"committedAt": "2026-03-03T16:10:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 319,
+"linesRemoved": 211
+},
+{
+"committedAt": "2026-03-03T16:13:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 138,
+"linesRemoved": 213
+},
+{
+"committedAt": "2026-03-03T19:49:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 415,
+"linesRemoved": 119
+},
+{
+"committedAt": "2026-03-04T09:32:00Z",
+"author": "Radia Perlman",
+"linesAdded": 41,
+"linesRemoved": 217
+},
+{
+"committedAt": "2026-03-04T10:06:00Z",
+"author": "Alan Turing",
+"linesAdded": 178,
+"linesRemoved": 213
+},
+{
+"committedAt": "2026-03-04T10:28:00Z",
+"author": "Radia Perlman",
+"linesAdded": 147,
+"linesRemoved": 58
+},
+{
+"committedAt": "2026-03-04T12:23:00Z",
+"author": "Ken Thompson",
+"linesAdded": 286,
+"linesRemoved": 236
+},
+{
+"committedAt": "2026-03-04T13:22:00Z",
+"author": "Donald Knuth",
+"linesAdded": 73,
+"linesRemoved": 65
+},
+{
+"committedAt": "2026-03-04T14:51:00Z",
+"author": "Donald Knuth",
+"linesAdded": 171,
+"linesRemoved": 69
+},
+{
+"committedAt": "2026-03-04T14:53:00Z",
+"author": "Donald Knuth",
+"linesAdded": 197,
+"linesRemoved": 256
+},
+{
+"committedAt": "2026-03-04T15:20:00Z",
+"author": "Grace Hopper",
+"linesAdded": 164,
+"linesRemoved": 17
+},
+{
+"committedAt": "2026-03-04T18:35:00Z",
+"author": "Grace Hopper",
+"linesAdded": 234,
+"linesRemoved": 190
+},
+{
+"committedAt": "2026-03-04T20:05:00Z",
+"author": "Ken Thompson",
+"linesAdded": 356,
+"linesRemoved": 116
+},
+{
+"committedAt": "2026-03-05T08:00:00Z",
+"author": "Donald Knuth",
+"linesAdded": 351,
+"linesRemoved": 27
+},
+{
+"committedAt": "2026-03-05T08:28:00Z",
+"author": "Ken Thompson",
+"linesAdded": 92,
+"linesRemoved": 171
+},
+{
+"committedAt": "2026-03-05T08:43:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 239,
+"linesRemoved": 54
+},
+{
+"committedAt": "2026-03-05T11:59:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 229,
+"linesRemoved": 172
+},
+{
+"committedAt": "2026-03-05T12:19:00Z",
+"author": "Donald Knuth",
+"linesAdded": 110,
+"linesRemoved": 41
+},
+{
+"committedAt": "2026-03-05T14:36:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 59,
+"linesRemoved": 169
+},
+{
+"committedAt": "2026-03-05T16:36:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 12,
+"linesRemoved": 148
+},
+{
+"committedAt": "2026-03-05T16:58:00Z",
+"author": "Radia Perlman",
+"linesAdded": 401,
+"linesRemoved": 103
+},
+{
+"committedAt": "2026-03-05T20:40:00Z",
+"author": "Alan Turing",
+"linesAdded": 70,
+"linesRemoved": 136
+},
+{
+"committedAt": "2026-03-05T21:44:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 376,
+"linesRemoved": 76
+},
+{
+"committedAt": "2026-03-05T23:54:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 260,
+"linesRemoved": 155
+},
+{
+"committedAt": "2026-03-06T09:34:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 157,
+"linesRemoved": 202
+},
+{
+"committedAt": "2026-03-06T09:40:00Z",
+"author": "Alan Turing",
+"linesAdded": 320,
+"linesRemoved": 25
+},
+{
+"committedAt": "2026-03-06T11:49:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 362,
+"linesRemoved": 91
+},
+{
+"committedAt": "2026-03-06T11:54:00Z",
+"author": "Grace Hopper",
+"linesAdded": 355,
+"linesRemoved": 30
+},
+{
+"committedAt": "2026-03-06T13:45:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 216,
+"linesRemoved": 80
+},
+{
+"committedAt": "2026-03-06T16:14:00Z",
+"author": "Donald Knuth",
+"linesAdded": 140,
+"linesRemoved": 177
+},
+{
+"committedAt": "2026-03-06T16:55:00Z",
+"author": "Grace Hopper",
+"linesAdded": 65,
+"linesRemoved": 251
+},
+{
+"committedAt": "2026-03-06T16:57:00Z",
+"author": "Radia Perlman",
+"linesAdded": 40,
+"linesRemoved": 143
+},
+{
+"committedAt": "2026-03-06T19:21:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 319,
+"linesRemoved": 199
+},
+{
+"committedAt": "2026-03-06T20:12:00Z",
+"author": "Alan Turing",
+"linesAdded": 139,
+"linesRemoved": 116
+},
+{
+"committedAt": "2026-03-06T22:51:00Z",
+"author": "Radia Perlman",
+"linesAdded": 339,
+"linesRemoved": 233
+},
+{
+"committedAt": "2026-03-07T08:12:00Z",
+"author": "Ken Thompson",
+"linesAdded": 95,
+"linesRemoved": 183
+},
+{
+"committedAt": "2026-03-07T08:25:00Z",
+"author": "Donald Knuth",
+"linesAdded": 260,
+"linesRemoved": 200
+},
+{
+"committedAt": "2026-03-07T13:21:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 254,
+"linesRemoved": 68
+},
+{
+"committedAt": "2026-03-07T13:56:00Z",
+"author": "Ken Thompson",
+"linesAdded": 103,
+"linesRemoved": 255
+},
+{
+"committedAt": "2026-03-07T14:21:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 231,
+"linesRemoved": 59
+},
+{
+"committedAt": "2026-03-07T17:38:00Z",
+"author": "Alan Turing",
+"linesAdded": 251,
+"linesRemoved": 238
+},
+{
+"committedAt": "2026-03-07T18:50:00Z",
+"author": "Grace Hopper",
+"linesAdded": 229,
+"linesRemoved": 198
+},
+{
+"committedAt": "2026-03-07T19:33:00Z",
+"author": "Alan Turing",
+"linesAdded": 62,
+"linesRemoved": 190
+},
+{
+"committedAt": "2026-03-07T21:09:00Z",
+"author": "Grace Hopper",
+"linesAdded": 133,
+"linesRemoved": 206
+},
+{
+"committedAt": "2026-03-08T09:00:00Z",
+"author": "Grace Hopper",
+"linesAdded": 169,
+"linesRemoved": 115
+},
+{
+"committedAt": "2026-03-08T09:31:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 372,
+"linesRemoved": 26
+},
+{
+"committedAt": "2026-03-08T11:26:00Z",
+"author": "Donald Knuth",
+"linesAdded": 38,
+"linesRemoved": 24
+},
+{
+"committedAt": "2026-03-08T11:30:00Z",
+"author": "Grace Hopper",
+"linesAdded": 145,
+"linesRemoved": 114
+},
+{
+"committedAt": "2026-03-08T12:06:00Z",
+"author": "Radia Perlman",
+"linesAdded": 311,
+"linesRemoved": 24
+},
+{
+"committedAt": "2026-03-08T14:31:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 361,
+"linesRemoved": 143
+},
+{
+"committedAt": "2026-03-08T15:20:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 341,
+"linesRemoved": 257
+},
+{
+"committedAt": "2026-03-08T15:54:00Z",
+"author": "Ken Thompson",
+"linesAdded": 18,
+"linesRemoved": 107
+},
+{
+"committedAt": "2026-03-08T16:44:00Z",
+"author": "Alan Turing",
+"linesAdded": 274,
+"linesRemoved": 183
+},
+{
+"committedAt": "2026-03-08T17:27:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 305,
+"linesRemoved": 245
+},
+{
+"committedAt": "2026-03-08T17:47:00Z",
+"author": "Grace Hopper",
+"linesAdded": 234,
+"linesRemoved": 20
+},
+{
+"committedAt": "2026-03-08T19:55:00Z",
+"author": "Grace Hopper",
+"linesAdded": 18,
+"linesRemoved": 66
+},
+{
+"committedAt": "2026-03-08T19:58:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 24,
+"linesRemoved": 210
+},
+{
+"committedAt": "2026-03-08T20:03:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 47,
+"linesRemoved": 123
+},
+{
+"committedAt": "2026-03-08T20:56:00Z",
+"author": "Ken Thompson",
+"linesAdded": 337,
+"linesRemoved": 46
+},
+{
+"committedAt": "2026-03-08T23:57:00Z",
+"author": "Ken Thompson",
+"linesAdded": 314,
+"linesRemoved": 161
+},
+{
+"committedAt": "2026-03-09T12:26:00Z",
+"author": "Radia Perlman",
+"linesAdded": 87,
+"linesRemoved": 234
+},
+{
+"committedAt": "2026-03-09T15:28:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 359,
+"linesRemoved": 137
+},
+{
+"committedAt": "2026-03-09T17:03:00Z",
+"author": "Alan Turing",
+"linesAdded": 47,
+"linesRemoved": 163
+},
+{
+"committedAt": "2026-03-09T17:07:00Z",
+"author": "Grace Hopper",
+"linesAdded": 147,
+"linesRemoved": 40
+},
+{
+"committedAt": "2026-03-09T17:23:00Z",
+"author": "Grace Hopper",
+"linesAdded": 85,
+"linesRemoved": 218
+},
+{
+"committedAt": "2026-03-09T17:23:00Z",
+"author": "Grace Hopper",
+"linesAdded": 281,
+"linesRemoved": 160
+},
+{
+"committedAt": "2026-03-09T18:35:00Z",
+"author": "Donald Knuth",
+"linesAdded": 393,
+"linesRemoved": 239
+},
+{
+"committedAt": "2026-03-09T21:25:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 307,
+"linesRemoved": 159
+},
+{
+"committedAt": "2026-03-09T21:52:00Z",
+"author": "Donald Knuth",
+"linesAdded": 341,
+"linesRemoved": 51
+},
+{
+"committedAt": "2026-03-09T22:07:00Z",
+"author": "Ken Thompson",
+"linesAdded": 258,
+"linesRemoved": 2
+},
+{
+"committedAt": "2026-03-10T08:20:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 276,
+"linesRemoved": 104
+},
+{
+"committedAt": "2026-03-10T11:23:00Z",
+"author": "Radia Perlman",
+"linesAdded": 259,
+"linesRemoved": 135
+},
+{
+"committedAt": "2026-03-10T12:50:00Z",
+"author": "Alan Turing",
+"linesAdded": 90,
+"linesRemoved": 48
+},
+{
+"committedAt": "2026-03-10T20:14:00Z",
+"author": "Ken Thompson",
+"linesAdded": 309,
+"linesRemoved": 163
+},
+{
+"committedAt": "2026-03-10T20:32:00Z",
+"author": "Donald Knuth",
+"linesAdded": 280,
+"linesRemoved": 145
+},
+{
+"committedAt": "2026-03-10T20:45:00Z",
+"author": "Ken Thompson",
+"linesAdded": 102,
+"linesRemoved": 100
+},
+{
+"committedAt": "2026-03-10T22:40:00Z",
+"author": "Grace Hopper",
+"linesAdded": 123,
+"linesRemoved": 229
+},
+{
+"committedAt": "2026-03-11T08:05:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 274,
+"linesRemoved": 44
+},
+{
+"committedAt": "2026-03-11T11:13:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 9,
+"linesRemoved": 210
+},
+{
+"committedAt": "2026-03-11T15:06:00Z",
+"author": "Grace Hopper",
+"linesAdded": 229,
+"linesRemoved": 155
+},
+{
+"committedAt": "2026-03-11T15:08:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 306,
+"linesRemoved": 159
+},
+{
+"committedAt": "2026-03-11T16:25:00Z",
+"author": "Radia Perlman",
+"linesAdded": 387,
+"linesRemoved": 230
+},
+{
+"committedAt": "2026-03-11T17:05:00Z",
+"author": "Donald Knuth",
+"linesAdded": 419,
+"linesRemoved": 74
+},
+{
+"committedAt": "2026-03-11T17:10:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 14,
+"linesRemoved": 78
+},
+{
+"committedAt": "2026-03-11T17:44:00Z",
+"author": "Donald Knuth",
+"linesAdded": 272,
+"linesRemoved": 223
+},
+{
+"committedAt": "2026-03-11T17:55:00Z",
+"author": "Donald Knuth",
+"linesAdded": 99,
+"linesRemoved": 131
+},
+{
+"committedAt": "2026-03-11T18:05:00Z",
+"author": "Grace Hopper",
+"linesAdded": 381,
+"linesRemoved": 52
+},
+{
+"committedAt": "2026-03-11T18:42:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 255,
+"linesRemoved": 205
+},
+{
+"committedAt": "2026-03-11T20:37:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 1,
+"linesRemoved": 67
+},
+{
+"committedAt": "2026-03-11T21:56:00Z",
+"author": "Radia Perlman",
+"linesAdded": 387,
+"linesRemoved": 227
+},
+{
+"committedAt": "2026-03-11T23:11:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 269,
+"linesRemoved": 94
+},
+{
+"committedAt": "2026-03-12T08:07:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 22,
+"linesRemoved": 176
+},
+{
+"committedAt": "2026-03-12T12:01:00Z",
+"author": "Radia Perlman",
+"linesAdded": 353,
+"linesRemoved": 17
+},
+{
+"committedAt": "2026-03-12T14:20:00Z",
+"author": "Ken Thompson",
+"linesAdded": 28,
+"linesRemoved": 151
+},
+{
+"committedAt": "2026-03-12T16:25:00Z",
+"author": "Ken Thompson",
+"linesAdded": 406,
+"linesRemoved": 114
+},
+{
+"committedAt": "2026-03-12T16:33:00Z",
+"author": "Radia Perlman",
+"linesAdded": 348,
+"linesRemoved": 94
+},
+{
+"committedAt": "2026-03-12T17:26:00Z",
+"author": "Ken Thompson",
+"linesAdded": 122,
+"linesRemoved": 191
+},
+{
+"committedAt": "2026-03-12T21:56:00Z",
+"author": "Ken Thompson",
+"linesAdded": 12,
+"linesRemoved": 94
+},
+{
+"committedAt": "2026-03-13T09:30:00Z",
+"author": "Ken Thompson",
+"linesAdded": 128,
+"linesRemoved": 173
+},
+{
+"committedAt": "2026-03-13T09:49:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 30,
+"linesRemoved": 76
+},
+{
+"committedAt": "2026-03-13T11:29:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 330,
+"linesRemoved": 246
+},
+{
+"committedAt": "2026-03-13T11:39:00Z",
+"author": "Radia Perlman",
+"linesAdded": 47,
+"linesRemoved": 19
+},
+{
+"committedAt": "2026-03-13T12:01:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 185,
+"linesRemoved": 190
+},
+{
+"committedAt": "2026-03-13T12:14:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 205,
+"linesRemoved": 127
+},
+{
+"committedAt": "2026-03-13T12:30:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 158,
+"linesRemoved": 58
+},
+{
+"committedAt": "2026-03-13T12:35:00Z",
+"author": "Alan Turing",
+"linesAdded": 146,
+"linesRemoved": 151
+},
+{
+"committedAt": "2026-03-13T12:41:00Z",
+"author": "Donald Knuth",
+"linesAdded": 115,
+"linesRemoved": 8
+},
+{
+"committedAt": "2026-03-13T13:59:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 102,
+"linesRemoved": 52
+},
+{
+"committedAt": "2026-03-13T14:44:00Z",
+"author": "Donald Knuth",
+"linesAdded": 300,
+"linesRemoved": 118
+},
+{
+"committedAt": "2026-03-13T23:14:00Z",
+"author": "Donald Knuth",
+"linesAdded": 155,
+"linesRemoved": 92
+},
+{
+"committedAt": "2026-03-14T09:51:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 200,
+"linesRemoved": 56
+},
+{
+"committedAt": "2026-03-14T10:19:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 224,
+"linesRemoved": 259
+},
+{
+"committedAt": "2026-03-14T13:22:00Z",
+"author": "Alan Turing",
+"linesAdded": 259,
+"linesRemoved": 42
+},
+{
+"committedAt": "2026-03-14T13:52:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 396,
+"linesRemoved": 126
+},
+{
+"committedAt": "2026-03-14T15:23:00Z",
+"author": "Alan Turing",
+"linesAdded": 167,
+"linesRemoved": 91
+},
+{
+"committedAt": "2026-03-14T17:16:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 141,
+"linesRemoved": 149
+},
+{
+"committedAt": "2026-03-14T17:31:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 260,
+"linesRemoved": 31
+},
+{
+"committedAt": "2026-03-14T22:15:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 10,
+"linesRemoved": 53
+},
+{
+"committedAt": "2026-03-15T10:34:00Z",
+"author": "Grace Hopper",
+"linesAdded": 410,
+"linesRemoved": 83
+},
+{
+"committedAt": "2026-03-15T11:43:00Z",
+"author": "Radia Perlman",
+"linesAdded": 190,
+"linesRemoved": 176
+},
+{
+"committedAt": "2026-03-15T14:10:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 160,
+"linesRemoved": 161
+},
+{
+"committedAt": "2026-03-15T14:35:00Z",
+"author": "Radia Perlman",
+"linesAdded": 366,
+"linesRemoved": 53
+},
+{
+"committedAt": "2026-03-15T15:50:00Z",
+"author": "Ken Thompson",
+"linesAdded": 290,
+"linesRemoved": 217
+},
+{
+"committedAt": "2026-03-15T15:54:00Z",
+"author": "Grace Hopper",
+"linesAdded": 111,
+"linesRemoved": 34
+},
+{
+"committedAt": "2026-03-15T17:21:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 252,
+"linesRemoved": 119
+},
+{
+"committedAt": "2026-03-15T18:26:00Z",
+"author": "Alan Turing",
+"linesAdded": 154,
+"linesRemoved": 40
+},
+{
+"committedAt": "2026-03-15T20:14:00Z",
+"author": "Grace Hopper",
+"linesAdded": 1,
+"linesRemoved": 98
+},
+{
+"committedAt": "2026-03-15T22:15:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 366,
+"linesRemoved": 229
+},
+{
+"committedAt": "2026-03-15T22:36:00Z",
+"author": "Ken Thompson",
+"linesAdded": 52,
+"linesRemoved": 227
+},
+{
+"committedAt": "2026-03-15T23:01:00Z",
+"author": "Donald Knuth",
+"linesAdded": 159,
+"linesRemoved": 44
+},
+{
+"committedAt": "2026-03-16T08:46:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 247,
+"linesRemoved": 85
+},
+{
+"committedAt": "2026-03-16T09:25:00Z",
+"author": "Radia Perlman",
+"linesAdded": 26,
+"linesRemoved": 111
+},
+{
+"committedAt": "2026-03-16T09:25:00Z",
+"author": "Ken Thompson",
+"linesAdded": 93,
+"linesRemoved": 70
+},
+{
+"committedAt": "2026-03-16T09:43:00Z",
+"author": "Radia Perlman",
+"linesAdded": 254,
+"linesRemoved": 23
+},
+{
+"committedAt": "2026-03-16T09:48:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 118,
+"linesRemoved": 147
+},
+{
+"committedAt": "2026-03-16T10:25:00Z",
+"author": "Donald Knuth",
+"linesAdded": 110,
+"linesRemoved": 239
+},
+{
+"committedAt": "2026-03-16T10:37:00Z",
+"author": "Alan Turing",
+"linesAdded": 50,
+"linesRemoved": 236
+},
+{
+"committedAt": "2026-03-16T11:05:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 117,
+"linesRemoved": 186
+},
+{
+"committedAt": "2026-03-16T12:17:00Z",
+"author": "Grace Hopper",
+"linesAdded": 393,
+"linesRemoved": 21
+},
+{
+"committedAt": "2026-03-16T12:42:00Z",
+"author": "Ken Thompson",
+"linesAdded": 194,
+"linesRemoved": 75
+},
+{
+"committedAt": "2026-03-16T16:31:00Z",
+"author": "Radia Perlman",
+"linesAdded": 207,
+"linesRemoved": 175
+},
+{
+"committedAt": "2026-03-16T17:29:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 168,
+"linesRemoved": 104
+},
+{
+"committedAt": "2026-03-17T08:22:00Z",
+"author": "Alan Turing",
+"linesAdded": 370,
+"linesRemoved": 52
+},
+{
+"committedAt": "2026-03-17T08:23:00Z",
+"author": "Grace Hopper",
+"linesAdded": 2,
+"linesRemoved": 127
+},
+{
+"committedAt": "2026-03-17T09:16:00Z",
+"author": "Ken Thompson",
+"linesAdded": 172,
+"linesRemoved": 112
+},
+{
+"committedAt": "2026-03-17T09:37:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 310,
+"linesRemoved": 142
+},
+{
+"committedAt": "2026-03-17T09:54:00Z",
+"author": "Grace Hopper",
+"linesAdded": 54,
+"linesRemoved": 257
+},
+{
+"committedAt": "2026-03-17T11:41:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 4,
+"linesRemoved": 214
+},
+{
+"committedAt": "2026-03-17T15:19:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 66,
+"linesRemoved": 114
+},
+{
+"committedAt": "2026-03-17T16:17:00Z",
+"author": "Grace Hopper",
+"linesAdded": 6,
+"linesRemoved": 142
+},
+{
+"committedAt": "2026-03-17T20:32:00Z",
+"author": "Donald Knuth",
+"linesAdded": 287,
+"linesRemoved": 131
+},
+{
+"committedAt": "2026-03-17T22:12:00Z",
+"author": "Grace Hopper",
+"linesAdded": 375,
+"linesRemoved": 67
+},
+{
+"committedAt": "2026-03-17T22:54:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 301,
+"linesRemoved": 97
+},
+{
+"committedAt": "2026-03-17T23:37:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 29,
+"linesRemoved": 88
+},
+{
+"committedAt": "2026-03-17T23:59:00Z",
+"author": "Radia Perlman",
+"linesAdded": 50,
+"linesRemoved": 201
+},
+{
+"committedAt": "2026-03-18T09:26:00Z",
+"author": "Alan Turing",
+"linesAdded": 63,
+"linesRemoved": 117
+},
+{
+"committedAt": "2026-03-18T09:27:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 322,
+"linesRemoved": 143
+},
+{
+"committedAt": "2026-03-18T09:38:00Z",
+"author": "Donald Knuth",
+"linesAdded": 238,
+"linesRemoved": 68
+},
+{
+"committedAt": "2026-03-18T10:41:00Z",
+"author": "Donald Knuth",
+"linesAdded": 362,
+"linesRemoved": 64
+},
+{
+"committedAt": "2026-03-18T11:03:00Z",
+"author": "Donald Knuth",
+"linesAdded": 90,
+"linesRemoved": 171
+},
+{
+"committedAt": "2026-03-18T13:20:00Z",
+"author": "Alan Turing",
+"linesAdded": 86,
+"linesRemoved": 253
+},
+{
+"committedAt": "2026-03-18T16:01:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 234,
+"linesRemoved": 23
+},
+{
+"committedAt": "2026-03-18T21:21:00Z",
+"author": "Grace Hopper",
+"linesAdded": 54,
+"linesRemoved": 171
+},
+{
+"committedAt": "2026-03-18T23:53:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 389,
+"linesRemoved": 228
+},
+{
+"committedAt": "2026-03-19T08:24:00Z",
+"author": "Alan Turing",
+"linesAdded": 286,
+"linesRemoved": 108
+},
+{
+"committedAt": "2026-03-19T10:40:00Z",
+"author": "Donald Knuth",
+"linesAdded": 79,
+"linesRemoved": 159
+},
+{
+"committedAt": "2026-03-19T11:39:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 278,
+"linesRemoved": 210
+},
+{
+"committedAt": "2026-03-19T15:33:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 159,
+"linesRemoved": 170
+},
+{
+"committedAt": "2026-03-20T08:05:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 47,
+"linesRemoved": 59
+},
+{
+"committedAt": "2026-03-20T09:33:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 287,
+"linesRemoved": 148
+},
+{
+"committedAt": "2026-03-20T10:20:00Z",
+"author": "Alan Turing",
+"linesAdded": 47,
+"linesRemoved": 250
+},
+{
+"committedAt": "2026-03-20T12:15:00Z",
+"author": "Radia Perlman",
+"linesAdded": 164,
+"linesRemoved": 220
+},
+{
+"committedAt": "2026-03-20T12:30:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 306,
+"linesRemoved": 229
+},
+{
+"committedAt": "2026-03-20T12:44:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 12,
+"linesRemoved": 200
+},
+{
+"committedAt": "2026-03-20T12:56:00Z",
+"author": "Donald Knuth",
+"linesAdded": 130,
+"linesRemoved": 37
+},
+{
+"committedAt": "2026-03-20T13:03:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 161,
+"linesRemoved": 93
+},
+{
+"committedAt": "2026-03-20T13:08:00Z",
+"author": "Grace Hopper",
+"linesAdded": 255,
+"linesRemoved": 179
+},
+{
+"committedAt": "2026-03-20T13:22:00Z",
+"author": "Donald Knuth",
+"linesAdded": 84,
+"linesRemoved": 179
+},
+{
+"committedAt": "2026-03-20T15:02:00Z",
+"author": "Alan Turing",
+"linesAdded": 181,
+"linesRemoved": 214
+},
+{
+"committedAt": "2026-03-20T15:17:00Z",
+"author": "Alan Turing",
+"linesAdded": 319,
+"linesRemoved": 26
+},
+{
+"committedAt": "2026-03-20T15:17:00Z",
+"author": "Alan Turing",
+"linesAdded": 75,
+"linesRemoved": 231
+},
+{
+"committedAt": "2026-03-20T18:42:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 163,
+"linesRemoved": 222
+},
+{
+"committedAt": "2026-03-20T21:05:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 172,
+"linesRemoved": 41
+},
+{
+"committedAt": "2026-03-21T11:38:00Z",
+"author": "Grace Hopper",
+"linesAdded": 261,
+"linesRemoved": 114
+},
+{
+"committedAt": "2026-03-21T12:11:00Z",
+"author": "Alan Turing",
+"linesAdded": 202,
+"linesRemoved": 51
+},
+{
+"committedAt": "2026-03-21T12:15:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 247,
+"linesRemoved": 233
+},
+{
+"committedAt": "2026-03-21T13:01:00Z",
+"author": "Ken Thompson",
+"linesAdded": 214,
+"linesRemoved": 176
+},
+{
+"committedAt": "2026-03-21T14:13:00Z",
+"author": "Grace Hopper",
+"linesAdded": 302,
+"linesRemoved": 231
+},
+{
+"committedAt": "2026-03-21T15:29:00Z",
+"author": "Alan Turing",
+"linesAdded": 348,
+"linesRemoved": 118
+},
+{
+"committedAt": "2026-03-21T16:36:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 302,
+"linesRemoved": 236
+},
+{
+"committedAt": "2026-03-21T18:03:00Z",
+"author": "Ken Thompson",
+"linesAdded": 219,
+"linesRemoved": 185
+},
+{
+"committedAt": "2026-03-21T18:05:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 213,
+"linesRemoved": 17
+},
+{
+"committedAt": "2026-03-21T19:11:00Z",
+"author": "Donald Knuth",
+"linesAdded": 375,
+"linesRemoved": 157
+},
+{
+"committedAt": "2026-03-21T19:22:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 127,
+"linesRemoved": 187
+},
+{
+"committedAt": "2026-03-21T22:34:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 198,
+"linesRemoved": 32
+},
+{
+"committedAt": "2026-03-22T08:55:00Z",
+"author": "Grace Hopper",
+"linesAdded": 155,
+"linesRemoved": 108
+},
+{
+"committedAt": "2026-03-22T12:23:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 399,
+"linesRemoved": 70
+},
+{
+"committedAt": "2026-03-22T17:14:00Z",
+"author": "Grace Hopper",
+"linesAdded": 225,
+"linesRemoved": 108
+},
+{
+"committedAt": "2026-03-22T17:25:00Z",
+"author": "Grace Hopper",
+"linesAdded": 76,
+"linesRemoved": 179
+},
+{
+"committedAt": "2026-03-22T18:04:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 375,
+"linesRemoved": 159
+},
+{
+"committedAt": "2026-03-22T18:13:00Z",
+"author": "Donald Knuth",
+"linesAdded": 393,
+"linesRemoved": 20
+},
+{
+"committedAt": "2026-03-22T20:17:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 31,
+"linesRemoved": 67
+},
+{
+"committedAt": "2026-03-22T21:29:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 66,
+"linesRemoved": 247
+},
+{
+"committedAt": "2026-03-23T11:12:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 78,
+"linesRemoved": 65
+},
+{
+"committedAt": "2026-03-23T13:04:00Z",
+"author": "Alan Turing",
+"linesAdded": 234,
+"linesRemoved": 258
+},
+{
+"committedAt": "2026-03-23T14:35:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 396,
+"linesRemoved": 131
+},
+{
+"committedAt": "2026-03-23T14:47:00Z",
+"author": "Grace Hopper",
+"linesAdded": 105,
+"linesRemoved": 258
+},
+{
+"committedAt": "2026-03-23T15:41:00Z",
+"author": "Donald Knuth",
+"linesAdded": 8,
+"linesRemoved": 70
+},
+{
+"committedAt": "2026-03-23T17:05:00Z",
+"author": "Grace Hopper",
+"linesAdded": 360,
+"linesRemoved": 258
+},
+{
+"committedAt": "2026-03-23T21:22:00Z",
+"author": "Donald Knuth",
+"linesAdded": 159,
+"linesRemoved": 9
+},
+{
+"committedAt": "2026-03-24T11:23:00Z",
+"author": "Radia Perlman",
+"linesAdded": 68,
+"linesRemoved": 128
+},
+{
+"committedAt": "2026-03-24T11:47:00Z",
+"author": "Grace Hopper",
+"linesAdded": 323,
+"linesRemoved": 100
+},
+{
+"committedAt": "2026-03-24T13:00:00Z",
+"author": "Donald Knuth",
+"linesAdded": 331,
+"linesRemoved": 165
+},
+{
+"committedAt": "2026-03-24T15:05:00Z",
+"author": "Donald Knuth",
+"linesAdded": 333,
+"linesRemoved": 105
+},
+{
+"committedAt": "2026-03-24T17:26:00Z",
+"author": "Grace Hopper",
+"linesAdded": 212,
+"linesRemoved": 93
+},
+{
+"committedAt": "2026-03-24T21:03:00Z",
+"author": "Donald Knuth",
+"linesAdded": 211,
+"linesRemoved": 91
+},
+{
+"committedAt": "2026-03-24T22:20:00Z",
+"author": "Radia Perlman",
+"linesAdded": 385,
+"linesRemoved": 156
+},
+{
+"committedAt": "2026-03-24T23:58:00Z",
+"author": "Donald Knuth",
+"linesAdded": 26,
+"linesRemoved": 243
+},
+{
+"committedAt": "2026-03-25T08:34:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 143,
+"linesRemoved": 37
+},
+{
+"committedAt": "2026-03-25T09:59:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 175,
+"linesRemoved": 11
+},
+{
+"committedAt": "2026-03-25T14:13:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 27,
+"linesRemoved": 182
+},
+{
+"committedAt": "2026-03-25T14:22:00Z",
+"author": "Grace Hopper",
+"linesAdded": 58,
+"linesRemoved": 199
+},
+{
+"committedAt": "2026-03-25T15:00:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 256,
+"linesRemoved": 30
+},
+{
+"committedAt": "2026-03-25T15:23:00Z",
+"author": "Alan Turing",
+"linesAdded": 213,
+"linesRemoved": 146
+},
+{
+"committedAt": "2026-03-25T15:53:00Z",
+"author": "Radia Perlman",
+"linesAdded": 17,
+"linesRemoved": 142
+},
+{
+"committedAt": "2026-03-25T16:44:00Z",
+"author": "Ken Thompson",
+"linesAdded": 65,
+"linesRemoved": 119
+},
+{
+"committedAt": "2026-03-25T17:24:00Z",
+"author": "Ken Thompson",
+"linesAdded": 219,
+"linesRemoved": 184
+},
+{
+"committedAt": "2026-03-25T18:15:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 318,
+"linesRemoved": 171
+},
+{
+"committedAt": "2026-03-25T18:27:00Z",
+"author": "Radia Perlman",
+"linesAdded": 209,
+"linesRemoved": 201
+},
+{
+"committedAt": "2026-03-25T18:32:00Z",
+"author": "Radia Perlman",
+"linesAdded": 288,
+"linesRemoved": 147
+},
+{
+"committedAt": "2026-03-25T21:31:00Z",
+"author": "Donald Knuth",
+"linesAdded": 46,
+"linesRemoved": 87
+},
+{
+"committedAt": "2026-03-25T23:03:00Z",
+"author": "Radia Perlman",
+"linesAdded": 78,
+"linesRemoved": 91
+},
+{
+"committedAt": "2026-03-26T10:25:00Z",
+"author": "Radia Perlman",
+"linesAdded": 19,
+"linesRemoved": 237
+},
+{
+"committedAt": "2026-03-26T11:41:00Z",
+"author": "Ken Thompson",
+"linesAdded": 55,
+"linesRemoved": 156
+},
+{
+"committedAt": "2026-03-26T12:07:00Z",
+"author": "Grace Hopper",
+"linesAdded": 201,
+"linesRemoved": 252
+},
+{
+"committedAt": "2026-03-26T12:36:00Z",
+"author": "Grace Hopper",
+"linesAdded": 24,
+"linesRemoved": 131
+},
+{
+"committedAt": "2026-03-26T13:38:00Z",
+"author": "Grace Hopper",
+"linesAdded": 162,
+"linesRemoved": 99
+},
+{
+"committedAt": "2026-03-26T14:14:00Z",
+"author": "Alan Turing",
+"linesAdded": 42,
+"linesRemoved": 246
+},
+{
+"committedAt": "2026-03-26T15:10:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 33,
+"linesRemoved": 230
+},
+{
+"committedAt": "2026-03-26T15:37:00Z",
+"author": "Ken Thompson",
+"linesAdded": 24,
+"linesRemoved": 27
+},
+{
+"committedAt": "2026-03-26T16:16:00Z",
+"author": "Ken Thompson",
+"linesAdded": 417,
+"linesRemoved": 241
+},
+{
+"committedAt": "2026-03-26T17:14:00Z",
+"author": "Ken Thompson",
+"linesAdded": 370,
+"linesRemoved": 109
+},
+{
+"committedAt": "2026-03-26T20:13:00Z",
+"author": "Donald Knuth",
+"linesAdded": 278,
+"linesRemoved": 69
+},
+{
+"committedAt": "2026-03-26T20:42:00Z",
+"author": "Ken Thompson",
+"linesAdded": 221,
+"linesRemoved": 193
+},
+{
+"committedAt": "2026-03-26T21:46:00Z",
+"author": "Donald Knuth",
+"linesAdded": 391,
+"linesRemoved": 143
+},
+{
+"committedAt": "2026-03-26T23:59:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 59,
+"linesRemoved": 62
+},
+{
+"committedAt": "2026-03-27T10:13:00Z",
+"author": "Radia Perlman",
+"linesAdded": 90,
+"linesRemoved": 115
+},
+{
+"committedAt": "2026-03-27T12:11:00Z",
+"author": "Alan Turing",
+"linesAdded": 171,
+"linesRemoved": 104
+},
+{
+"committedAt": "2026-03-27T15:01:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 144,
+"linesRemoved": 226
+},
+{
+"committedAt": "2026-03-27T15:17:00Z",
+"author": "Radia Perlman",
+"linesAdded": 35,
+"linesRemoved": 164
+},
+{
+"committedAt": "2026-03-27T19:20:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 180,
+"linesRemoved": 31
+},
+{
+"committedAt": "2026-03-27T20:39:00Z",
+"author": "Donald Knuth",
+"linesAdded": 358,
+"linesRemoved": 186
+},
+{
+"committedAt": "2026-03-28T08:31:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 308,
+"linesRemoved": 52
+},
+{
+"committedAt": "2026-03-28T08:49:00Z",
+"author": "Alan Turing",
+"linesAdded": 21,
+"linesRemoved": 126
+},
+{
+"committedAt": "2026-03-28T09:57:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 200,
+"linesRemoved": 44
+},
+{
+"committedAt": "2026-03-28T10:41:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 19,
+"linesRemoved": 122
+},
+{
+"committedAt": "2026-03-28T10:48:00Z",
+"author": "Alan Turing",
+"linesAdded": 235,
+"linesRemoved": 8
+},
+{
+"committedAt": "2026-03-28T13:11:00Z",
+"author": "Grace Hopper",
+"linesAdded": 94,
+"linesRemoved": 87
+},
+{
+"committedAt": "2026-03-28T14:26:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 109,
+"linesRemoved": 0
+},
+{
+"committedAt": "2026-03-28T14:42:00Z",
+"author": "Grace Hopper",
+"linesAdded": 15,
+"linesRemoved": 124
+},
+{
+"committedAt": "2026-03-28T15:23:00Z",
+"author": "Donald Knuth",
+"linesAdded": 40,
+"linesRemoved": 90
+},
+{
+"committedAt": "2026-03-28T15:24:00Z",
+"author": "Radia Perlman",
+"linesAdded": 102,
+"linesRemoved": 211
+},
+{
+"committedAt": "2026-03-28T17:42:00Z",
+"author": "Donald Knuth",
+"linesAdded": 82,
+"linesRemoved": 56
+},
+{
+"committedAt": "2026-03-28T23:42:00Z",
+"author": "Donald Knuth",
+"linesAdded": 389,
+"linesRemoved": 23
+},
+{
+"committedAt": "2026-03-29T10:37:00Z",
+"author": "Grace Hopper",
+"linesAdded": 356,
+"linesRemoved": 68
+},
+{
+"committedAt": "2026-03-29T11:02:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 45,
+"linesRemoved": 65
+},
+{
+"committedAt": "2026-03-29T11:12:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 77,
+"linesRemoved": 108
+},
+{
+"committedAt": "2026-03-29T11:15:00Z",
+"author": "Ken Thompson",
+"linesAdded": 274,
+"linesRemoved": 171
+},
+{
+"committedAt": "2026-03-29T12:24:00Z",
+"author": "Barbara Liskov",
+"linesAdded": 110,
+"linesRemoved": 5
+},
+{
+"committedAt": "2026-03-29T14:31:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 392,
+"linesRemoved": 173
+},
+{
+"committedAt": "2026-03-29T14:57:00Z",
+"author": "Grace Hopper",
+"linesAdded": 37,
+"linesRemoved": 50
+},
+{
+"committedAt": "2026-03-29T16:43:00Z",
+"author": "Ada Lovelace",
+"linesAdded": 60,
+"linesRemoved": 168
+},
+{
+"committedAt": "2026-03-29T17:01:00Z",
+"author": "Radia Perlman",
+"linesAdded": 405,
+"linesRemoved": 202
+},
+{
+"committedAt": "2026-03-29T17:33:00Z",
+"author": "Grace Hopper",
+"linesAdded": 221,
+"linesRemoved": 161
+},
+{
+"committedAt": "2026-03-29T19:45:00Z",
+"author": "Donald Knuth",
+"linesAdded": 365,
+"linesRemoved": 173
+}
+]
+}

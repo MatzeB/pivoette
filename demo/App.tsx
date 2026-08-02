@@ -19,6 +19,8 @@ import { view as tokensView } from './examples/tokens/view';
 import tokensData from './examples/tokens/data.json';
 import { view as metricsView } from './examples/metrics/view';
 import metricsData from './examples/metrics/data.json';
+import { view as commitsView } from './examples/commits/view';
+import commitsData from './examples/commits/data.json';
 
 type Row = Record<string, unknown>;
 
@@ -92,6 +94,15 @@ const EXAMPLES: Example[] = [
       footer: [{ label: 'median', agg: 'median' }],
     },
   },
+  {
+    id: 'commits',
+    title: '6 · Commits by weekday (dates)',
+    blurb:
+      'The timestamp column declares its own encoding in the data; the view derives a weekday from it with `weekday(committedAt)`. The integers 0–6 sort into calendar order by themselves, and kind `weekday` deduces the format that names them. Locale re-orders and renames the columns; time zone moves commits between them.',
+    view: commitsView,
+    data: commitsData as DatasetJson,
+    display: { groupSpacing: 10, indexGap: 8 },
+  },
 ];
 
 type Theme = 'auto' | 'light' | 'dark';
@@ -150,6 +161,16 @@ const LOCALES: { id: string; label: string }[] = [
   { id: 'ja-JP', label: 'ja-JP' },
 ];
 
+/** Time-zone override. '' means 'auto' — the runtime's zone. */
+const TIME_ZONES: { id: string; label: string }[] = [
+  { id: '', label: 'Auto' },
+  { id: 'UTC', label: 'UTC' },
+  { id: 'America/New_York', label: 'New York' },
+  { id: 'Europe/Berlin', label: 'Berlin' },
+  { id: 'Asia/Tokyo', label: 'Tokyo' },
+  { id: 'Pacific/Auckland', label: 'Auckland' },
+];
+
 function Select<T extends string>({
   label,
   value,
@@ -206,6 +227,7 @@ export function App() {
   const [unitPlacement, setUnitPlacement] = useState<UnitPlacement>('header');
   const [scalePlacement, setScalePlacement] = useState<UnitPlacement>('header');
   const [locale, setLocale] = useState('');
+  const [timeZone, setTimeZone] = useState('');
 
   const example = EXAMPLES.find((e) => e.id === selected)!;
   const isRegression = example.id === 'regression';
@@ -213,10 +235,17 @@ export function App() {
   // Overriding the view's locale changes number separators and, for currency
   // units, where the symbol sits and how many decimals it takes. Memoized so
   // the engine is not re-run on unrelated renders.
-  const view = useMemo(
-    () => (locale ? { ...example.view, locale } : example.view),
-    [example.view, locale],
-  );
+  const view = useMemo(() => {
+    if (!locale && !timeZone) return example.view;
+    return {
+      ...example.view,
+      ...(locale ? { locale } : {}),
+      ...(timeZone ? { timeZone } : {}),
+    };
+  }, [example.view, locale, timeZone]);
+
+  // Only a view that derives something can be affected by the zone.
+  const usesTime = view.derive !== undefined;
 
   useEffect(() => {
     if (stress && isRegression && !stressData) {
@@ -289,6 +318,14 @@ export function App() {
             options={LOCALES}
             onChange={setLocale}
           />
+          {usesTime && (
+            <Select
+              label="zone"
+              value={timeZone}
+              options={TIME_ZONES}
+              onChange={setTimeZone}
+            />
+          )}
           {(['auto', 'light', 'dark'] as Theme[]).map((t) => (
             <button
               key={t}

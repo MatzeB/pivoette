@@ -99,7 +99,7 @@ describe('deduceFormat', () => {
   });
 
   it('returns nothing for an unmapped or absent kind', () => {
-    expect(deduceFormat(meta({ kind: 'weekday' }))).toBeUndefined();
+    expect(deduceFormat(meta({ kind: 'uid' }))).toBeUndefined();
     expect(deduceFormat(meta({}))).toBeUndefined();
     expect(deduceFormat(undefined)).toBeUndefined();
     // A compound kind has its own key and is not mapped by default.

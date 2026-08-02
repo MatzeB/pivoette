@@ -6,10 +6,14 @@ import type { CellValue, DataFrame, DatasetJson } from '../data/types';
 import type { ColumnMeta } from '../data/meta';
 import { unitLabels } from '../data/meta';
 import { fromDataset } from '../data/import';
-import { withMeta } from '../data/frame';
 import { computeView } from '../pivot/engine';
 import { getAggregation } from '../pivot/aggregations';
-import type { Cell, ResolvedLeaf, ResultRow } from '../pivot/result';
+import type {
+  Cell,
+  MemberFormat,
+  ResolvedLeaf,
+  ResultRow,
+} from '../pivot/result';
 import type { ViewSpec } from '../pivot/spec';
 import { compareValues } from '../util';
 import styles from './DataTable.module.css';
@@ -253,14 +257,14 @@ export function DataTable({
     scalePlacement = 'off',
   } = display;
 
-  const result = useMemo(() => {
-    // View metadata layers over whatever the data shipped with, so a plain
-    // JSON row array can still be annotated from the view.
-    const frame = withMeta(isFrame(data) ? data : fromDataset(data), view.meta);
-    return computeView(frame, view);
-  }, [data, view]);
+  // `computeView` prepares its own frame from the spec (metadata, derived
+  // columns), so the component only has to turn `data` into one.
+  const result = useMemo(
+    () => computeView(isFrame(data) ? data : fromDataset(data), view),
+    [data, view],
+  );
 
-  const { rowLevels, summary, frame } = result;
+  const { rowLevels, rowMemberFormats, summary, frame } = result;
   const depth = result.columnHeaderDepth;
 
   // Unit decoration: wrap each leaf's formatter with its value suffix, and keep
@@ -610,6 +614,7 @@ export function DataTable({
                 nextPath={grouped ? next?.path : undefined}
                 grouped={grouped}
                 rowLevels={rowLevels}
+                memberFormats={rowMemberFormats}
                 leaves={leaves}
                 frame={frame}
                 leftOffset={leftOffset}
@@ -698,6 +703,7 @@ interface RowProps {
   nextPath: unknown[] | undefined;
   grouped: boolean;
   rowLevels: string[];
+  memberFormats: MemberFormat[];
   leaves: ResolvedLeaf[];
   frame: DataFrame;
   leftOffset: number[];
@@ -718,6 +724,7 @@ function Row({
   nextPath,
   grouped,
   rowLevels,
+  memberFormats,
   leaves,
   frame,
   leftOffset,
@@ -767,7 +774,9 @@ function Row({
             }}
             onMouseEnter={() => onHover({ row: rowIndex, leaf: -1 })}
           >
-            {show ? String(row.path[level] ?? '') : ''}
+            {show
+              ? (memberFormats[level]?.(row.path[level] ?? null) ?? '')
+              : ''}
           </th>
         );
       })}

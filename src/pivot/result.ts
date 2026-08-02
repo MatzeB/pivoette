@@ -30,6 +30,12 @@ export interface ResolvedLeaf {
   render?: CellRender;
 }
 
+/**
+ * Renders an index member — a row or column key value — for display. Grouping
+ * and sorting keep the raw value; only the label goes through here.
+ */
+export type MemberFormat = (value: CellValue) => string;
+
 /** A node in the multi-level column header forest. */
 export interface HeaderNode {
   label: string;
@@ -51,6 +57,8 @@ export interface ViewResult {
   mode: 'pivot' | 'flat';
   /** Labels for the leading row-index columns (pivot); empty for flat. */
   rowLevels: string[];
+  /** Renders each row level's members; aligned to `rowLevels`. */
+  rowMemberFormats: MemberFormat[];
   leaves: ResolvedLeaf[];
   /** Multi-level header forest over `leaves`. */
   columnHeader: HeaderNode[];

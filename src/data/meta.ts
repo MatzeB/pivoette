@@ -39,6 +39,16 @@ export interface ColumnMeta {
   scale?: (string | null)[];
   /** Short scale per factor, e.g. `['M',null]`; deduced when missing. */
   scaleShort?: (string | null)[];
+  /**
+   * How the raw value encodes what it represents, independent of the column's
+   * type — `'rfc3339'` is the only one understood today, but a numeric epoch
+   * encoding is the same kind of statement. Scalar, not a per-factor array: a
+   * column has one encoding however many unit factors it has.
+   *
+   * Deliberately not a `unit` entry: `unit` feeds label composition, so an
+   * encoding there would be rendered as the column's unit on every cell.
+   */
+  encoding?: string;
 }
 
 /** Array-valued metadata fields; each accepts a bare string for one factor. */
@@ -247,6 +257,7 @@ export function normalizeMeta(
     type: input.type ?? base.type,
     category: input.category ?? base.category,
   };
+  if (input.encoding) meta.encoding = input.encoding;
 
   const fields: [UnitField, (string | null)[] | undefined][] = [
     ['kind', orUndefined(kind)],
@@ -256,6 +267,9 @@ export function normalizeMeta(
     ['scaleShort', orUndefined(scaleShort)],
   ];
   for (const [name, value] of fields) if (value) meta[name] = value;
+  // A declared encoding says the column holds instants, so the kind follows
+  // unless the caller named one.
+  if (meta.encoding && !meta.kind) meta.kind = [ColumnKind.Timestamp];
   return meta;
 }
 
