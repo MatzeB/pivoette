@@ -105,23 +105,21 @@ function initialExample(): string {
   return EXAMPLES.some((e) => e.id === ex) ? ex! : EXAMPLES[0]!.id;
 }
 
-/** True if this metadata declares a unit or scale. */
-function declaresUnit(m: ColumnMetaInput | undefined): boolean {
-  return !!(m && (m.unit ?? m.scale ?? m.unitShort ?? m.scaleShort));
-}
-
 /**
- * True when any column carries a unit, from either source: the data (metrics
+ * Every piece of column metadata in play, from either source: the data (metrics
  * ships a `{meta, rows}` document) or the view (ticker annotates plain rows,
- * including a computed column's own `meta`). The placement controls do nothing
- * without one, so they only appear for such examples.
+ * including a computed column's own `meta`).
  */
-function hasUnitMeta(data: Row[] | DatasetJson, view: ViewSpec): boolean {
-  if (!Array.isArray(data) && Object.values(data.meta ?? {}).some(declaresUnit))
-    return true;
-  if (Object.values(view.meta ?? {}).some(declaresUnit)) return true;
+function collectMeta(
+  data: Row[] | DatasetJson,
+  view: ViewSpec,
+): ColumnMetaInput[] {
   const defs = isFlat(view) ? view.columns : (view.computed ?? []);
-  return defs.some((def) => declaresUnit(def.meta));
+  return [
+    ...(Array.isArray(data) ? [] : Object.values(data.meta ?? {})),
+    ...Object.values(view.meta ?? {}),
+    ...defs.map((def) => def.meta).filter((m) => m !== undefined),
+  ];
 }
 
 const PLACEMENTS: UnitPlacement[] = ['off', 'value', 'header'];
@@ -202,6 +200,21 @@ export function App() {
 
   const data = isRegression && stress && stressData ? stressData : example.data;
   const rowCount = Array.isArray(data) ? data.length : data.rows.length;
+
+  // Placement controls appear only where they'd do something, and split into
+  // two only where a single column has both halves to place. Ticker's `$` and
+  // `%` live on different columns, so one control covers it; metrics has
+  // `ms`/`MiB`, where scale and unit really can go to different places.
+  const metas = collectMeta(data, example.view);
+  const hasUnits = metas.some((m) => m.unit ?? m.scale ?? m.unitShort);
+  const hasSplit = metas.some(
+    (m) => (m.unit ?? m.unitShort) && (m.scale ?? m.scaleShort),
+  );
+
+  function setBoth(v: UnitPlacement) {
+    setUnitPlacement(v);
+    setScalePlacement(v);
+  }
 
   return (
     <div
@@ -300,7 +313,7 @@ export function App() {
         </label>
       )}
 
-      {hasUnitMeta(data, example.view) && (
+      {hasUnits && (
         <div
           style={{
             display: 'flex',
@@ -309,16 +322,26 @@ export function App() {
             marginBottom: 10,
           }}
         >
-          <PlacementSelect
-            label="unit"
-            value={unitPlacement}
-            onChange={setUnitPlacement}
-          />
-          <PlacementSelect
-            label="scale"
-            value={scalePlacement}
-            onChange={setScalePlacement}
-          />
+          {hasSplit ? (
+            <>
+              <PlacementSelect
+                label="unit"
+                value={unitPlacement}
+                onChange={setUnitPlacement}
+              />
+              <PlacementSelect
+                label="scale"
+                value={scalePlacement}
+                onChange={setScalePlacement}
+              />
+            </>
+          ) : (
+            <PlacementSelect
+              label="units"
+              value={unitPlacement}
+              onChange={setBoth}
+            />
+          )}
         </div>
       )}
 

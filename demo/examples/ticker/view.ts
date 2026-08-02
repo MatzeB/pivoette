@@ -64,12 +64,16 @@ export const view: ViewSpec = {
     },
     {
       id: 'plPercent',
-      label: 'P/L %',
-      compute: 'basePrice ? (price - basePrice) / basePrice : null',
-      // A ratio, not a stored percentage: `percent` scales it by 100 and prints
-      // its own sign, so this one keeps an explicit self-contained format.
+      label: 'Return',
+      // The *compute* yields percentage points (5.23, not 0.0523) — scale
+      // metadata is a label and never transforms a number, so a `%` on a ratio
+      // would read "0.05%". With the value already in points, `scale: percent`
+      // is pure annotation and the toggle can move it, exactly like the
+      // metrics example's `cpu` column.
+      compute: 'basePrice ? ((price - basePrice) / basePrice) * 100 : null',
+      meta: { kind: ['percentage'], scale: ['percent'] },
       format: {
-        name: 'percent',
+        name: 'number',
         options: { decimals: 2, signDisplay: 'exceptZero' },
       },
       style: {
