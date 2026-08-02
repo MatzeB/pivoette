@@ -65,6 +65,7 @@ const EXAMPLES: Example[] = [
       'Nested rows team → project → model, compact K/M/B token counts, computed Total column, grand-total summary footer.',
     view: tokensView,
     data: tokensData as Row[],
+    display: { rowGroupSpacing: 10 },
   },
 ];
 

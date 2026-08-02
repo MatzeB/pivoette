@@ -115,9 +115,6 @@
 }
 
 /* Row + cell shading follow the hovered cell (defined last → win over tints). */
-.rowHoverFaint {
-  background: var(--pv-hover-faint);
-}
 .rowHover {
   background: var(--pv-hover);
 }

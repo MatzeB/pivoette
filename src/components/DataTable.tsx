@@ -20,6 +20,9 @@ export interface DataTableDisplay {
   groupSpacing?: number;
   /** Px gap between the index columns and the data area (0 = off). */
   indexGap?: number;
+  /** Px vertical gap between higher-level row-index blocks (0 = off).
+   * Shallower (outer) levels get a proportionally larger gap. */
+  rowGroupSpacing?: number;
   /** Flat mode: number of leading columns to tint as an index (default 0). */
   indexColumns?: number;
   /** Highlight the hovered cell's column header + ancestors (default true). */
@@ -160,6 +163,7 @@ export function DataTable({
     frameless = false,
     groupSpacing = 0,
     indexGap = 0,
+    rowGroupSpacing = 0,
     indexColumns = 0,
     highlightHeaders = true,
     footer = [],
@@ -262,6 +266,24 @@ export function DataTable({
   }, [result.rows, sort]);
 
   const grouped = sort === null; // only show grouped (blanked) row labels unsorted
+  const nLevels = rowLevels.length;
+
+  // Extra top space for the first row of a higher-level row-index block.
+  const extraTop = useMemo(() => {
+    const arr = new Array<number>(rows.length).fill(0);
+    if (rowGroupSpacing > 0 && grouped && nLevels > 1) {
+      for (let i = 1; i < rows.length; i++) {
+        let lc = 0;
+        while (lc < nLevels && rows[i]!.path[lc] === rows[i - 1]!.path[lc])
+          lc++;
+        if (lc < nLevels - 1)
+          arr[i] = Math.round(
+            rowGroupSpacing * Math.pow(1.3, nLevels - 2 - lc),
+          );
+      }
+    }
+    return arr;
+  }, [rows, rowGroupSpacing, grouped, nLevels]);
 
   function cycleSort(key: SortKey) {
     if (!sortable) return;
@@ -306,7 +328,7 @@ export function DataTable({
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => ROW_HEIGHT,
+    estimateSize: (i) => ROW_HEIGHT + (extraTop[i] ?? 0),
     overscan: 12,
   });
   const items = virtualizer.getVirtualItems();
@@ -441,12 +463,15 @@ export function DataTable({
           {items.map((item) => {
             const row = rows[item.index]!;
             const prev = item.index > 0 ? rows[item.index - 1] : undefined;
+            const next =
+              item.index < rows.length - 1 ? rows[item.index + 1] : undefined;
             return (
               <Row
                 key={item.index}
                 rowIndex={item.index}
                 row={row}
                 prevPath={grouped ? prev?.path : undefined}
+                nextPath={grouped ? next?.path : undefined}
                 grouped={grouped}
                 rowLevels={rowLevels}
                 leaves={leaves}
@@ -455,6 +480,7 @@ export function DataTable({
                 gapAfter={gapAfter}
                 bodyLeadGap={bodyLeadGap}
                 indexColumns={indexColumns}
+                extraTop={extraTop[item.index] ?? 0}
                 hover={hover}
                 hoverPath={hover ? rows[hover.row]?.path : undefined}
                 onHover={setHover}
@@ -535,10 +561,17 @@ function edgeGapStyle(
   return style;
 }
 
+/** True if the first `n` levels of two paths are equal. */
+function prefixEqual(a: unknown[], b: unknown[], n: number): boolean {
+  for (let i = 0; i < n; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+
 interface RowProps {
   rowIndex: number;
   row: ResultRow;
   prevPath: unknown[] | undefined;
+  nextPath: unknown[] | undefined;
   grouped: boolean;
   rowLevels: string[];
   leaves: ResolvedLeaf[];
@@ -547,6 +580,7 @@ interface RowProps {
   gapAfter: number[];
   bodyLeadGap: number;
   indexColumns: number;
+  extraTop: number;
   hover: { row: number; leaf: number } | null;
   hoverPath: unknown[] | undefined;
   onHover: (h: { row: number; leaf: number } | null) => void;
@@ -556,6 +590,7 @@ function Row({
   rowIndex,
   row,
   prevPath,
+  nextPath,
   grouped,
   rowLevels,
   leaves,
@@ -564,41 +599,29 @@ function Row({
   gapAfter,
   bodyLeadGap,
   indexColumns,
+  extraTop,
   hover,
   hoverPath,
   onHover,
 }: RowProps) {
-  const nLevels = rowLevels.length;
   const hoveredRow = hover?.row === rowIndex;
-  // How many leading row-index levels this row shares with the hovered row.
-  let matchDepth = 0;
-  if (hoverPath && nLevels > 0) {
-    while (
-      matchDepth < nLevels &&
-      row.path[matchDepth] === hoverPath[matchDepth]
-    )
-      matchDepth++;
-  } else if (hoveredRow) {
-    matchDepth = Math.max(nLevels, 1);
-  }
-  // Data cells: strong for the hovered row + its innermost sibling group,
-  // faint for the broader (outer-level) group.
-  const strong =
-    nLevels === 0 ? hoveredRow : matchDepth >= Math.max(nLevels - 1, 1);
-  const faint = !strong && matchDepth >= 1;
-  const rowShade = strong ? styles.rowHover : faint ? styles.rowHoverFaint : '';
+  const gapTop = extraTop
+    ? { borderTop: `${extraTop}px solid var(--pv-bg)` }
+    : undefined;
 
   return (
-    <tr style={{ height: ROW_HEIGHT }}>
+    <tr style={{ height: ROW_HEIGHT + extraTop }}>
       {rowLevels.map((_, level) => {
-        let show = true;
-        if (grouped && prevPath) {
-          show = false;
-          for (let l = 0; l <= level; l++)
-            if (prevPath[l] !== row.path[l]) show = true;
-        }
-        // Light up the index cell whose grouping level the hovered row shares.
-        const lit = matchDepth >= level + 1;
+        // Label shown only where this level's group starts.
+        const show =
+          !grouped || !prevPath || !prefixEqual(prevPath, row.path, level + 1);
+        // Merge cells: drop the bottom rule while the group continues below.
+        const continues =
+          grouped && !!nextPath && prefixEqual(nextPath, row.path, level + 1);
+        // Breadcrumb highlight: the label cell carrying an ancestor (or self)
+        // of the hovered row.
+        const lit =
+          !!hoverPath && show && prefixEqual(row.path, hoverPath, level + 1);
         const cls = [
           styles.rowHeaderCell,
           styles.indexTint,
@@ -612,7 +635,13 @@ function Row({
             key={level}
             scope="row"
             className={cls}
-            style={{ left: leftOffset[level] }}
+            style={{
+              left: leftOffset[level],
+              // Gap only where this level starts a new block; spanning
+              // (blank) cells stay continuous across the gap.
+              ...(gapTop && show ? gapTop : {}),
+              ...(continues ? { borderBottom: 'none' } : {}),
+            }}
             onMouseEnter={() => onHover({ row: rowIndex, leaf: -1 })}
           >
             {show ? String(row.path[level] ?? '') : ''}
@@ -630,7 +659,7 @@ function Row({
         const cls = [
           alignClass(leaf.column.align),
           isIndex ? styles.indexTint : '',
-          rowShade,
+          hoveredRow ? styles.rowHover : '',
           cellHovered ? styles.cellHover : '',
         ]
           .filter(Boolean)
@@ -642,6 +671,7 @@ function Row({
             style={{
               ...leaf.style(ctx),
               ...edgeGapStyle(i, i, gapAfter, bodyLeadGap),
+              ...gapTop,
             }}
             onMouseEnter={() => onHover({ row: rowIndex, leaf: i })}
           >
