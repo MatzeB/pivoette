@@ -26,7 +26,7 @@ export const view: ViewSpec = {
   computed: [
     {
       id: 'delta',
-      label: 'Δ%',
+      label: 'Δ',
       repeatPer: ['platform'],
       inputs: {
         before: { colPath: ['before'], value: 'mean' },
@@ -34,10 +34,12 @@ export const view: ViewSpec = {
       },
       compute: 'before ? (after - before) / before : null',
       place: { after: 'after' },
-      format: {
-        fnName: Format.Percent,
-        options: { decimals: 1, signDisplay: 'exceptZero' },
-      },
+      // The compute yields a ratio; `factor` converts it to percentage points
+      // and the `%` comes from the metadata, so the label follows the unit
+      // placement like every other column.
+      factor: 100,
+      meta: { scale: ['percent'] },
+      format: { options: { signDisplay: 'exceptZero' } },
       style: {
         fnName: Style.SignColors,
         options: { negative: green, positive: red },

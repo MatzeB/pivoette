@@ -27,7 +27,7 @@ import type {
 import { isFlat } from './spec';
 import type { Cell, ResolvedLeaf, ResultRow, ViewResult } from './result';
 import { buildHeader } from './result';
-import { compareValues, isNumericType } from '../util';
+import { asNumber, compareValues, isNumericType } from '../util';
 
 const NUMERIC_FORMATS = new Set<string>(Object.values(Format));
 
@@ -186,7 +186,7 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
       } else {
         value = null;
       }
-      return { value, inputs };
+      return { value: scaled(value as CellValue, def.factor), inputs };
     });
     rows.push({ path: [], cells });
   }
@@ -272,6 +272,17 @@ function sortTuples(
     }
     return 0;
   });
+}
+
+/**
+ * Convert a stored value to display units. Applied once, at cell construction,
+ * so format/style/render, sorting, and footer aggregates all agree — unlike a
+ * format option, which only the formats that implement it would honour.
+ */
+function scaled(value: CellValue, factor: number | undefined): CellValue {
+  if (factor === undefined || value === null) return value;
+  const n = asNumber(value);
+  return n === null ? value : n * factor;
 }
 
 function aggregate(measure: ValueSpec, values: CellValue[]): CellValue {
@@ -463,7 +474,9 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
         const idxs = byCol?.get(d.colKeyStr);
         const col = fieldValues[d.measureIndex]!;
         const vals = idxs ? idxs.map((r) => col[r] ?? null) : [];
-        const value = idxs ? aggregate(d.measure, vals) : null;
+        const value = idxs
+          ? scaled(aggregate(d.measure, vals), d.measure.factor)
+          : null;
         baseValues.set(d.baseKey, value);
         cells[i] = { value };
       }
@@ -489,7 +502,13 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
         const vals = idxs ? idxs.map((r) => col[r] ?? null) : [];
         const aggId = d.measure.summaryAgg ?? d.measure.agg;
         const value = idxs
-          ? aggregate({ ...d.measure, agg: aggId, expression: undefined }, vals)
+          ? scaled(
+              aggregate(
+                { ...d.measure, agg: aggId, expression: undefined },
+                vals,
+              ),
+              d.measure.factor,
+            )
           : null;
         baseValues.set(d.baseKey, value);
         summary![i] = { value };
@@ -532,7 +551,7 @@ function derivedCell(
   const value = d.def.compute
     ? evalExpression(d.def.compute, { ...inputs, inputs, row: rowPath })
     : null;
-  return { value, inputs };
+  return { value: scaled(value as CellValue, d.def.factor), inputs };
 }
 
 function distinctPrefixes(colKeys: CellValue[][], len: number): CellValue[][] {
@@ -620,7 +639,9 @@ function pivotMeasuresOnRows(
       const cells: Cell[] = colKeys.map((colKey) => {
         const idxs = byCol?.get(keyOf(colKey));
         const vals = idxs ? idxs.map((r) => fieldValues[mi]![r] ?? null) : [];
-        return { value: idxs ? aggregate(measure, vals) : null };
+        return {
+          value: idxs ? scaled(aggregate(measure, vals), measure.factor) : null,
+        };
       });
       rows.push({ path: [...rowKey, measure.label ?? measure.id], cells });
     });

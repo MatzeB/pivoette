@@ -518,3 +518,62 @@ describe('inheritUnitFormat', () => {
     ).toBe('5.25');
   });
 });
+
+describe('factor', () => {
+  const rows = [
+    { g: 'A', rate: 0.1 },
+    { g: 'A', rate: 0.2 },
+    { g: 'B', rate: 0.6 },
+  ];
+
+  it('scales a pivot measure and its summary alike', () => {
+    const res = computeView(fromRows(rows), {
+      rows: ['g'],
+      columns: [],
+      showSummary: true,
+      values: [
+        { id: 'm', field: 'rate', agg: 'mean', label: 'mean', factor: 100 },
+      ],
+    } satisfies PivotSpec);
+    const [a, b] = res.rows.map((r) => r.cells[0]!.value as number);
+    expect(a).toBeCloseTo(15, 10); // float: ((0.1+0.2)/2)*100
+    expect(b).toBeCloseTo(60, 10);
+    // The summary re-aggregates from source, and is scaled the same way — the
+    // hole that made `expression`-based scaling unusable.
+    expect(res.summary![0]!.value).toBeCloseTo(30, 10);
+  });
+
+  it('scales a flat column before formatting and styling', () => {
+    const res = computeView(fromRows(rows), {
+      mode: 'flat',
+      columns: [{ id: 'rate', factor: 100 }],
+    } satisfies TableSpec);
+    expect(res.rows.map((r) => r.cells[0]!.value)).toEqual([10, 20, 60]);
+  });
+
+  it('leaves nulls and non-numbers alone', () => {
+    const res = computeView(fromRows([{ a: null, b: 'x' }]), {
+      mode: 'flat',
+      columns: [
+        { id: 'a', factor: 100 },
+        { id: 'b', factor: 100 },
+      ],
+    } satisfies TableSpec);
+    expect(res.rows[0]!.cells.map((c) => c.value)).toEqual([null, 'x']);
+  });
+
+  it('reaches formats that could not honour an option', () => {
+    const res = computeView(fromRows(rows), {
+      mode: 'flat',
+      columns: [
+        // An inline fn has no `options` at all — a format-level factor could
+        // never have applied here.
+        { id: 'rate', factor: 100, format: { fn: (ctx) => `<${ctx.value}>` } },
+      ],
+    } satisfies TableSpec);
+    const leaf = res.leaves[0]!;
+    expect(leaf.format({ value: res.rows[0]!.cells[0]!.value } as never)).toBe(
+      '<10>',
+    );
+  });
+});

@@ -62,6 +62,13 @@ export interface ColumnDef {
   compute?: string;
   /** alias -> cell ref (pivot) or column/field id (flat, defaults to siblings). */
   inputs?: Record<string, CellRef | string>;
+  /** Multiply this column's values by a constant before they are formatted —
+   * the conversion from how the data is stored to how it is displayed (a ratio
+   * stored as 0.0523 shown as 5.23 percent points). Applied by the engine, so
+   * it holds for every format, including inline `fn`/`expression` ones, and for
+   * styles, sorting, and footer aggregates alike. The unit *label* is separate:
+   * that comes from the column's metadata. */
+  factor?: number;
   format?: FormatSpec;
   /** Use the format deduced from this column's metadata (default true). Set
    * false to supply a complete format instead of overriding parts of the
@@ -87,6 +94,13 @@ export interface ValueSpec {
   field: string;
   agg: string;
   label?: string;
+  /** Multiply this column's values by a constant before they are formatted —
+   * the conversion from how the data is stored to how it is displayed (a ratio
+   * stored as 0.0523 shown as 5.23 percent points). Applied by the engine, so
+   * it holds for every format, including inline `fn`/`expression` ones, and for
+   * styles, sorting, and footer aggregates alike. The unit *label* is separate:
+   * that comes from the column's metadata. */
+  factor?: number;
   format?: FormatSpec;
   /** Use the format deduced from this column's metadata (default true). Set
    * false to supply a complete format instead of overriding parts of the
