@@ -120,7 +120,7 @@ export const UNIT_SHORT: Record<string, string> = {
  * Only consulted for a single-factor unit — a rate like `price/duration`
  * reads better as a trailing `$/h`.
  */
-const PREFIX_KINDS = new Set<string>([ColumnKind.Price, 'currency']);
+const PREFIX_KINDS = new Set<string>([ColumnKind.Price, 'currency']); // kinds, not formats
 
 export const SCALE_SHORT: Record<string, string> = {
   femto: 'f',

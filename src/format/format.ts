@@ -23,12 +23,8 @@ function numberFormat(options: Record<string, unknown>): Intl.NumberFormat {
   const key = JSON.stringify(options);
   let nf = intlCache.get(key);
   if (!nf) {
-    const style = opt<string>(options, 'style');
     const nfOpts: Intl.NumberFormatOptions = {};
-    if (style === 'currency') {
-      nfOpts.style = 'currency';
-      nfOpts.currency = opt<string>(options, 'currency') ?? 'USD';
-    } else if (style === 'percent') {
+    if (opt<string>(options, 'style') === 'percent') {
       nfOpts.style = 'percent';
     }
     const decimals = opt<number>(options, 'decimals');
@@ -54,7 +50,7 @@ function affix(options: Record<string, unknown>, body: string): string {
   return `${prefix}${body}${suffix}`;
 }
 
-/** Numeric built-in shared by number/integer/currency/percent. */
+/** Numeric built-in shared by number/integer/percent. */
 function intlBuiltin(base: Record<string, unknown>): FormatFactory {
   return (options) => {
     const merged = { ...base, ...options };
@@ -69,7 +65,6 @@ function intlBuiltin(base: Record<string, unknown>): FormatFactory {
 
 registry.set('number', intlBuiltin({}));
 registry.set('integer', intlBuiltin({ decimals: 0 }));
-registry.set('currency', intlBuiltin({ style: 'currency' }));
 registry.set('percent', intlBuiltin({ style: 'percent' }));
 
 // --- duration (SI-time) -----------------------------------------------------

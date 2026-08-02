@@ -6,6 +6,9 @@ export const view: ViewSpec = {
   rows: ['team', 'project', 'model'],
   columns: [],
   labels: { team: 'Team', project: 'Project', model: 'Model' },
+  // The money column takes its 2 decimals from kind `price`; the `$` itself
+  // comes from the unit placement.
+  meta: { costUsd: { kind: ['price'], unit: ['dollar'] } },
   values: [
     {
       id: 'input',
@@ -33,7 +36,6 @@ export const view: ViewSpec = {
       field: 'costUsd',
       agg: 'sum',
       label: 'Price',
-      format: { fnName: Format.Currency, options: { decimals: 2 } },
     },
   ],
   computed: [

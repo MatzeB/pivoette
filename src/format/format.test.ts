@@ -44,13 +44,15 @@ describe('duration formatter', () => {
 });
 
 describe('intl-backed formatters', () => {
-  it('currency with explicit + sign', () => {
+  it('number with explicit + sign', () => {
+    // Money is a plain 2-decimal number; the `$` is a unit label placed by the
+    // table (see the currency-prefix cases in DataTable.test.tsx).
     const spec: FormatSpec = {
-      fnName: 'currency',
+      fnName: 'number',
       options: { decimals: 2, signDisplay: 'exceptZero' },
     };
-    expect(fmt(spec, 12.5)).toBe('+$12.50');
-    expect(fmt(spec, -3)).toBe('-$3.00');
+    expect(fmt(spec, 12.5)).toBe('+12.50');
+    expect(fmt(spec, -3)).toBe('-3.00');
   });
 
   it('percent with decimals', () => {

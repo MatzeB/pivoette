@@ -13,7 +13,6 @@
 export const Format = {
   Number: 'number',
   Integer: 'integer',
-  Currency: 'currency',
   Percent: 'percent',
   Duration: 'duration',
 } as const;

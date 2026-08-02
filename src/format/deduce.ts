@@ -10,9 +10,9 @@
  *
  * Note what these rules *don't* do: none of them print a unit. The symbol comes
  * from the metadata via the table's unit placement (`$12.50`, `45.6%`), which
- * is why `price` maps to a plain 2-decimal number rather than `currency`, and
- * `percentage` to a plain number rather than `percent` (a stored `45.6` means
- * 45.6%, and `Intl`'s percent style would multiply it by 100).
+ * is why `price` maps to a plain 2-decimal number (there is no `currency`
+ * built-in — the symbol is metadata), and `percentage` to a plain number rather
+ * than `percent`, whose `Intl` style would multiply a stored `45.6` by 100.
  */
 import { kindId, unitLabels } from '../data/meta';
 import type { ColumnMeta } from '../data/meta';

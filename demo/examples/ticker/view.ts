@@ -14,7 +14,7 @@ const dollar = { kind: ['price'], unit: ['dollar'] };
  * comes from somewhere that knows nothing about presentation — so the column
  * metadata is declared in the view instead and layered on at load. From it the
  * headers and the 2-decimal dollar format are both deduced; the `$` itself comes
- * from the unit placement, which is why no column names `currency`.
+ * from the unit placement rather than from any currency formatter.
  *
  * Columns with neither `compute` nor `composite` omit `source`: it defaults to
  * the column id.
