@@ -167,10 +167,13 @@
   border-bottom: none;
 }
 
-/* Shade the hovered footer row (footer isn't virtualized → plain :hover). */
+/* Shade the hovered footer row + cell (footer isn't virtualized → :hover). */
 .summaryRow:hover td,
 .summaryRow:hover th {
   background: var(--pv-hover);
+}
+.summaryRow td:hover {
+  background: var(--pv-hi);
 }
 
 .summaryLabel {

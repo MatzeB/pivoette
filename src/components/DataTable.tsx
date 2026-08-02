@@ -518,7 +518,7 @@ export function DataTable({
         </tbody>
 
         {(summary || footerRows.length > 0) && (
-          <tfoot onMouseOver={() => setHover(null)}>
+          <tfoot>
             {(() => {
               const lines = [
                 ...footerRows,
@@ -537,6 +537,8 @@ export function DataTable({
                       bottom: contentBottom,
                       zIndex: 4,
                     }}
+                    // Leaving the body into the footer drops the body-row hover.
+                    onMouseEnter={() => setHover({ row: -1, leaf: -1 })}
                   />
                 </tr>
               );
@@ -554,6 +556,7 @@ export function DataTable({
                     bodyLeadGap={bodyLeadGap}
                     bottom={(lines.length - 1 - fi) * ROW_HEIGHT}
                     leftOffset={leftOffset}
+                    onHover={setHover}
                   />
                 )),
               ];
@@ -719,6 +722,7 @@ interface FooterRowProps {
   bodyLeadGap: number;
   bottom: number;
   leftOffset: number[];
+  onHover: (h: { row: number; leaf: number } | null) => void;
 }
 
 function FooterRow({
@@ -731,6 +735,7 @@ function FooterRow({
   bodyLeadGap,
   bottom,
   leftOffset,
+  onHover,
 }: FooterRowProps) {
   const sticky: CSSProperties = { position: 'sticky', bottom, zIndex: 1 };
   return (
@@ -740,6 +745,7 @@ function FooterRow({
           className={`${styles.summaryLabel} ${styles.indexTint}`}
           colSpan={rowLevels.length}
           style={{ ...sticky, left: leftOffset[0], zIndex: 3 }}
+          onMouseEnter={() => onHover({ row: -1, leaf: -1 })}
         >
           {label}
         </th>
@@ -759,6 +765,8 @@ function FooterRow({
               ...edgeGapStyle(i, i, gapAfter, bodyLeadGap),
               ...sticky,
             }}
+            // Footer sentinel row (-1): lights the column header, no body row.
+            onMouseEnter={() => onHover({ row: -1, leaf: i })}
           >
             {node}
           </td>
