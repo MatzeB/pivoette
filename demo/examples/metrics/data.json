@@ -35,9 +35,6 @@
 },
 "cpu": {
 "displayName": "CPU",
-"kind": [
-"percentage"
-],
 "scale": [
 "percent"
 ]

@@ -71,7 +71,8 @@ export const view: ViewSpec = {
       // is pure annotation and the toggle can move it, exactly like the
       // metrics example's `cpu` column.
       compute: 'basePrice ? ((price - basePrice) / basePrice) * 100 : null',
-      meta: { kind: ['percentage'], scale: ['percent'] },
+      // Unitless: the `%` scale is the whole unit.
+      meta: { scale: ['percent'] },
       // Likewise: 1 decimal is deduced from kind `percentage`.
       format: { options: { signDisplay: 'exceptZero' } },
       style: {

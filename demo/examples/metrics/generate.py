@@ -34,9 +34,10 @@ META = {
         "unit": ["second"],
         "scale": ["milli"],
     },
+    # Unitless: a bare scale is a complete unit on its own. No `kind` needed —
+    # "percentage" is what the scale already says.
     "cpu": {
         "displayName": "CPU",
-        "kind": ["percentage"],
         "scale": ["percent"],
     },
     "throughput": {
