@@ -15,8 +15,11 @@ export interface DataTableDisplay {
   sortable?: boolean;
   /** Line-free look: spacing instead of inner borders, only a header rule. */
   frameless?: boolean;
-  /** Px gap inserted at column-group boundaries (0 = off). */
+  /** Px gap inserted at column-group boundaries (0 = off). Shallower group
+   * levels get a proportionally larger gap; the innermost level gets none. */
   groupSpacing?: number;
+  /** Px gap between the index columns and the data area (0 = off). */
+  indexGap?: number;
   /** Flat mode: number of leading columns to tint as an index (default 0). */
   indexColumns?: number;
   /** Highlight the hovered cell's column header + ancestors (default true). */
@@ -156,6 +159,7 @@ export function DataTable({
     sortable = true,
     frameless = false,
     groupSpacing = 0,
+    indexGap = 0,
     indexColumns = 0,
     highlightHeaders = true,
     footer = [],
@@ -215,7 +219,8 @@ export function DataTable({
       for (const r of sample) w = Math.max(w, widthOf(String(r.path[i] ?? '')));
       return Math.min(320, Math.max(80, Math.ceil(w) + CELL_PAD));
     });
-    // Group gaps: bigger gap for shallower boundaries; none at innermost level.
+    // Group gaps: each shallower boundary level is 1.3x the next; the innermost
+    // (measure) level gets no gap.
     const gapAfter = leaves.map(() => 0);
     if (groupSpacing > 0) {
       for (let i = 0; i < leaves.length - 1; i++) {
@@ -223,7 +228,8 @@ export function DataTable({
         const b = leaves[i + 1]!.colPath;
         let L = 0;
         while (L < depth && a[L] === b[L]) L++;
-        if (L < depth - 1) gapAfter[i] = groupSpacing * (depth - 1 - L);
+        if (L <= depth - 2)
+          gapAfter[i] = Math.round(groupSpacing * Math.pow(1.3, depth - 2 - L));
       }
     }
     // Sticky-left offsets for index columns.
@@ -236,9 +242,8 @@ export function DataTable({
     return { indexW, leafW, gapAfter, leftOffset };
   }, [result, leaves, rowLevels, frame, groupSpacing, depth, footer, summary]);
 
-  // Index/body separation gap.
-  const bodyLeadGap =
-    groupSpacing > 0 && rowLevels.length > 0 ? groupSpacing * 2 : 0;
+  // Index/body separation gap (independent of group spacing).
+  const bodyLeadGap = rowLevels.length > 0 ? indexGap : 0;
 
   const totalWidth =
     indexW.reduce((a, b) => a + b, 0) +
@@ -417,6 +422,14 @@ export function DataTable({
               })}
             </tr>
           ))}
+          {/* One contiguous rule under the whole header (spans the gaps). */}
+          <tr aria-hidden="true">
+            <td
+              colSpan={totalCols}
+              className={styles.headerRule}
+              style={{ top: depth * HEADER_H }}
+            />
+          </tr>
         </thead>
 
         <tbody className={styles.body}>
@@ -443,6 +456,7 @@ export function DataTable({
                 bodyLeadGap={bodyLeadGap}
                 indexColumns={indexColumns}
                 hover={hover}
+                hoverPath={hover ? rows[hover.row]?.path : undefined}
                 onHover={setHover}
               />
             );
@@ -461,16 +475,22 @@ export function DataTable({
                 ...footerRows,
                 ...(summary ? [{ label: 'Total', cells: summary }] : []),
               ];
+              const contentBottom = lines.length * ROW_HEIGHT;
               return [
-                // Background-colored gap between the body and the sticky footer.
-                <tr key="fgap" aria-hidden="true">
+                // Space between the body and the footer.
+                <tr key="fspace" aria-hidden="true">
                   <td
                     colSpan={totalCols}
-                    className={styles.footGap}
-                    style={{
-                      position: 'sticky',
-                      bottom: lines.length * ROW_HEIGHT,
-                    }}
+                    className={styles.footSpace}
+                    style={{ position: 'sticky', bottom: contentBottom + 4 }}
+                  />
+                </tr>,
+                // Contiguous accountant-style double line before the totals.
+                <tr key="fdouble" aria-hidden="true">
+                  <td
+                    colSpan={totalCols}
+                    className={styles.footDouble}
+                    style={{ position: 'sticky', bottom: contentBottom }}
                   />
                 </tr>,
                 ...lines.map((fr, fi) => (
@@ -483,7 +503,6 @@ export function DataTable({
                     rowLevels={rowLevels}
                     gapAfter={gapAfter}
                     bodyLeadGap={bodyLeadGap}
-                    topRule={fi === 0}
                     bottom={(lines.length - 1 - fi) * ROW_HEIGHT}
                     leftOffset={leftOffset}
                   />
@@ -529,6 +548,7 @@ interface RowProps {
   bodyLeadGap: number;
   indexColumns: number;
   hover: { row: number; leaf: number } | null;
+  hoverPath: unknown[] | undefined;
   onHover: (h: { row: number; leaf: number } | null) => void;
 }
 
@@ -545,9 +565,29 @@ function Row({
   bodyLeadGap,
   indexColumns,
   hover,
+  hoverPath,
   onHover,
 }: RowProps) {
-  const rowHovered = hover?.row === rowIndex;
+  const nLevels = rowLevels.length;
+  const hoveredRow = hover?.row === rowIndex;
+  // How many leading row-index levels this row shares with the hovered row.
+  let matchDepth = 0;
+  if (hoverPath && nLevels > 0) {
+    while (
+      matchDepth < nLevels &&
+      row.path[matchDepth] === hoverPath[matchDepth]
+    )
+      matchDepth++;
+  } else if (hoveredRow) {
+    matchDepth = Math.max(nLevels, 1);
+  }
+  // Data cells: strong for the hovered row + its innermost sibling group,
+  // faint for the broader (outer-level) group.
+  const strong =
+    nLevels === 0 ? hoveredRow : matchDepth >= Math.max(nLevels - 1, 1);
+  const faint = !strong && matchDepth >= 1;
+  const rowShade = strong ? styles.rowHover : faint ? styles.rowHoverFaint : '';
+
   return (
     <tr style={{ height: ROW_HEIGHT }}>
       {rowLevels.map((_, level) => {
@@ -557,11 +597,13 @@ function Row({
           for (let l = 0; l <= level; l++)
             if (prevPath[l] !== row.path[l]) show = true;
         }
+        // Light up the index cell whose grouping level the hovered row shares.
+        const lit = matchDepth >= level + 1;
         const cls = [
           styles.rowHeaderCell,
           styles.indexTint,
           styles.left,
-          rowHovered ? styles.rowHover : '',
+          lit ? styles.rowHover : '',
         ]
           .filter(Boolean)
           .join(' ');
@@ -584,11 +626,11 @@ function Row({
           ? leaf.render(ctx)
           : leaf.format(ctx);
         const isIndex = rowLevels.length === 0 && i < indexColumns;
-        const cellHovered = rowHovered && hover?.leaf === i;
+        const cellHovered = hoveredRow && hover?.leaf === i;
         const cls = [
           alignClass(leaf.column.align),
           isIndex ? styles.indexTint : '',
-          rowHovered ? styles.rowHover : '',
+          rowShade,
           cellHovered ? styles.cellHover : '',
         ]
           .filter(Boolean)
@@ -619,7 +661,6 @@ interface FooterRowProps {
   rowLevels: string[];
   gapAfter: number[];
   bodyLeadGap: number;
-  topRule: boolean;
   bottom: number;
   leftOffset: number[];
 }
@@ -632,14 +673,12 @@ function FooterRow({
   rowLevels,
   gapAfter,
   bodyLeadGap,
-  topRule,
   bottom,
   leftOffset,
 }: FooterRowProps) {
-  const cls = `${styles.summaryRow} ${topRule ? styles.footTop : ''}`;
   const sticky: CSSProperties = { position: 'sticky', bottom, zIndex: 1 };
   return (
-    <tr className={cls} style={{ height: ROW_HEIGHT }}>
+    <tr className={styles.summaryRow} style={{ height: ROW_HEIGHT }}>
       {rowLevels.length > 0 && (
         <th
           className={`${styles.summaryLabel} ${styles.indexTint}`}
