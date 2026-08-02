@@ -21,11 +21,12 @@ META = {
     "host": {"displayName": "Host"},
     "region": {"displayName": "Region"},
     "role": {"displayName": "Role"},
+    # RAM is conventionally binary: mebi (2^20), not mega (10^6).
     "memory": {
         "displayName": "Memory",
         "kind": ["memory"],
         "siUnit": ["byte"],
-        "siScale": ["mega"],
+        "siScale": ["mebi"],
     },
     "latency": {
         "displayName": "Latency",
@@ -46,6 +47,8 @@ META = {
         "siScale": ["kilo", None],
     },
     "bandwidth": {
+        # Deliberately decimal, unlike memory above: throughput is quoted in
+        # MB/s, so one table shows both a binary and an SI prefix.
         "displayName": "Bandwidth",
         "kind": ["memory", "1/duration"],
         "siUnit": ["byte", "1/second"],

@@ -81,7 +81,7 @@ const EXAMPLES: Example[] = [
     id: 'metrics',
     title: '5 · Fleet metrics (column metadata)',
     blurb:
-      'Headers and units come from column metadata shipped with the data. Compound units (ktok/s, MB/s, m²) move as one label; simple ones (ms, MB) can split scale onto the value and unit into the header.',
+      'Headers and units come from column metadata shipped with the data. Compound units (ktok/s, MB/s, m²) move as one label; simple ones (ms, MiB) can split scale onto the value and unit into the header.',
     view: metricsView,
     data: metricsData as DatasetJson,
     display: {

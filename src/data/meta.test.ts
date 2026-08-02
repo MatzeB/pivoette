@@ -50,6 +50,19 @@ describe('deduction', () => {
     ]);
   });
 
+  it('deduces IEC binary prefixes alongside the SI ones', () => {
+    expect(unitLabels(meta({ siUnit: 'byte', siScale: 'mebi' })).full).toBe(
+      'MiB',
+    );
+    expect(unitLabels(meta({ siUnit: 'byte', siScale: 'gibi' })).full).toBe(
+      'GiB',
+    );
+    // The SI prefix stays distinct from its binary neighbour.
+    expect(unitLabels(meta({ siUnit: 'byte', siScale: 'mega' })).full).toBe(
+      'MB',
+    );
+  });
+
   it('keeps an explicit shortname over the deduced one', () => {
     expect(meta({ siUnit: 'byte', siUnitShort: 'Byte' }).siUnitShort).toEqual([
       'Byte',

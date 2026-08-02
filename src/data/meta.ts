@@ -124,6 +124,12 @@ export const SCALE_SHORT: Record<string, string> = {
   giga: 'G',
   tera: 'T',
   peta: 'P',
+  // IEC binary prefixes — powers of 1024, conventional for memory sizes.
+  kibi: 'Ki',
+  mebi: 'Mi',
+  gibi: 'Gi',
+  tebi: 'Ti',
+  pebi: 'Pi',
   percent: '%',
 };
 
