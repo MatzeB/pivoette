@@ -5,6 +5,7 @@ import type {
   UnitLabels,
   DataTableDisplay,
   DatasetJson,
+  TableSpec,
   UnitPlacement,
   ViewSpec,
 } from '../src';
@@ -161,6 +162,35 @@ const LOCALES: { id: string; label: string }[] = [
   { id: 'ja-JP', label: 'ja-JP' },
 ];
 
+/** The source rows, exactly as given. */
+function sourceRows(data: Row[] | DatasetJson): Row[] {
+  return Array.isArray(data) ? data : data.rows;
+}
+
+/**
+ * A flat view of every source field, deliberately stripped of everything the
+ * library would otherwise contribute: raw field names as headers (not
+ * `displayName`), and `inheritUnitFormat: false` so no format is deduced from
+ * metadata. What you see is what was in the JSON — the RFC3339 text rather than
+ * a weekday, the ratio rather than a percentage.
+ */
+function rawView(rows: Row[]): TableSpec {
+  const fields: string[] = [];
+  const seen = new Set<string>();
+  for (const row of rows) {
+    for (const key of Object.keys(row)) {
+      if (!seen.has(key)) {
+        seen.add(key);
+        fields.push(key);
+      }
+    }
+  }
+  return {
+    mode: 'flat',
+    columns: fields.map((id) => ({ id, label: id, inheritUnitFormat: false })),
+  };
+}
+
 /** Time-zone override. '' means 'auto' — the runtime's zone. */
 const TIME_ZONES: { id: string; label: string }[] = [
   { id: '', label: 'Auto' },
@@ -228,6 +258,7 @@ export function App() {
   const [scalePlacement, setScalePlacement] = useState<UnitPlacement>('header');
   const [locale, setLocale] = useState('');
   const [timeZone, setTimeZone] = useState('');
+  const [showSource, setShowSource] = useState(false);
 
   const example = EXAMPLES.find((e) => e.id === selected)!;
   const isRegression = example.id === 'regression';
@@ -265,6 +296,11 @@ export function App() {
 
   const data = isRegression && stress && stressData ? stressData : example.data;
   const rowCount = Array.isArray(data) ? data.length : data.rows.length;
+
+  // The collapsible at the bottom renders these; both memoized so opening it
+  // does not re-derive on every render.
+  const sourceData = useMemo(() => sourceRows(data), [data]);
+  const sourceView = useMemo(() => rawView(sourceData), [sourceData]);
 
   // Placement controls appear only where they'd do something, and split into
   // two only where a single column has both halves to place. Ticker's `$` and
@@ -444,6 +480,33 @@ export function App() {
       <p style={{ color: 'var(--page-muted)', fontSize: 12, marginTop: 10 }}>
         {rowCount.toLocaleString()} source rows.
       </p>
+
+      <details
+        open={showSource}
+        onToggle={(e) => setShowSource(e.currentTarget.open)}
+        style={{ marginTop: 4 }}
+      >
+        <summary
+          style={{
+            cursor: 'pointer',
+            fontSize: 13,
+            color: 'var(--page-muted)',
+            marginBottom: 10,
+          }}
+        >
+          Source data — the rows as given, before any of the above
+        </summary>
+        {/* Mounted only while open: the stress fixture is 10k rows. */}
+        {showSource && (
+          <DataTable
+            key={example.id + (stress ? '-stress' : '') + '-src'}
+            data={sourceData}
+            view={sourceView}
+            height={320}
+            theme={theme}
+          />
+        )}
+      </details>
     </div>
   );
 }
