@@ -53,6 +53,11 @@ export interface ColumnDef {
   /** alias -> cell ref (pivot) or column/field id (flat, defaults to siblings). */
   inputs?: Record<string, CellRef | string>;
   format?: FormatSpec;
+  /** Use the format deduced from this column's metadata (default true). Set
+   * false to supply a complete format instead of overriding parts of the
+   * deduced one — and to opt out of deduction entirely when no `format` is
+   * given. */
+  inheritUnitFormat?: boolean;
   style?: StyleSpec;
   render?: RenderSpec;
   composite?: CompositeSpec;
@@ -73,6 +78,11 @@ export interface ValueSpec {
   agg: string;
   label?: string;
   format?: FormatSpec;
+  /** Use the format deduced from this column's metadata (default true). Set
+   * false to supply a complete format instead of overriding parts of the
+   * deduced one — and to opt out of deduction entirely when no `format` is
+   * given. */
+  inheritUnitFormat?: boolean;
   style?: StyleSpec;
   /** Custom aggregation: JS expression over the group's `values` array. */
   expression?: string;

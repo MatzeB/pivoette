@@ -460,3 +460,55 @@ describe('view metadata and defaults', () => {
     expect(res.leaves[0]!.format({ value: 12.5 } as never)).toBe('13');
   });
 });
+
+describe('inheritUnitFormat', () => {
+  const rows = [{ ratio: 5.25 }];
+  const meta = { ratio: { kind: ['percentage'], scale: ['percent'] } };
+
+  function leafFormat(def: Parameters<typeof computeView>[1]) {
+    const spec = def as TableSpec;
+    const res = computeView(withMeta(fromRows(rows), spec.meta), spec);
+    return res.leaves[0]!.format({ value: 5.25 } as never);
+  }
+
+  it('inherits the deduced decimals by default', () => {
+    expect(
+      leafFormat({
+        mode: 'flat',
+        meta,
+        columns: [
+          {
+            id: 'ratio',
+            format: { name: 'number', options: { signDisplay: 'exceptZero' } },
+          },
+        ],
+      }),
+    ).toBe('+5.3');
+  });
+
+  it('uses the format verbatim when inheritUnitFormat is false', () => {
+    expect(
+      leafFormat({
+        mode: 'flat',
+        meta,
+        columns: [
+          {
+            id: 'ratio',
+            inheritUnitFormat: false,
+            format: { name: 'number', options: { signDisplay: 'exceptZero' } },
+          },
+        ],
+      }),
+    ).toBe('+5.25');
+  });
+
+  it('opts out of deduction with no format at all', () => {
+    expect(
+      leafFormat({
+        mode: 'flat',
+        meta,
+        columns: [{ id: 'ratio', inheritUnitFormat: false }],
+      }),
+    ).toBe('5.25');
+  });
+});

@@ -54,11 +54,17 @@ export function deduceFormat(
  * inherit the rest — `{ name: 'number', options: { signDisplay: 'exceptZero' } }`
  * on a percentage keeps the deduced 1 decimal. Naming a different built-in (or
  * supplying an inline fn/expression) replaces the deduction outright.
+ *
+ * `inherit: false` opts out of deduction altogether: the explicit format is
+ * used exactly as written, and a column with no format falls back to the
+ * default formatter rather than to its metadata's.
  */
 export function resolveFormatSpec(
   explicit: FormatSpec | undefined,
   deduced: FormatSpec | undefined,
+  inherit = true,
 ): FormatSpec | undefined {
+  if (!inherit) return explicit;
   if (!explicit || !deduced) return explicit ?? deduced;
   if (!('name' in explicit) || !('name' in deduced)) return explicit;
   if (explicit.name !== deduced.name) return explicit;

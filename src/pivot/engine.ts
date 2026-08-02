@@ -124,7 +124,11 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
     const source = sourceName ? frame.columnByName.get(sourceName) : undefined;
     const meta = columnMeta(frame, def, sourceName);
     // An explicit format wins, merging over any the column's kind implies.
-    const format = resolveFormatSpec(def.format, deduceFormat(meta));
+    const format = resolveFormatSpec(
+      def.format,
+      deduceFormat(meta),
+      def.inheritUnitFormat,
+    );
     const column: ResolvedColumn = {
       id: def.id,
       // def.label > spec.labels > metadata displayName > the field name.
@@ -413,7 +417,11 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     if (d.kind === 'measure') {
       baseIndexByKey.set(d.baseKey, i);
       const meta = frame.columnByName.get(d.measure.field)?.meta;
-      const format = resolveFormatSpec(d.measure.format, deduceFormat(meta));
+      const format = resolveFormatSpec(
+        d.measure.format,
+        deduceFormat(meta),
+        d.measure.inheritUnitFormat,
+      );
       const column: ResolvedColumn = {
         id: d.baseKey,
         label: d.measure.label ?? d.measure.id,
@@ -432,7 +440,11 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     }
     // A derived column has no source field; only its own `meta` applies.
     const meta = columnMeta(frame, d.def, undefined);
-    const format = resolveFormatSpec(d.def.format, deduceFormat(meta));
+    const format = resolveFormatSpec(
+      d.def.format,
+      deduceFormat(meta),
+      d.def.inheritUnitFormat,
+    );
     const column: ResolvedColumn = {
       id: d.def.id,
       label: d.def.label ?? d.def.id,

@@ -141,6 +141,20 @@ describe('resolveFormatSpec', () => {
     expect(resolveFormatSpec(spec, deduced)).toBe(spec);
   });
 
+  it('uses the explicit format verbatim when inherit is false', () => {
+    expect(
+      resolveFormatSpec(
+        { name: 'number', options: { signDisplay: 'exceptZero' } },
+        deduced,
+        false,
+      ),
+    ).toEqual({ name: 'number', options: { signDisplay: 'exceptZero' } });
+  });
+
+  it('opts out of deduction entirely when inherit is false', () => {
+    expect(resolveFormatSpec(undefined, deduced, false)).toBeUndefined();
+  });
+
   it('passes either side through when the other is absent', () => {
     expect(resolveFormatSpec(undefined, deduced)).toBe(deduced);
     expect(resolveFormatSpec({ name: 'integer' }, undefined)).toEqual({
