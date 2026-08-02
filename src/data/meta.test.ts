@@ -150,6 +150,7 @@ describe('unitLabels', () => {
       simple: true,
       scalePart: 'm',
       unitPart: 's',
+      prefix: false,
     });
 
     const compound = unitLabels(meta({ siUnit: ['byte', '1/second'] }));
@@ -212,5 +213,29 @@ describe('dataset JSON', () => {
     expect(out.latency).toMatchObject(dataset.meta.latency);
     // Plain JSON in, plain JSON out — no custom codec needed.
     expect(JSON.parse(JSON.stringify(out.latency))).toEqual(out.latency);
+  });
+});
+
+describe('currency units', () => {
+  it('deduces the symbol and marks it as a prefix', () => {
+    const m = meta({ kind: 'price', siUnit: 'dollar' });
+    const labels = unitLabels(m);
+    expect(labels.full).toBe('$');
+    expect(labels.prefix).toBe(true);
+    expect(unitLabels(meta({ kind: 'price', siUnit: 'euro' })).full).toBe('€');
+  });
+
+  it('does not prefix a compound rate', () => {
+    // `$/h` reads better trailing the number than leading it.
+    const m = meta({
+      kind: ['price', '1/duration'],
+      siUnit: ['dollar', '1/hour'],
+    });
+    expect(unitLabels(m).full).toBe('$/h');
+    expect(unitLabels(m).prefix).toBe(false);
+  });
+
+  it('does not prefix a non-currency kind', () => {
+    expect(unitLabels(meta({ siUnit: 'second' })).prefix).toBe(false);
   });
 });

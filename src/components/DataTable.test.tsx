@@ -227,3 +227,67 @@ describe('<DataTable> unit decoration', () => {
     expect(head).not.toContain('host (');
   });
 });
+
+describe('<DataTable> currency prefix', () => {
+  const rows = [{ sym: 'A', price: 12.5, delta: -3.25, gain: 4 }];
+  const view: TableSpec = {
+    mode: 'flat',
+    meta: {
+      price: { displayName: 'Price', kind: ['price'], siUnit: ['dollar'] },
+    },
+    columns: [
+      { id: 'sym' },
+      { id: 'price' },
+      {
+        id: 'delta',
+        meta: { kind: ['price'], siUnit: ['dollar'] },
+        format: {
+          name: 'number',
+          options: { decimals: 2, signDisplay: 'exceptZero' },
+        },
+      },
+      {
+        id: 'gain',
+        meta: { kind: ['price'], siUnit: ['dollar'] },
+        format: {
+          name: 'number',
+          options: { decimals: 2, signDisplay: 'exceptZero' },
+        },
+      },
+    ],
+  };
+
+  async function renderWith(display: DataTableDisplay) {
+    const el = await render(
+      <DataTable
+        data={rows}
+        view={view}
+        display={{ footer: [{ label: 'sum', agg: 'sum' }], ...display }}
+      />,
+    );
+    return {
+      head: el.querySelector('thead')!.textContent ?? '',
+      values: el.querySelector('tfoot')!.textContent ?? '',
+    };
+  }
+
+  it('leads the number with the symbol, inside the sign', async () => {
+    const { values } = await renderWith({ unitPlacement: 'value' });
+    expect(values).toContain('$12.50');
+    expect(values).toContain('-$3.25');
+    expect(values).toContain('+$4.00');
+  });
+
+  it('can move the symbol into the header instead', async () => {
+    const { head, values } = await renderWith({ unitPlacement: 'header' });
+    expect(head).toContain('Price ($)');
+    expect(values).toContain('12.50');
+    expect(values).not.toContain('$12.50');
+  });
+
+  it('deduces the money format from the kind alone', async () => {
+    // `price` sets no `format`; the 2 decimals come from kind: price.
+    const { values } = await renderWith({ unitPlacement: 'off' });
+    expect(values).toContain('12.50');
+  });
+});

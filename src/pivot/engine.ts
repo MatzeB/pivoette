@@ -4,8 +4,11 @@
  *  - pivot: group + aggregate into a multi-level table, then derived columns.
  */
 import type { CellValue, ColumnType, DataFrame } from '../data/types';
+import type { ColumnMeta } from '../data/meta';
+import { normalizeMeta } from '../data/meta';
 import { requireColumn } from '../data/frame';
 import type { Align, ResolvedColumn } from '../format/context';
+import { deduceFormat } from '../format/deduce';
 import { resolveFormat } from '../format/format';
 import { resolveStyle } from '../format/style';
 import { resolveRender } from '../format/render';
@@ -57,6 +60,37 @@ function label(
   );
 }
 
+/**
+ * The data field a column projects. A plain projection defaults to its `id`, so
+ * `{ id: 'price' }` needs no `source`; a computed or composite column has no
+ * single source unless it says so.
+ */
+function sourceField(def: ColumnDef): string | undefined {
+  if (def.compute || def.composite) return def.source;
+  return def.source ?? def.id;
+}
+
+/**
+ * Metadata for a displayed column: the source field's, with any `def.meta`
+ * layered on top (the only way a computed column gets a unit).
+ */
+function columnMeta(
+  frame: DataFrame,
+  def: ColumnDef,
+  source: string | undefined,
+): ColumnMeta | undefined {
+  const base = source ? frame.columnByName.get(source)?.meta : undefined;
+  if (!def.meta) return base;
+  return normalizeMeta(
+    {
+      dataName: base?.dataName ?? def.id,
+      type: base?.type ?? 'float',
+      category: base?.category ?? 'data',
+    },
+    { ...base, ...def.meta },
+  );
+}
+
 function makeLeaf(args: {
   id: string;
   colPath: string[];
@@ -86,13 +120,23 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
     frame.columnByName.get(name)?.values[row] ?? null;
 
   const leaves: ResolvedLeaf[] = spec.columns.map((def) => {
-    const source = def.source ? frame.columnByName.get(def.source) : undefined;
+    const sourceName = sourceField(def);
+    const source = sourceName ? frame.columnByName.get(sourceName) : undefined;
+    const meta = columnMeta(frame, def, sourceName);
+    // An explicit format wins; otherwise the column's kind may imply one.
+    const format = def.format ?? deduceFormat(meta);
     const column: ResolvedColumn = {
       id: def.id,
-      label: def.label ?? label(frame, def.source ?? def.id, spec.labels),
-      align: alignFor(source?.type, def.format),
+      // def.label > spec.labels > metadata displayName > the field name.
+      label:
+        def.label ??
+        spec.labels?.[sourceName ?? def.id] ??
+        meta?.displayName ??
+        sourceName ??
+        def.id,
+      align: alignFor(source?.type, format),
       def,
-      meta: source?.meta,
+      meta,
       sources: def.composite
         ? def.composite.fields
             .map((f) => frame.columnByName.get(f)?.meta)
@@ -103,7 +147,7 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
       id: def.id,
       colPath: [column.label],
       column,
-      format: def.format,
+      format,
       style: def.style,
       render: def.composite ? { name: 'imageText' } : def.render,
       emptyDisplay,
@@ -131,10 +175,11 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
         }
       }
       let value: unknown;
+      const sourceName = sourceField(def);
       if (def.compute) {
         value = evalExpression(def.compute, { ...inputs, inputs });
-      } else if (def.source) {
-        value = fieldValues(def.source, r);
+      } else if (sourceName) {
+        value = fieldValues(sourceName, r);
       } else if (def.composite) {
         // Composite renders from inputs; its sortable value is the sort key.
         value = fieldValues(def.composite.sortKey, r);
@@ -367,33 +412,39 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
   const leaves: ResolvedLeaf[] = descs.map((d, i) => {
     if (d.kind === 'measure') {
       baseIndexByKey.set(d.baseKey, i);
+      const meta = frame.columnByName.get(d.measure.field)?.meta;
+      const format = d.measure.format ?? deduceFormat(meta);
       const column: ResolvedColumn = {
         id: d.baseKey,
         label: d.measure.label ?? d.measure.id,
-        align: alignFor('float', d.measure.format),
+        align: alignFor('float', format),
         value: d.measure,
-        meta: frame.columnByName.get(d.measure.field)?.meta,
+        meta,
       };
       return makeLeaf({
-        id: `${d.colPath.join('')}#${i}`,
+        id: `${d.colPath.join('')}#${i}`,
         colPath: d.colPath,
         column,
-        format: d.measure.format,
+        format,
         style: d.measure.style,
         emptyDisplay,
       });
     }
+    // A derived column has no source field; only its own `meta` applies.
+    const meta = columnMeta(frame, d.def, undefined);
+    const format = d.def.format ?? deduceFormat(meta);
     const column: ResolvedColumn = {
       id: d.def.id,
       label: d.def.label ?? d.def.id,
-      align: alignFor('float', d.def.format),
+      align: alignFor('float', format),
       def: d.def,
+      meta,
     };
     return makeLeaf({
-      id: `${d.colPath.join('')}#${i}`,
+      id: `${d.colPath.join('')}#${i}`,
       colPath: d.colPath,
       column,
-      format: d.def.format,
+      format,
       style: d.def.style,
       render: d.def.render,
       emptyDisplay,

@@ -10,7 +10,7 @@ export type {
 
 // Data model
 export { datasetMeta, fromDataset, fromRows } from './data/import';
-export { makeFrame, requireColumn } from './data/frame';
+export { makeFrame, requireColumn, withMeta } from './data/frame';
 export type {
   CellValue,
   ColumnType,
@@ -75,6 +75,7 @@ export {
   registerAggregation,
 } from './pivot/aggregations';
 export type { Aggregation, Reducer } from './pivot/aggregations';
+export { deduceFormat } from './format/deduce';
 export { registerFormat, resolveFormat } from './format/format';
 export { registerStyle, resolveStyle } from './format/style';
 export { registerRender, resolveRender } from './format/render';

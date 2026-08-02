@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { deduceFormat } from './deduce';
+import { normalizeMeta } from '../data/meta';
+import type { ColumnMetaInput } from '../data/meta';
 import { resolveFormat } from './format';
 import type { CellCtx } from './context';
 import type { FormatSpec } from '../pivot/spec';
@@ -60,5 +63,32 @@ describe('intl-backed formatters', () => {
     expect(fmt({ name: 'number', options: { compact: true } }, 1_500_000)).toBe(
       '1.5M',
     );
+  });
+});
+
+describe('deduceFormat', () => {
+  const meta = (input: ColumnMetaInput) =>
+    normalizeMeta({ dataName: 'x', type: 'float', category: 'data' }, input);
+
+  it('maps the known kinds to a format', () => {
+    expect(deduceFormat(meta({ kind: 'price' }))).toEqual({
+      name: 'number',
+      options: { decimals: 2 },
+    });
+    expect(deduceFormat(meta({ kind: 'count' }))).toEqual({ name: 'integer' });
+    expect(deduceFormat(meta({ kind: 'percentage' }))).toEqual({
+      name: 'number',
+      options: { decimals: 1 },
+    });
+  });
+
+  it('returns nothing for an unmapped or absent kind', () => {
+    expect(deduceFormat(meta({ kind: 'weekday' }))).toBeUndefined();
+    expect(deduceFormat(meta({}))).toBeUndefined();
+    expect(deduceFormat(undefined)).toBeUndefined();
+    // A compound kind has its own key and is not mapped by default.
+    expect(
+      deduceFormat(meta({ kind: ['price', '1/duration'] })),
+    ).toBeUndefined();
   });
 });

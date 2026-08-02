@@ -6,6 +6,7 @@ import type { CellValue, DataFrame, DatasetJson } from '../data/types';
 import type { ColumnMeta } from '../data/meta';
 import { unitLabels } from '../data/meta';
 import { fromDataset } from '../data/import';
+import { withMeta } from '../data/frame';
 import { computeView } from '../pivot/engine';
 import { getAggregation } from '../pivot/aggregations';
 import type { Cell, ResolvedLeaf, ResultRow } from '../pivot/result';
@@ -171,9 +172,9 @@ function unitAffixes(
   meta: ColumnMeta | undefined,
   unitPlacement: UnitPlacement,
   scalePlacement: UnitPlacement,
-): { value: string; header: string } {
-  const out = { value: '', header: '' };
+): { value: string; header: string; prefix: boolean } {
   const labels = unitLabels(meta);
+  const out = { value: '', header: '', prefix: labels.prefix };
   if (!labels.full) return out;
   if (!labels.simple) {
     if (unitPlacement !== 'off') out[unitPlacement] += labels.full;
@@ -184,10 +185,16 @@ function unitAffixes(
   return out;
 }
 
-/** Unit labels follow a number with a space — except a bare `%`, which hugs. */
-function valueSuffix(text: string): string {
-  if (!text) return '';
-  return text === '%' ? text : ` ${text}`;
+/**
+ * Attach a unit label to a formatted number. Currency-style labels lead the
+ * number and sit inside any sign (`-$12.50`); everything else trails it after a
+ * space, except a bare `%`, which hugs.
+ */
+function decorate(text: string, label: string, prefix: boolean): string {
+  if (!text || !label) return text;
+  if (!prefix) return label === '%' ? text + label : `${text} ${label}`;
+  const sign = text[0] === '-' || text[0] === '+' ? text[0] : '';
+  return sign + label + text.slice(sign.length);
 }
 
 function isFrame(
@@ -221,10 +228,12 @@ export function DataTable({
     scalePlacement = 'off',
   } = display;
 
-  const result = useMemo(
-    () => computeView(isFrame(data) ? data : fromDataset(data), view),
-    [data, view],
-  );
+  const result = useMemo(() => {
+    // View metadata layers over whatever the data shipped with, so a plain
+    // JSON row array can still be annotated from the view.
+    const frame = withMeta(isFrame(data) ? data : fromDataset(data), view.meta);
+    return computeView(frame, view);
+  }, [data, view]);
 
   const { rowLevels, summary, frame } = result;
   const depth = result.columnHeaderDepth;
@@ -243,17 +252,14 @@ export function DataTable({
         scalePlacement,
       );
       headerSuffix[i] = affix.header ? ` (${affix.header})` : '';
-      const suffix = valueSuffix(affix.value);
       // Tier-3 cells own their whole rendering; metadata is on `CellCtx` if
       // they want it.
-      if (!suffix || leaf.render) return leaf;
+      if (!affix.value || leaf.render) return leaf;
       const base = leaf.format;
       return {
         ...leaf,
-        format: (ctx: CellCtx) => {
-          const text = base(ctx);
-          return text ? text + suffix : text;
-        },
+        format: (ctx: CellCtx) =>
+          decorate(base(ctx), affix.value, affix.prefix),
       };
     });
     return { leaves, headerSuffix };

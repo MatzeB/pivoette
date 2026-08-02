@@ -109,7 +109,18 @@ export const UNIT_SHORT: Record<string, string> = {
   candela: 'cd',
   mole: 'mol',
   pixel: 'px',
+  dollar: '$',
+  euro: '€',
+  pound: '£',
+  yen: '¥',
 };
+
+/**
+ * Kinds whose symbol conventionally precedes the number ($12.50, not 12.50 $).
+ * Only consulted for a single-factor unit — a rate like `price/duration`
+ * reads better as a trailing `$/h`.
+ */
+const PREFIX_KINDS = new Set<string>([ColumnKind.Price, 'currency']);
 
 export const SCALE_SHORT: Record<string, string> = {
   femto: 'f',
@@ -253,6 +264,8 @@ export interface UnitLabels {
   scalePart: string;
   /** Unit half of a `simple` label (`s` of `ms`); empty otherwise. */
   unitPart: string;
+  /** True when the label leads the number instead of trailing it ($12.50). */
+  prefix: boolean;
 }
 
 interface Factor {
@@ -326,6 +339,7 @@ const EMPTY_LABELS: UnitLabels = {
   simple: false,
   scalePart: '',
   unitPart: '',
+  prefix: false,
 };
 
 const labelCache = new WeakMap<ColumnMeta, UnitLabels>();
@@ -347,6 +361,7 @@ export function unitLabels(meta: ColumnMeta | undefined): UnitLabels {
     simple,
     scalePart: simple ? only.scale : '',
     unitPart: simple ? only.unit : '',
+    prefix: simple && PREFIX_KINDS.has(kindId(meta)),
   };
   labelCache.set(meta, labels);
   return labels;

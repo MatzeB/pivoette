@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fromRows } from '../data/import';
+import { withMeta } from '../data/frame';
+import { unitLabels } from '../data/meta';
 import { computeView } from './engine';
 import type { ViewResult } from './result';
 import type { PivotSpec, TableSpec } from './spec';
@@ -381,5 +383,80 @@ describe('column metadata wiring', () => {
     expect(res.leaves[0]!.column.meta!.dataName).toBe('latency');
     // Row-level headers pick up displayName too.
     expect(res.rowLevels).toEqual(['Host']);
+  });
+});
+
+describe('view metadata and defaults', () => {
+  const rows = [
+    { symbol: 'AAA', price: 12.5, basePrice: 10 },
+    { symbol: 'BBB', price: 8, basePrice: 10 },
+  ];
+
+  /** Plain rows + view-declared metadata, as a caller would wire it up. */
+  function build(spec: TableSpec) {
+    return computeView(withMeta(fromRows(rows), spec.meta), spec);
+  }
+
+  it('defaults `source` to the column id for a plain projection', () => {
+    const res = build({
+      mode: 'flat',
+      columns: [{ id: 'symbol' }, { id: 'price' }],
+    });
+    expect(res.rows[0]!.cells.map((c) => c.value)).toEqual(['AAA', 12.5]);
+  });
+
+  it('does not default `source` for computed or composite columns', () => {
+    const res = build({
+      mode: 'flat',
+      columns: [
+        { id: 'price', compute: 'basePrice * 2' },
+        { id: 'sym', composite: { fields: ['symbol'], sortKey: 'symbol' } },
+      ],
+    });
+    // `price` took its compute, not the same-named field.
+    expect(res.rows[0]!.cells[0]!.value).toBe(20);
+    expect(res.rows[0]!.cells[1]!.value).toBe('AAA');
+  });
+
+  it('layers view metadata over the frame and deduces the format', () => {
+    const res = build({
+      mode: 'flat',
+      meta: {
+        price: { displayName: 'Price', kind: ['price'], siUnit: ['dollar'] },
+      },
+      columns: [{ id: 'price' }],
+    });
+    const leaf = res.leaves[0]!;
+    expect(leaf.column.label).toBe('Price');
+    expect(unitLabels(leaf.column.meta).full).toBe('$');
+    // kind `price` implies a 2-decimal number (the $ comes from placement).
+    expect(leaf.format({ value: 12.5 } as never)).toBe('12.50');
+  });
+
+  it('lets a computed column declare its own metadata', () => {
+    const res = build({
+      mode: 'flat',
+      columns: [
+        {
+          id: 'delta',
+          compute: 'price - basePrice',
+          meta: { kind: ['price'], siUnit: ['dollar'] },
+        },
+      ],
+    });
+    const leaf = res.leaves[0]!;
+    expect(unitLabels(leaf.column.meta).prefix).toBe(true);
+    expect(leaf.format({ value: 2.5 } as never)).toBe('2.50');
+  });
+
+  it('keeps an explicit format over the deduced one', () => {
+    const res = build({
+      mode: 'flat',
+      meta: { price: { kind: ['price'], siUnit: ['dollar'] } },
+      columns: [
+        { id: 'price', format: { name: 'number', options: { decimals: 0 } } },
+      ],
+    });
+    expect(res.leaves[0]!.format({ value: 12.5 } as never)).toBe('13');
   });
 });

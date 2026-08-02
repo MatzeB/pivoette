@@ -4,9 +4,28 @@ import type { ViewSpec } from '../../../src';
 const green = 'light-dark(#137333, #30d158)';
 const red = 'light-dark(#c5221f, #ff453a)';
 
-/** Flat detail table: composite asset column, computed P/L, sign coloring. */
+const money = { kind: ['price'], siUnit: ['dollar'] };
+
+/**
+ * Flat detail table: composite asset column, computed P/L, sign coloring.
+ *
+ * `data.json` here is a plain row array — the typical case, where the data
+ * comes from somewhere that knows nothing about presentation — so the column
+ * metadata is declared in the view instead and layered on at load. From it the
+ * headers and the 2-decimal money format are both deduced; the `$` itself comes
+ * from the unit placement, which is why no column names `currency`.
+ *
+ * Columns with neither `compute` nor `composite` omit `source`: it defaults to
+ * the column id.
+ */
 export const view: ViewSpec = {
   mode: 'flat',
+  meta: {
+    symbol: { displayName: 'Symbol' },
+    description: { displayName: 'Asset' },
+    price: { displayName: 'Price', ...money },
+    basePrice: { displayName: 'Base', ...money },
+  },
   columns: [
     {
       id: 'asset',
@@ -16,8 +35,6 @@ export const view: ViewSpec = {
     },
     {
       id: 'symbol',
-      label: 'Symbol',
-      source: 'symbol',
       style: {
         name: 'static',
         options: {
@@ -27,24 +44,17 @@ export const view: ViewSpec = {
         },
       },
     },
-    {
-      id: 'price',
-      label: 'Price',
-      source: 'price',
-      format: { name: 'currency', options: { decimals: 2 } },
-    },
-    {
-      id: 'basePrice',
-      label: 'Base',
-      source: 'basePrice',
-      format: { name: 'currency', options: { decimals: 2 } },
-    },
+    { id: 'price' },
+    { id: 'basePrice' },
     {
       id: 'plChange',
-      label: 'P/L $',
+      // No '$' in the label — the unit comes from the metadata.
+      label: 'P/L',
       compute: 'price - basePrice',
+      // A computed column has no source field, so it declares its own unit.
+      meta: money,
       format: {
-        name: 'currency',
+        name: 'number',
         options: { decimals: 2, signDisplay: 'exceptZero' },
       },
       style: {
@@ -56,6 +66,8 @@ export const view: ViewSpec = {
       id: 'plPercent',
       label: 'P/L %',
       compute: 'basePrice ? (price - basePrice) / basePrice : null',
+      // A ratio, not a stored percentage: `percent` scales it by 100 and prints
+      // its own sign, so this one keeps an explicit self-contained format.
       format: {
         name: 'percent',
         options: { decimals: 2, signDisplay: 'exceptZero' },

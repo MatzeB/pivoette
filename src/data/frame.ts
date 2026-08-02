@@ -1,4 +1,5 @@
 import { deduceCategory, normalizeMeta } from './meta';
+import type { ColumnMetaInput } from './meta';
 import type { DataColumn, DataColumnInput, DataFrame } from './types';
 
 /**
@@ -26,6 +27,25 @@ export function makeFrame(columns: DataColumnInput[]): DataFrame {
   const columnByName = new Map<string, DataColumn>();
   for (const col of resolved) columnByName.set(col.name, col);
   return { columns: resolved, length, columnByName };
+}
+
+/**
+ * Layer metadata over an existing frame, keyed by field name. Each column's
+ * current metadata is the base and the supplied fields win, so a view can
+ * annotate plain JSON data (the typical case) or refine what the data shipped
+ * with. Value arrays are shared, not copied.
+ */
+export function withMeta(
+  frame: DataFrame,
+  overrides: Record<string, ColumnMetaInput> | undefined,
+): DataFrame {
+  if (!overrides) return frame;
+  return makeFrame(
+    frame.columns.map((col) => {
+      const override = overrides[col.name];
+      return override ? { ...col, meta: { ...col.meta, ...override } } : col;
+    }),
+  );
 }
 
 /** Look up a column, throwing a helpful error if the field is unknown. */

@@ -4,6 +4,7 @@
  * for the optional inline `fn` escape hatches on format/style/render specs.
  */
 import type { CellRender, FormatFn, StyleFn } from '../format/context';
+import type { ColumnMetaInput } from '../data/meta';
 
 export type Direction = 'asc' | 'desc';
 
@@ -44,7 +45,8 @@ export interface CompositeSpec {
 export interface ColumnDef {
   id: string;
   label?: string;
-  /** flat: a data field; pivot: a measure/value id. */
+  /** flat: a data field; pivot: a measure/value id. Defaults to `id` for a
+   * plain projection (i.e. when neither `compute` nor `composite` is set). */
   source?: string;
   /** JS expression over named `inputs` (+ CellCtx) -> value. */
   compute?: string;
@@ -59,6 +61,9 @@ export interface ColumnDef {
   place?: 'append' | { after: string };
   /** Pivot: repeat once per member of these column level(s); `inputs.colPath`s become relative. */
   repeatPer?: string[];
+  /** Metadata for this column, overriding the source field's. The only way to
+   * give a computed column a unit, since it has no source field to inherit. */
+  meta?: ColumnMetaInput;
 }
 
 /** A measure: an aggregation applied to a source field. */
@@ -96,6 +101,8 @@ export interface PivotSpec {
   emptyDisplay?: string;
   /** data field name -> display header label. */
   labels?: Record<string, string>;
+  /** data field name -> metadata, layered over whatever the data supplied. */
+  meta?: Record<string, ColumnMetaInput>;
 }
 
 export interface TableSpec {
@@ -104,6 +111,8 @@ export interface TableSpec {
   sort?: SortSpec[];
   emptyDisplay?: string;
   labels?: Record<string, string>;
+  /** data field name -> metadata, layered over whatever the data supplied. */
+  meta?: Record<string, ColumnMetaInput>;
 }
 
 export type ViewSpec = PivotSpec | TableSpec;
