@@ -326,7 +326,7 @@ describe('<DataTable> editing', () => {
     expect(el.querySelectorAll('button[aria-label^="Add"]')).toHaveLength(0);
   });
 
-  it('adds the four + affordances when editable', async () => {
+  it('offers a single + on the row-index group', async () => {
     const el = await render(
       <DataTable
         data={data}
@@ -340,15 +340,10 @@ describe('<DataTable> editing', () => {
     const labels = [...el.querySelectorAll('button[aria-label^="Add"]')].map(
       (b) => b.getAttribute('aria-label'),
     );
-    expect(labels).toEqual([
-      'Add a row field',
-      'Add a measure',
-      'Add a column field',
-      'Add a footer row',
-    ]);
+    expect(labels).toEqual(['Add a row field']);
   });
 
-  it('widens every row by exactly two cells', async () => {
+  it('widens every row by exactly one cell', async () => {
     const plain = await render(
       <DataTable
         data={data}
@@ -368,8 +363,34 @@ describe('<DataTable> editing', () => {
       />,
     );
     const after = await cellCounts(edit);
-    expect(after.head).toBe(before.head + 2);
-    expect(after.foot).toBe(before.foot + 2);
+    expect(after.head).toBe(before.head + 1);
+    expect(after.foot).toBe(before.foot + 1);
+  });
+
+  it('expands the pending column when + is pressed', async () => {
+    // The choices themselves live in body rows, which the virtualizer does not
+    // render under jsdom — so what is observable here is the column opening.
+    const el = await render(
+      <DataTable data={data} view={view} editing onViewChange={() => {}} />,
+    );
+    const add = el.querySelector<HTMLButtonElement>(
+      'button[aria-label="Add a row field"]',
+    )!;
+    const pendingCol = () =>
+      [...el.querySelectorAll('colgroup col')].at(view.rows.length)!;
+
+    expect(add.getAttribute('aria-expanded')).toBe('false');
+    const narrow = (pendingCol() as HTMLElement).style.width;
+
+    await act(async () => add.click());
+    const open = el.querySelector<HTMLButtonElement>(
+      'button[aria-label="Cancel"]',
+    )!;
+    expect(open.getAttribute('aria-expanded')).toBe('true');
+    expect((pendingCol() as HTMLElement).style.width).not.toBe(narrow);
+
+    await act(async () => open.click());
+    expect((pendingCol() as HTMLElement).style.width).toBe(narrow);
   });
 
   it('names the column fields, which the headers never show', async () => {
@@ -380,28 +401,22 @@ describe('<DataTable> editing', () => {
     expect(el.querySelector('thead')!.textContent).toContain('weekday');
   });
 
-  it('reports an added field instead of mutating', async () => {
-    let next: PivotSpec | undefined;
+  it('leaves the given spec untouched', async () => {
+    // Committing a choice goes through `addField`, which never mutates; the
+    // click itself is not reachable here because the choices render in body
+    // rows and the virtualizer renders none under jsdom.
+    const before = JSON.parse(JSON.stringify(view)) as PivotSpec;
     const el = await render(
-      <DataTable
-        data={data}
-        view={view}
-        editing
-        onViewChange={(v) => (next = v as PivotSpec)}
-      />,
+      <DataTable data={data} view={view} editing onViewChange={() => {}} />,
     );
-    const add = el.querySelector<HTMLButtonElement>(
-      'button[aria-label="Add a row field"]',
-    )!;
-    await act(async () => add.click());
-    const option = [...el.querySelectorAll('button[role="menuitem"]')].find(
-      (b) => b.textContent?.startsWith('weekday') === false,
-    ) as HTMLButtonElement | undefined;
-    // `weekday` is already placed, so only unplaced index columns plus Custom…
-    expect(option).toBeTruthy();
-    await act(async () => option!.click());
-    expect(view.rows).toEqual(['author']); // untouched
-    if (next) expect(next.rows.length).toBeGreaterThanOrEqual(1);
+    await act(async () =>
+      el
+        .querySelector<HTMLButtonElement>(
+          'button[aria-label="Add a row field"]',
+        )!
+        .click(),
+    );
+    expect(view).toEqual(before);
   });
 });
 

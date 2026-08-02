@@ -16,14 +16,9 @@ import type {
 } from '../pivot/result';
 import type { ViewSpec } from '../pivot/spec';
 import { compareValues } from '../util';
-import { aggregationIds } from '../pivot/aggregations';
 import { isFlat } from '../pivot/spec';
-import { AddMenu } from '../editor/AddMenu';
-import type { AddOption } from '../editor/AddMenu';
 import {
   addField,
-  addFooterRow,
-  addValue,
   moveField,
   removeField,
   removeFooterRow,
@@ -123,8 +118,9 @@ function RemoveField({
   );
 }
 
-/** Width of the narrow `+` columns shown in edit mode. */
+/** The pending row-field column: narrow until it is offering its choices. */
 const EDIT_COL_W = 26;
+const ADD_COL_W = 150;
 
 const ROW_HEIGHT = 30;
 const HEADER_H = 28;
@@ -544,50 +540,27 @@ export function DataTable({
   // Chrome appears only when the host can actually receive the change.
   const editable = editing && !!onViewChange && !isFlat(view);
   const spec = isFlat(view) ? undefined : view;
-  /** Two extra columns in edit mode: the row `+` and the value `+`. */
-  const editCols = editable ? 2 : 0;
-  const [pendingValueField, setPendingValueField] = useState<string | null>(
-    null,
-  );
+  /** One extra column in edit mode: the pending row field. */
+  const editCols = editable ? 1 : 0;
+  /** True while the pending column is expanded, offering its choices. */
+  const [adding, setAdding] = useState(false);
   // Which measure's remove controls are lit; they repeat per column group.
   const [linkedMeasure, setLinkedMeasure] = useState<number | null>(null);
 
-  /** Columns not yet placed on an axis, split by what they can be used for. */
-  const { indexOptions, dataOptions } = useMemo(() => {
+  /**
+   * Groupable columns not already on an axis — the choices the pending column
+   * offers. `category` is exactly this split, deduced at import.
+   */
+  const addOptions = useMemo(() => {
     const placed = new Set([...(spec?.rows ?? []), ...(spec?.columns ?? [])]);
-    const index: AddOption[] = [];
-    const data: AddOption[] = [];
-    for (const col of frame.columns) {
-      const option = { id: col.name, label: col.meta.displayName };
-      if (col.meta.category === 'index') {
-        if (!placed.has(col.name)) index.push(option);
-      } else {
-        data.push(option);
-      }
-    }
-    index.push({ id: '__custom__', label: 'Custom…', hint: 'soon' });
-    return { indexOptions: index, dataOptions: data };
+    return frame.columns
+      .filter((c) => c.meta.category === 'index' && !placed.has(c.name))
+      .map((c) => ({ id: c.name, label: c.meta.displayName }));
   }, [frame, spec?.rows, spec?.columns]);
 
-  const aggOptions = useMemo<AddOption[]>(
-    () => aggregationIds().map((id) => ({ id, label: id })),
-    [],
-  );
-
-  function addTo(zone: 'rows' | 'columns', field: string) {
-    if (field === '__custom__' || !spec) return;
-    onViewChange?.(addField(spec, zone, field));
-  }
-
-  /** Two-step: pick the field, then the aggregation. */
-  function pickValue(id: string): boolean | void {
-    if (!spec) return;
-    if (pendingValueField === null) {
-      setPendingValueField(id);
-      return true; // keep the menu open for the aggregation
-    }
-    onViewChange?.(addValue(spec, pendingValueField, id));
-    setPendingValueField(null);
+  function commitAdd(field: string) {
+    setAdding(false);
+    if (spec) onViewChange?.(addField(spec, 'rows', field));
   }
 
   /** Drag state: which field is in flight, so drops know the source. */
@@ -676,7 +649,12 @@ export function DataTable({
           {indexW.map((w, i) => (
             <col key={`i${i}`} style={{ width: w }} />
           ))}
-          {editable && <col key="e-rows" style={{ width: EDIT_COL_W }} />}
+          {editable && (
+            <col
+              key="e-rows"
+              style={{ width: adding ? ADD_COL_W : EDIT_COL_W }}
+            />
+          )}
           {leafW.map((w, i) => (
             <col
               key={`l${i}`}
@@ -685,7 +663,6 @@ export function DataTable({
               }}
             />
           ))}
-          {editable && <col key="e-vals" style={{ width: EDIT_COL_W }} />}
         </colgroup>
 
         <thead onMouseOver={() => setHover(null)}>
@@ -735,11 +712,19 @@ export function DataTable({
                     onFieldDrop({ zone: 'rows', index: rowLevels.length })
                   }
                 >
-                  <AddMenu
-                    title="Add a row field"
-                    options={indexOptions}
-                    onPick={(id) => addTo('rows', id)}
-                  />
+                  <button
+                    type="button"
+                    title={adding ? 'Cancel' : 'Add a row field'}
+                    aria-label={adding ? 'Cancel' : 'Add a row field'}
+                    aria-expanded={adding}
+                    className={cls(
+                      styles.addField,
+                      adding && styles.addFieldOpen,
+                    )}
+                    onClick={() => setAdding((v) => !v)}
+                  >
+                    +
+                  </button>
                 </th>
               )}
               {hrow.map((hc, ci) => {
@@ -785,23 +770,6 @@ export function DataTable({
                   </th>
                 );
               })}
-              {level === 0 && editable && (
-                <th
-                  key="e-vals"
-                  rowSpan={depth}
-                  className={styles.editCell}
-                  style={{ top: 0 }}
-                >
-                  <AddMenu
-                    title="Add a measure"
-                    options={
-                      pendingValueField === null ? dataOptions : aggOptions
-                    }
-                    onPick={pickValue}
-                    onClose={() => setPendingValueField(null)}
-                  />
-                </th>
-              )}
             </tr>
           ))}
           {/* Column fields have no visible handle otherwise: the headers above
@@ -842,11 +810,6 @@ export function DataTable({
                     />
                   </span>
                 ))}
-                <AddMenu
-                  title="Add a column field"
-                  options={indexOptions}
-                  onPick={(id) => addTo('columns', id)}
-                />
               </td>
             </tr>
           )}
@@ -892,6 +855,13 @@ export function DataTable({
                 extraTop={extraTop[item.index] ?? 0}
                 zebra={zebra}
                 editCols={editCols}
+                addOption={adding ? addOptions[item.index] : undefined}
+                addNote={
+                  adding && addOptions.length === 0 && item.index === 0
+                    ? 'every field is already placed'
+                    : undefined
+                }
+                onAdd={commitAdd}
                 hover={hover}
                 hoverPath={hover ? rows[hover.row]?.path : undefined}
                 onHover={setHover}
@@ -907,41 +877,6 @@ export function DataTable({
 
         {(footerLines.length > 0 || editable) && (
           <tfoot>
-            {editable && (
-              <tr style={{ height: HEADER_H }}>
-                <th
-                  colSpan={rowLevels.length + 1}
-                  className={`${styles.rowHeaderCell} ${styles.indexTint} ${styles.left}`}
-                  style={{
-                    position: 'sticky',
-                    bottom: footerBottom + HEADER_H,
-                  }}
-                >
-                  <span className={styles.zoneLabel}>totals</span>
-                </th>
-                <td
-                  colSpan={leaves.length + 1}
-                  className={styles.fieldStrip}
-                  style={{
-                    position: 'sticky',
-                    bottom: footerBottom + HEADER_H,
-                  }}
-                >
-                  {footer.map((f, i) => (
-                    <span key={`${f.agg}${i}`} className={styles.chip}>
-                      {f.label}
-                    </span>
-                  ))}
-                  <AddMenu
-                    title="Add a footer row"
-                    options={aggOptions}
-                    onPick={(id) =>
-                      onDisplayChange?.(addFooterRow(display, id))
-                    }
-                  />
-                </td>
-              </tr>
-            )}
             {/* Lineless: a small background gap; otherwise a contiguous
                 accountant-style double line directly against the data. */}
             <tr aria-hidden="true">
@@ -1024,8 +959,13 @@ interface RowProps {
   indexColumns: number;
   extraTop: number;
   zebra: boolean;
-  /** 0, or 2 in edit mode: one cell after the index group, one at the end. */
+  /** 0, or 1 in edit mode: the pending row-field cell after the index group. */
   editCols: number;
+  /** One choice per row while the pending column is open. */
+  addOption?: { id: string; label: string };
+  /** Shown in the first row when there is nothing left to add. */
+  addNote?: string;
+  onAdd?: (field: string) => void;
   hover: { row: number; leaf: number } | null;
   hoverPath: unknown[] | undefined;
   onHover: (h: { row: number; leaf: number } | null) => void;
@@ -1048,6 +988,9 @@ function Row({
   extraTop,
   zebra,
   editCols,
+  addOption,
+  addNote,
+  onAdd,
   hover,
   hoverPath,
   onHover,
@@ -1096,7 +1039,18 @@ function Row({
         );
       })}
       {editCols > 0 && (
-        <td className={styles.editCell} style={gapTop} aria-hidden="true" />
+        <td className={styles.editCell} style={gapTop}>
+          {addOption && (
+            <button
+              type="button"
+              className={styles.addOption}
+              onClick={() => onAdd?.(addOption.id)}
+            >
+              {addOption.label}
+            </button>
+          )}
+          {addNote && <span className={styles.addNote}>{addNote}</span>}
+        </td>
       )}
       {row.cells.map((cell, i) => {
         const leaf = leaves[i]!;
@@ -1127,9 +1081,6 @@ function Row({
           </td>
         );
       })}
-      {editCols > 0 && (
-        <td className={styles.editCell} style={gapTop} aria-hidden="true" />
-      )}
     </tr>
   );
 }
@@ -1208,9 +1159,6 @@ function FooterRow({
           </td>
         );
       })}
-      {editCols > 0 && (
-        <td className={styles.editCell} style={sticky} aria-hidden="true" />
-      )}
     </tr>
   );
 }
