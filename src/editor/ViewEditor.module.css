@@ -53,13 +53,8 @@
   font-size: 11px;
 }
 
-.controls {
-  display: inline-flex;
-  gap: 2px;
+.remove {
   flex: 0 0 auto;
-}
-
-.controls button {
   width: 18px;
   height: 18px;
   padding: 0;
@@ -67,19 +62,36 @@
   border-radius: 4px;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--pv-muted, #6e6e73);
-  font-size: 11px;
+  color: light-dark(#c5221f, #ff6b64);
+  font-size: 12px;
+  opacity: 0.55;
   cursor: pointer;
 }
 
-.controls button:hover:not(:disabled) {
-  border-color: var(--pv-border, #e2e2e5);
-  color: var(--pv-text, #1d1d1f);
+.remove:hover {
+  opacity: 1;
+  background: light-dark(rgba(197, 34, 31, 0.12), rgba(255, 107, 100, 0.18));
 }
 
-.controls button:disabled {
-  opacity: 0.28;
-  cursor: default;
+/* Reordering is by dragging the entry itself. */
+.draggable {
+  cursor: grab;
+  border-radius: 5px;
+  padding-left: 4px;
+  margin-left: -4px;
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
+
+.draggable:hover {
+  background: var(--pv-hover, #f0f7ff);
+}
+
+/* Where the dragged entry would land. */
+.over {
+  box-shadow: inset 0 2px 0 -1px light-dark(#3b82f6, #60a5fa);
 }
 
 .empty,

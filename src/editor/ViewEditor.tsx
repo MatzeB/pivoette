@@ -6,6 +6,7 @@
  * this is for seeing what is configured, reordering it, and removing it. All of
  * it is presentation over `ops.ts`, which is where the behaviour is tested.
  */
+import { useRef, useState } from 'react';
 import { aggregationIds } from '../pivot/aggregations';
 import { isFlat } from '../pivot/spec';
 import type { ViewSpec } from '../pivot/spec';
@@ -34,44 +35,39 @@ export interface ViewEditorProps {
 
 function Row({
   label,
-  onUp,
-  onDown,
   onRemove,
+  drag,
+  over,
   children,
 }: {
   label: string;
-  onUp?: () => void;
-  onDown?: () => void;
   onRemove?: () => void;
+  /** Absent for a list that cannot be reordered. */
+  drag?: React.HTMLAttributes<HTMLLIElement> & { draggable: true };
+  over?: boolean;
   children?: React.ReactNode;
 }) {
   return (
-    <li className={styles.row}>
+    <li
+      className={`${styles.row} ${drag ? styles.draggable : ''} ${
+        over ? styles.over : ''
+      }`}
+      {...drag}
+    >
       <span className={styles.label} title={label}>
         {label}
       </span>
       {children}
-      <span className={styles.controls}>
-        <button type="button" title="Move up" disabled={!onUp} onClick={onUp}>
-          ↑
-        </button>
+      {onRemove && (
         <button
           type="button"
-          title="Move down"
-          disabled={!onDown}
-          onClick={onDown}
-        >
-          ↓
-        </button>
-        <button
-          type="button"
+          className={styles.remove}
           title="Remove"
-          disabled={!onRemove}
           onClick={onRemove}
         >
           ×
         </button>
-      </span>
+      )}
     </li>
   );
 }
@@ -97,6 +93,12 @@ function Section({
   );
 }
 
+/** What is being dragged: which list, and its position in it. */
+interface DragRef {
+  list: FieldZone | 'values';
+  index: number;
+}
+
 export function ViewEditor({
   view,
   onViewChange,
@@ -105,6 +107,9 @@ export function ViewEditor({
   frame,
   className,
 }: ViewEditorProps) {
+  const dragged = useRef<DragRef | null>(null);
+  const [over, setOver] = useState<DragRef | null>(null);
+
   if (isFlat(view)) {
     return (
       <div className={`${styles.root} ${className ?? ''}`}>
@@ -123,6 +128,58 @@ export function ViewEditor({
   const name = (field: string) =>
     frame?.columnByName.get(field)?.meta.displayName ?? field;
 
+  /** Apply a drop. Rows and columns are interchangeable — dragging between the
+   * two sections pivots the field, exactly as dragging in the table does — but
+   * a measure only reorders among measures. */
+  function drop(to: DragRef) {
+    const from = dragged.current;
+    dragged.current = null;
+    setOver(null);
+    if (!from || (from.list === to.list && from.index === to.index)) return;
+    if (from.list === 'values' || to.list === 'values') {
+      if (from.list !== to.list) return;
+      onViewChange(moveValue(view, from.index, to.index));
+      return;
+    }
+    onViewChange(
+      moveField(
+        view,
+        { zone: from.list, index: from.index },
+        { zone: to.list, index: to.index },
+      ),
+    );
+  }
+
+  /** Handlers for one draggable entry. */
+  function dragProps(ref: DragRef) {
+    return {
+      draggable: true as const,
+      onDragStart: (e: React.DragEvent) => {
+        dragged.current = ref;
+        e.dataTransfer.effectAllowed = 'move';
+        // Firefox will not start a drag without data on the transfer.
+        e.dataTransfer.setData('text/plain', `${ref.list}:${ref.index}`);
+      },
+      onDragOver: (e: React.DragEvent) => {
+        if (!dragged.current) return;
+        e.preventDefault();
+        setOver(ref);
+      },
+      onDragLeave: () => setOver(null),
+      onDrop: (e: React.DragEvent) => {
+        e.preventDefault();
+        drop(ref);
+      },
+      onDragEnd: () => {
+        dragged.current = null;
+        setOver(null);
+      },
+    };
+  }
+
+  const isOver = (ref: DragRef) =>
+    over?.list === ref.list && over.index === ref.index;
+
   const zone = (title: string, key: FieldZone) => {
     const fields = view[key];
     return (
@@ -131,30 +188,8 @@ export function ViewEditor({
           <Row
             key={field}
             label={name(field)}
-            onUp={
-              i > 0
-                ? () =>
-                    onViewChange(
-                      moveField(
-                        view,
-                        { zone: key, index: i },
-                        { zone: key, index: i - 1 },
-                      ),
-                    )
-                : undefined
-            }
-            onDown={
-              i < fields.length - 1
-                ? () =>
-                    onViewChange(
-                      moveField(
-                        view,
-                        { zone: key, index: i },
-                        { zone: key, index: i + 1 },
-                      ),
-                    )
-                : undefined
-            }
+            drag={dragProps({ list: key, index: i })}
+            over={isOver({ list: key, index: i })}
             onRemove={() => onViewChange(removeField(view, key, i))}
           />
         ))}
@@ -174,14 +209,8 @@ export function ViewEditor({
           <Row
             key={value.id}
             label={value.label ?? name(value.field)}
-            onUp={
-              i > 0 ? () => onViewChange(moveValue(view, i, i - 1)) : undefined
-            }
-            onDown={
-              i < view.values.length - 1
-                ? () => onViewChange(moveValue(view, i, i + 1))
-                : undefined
-            }
+            drag={dragProps({ list: 'values', index: i })}
+            over={isOver({ list: 'values', index: i })}
             // The last measure cannot go: there would be nothing to aggregate.
             onRemove={
               view.values.length > 1
