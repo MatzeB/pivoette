@@ -167,6 +167,12 @@
   border-bottom: none;
 }
 
+/* Shade the hovered footer row (footer isn't virtualized → plain :hover). */
+.summaryRow:hover td,
+.summaryRow:hover th {
+  background: var(--pv-hover);
+}
+
 .summaryLabel {
   position: sticky;
   left: 0;
