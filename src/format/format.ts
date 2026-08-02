@@ -24,9 +24,6 @@ function numberFormat(options: Record<string, unknown>): Intl.NumberFormat {
   let nf = intlCache.get(key);
   if (!nf) {
     const nfOpts: Intl.NumberFormatOptions = {};
-    if (opt<string>(options, 'style') === 'percent') {
-      nfOpts.style = 'percent';
-    }
     const decimals = opt<number>(options, 'decimals');
     if (decimals != null) {
       nfOpts.minimumFractionDigits = decimals;
@@ -50,7 +47,7 @@ function affix(options: Record<string, unknown>, body: string): string {
   return `${prefix}${body}${suffix}`;
 }
 
-/** Numeric built-in shared by number/integer/percent. */
+/** Numeric built-in shared by number/integer. */
 function intlBuiltin(base: Record<string, unknown>): FormatFactory {
   return (options) => {
     const merged = { ...base, ...options };
@@ -65,7 +62,6 @@ function intlBuiltin(base: Record<string, unknown>): FormatFactory {
 
 registry.set('number', intlBuiltin({}));
 registry.set('integer', intlBuiltin({ decimals: 0 }));
-registry.set('percent', intlBuiltin({ style: 'percent' }));
 
 // --- duration (SI-time) -----------------------------------------------------
 

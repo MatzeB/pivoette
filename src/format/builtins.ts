@@ -13,17 +13,6 @@
 export const Format = {
   Number: 'number',
   Integer: 'integer',
-  /**
-   * `Intl`'s percent style: **multiplies by 100** and appends its own `%`, for
-   * data stored as a ratio (`0.0523` -> `5.2%`).
-   *
-   * Not interchangeable with `scale: ['percent']`, which only appends a label
-   * and never touches the number — that is for data already in percentage
-   * points (`5.23` -> `5.23%`). Combining the two double-appends (`5.2%%`), so
-   * pick whichever matches how the column is stored: the format when it holds
-   * ratios, the scale when it holds points.
-   */
-  Percent: 'percent',
   Duration: 'duration',
 } as const;
 

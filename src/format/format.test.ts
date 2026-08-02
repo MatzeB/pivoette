@@ -54,10 +54,10 @@ describe('intl-backed formatters', () => {
     expect(fmt(spec, -3)).toBe('-3.00');
   });
 
-  it('percent with decimals', () => {
-    expect(fmt({ fnName: 'percent', options: { decimals: 1 } }, 0.125)).toBe(
-      '12.5%',
-    );
+  it('rejects a format that is not registered', () => {
+    // `percent` was removed: a ratio is scaled by the column's `factor` and
+    // labelled by `scale: ['percent']`, so no format transforms a number.
+    expect(() => fmt({ fnName: 'percent' }, 0.125)).toThrow(/Unknown format/);
   });
 
   it('compact notation gives K/M/B', () => {

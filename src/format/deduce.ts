@@ -8,11 +8,11 @@
  * unmatched column falls back to the default formatter — so adding metadata can
  * never silently break a column's rendering.
  *
- * Note what these rules *don't* do: none of them print a unit. The symbol comes
- * from the metadata via the table's unit placement (`$12.50`, `45.6%`), which
- * is why `price` maps to a plain 2-decimal number (there is no `currency`
- * built-in — the symbol is metadata), and `percentage` to a plain number rather
- * than `percent`, whose `Intl` style would multiply a stored `45.6` by 100.
+ * Note what these rules *don't* do: none of them print a unit, and none of them
+ * transform a number. The symbol comes from the metadata via the table's unit
+ * placement (`$12.50`, `45.6%`) and any conversion from the column's `factor` —
+ * which is why every rule here maps to a plain number and there is no
+ * `currency` or `percent` built-in to reach for.
  */
 import { columnCurrency, kindId, unitLabels } from '../data/meta';
 import type { ColumnMeta } from '../data/meta';
