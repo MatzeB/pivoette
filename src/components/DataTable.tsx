@@ -21,8 +21,6 @@ export interface DataTableDisplay {
   indexColumns?: number;
   /** Highlight the hovered cell's column header + ancestors (default true). */
   highlightHeaders?: boolean;
-  /** Tint body cells sharing the hovered cell's top-level column group. */
-  highlightGroups?: boolean;
   /** Extra footer rows summarizing each column's displayed values. */
   footer?: { label: string; agg: string }[];
 }
@@ -160,7 +158,6 @@ export function DataTable({
     groupSpacing = 0,
     indexColumns = 0,
     highlightHeaders = true,
-    highlightGroups = false,
     footer = [],
   } = display;
 
@@ -173,7 +170,10 @@ export function DataTable({
   const depth = result.columnHeaderDepth;
 
   const [sort, setSort] = useState<SortState | null>(null);
-  const [hoverLeaf, setHoverLeaf] = useState<number | null>(null);
+  // Hovered cell: row index + leaf index (leaf = -1 when hovering an index cell).
+  const [hover, setHover] = useState<{ row: number; leaf: number } | null>(
+    null,
+  );
 
   const headerRows = useMemo(
     () => headerRowsRanged(result.columnHeader, depth),
@@ -272,9 +272,13 @@ export function DataTable({
     });
   }
 
-  function sortIndicator(active: boolean, dir?: 'asc' | 'desc'): string {
-    if (!active) return '';
-    return dir === 'asc' ? ' ▲' : ' ▼';
+  function sortArrow(active: boolean): ReactNode {
+    if (!active) return null;
+    return (
+      <span className={styles.sortArrow}>
+        {sort!.dir === 'asc' ? '▲' : '▼'}
+      </span>
+    );
   }
 
   // Column footers (over displayed cell values).
@@ -307,9 +311,6 @@ export function DataTable({
     items.length > 0 ? totalSize - items[items.length - 1]!.end : 0;
   const totalCols = rowLevels.length + leaves.length;
 
-  const activeGroup =
-    highlightGroups && hoverLeaf != null ? leaves[hoverLeaf]!.colPath[0] : null;
-
   const wrapperCls = [
     styles.wrapper,
     frameless ? styles.frameless : '',
@@ -322,9 +323,9 @@ export function DataTable({
     const isLeafCol = hc.leafStart === hc.leafEnd;
     const hovered =
       highlightHeaders &&
-      hoverLeaf != null &&
-      hoverLeaf >= hc.leafStart &&
-      hoverLeaf <= hc.leafEnd;
+      hover != null &&
+      hover.leaf >= hc.leafStart &&
+      hover.leaf <= hc.leafEnd;
     return [
       isLeafCol && sortable ? styles.sortable : '',
       hovered ? styles.headerHi : '',
@@ -339,7 +340,7 @@ export function DataTable({
       className={wrapperCls}
       data-theme={theme === 'auto' ? undefined : theme}
       style={{ maxHeight: height }}
-      onMouseLeave={() => setHoverLeaf(null)}
+      onMouseLeave={() => setHover(null)}
     >
       <table className={styles.table} style={{ width: totalWidth }}>
         <colgroup>
@@ -368,11 +369,17 @@ export function DataTable({
                       key={`ih${i}`}
                       rowSpan={depth}
                       className={`${styles.corner} ${styles.rowHeaderCell} ${styles.indexTint} ${sortable ? styles.sortable : ''}`}
-                      style={{ top: 0, left: leftOffset[i] }}
+                      style={{
+                        top: 0,
+                        left: leftOffset[i],
+                        ...(i === 0
+                          ? {}
+                          : { borderLeft: '1px solid var(--pv-border)' }),
+                      }}
                       onClick={() => cycleSort({ kind: 'index', level: i })}
                     >
                       {lvl}
-                      {sortIndicator(active, sort?.dir)}
+                      {sortArrow(active)}
                     </th>
                   );
                 })}
@@ -388,7 +395,15 @@ export function DataTable({
                     colSpan={hc.colSpan}
                     rowSpan={hc.rowSpan}
                     className={leafHeaderCls(hc)}
-                    style={{ top: level * HEADER_H }}
+                    style={{
+                      top: level * HEADER_H,
+                      ...edgeGapStyle(
+                        hc.leafStart,
+                        hc.leafEnd,
+                        gapAfter,
+                        bodyLeadGap,
+                      ),
+                    }}
                     onClick={
                       isLeafCol
                         ? () => cycleSort({ kind: 'leaf', index: hc.leafStart })
@@ -396,7 +411,7 @@ export function DataTable({
                     }
                   >
                     {hc.label}
-                    {sortIndicator(active, sort?.dir)}
+                    {sortArrow(active)}
                   </th>
                 );
               })}
@@ -416,6 +431,7 @@ export function DataTable({
             return (
               <Row
                 key={item.index}
+                rowIndex={item.index}
                 row={row}
                 prevPath={grouped ? prev?.path : undefined}
                 grouped={grouped}
@@ -426,8 +442,8 @@ export function DataTable({
                 gapAfter={gapAfter}
                 bodyLeadGap={bodyLeadGap}
                 indexColumns={indexColumns}
-                activeGroup={activeGroup}
-                onHoverLeaf={setHoverLeaf}
+                hover={hover}
+                onHover={setHover}
               />
             );
           })}
@@ -445,21 +461,34 @@ export function DataTable({
                 ...footerRows,
                 ...(summary ? [{ label: 'Total', cells: summary }] : []),
               ];
-              return lines.map((fr, fi) => (
-                <FooterRow
-                  key={`f${fi}`}
-                  label={fr.label}
-                  cells={fr.cells}
-                  leaves={leaves}
-                  frame={frame}
-                  rowLevels={rowLevels}
-                  gapAfter={gapAfter}
-                  bodyLeadGap={bodyLeadGap}
-                  topRule={fi === 0}
-                  bottom={(lines.length - 1 - fi) * ROW_HEIGHT}
-                  leftOffset={leftOffset}
-                />
-              ));
+              return [
+                // Background-colored gap between the body and the sticky footer.
+                <tr key="fgap" aria-hidden="true">
+                  <td
+                    colSpan={totalCols}
+                    className={styles.footGap}
+                    style={{
+                      position: 'sticky',
+                      bottom: lines.length * ROW_HEIGHT,
+                    }}
+                  />
+                </tr>,
+                ...lines.map((fr, fi) => (
+                  <FooterRow
+                    key={`f${fi}`}
+                    label={fr.label}
+                    cells={fr.cells}
+                    leaves={leaves}
+                    frame={frame}
+                    rowLevels={rowLevels}
+                    gapAfter={gapAfter}
+                    bodyLeadGap={bodyLeadGap}
+                    topRule={fi === 0}
+                    bottom={(lines.length - 1 - fi) * ROW_HEIGHT}
+                    leftOffset={leftOffset}
+                  />
+                )),
+              ];
             })()}
           </tfoot>
         )}
@@ -468,21 +497,27 @@ export function DataTable({
   );
 }
 
-function cellGapStyle(
-  base: CSSProperties,
-  leafIndex: number,
+/**
+ * Group-boundary gaps, rendered as a background-colored channel so the space is
+ * visible between column groups (in headers, footer, and body). Keyed by the
+ * cell's leaf range so a spanning header (e.g. "tiny") shows no internal gap.
+ */
+function edgeGapStyle(
+  leafStart: number,
+  leafEnd: number,
   gapAfter: number[],
   bodyLeadGap: number,
 ): CSSProperties {
-  const style: CSSProperties = { ...base };
-  const after = gapAfter[leafIndex] ?? 0;
-  if (after) style.borderRight = `${after}px solid transparent`;
-  if (leafIndex === 0 && bodyLeadGap)
-    style.borderLeft = `${bodyLeadGap}px solid transparent`;
+  const style: CSSProperties = {};
+  const after = gapAfter[leafEnd] ?? 0;
+  if (after) style.borderRight = `${after}px solid var(--pv-bg)`;
+  if (leafStart === 0 && bodyLeadGap)
+    style.borderLeft = `${bodyLeadGap}px solid var(--pv-bg)`;
   return style;
 }
 
 interface RowProps {
+  rowIndex: number;
   row: ResultRow;
   prevPath: unknown[] | undefined;
   grouped: boolean;
@@ -493,11 +528,12 @@ interface RowProps {
   gapAfter: number[];
   bodyLeadGap: number;
   indexColumns: number;
-  activeGroup: unknown;
-  onHoverLeaf: (i: number | null) => void;
+  hover: { row: number; leaf: number } | null;
+  onHover: (h: { row: number; leaf: number } | null) => void;
 }
 
 function Row({
+  rowIndex,
   row,
   prevPath,
   grouped,
@@ -508,9 +544,10 @@ function Row({
   gapAfter,
   bodyLeadGap,
   indexColumns,
-  activeGroup,
-  onHoverLeaf,
+  hover,
+  onHover,
 }: RowProps) {
+  const rowHovered = hover?.row === rowIndex;
   return (
     <tr style={{ height: ROW_HEIGHT }}>
       {rowLevels.map((_, level) => {
@@ -520,12 +557,21 @@ function Row({
           for (let l = 0; l <= level; l++)
             if (prevPath[l] !== row.path[l]) show = true;
         }
+        const cls = [
+          styles.rowHeaderCell,
+          styles.indexTint,
+          styles.left,
+          rowHovered ? styles.rowHover : '',
+        ]
+          .filter(Boolean)
+          .join(' ');
         return (
           <th
             key={level}
             scope="row"
-            className={`${styles.rowHeaderCell} ${styles.indexTint} ${styles.left}`}
+            className={cls}
             style={{ left: leftOffset[level] }}
+            onMouseEnter={() => onHover({ row: rowIndex, leaf: -1 })}
           >
             {show ? String(row.path[level] ?? '') : ''}
           </th>
@@ -537,12 +583,13 @@ function Row({
         const node: ReactNode = leaf.render
           ? leaf.render(ctx)
           : leaf.format(ctx);
-        const inGroup = activeGroup != null && leaf.colPath[0] === activeGroup;
         const isIndex = rowLevels.length === 0 && i < indexColumns;
+        const cellHovered = rowHovered && hover?.leaf === i;
         const cls = [
           alignClass(leaf.column.align),
           isIndex ? styles.indexTint : '',
-          inGroup ? styles.groupTint : '',
+          rowHovered ? styles.rowHover : '',
+          cellHovered ? styles.cellHover : '',
         ]
           .filter(Boolean)
           .join(' ');
@@ -550,8 +597,11 @@ function Row({
           <td
             key={leaf.id}
             className={cls}
-            style={cellGapStyle(leaf.style(ctx), i, gapAfter, bodyLeadGap)}
-            onMouseEnter={() => onHoverLeaf(i)}
+            style={{
+              ...leaf.style(ctx),
+              ...edgeGapStyle(i, i, gapAfter, bodyLeadGap),
+            }}
+            onMouseEnter={() => onHover({ row: rowIndex, leaf: i })}
           >
             {node}
           </td>
@@ -610,7 +660,8 @@ function FooterRow({
             key={leaf.id}
             className={alignClass(leaf.column.align)}
             style={{
-              ...cellGapStyle(leaf.style(ctx), i, gapAfter, bodyLeadGap),
+              ...leaf.style(ctx),
+              ...edgeGapStyle(i, i, gapAfter, bodyLeadGap),
               ...sticky,
             }}
           >

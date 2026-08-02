@@ -53,10 +53,10 @@ const EXAMPLES: Example[] = [
     id: 'regression',
     title: '3 · Before/after regression',
     blurb:
-      'Per-platform derived Δ% referencing each platform’s own before/after cells; faster is green, regressions red. Hover tints the platform group.',
+      'Per-platform derived Δ% referencing each platform’s own before/after cells; faster is green, regressions red. Hover shades the row, cell, and index.',
     view: regressionView,
     data: regressionData as Row[],
-    display: { highlightGroups: true, groupSpacing: 8 },
+    display: { groupSpacing: 8 },
   },
   {
     id: 'tokens',
