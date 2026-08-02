@@ -14,7 +14,7 @@
  * built-in — the symbol is metadata), and `percentage` to a plain number rather
  * than `percent`, whose `Intl` style would multiply a stored `45.6` by 100.
  */
-import { kindId, unitLabels } from '../data/meta';
+import { columnCurrency, kindId, unitLabels } from '../data/meta';
 import type { ColumnMeta } from '../data/meta';
 import type { FormatSpec } from '../pivot/spec';
 import { Format } from './builtins';
@@ -47,12 +47,21 @@ const UNIT_RULES: Record<string, FormatSpec> = {
   '£': TWO_DECIMALS,
 };
 
-/** The format implied by a column's kind, else by its unit. */
+/**
+ * The format implied by a column's kind, else by its unit. A recognised
+ * currency overrides both with its own fraction digits — 2 for USD, 0 for JPY —
+ * rather than the flat 2 the `price` kind assumes.
+ */
 export function deduceFormat(
   meta: ColumnMeta | undefined,
+  locale?: string,
 ): FormatSpec | undefined {
   if (!meta) return undefined;
-  return KIND_RULES[kindId(meta)] ?? UNIT_RULES[unitLabels(meta).full];
+  const currency = columnCurrency(meta, locale);
+  if (currency) {
+    return { fnName: Format.Number, options: { decimals: currency.decimals } };
+  }
+  return KIND_RULES[kindId(meta)] ?? UNIT_RULES[unitLabels(meta, locale).full];
 }
 
 /**

@@ -15,6 +15,8 @@
  * Units are a *display* concern only — nothing here transforms a number. A
  * `kilo` scale appends `k`; it does not divide by 1000.
  */
+import { currencyFacts } from './currency';
+import type { CurrencyFacts } from './currency';
 import type { ColumnType } from './types';
 
 export type ColumnCategory = 'index' | 'data';
@@ -116,9 +118,10 @@ export const UNIT_SHORT: Record<string, string> = {
 };
 
 /**
- * Kinds whose symbol conventionally precedes the number ($12.50, not 12.50 $).
- * Only consulted for a single-factor unit — a rate like `price/duration`
- * reads better as a trailing `$/h`.
+ * Kinds whose symbol precedes the number when the unit names no currency
+ * `Intl` knows (say `kind: price, unit: credit`). Real currencies get their
+ * placement from the locale instead — see `columnCurrency`. Only consulted for
+ * a single-factor unit; a rate like `price/duration` reads better as `$/h`.
  */
 const PREFIX_KINDS = new Set<string>([ColumnKind.Price, 'currency']); // kinds, not formats
 
@@ -264,7 +267,8 @@ export interface UnitLabels {
   scalePart: string;
   /** Unit half of a `simple` label (`s` of `ms`); empty otherwise. */
   unitPart: string;
-  /** True when the label leads the number instead of trailing it ($12.50). */
+  /** True when the label leads the number instead of trailing it ($12.50).
+   * Locale-derived for currencies: `$1.00`, but `1,00 €` in de-DE. */
   prefix: boolean;
 }
 
@@ -342,15 +346,21 @@ const EMPTY_LABELS: UnitLabels = {
   prefix: false,
 };
 
-const labelCache = new WeakMap<ColumnMeta, UnitLabels>();
+const labelCache = new Map<string, WeakMap<ColumnMeta, UnitLabels>>();
 
 /**
  * The composed unit label for a column, memoized per meta object so the render
  * path never re-parses the parallel arrays.
  */
-export function unitLabels(meta: ColumnMeta | undefined): UnitLabels {
+export function unitLabels(
+  meta: ColumnMeta | undefined,
+  locale?: string,
+): UnitLabels {
   if (!meta) return EMPTY_LABELS;
-  const cached = labelCache.get(meta);
+  const key = locale ?? '';
+  let perLocale = labelCache.get(key);
+  if (!perLocale) labelCache.set(key, (perLocale = new WeakMap()));
+  const cached = perLocale.get(meta);
   if (cached) return cached;
 
   const factors = factorsOf(meta.unitShort, meta.scaleShort);
@@ -361,10 +371,25 @@ export function unitLabels(meta: ColumnMeta | undefined): UnitLabels {
     simple,
     scalePart: simple ? only.scale : '',
     unitPart: simple ? only.unit : '',
-    prefix: simple && PREFIX_KINDS.has(kindId(meta)),
+    prefix:
+      simple &&
+      (columnCurrency(meta, locale)?.prefix ?? PREFIX_KINDS.has(kindId(meta))),
   };
-  labelCache.set(meta, labels);
+  perLocale.set(meta, labels);
   return labels;
+}
+
+/**
+ * The currency this column is denominated in, if any — the locale facts behind
+ * its symbol placement and decimal count. Only single-factor units qualify: a
+ * rate like `$/h` is not itself a currency amount.
+ */
+export function columnCurrency(
+  meta: ColumnMeta | undefined,
+  locale?: string,
+): CurrencyFacts | undefined {
+  if (!meta || meta.unit?.length !== 1) return undefined;
+  return currencyFacts(meta.unit[0], locale);
 }
 
 const kindCache = new WeakMap<ColumnMeta, string>();

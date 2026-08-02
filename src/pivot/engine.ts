@@ -86,6 +86,19 @@ function columnMeta(
   );
 }
 
+/**
+ * Give a named format the view's locale unless it set one itself, so grouping
+ * separators and digits follow the same locale the currency facts came from.
+ */
+function withLocale(
+  format: FormatSpec | undefined,
+  locale: string | undefined,
+): FormatSpec | undefined {
+  if (!format || !locale || !('fnName' in format)) return format;
+  if (format.options?.locale !== undefined) return format;
+  return { ...format, options: { ...format.options, locale } };
+}
+
 function makeLeaf(args: {
   id: string;
   colPath: string[];
@@ -119,10 +132,13 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
     const source = sourceName ? frame.columnByName.get(sourceName) : undefined;
     const meta = columnMeta(frame, def, sourceName);
     // An explicit format wins, merging over any the column's kind implies.
-    const format = resolveFormatSpec(
-      def.format,
-      deduceFormat(meta),
-      def.inheritUnitFormat,
+    const format = withLocale(
+      resolveFormatSpec(
+        def.format,
+        deduceFormat(meta, spec.locale),
+        def.inheritUnitFormat,
+      ),
+      spec.locale,
     );
     const column: ResolvedColumn = {
       id: def.id,
@@ -412,10 +428,13 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     if (d.kind === 'measure') {
       baseIndexByKey.set(d.baseKey, i);
       const meta = frame.columnByName.get(d.measure.field)?.meta;
-      const format = resolveFormatSpec(
-        d.measure.format,
-        deduceFormat(meta),
-        d.measure.inheritUnitFormat,
+      const format = withLocale(
+        resolveFormatSpec(
+          d.measure.format,
+          deduceFormat(meta, spec.locale),
+          d.measure.inheritUnitFormat,
+        ),
+        spec.locale,
       );
       const column: ResolvedColumn = {
         id: d.baseKey,
@@ -435,10 +454,13 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     }
     // A derived column has no source field; only its own `meta` applies.
     const meta = columnMeta(frame, d.def, undefined);
-    const format = resolveFormatSpec(
-      d.def.format,
-      deduceFormat(meta),
-      d.def.inheritUnitFormat,
+    const format = withLocale(
+      resolveFormatSpec(
+        d.def.format,
+        deduceFormat(meta, spec.locale),
+        d.def.inheritUnitFormat,
+      ),
+      spec.locale,
     );
     const column: ResolvedColumn = {
       id: d.def.id,

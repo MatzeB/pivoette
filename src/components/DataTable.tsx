@@ -172,8 +172,9 @@ function unitAffixes(
   meta: ColumnMeta | undefined,
   unitPlacement: UnitPlacement,
   scalePlacement: UnitPlacement,
+  locale?: string,
 ): { value: string; header: string; prefix: boolean } {
-  const labels = unitLabels(meta);
+  const labels = unitLabels(meta, locale);
   const out = { value: '', header: '', prefix: labels.prefix };
   if (!labels.full) return out;
   if (!labels.simple) {
@@ -250,6 +251,7 @@ export function DataTable({
         leaf.column.meta,
         unitPlacement,
         scalePlacement,
+        view.locale,
       );
       headerSuffix[i] = affix.header ? ` (${affix.header})` : '';
       // Tier-3 cells own their whole rendering; metadata is on `CellCtx` if
@@ -263,7 +265,7 @@ export function DataTable({
       };
     });
     return { leaves, headerSuffix };
-  }, [result.leaves, unitPlacement, scalePlacement]);
+  }, [result.leaves, unitPlacement, scalePlacement, view.locale]);
 
   const [sort, setSort] = useState<SortState | null>(null);
   // Hovered cell: row index + leaf index (leaf = -1 when hovering an index cell).

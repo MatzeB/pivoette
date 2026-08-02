@@ -123,6 +123,9 @@ export interface PivotSpec {
   labels?: Record<string, string>;
   /** data field name -> metadata, layered over whatever the data supplied. */
   meta?: Record<string, ColumnMetaInput>;
+  /** BCP-47 locale for number formatting and for currency facts (symbol
+   * placement, fraction digits). Defaults to the runtime's locale. */
+  locale?: string;
 }
 
 export interface TableSpec {
@@ -133,6 +136,9 @@ export interface TableSpec {
   labels?: Record<string, string>;
   /** data field name -> metadata, layered over whatever the data supplied. */
   meta?: Record<string, ColumnMetaInput>;
+  /** BCP-47 locale for number formatting and for currency facts (symbol
+   * placement, fraction digits). Defaults to the runtime's locale. */
+  locale?: string;
 }
 
 export type ViewSpec = PivotSpec | TableSpec;

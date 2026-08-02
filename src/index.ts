@@ -22,7 +22,10 @@ export type {
 } from './data/types';
 
 // Column metadata (display name, category, compound units)
+export { currencyFacts } from './data/currency';
+export type { CurrencyFacts } from './data/currency';
 export {
+  columnCurrency,
   ColumnKind,
   deduceCategory,
   kindId,
