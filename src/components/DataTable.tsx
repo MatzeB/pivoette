@@ -25,6 +25,8 @@ export interface DataTableDisplay {
   rowGroupSpacing?: number;
   /** Flat mode: number of leading columns to tint as an index (default 0). */
   indexColumns?: number;
+  /** Alternate (even/odd) row background shading. */
+  zebra?: boolean;
   /** Highlight the hovered cell's column header + ancestors (default true). */
   highlightHeaders?: boolean;
   /** Extra footer rows summarizing each column's displayed values. */
@@ -165,6 +167,7 @@ export function DataTable({
     indexGap = 0,
     rowGroupSpacing = 0,
     indexColumns = 0,
+    zebra = false,
     highlightHeaders = true,
     footer = [],
   } = display;
@@ -481,6 +484,7 @@ export function DataTable({
                 bodyLeadGap={bodyLeadGap}
                 indexColumns={indexColumns}
                 extraTop={extraTop[item.index] ?? 0}
+                zebra={zebra}
                 hover={hover}
                 hoverPath={hover ? rows[hover.row]?.path : undefined}
                 onHover={setHover}
@@ -508,7 +512,11 @@ export function DataTable({
                   <td
                     colSpan={totalCols}
                     className={styles.footSpace}
-                    style={{ position: 'sticky', bottom: contentBottom + 4 }}
+                    style={{
+                      position: 'sticky',
+                      bottom: contentBottom + 4,
+                      zIndex: 4,
+                    }}
                   />
                 </tr>,
                 // Contiguous accountant-style double line before the totals.
@@ -516,7 +524,11 @@ export function DataTable({
                   <td
                     colSpan={totalCols}
                     className={styles.footDouble}
-                    style={{ position: 'sticky', bottom: contentBottom }}
+                    style={{
+                      position: 'sticky',
+                      bottom: contentBottom,
+                      zIndex: 4,
+                    }}
                   />
                 </tr>,
                 ...lines.map((fr, fi) => (
@@ -581,6 +593,7 @@ interface RowProps {
   bodyLeadGap: number;
   indexColumns: number;
   extraTop: number;
+  zebra: boolean;
   hover: { row: number; leaf: number } | null;
   hoverPath: unknown[] | undefined;
   onHover: (h: { row: number; leaf: number } | null) => void;
@@ -600,6 +613,7 @@ function Row({
   bodyLeadGap,
   indexColumns,
   extraTop,
+  zebra,
   hover,
   hoverPath,
   onHover,
@@ -659,6 +673,7 @@ function Row({
         const cls = [
           alignClass(leaf.column.align),
           isIndex ? styles.indexTint : '',
+          zebra && rowIndex % 2 === 1 ? styles.zebra : '',
           hoveredRow ? styles.rowHover : '',
           cellHovered ? styles.cellHover : '',
         ]

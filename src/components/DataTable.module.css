@@ -9,7 +9,7 @@
   --pv-muted: #6e6e73;
   --pv-index-bg: #eeeef1;
   --pv-hi: #dcebff;
-  --pv-hover-faint: #f4f8ff;
+  --pv-zebra: #f7f7f9;
 
   position: relative;
   overflow: auto;
@@ -34,7 +34,7 @@
     --pv-muted: #a1a1a6;
     --pv-index-bg: #0f0f11;
     --pv-hi: #2a3d54;
-    --pv-hover-faint: #172029;
+    --pv-zebra: #1c1c1f;
   }
 }
 
@@ -48,7 +48,7 @@
   --pv-muted: #a1a1a6;
   --pv-index-bg: #0f0f11;
   --pv-hi: #2a3d54;
-  --pv-hover-faint: #172029;
+  --pv-zebra: #1c1c1f;
   color-scheme: dark;
 }
 
@@ -87,6 +87,7 @@
 
 /* One contiguous line under the whole header (spans across group gaps). */
 .headerRule {
+  position: sticky;
   height: 1px;
   padding: 0 !important;
   border: none !important;
@@ -112,6 +113,11 @@
 /* Darker tint marks index columns (defined after rowHeaderCell so it wins). */
 .indexTint {
   background: var(--pv-index-bg);
+}
+
+/* Even/odd row shading (index-based; applied before hover so hover wins). */
+.zebra {
+  background: var(--pv-zebra);
 }
 
 /* Row + cell shading follow the hovered cell (defined last → win over tints). */
@@ -190,7 +196,11 @@
   border: none;
 }
 
-/* Line-free variant: spacing instead of inner rules; only the header rule. */
+/* Line-free variant: no outer box, spacing instead of inner rules; only the
+ * contiguous header rule and the footer double line remain. */
+.frameless {
+  border: none;
+}
 .frameless th,
 .frameless td {
   border-right: none;
