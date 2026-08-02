@@ -117,7 +117,7 @@ const EXAMPLES: Example[] = [
     view: commitsView,
     source: commitsSrc,
     data: commitsData as DatasetJson,
-    display: { groupSpacing: 10, indexGap: 8 },
+    display: { groupSpacing: 10 },
   },
 ];
 
