@@ -97,6 +97,7 @@ export {
   removeField,
   removeFooterRow,
   removeValue,
+  setShowSummary,
   setValueAgg,
 } from './editor/ops';
 export type { FieldRef, FieldZone } from './editor/ops';

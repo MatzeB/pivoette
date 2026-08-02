@@ -3,7 +3,7 @@ import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { DataTable } from './DataTable';
 import type { DataTableDisplay } from './DataTable';
-import type { PivotSpec, TableSpec } from '../pivot/spec';
+import type { PivotSpec, TableSpec, ViewSpec } from '../pivot/spec';
 
 // react-dom needs this flag; @tanstack/react-virtual needs ResizeObserver.
 (
@@ -447,5 +447,90 @@ describe('<DataTable> field removal', () => {
     // The click must not also reach the header's sort handler.
     expect(el.querySelector('thead')!.textContent).not.toContain('▼');
     expect(el.querySelector('thead')!.textContent).not.toContain('▲');
+  });
+});
+
+describe('<DataTable> remove controls', () => {
+  const data = [
+    { team: 'A', wd: 1, n: 2 },
+    { team: 'B', wd: 2, n: 3 },
+  ];
+  const view: PivotSpec = {
+    rows: ['team'],
+    columns: ['wd'],
+    showSummary: true,
+    values: [
+      { id: 'a', field: 'n', agg: 'sum', label: 'sum' },
+      { id: 'b', field: 'n', agg: 'mean', label: 'avg' },
+    ],
+  };
+
+  async function mount(
+    spec: PivotSpec,
+    onView: (v: ViewSpec) => void = () => {},
+    onDisplay: (d: DataTableDisplay) => void = () => {},
+  ) {
+    return render(
+      <DataTable
+        data={data}
+        view={spec}
+        editing
+        onViewChange={onView}
+        onDisplayChange={onDisplay}
+        display={{ footer: [{ label: 'med', agg: 'median' }] }}
+      />,
+    );
+  }
+
+  const labels = (el: HTMLElement) =>
+    [...el.querySelectorAll('button[aria-label^="Remove"]')].map((b) =>
+      b.getAttribute('aria-label'),
+    );
+
+  it('offers one for every removable thing', async () => {
+    const el = await mount(view);
+    const kinds = new Set(labels(el));
+    expect(kinds).toEqual(
+      new Set([
+        'Remove the team row field',
+        'Remove the wd column field',
+        'Remove the sum measure',
+        'Remove the avg measure',
+        'Remove the med row',
+        'Remove the Total row',
+      ]),
+    );
+  });
+
+  it('omits the measure control while only one measure remains', async () => {
+    // Removing it would be a no-op, and a dead control is worse than none.
+    const el = await mount({ ...view, values: [view.values[0]!] });
+    expect(labels(el).some((l) => l?.includes('measure'))).toBe(false);
+  });
+
+  it('removes the measure, a footer row, and the grand total', async () => {
+    let v: PivotSpec | undefined;
+    let d: DataTableDisplay | undefined;
+    const el = await mount(
+      view,
+      (x) => (v = x as PivotSpec),
+      (x) => (d = x),
+    );
+    const click = async (label: string) => {
+      const b = el.querySelector<HTMLButtonElement>(
+        `button[aria-label="${label}"]`,
+      )!;
+      await act(async () => b.click());
+    };
+
+    await click('Remove the avg measure');
+    expect(v!.values.map((x) => x.id)).toEqual(['a']);
+
+    await click('Remove the med row');
+    expect(d!.footer).toEqual([]);
+
+    // The grand total lives on the spec, not in display.footer.
+    await click('Remove the Total row');
+    expect(v!.showSummary).toBe(false);
   });
 });

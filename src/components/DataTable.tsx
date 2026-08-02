@@ -26,6 +26,9 @@ import {
   addValue,
   moveField,
   removeField,
+  removeFooterRow,
+  removeValue,
+  setShowSummary,
 } from '../editor/ops';
 import type { FieldRef } from '../editor/ops';
 import styles from './DataTable.module.css';
@@ -618,6 +621,21 @@ export function DataTable({
     : footerRows;
   const footerBottom = footerLines.length * ROW_HEIGHT;
 
+  /**
+   * The measure a header cell removes, if any. Only the cell that *is* the
+   * measure level qualifies — its text is the measure's own label, which a
+   * column-member header never is. Absent while one measure remains, since
+   * removing it is a no-op and a dead control is worse than none.
+   */
+  function measureAt(hc: HCell): number | undefined {
+    if (!editable || !spec || spec.values.length <= 1) return undefined;
+    if (hc.leafStart !== hc.leafEnd) return undefined;
+    const value = leaves[hc.leafStart]?.column.value;
+    if (!value || hc.label !== (value.label ?? value.id)) return undefined;
+    const at = spec.values.findIndex((v) => v.id === value.id);
+    return at >= 0 ? at : undefined;
+  }
+
   function leafHeaderCls(hc: HCell, isLeafCol: boolean): string {
     const hovered =
       highlightHeaders &&
@@ -738,6 +756,14 @@ export function DataTable({
                   >
                     {hc.label}
                     {sortArrow(active)}
+                    {measureAt(hc) !== undefined && (
+                      <RemoveField
+                        title={`Remove the ${hc.label} measure`}
+                        onRemove={() =>
+                          onViewChange?.(removeValue(view, measureAt(hc)!))
+                        }
+                      />
+                    )}
                   </th>
                 );
               })}
@@ -922,6 +948,13 @@ export function DataTable({
                 bottom={(footerLines.length - 1 - fi) * ROW_HEIGHT}
                 leftOffset={leftOffset}
                 editCols={editCols}
+                onRemove={
+                  editable
+                    ? fi < footerRows.length
+                      ? () => onDisplayChange?.(removeFooterRow(display, fi))
+                      : () => onViewChange?.(setShowSummary(view, false))
+                    : undefined
+                }
                 onHover={setHover}
               />
             ))}
@@ -1094,6 +1127,8 @@ interface FooterRowProps {
   bottom: number;
   leftOffset: number[];
   editCols: number;
+  /** Present in edit mode: drops this line from the footer. */
+  onRemove?: () => void;
   onHover: (h: { row: number; leaf: number } | null) => void;
 }
 
@@ -1108,6 +1143,7 @@ function FooterRow({
   bottom,
   leftOffset,
   editCols,
+  onRemove,
   onHover,
 }: FooterRowProps) {
   const sticky: CSSProperties = { position: 'sticky', bottom, zIndex: 1 };
@@ -1121,6 +1157,12 @@ function FooterRow({
           onMouseEnter={() => onHover({ row: -1, leaf: -1 })}
         >
           {label}
+          {onRemove && (
+            <RemoveField
+              title={`Remove the ${label} row`}
+              onRemove={onRemove}
+            />
+          )}
         </th>
       )}
       {editCols > 0 && (

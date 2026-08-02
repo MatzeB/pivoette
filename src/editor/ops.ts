@@ -165,6 +165,13 @@ export function moveValue(spec: ViewSpec, from: number, to: number): ViewSpec {
   return { ...p, values: insertAt(rest, at, value) };
 }
 
+/** The grand-total row is part of the view, not of `display.footer`. */
+export function setShowSummary(spec: ViewSpec, on: boolean): ViewSpec {
+  const p = pivot(spec);
+  if (!p) return spec;
+  return { ...p, showSummary: on };
+}
+
 // --- footer rows ------------------------------------------------------------
 
 export function addFooterRow(
