@@ -118,6 +118,25 @@ function RemoveField({
   );
 }
 
+/**
+ * Render the index group with the pending column spliced in at `at`.
+ * Header, body, and colgroup all go through this so they cannot disagree
+ * about where the extra column sits.
+ */
+function indexCols(
+  levels: number,
+  at: number | null,
+  cell: (level: number) => ReactNode,
+  pending?: () => ReactNode,
+): ReactNode[] {
+  const out: ReactNode[] = [];
+  for (let i = 0; i <= levels; i++) {
+    if (i === at) out.push(pending ? pending() : <col key="pending" />);
+    if (i < levels) out.push(cell(i));
+  }
+  return out;
+}
+
 /** A line in the opened pending column: a field, the Custom placeholder, or a note. */
 type AddEntry =
   | { kind: 'option'; id: string; label: string }
@@ -127,6 +146,8 @@ type AddEntry =
 /** The pending row-field column: narrow until it is offering its choices. */
 const EDIT_COL_W = 26;
 const ADD_COL_W = 150;
+/** How close to a header's edge the pointer must be to reveal the column. */
+const EDGE_ZONE = 18;
 
 const ROW_HEIGHT = 30;
 const HEADER_H = 28;
@@ -546,10 +567,42 @@ export function DataTable({
   // Chrome appears only when the host can actually receive the change.
   const editable = editing && !!onViewChange && !isFlat(view);
   const spec = isFlat(view) ? undefined : view;
-  /** One extra column in edit mode: the pending row field. */
-  const editCols = editable ? 1 : 0;
-  /** True while the pending column is expanded, offering its choices. */
-  const [adding, setAdding] = useState(false);
+  /**
+   * Where a row field would be inserted. `hoverInsert` follows the pointer near
+   * a header's left or right edge; `addingAt` pins it once the column is
+   * opened. Nothing is shown otherwise — the affordance appears where it would
+   * act, so a field can go anywhere in the order rather than only at the end.
+   */
+  const [hoverInsert, setHoverInsert] = useState<number | null>(null);
+  const [addingAt, setAddingAt] = useState<number | null>(null);
+  const adding = addingAt !== null;
+  const pendingAt = editable ? (addingAt ?? hoverInsert) : null;
+  const editCols = pendingAt !== null ? 1 : 0;
+
+  const pendingW = adding ? ADD_COL_W : EDIT_COL_W;
+  /** Sticky offsets with the pending column spliced into the index group. */
+  const editLeftOffset = useMemo(
+    () =>
+      pendingAt === null
+        ? leftOffset
+        : leftOffset.map((v, i) => v + (i >= pendingAt ? pendingW : 0)),
+    [leftOffset, pendingAt, pendingW],
+  );
+  const pendingLeft =
+    pendingAt === null
+      ? 0
+      : (leftOffset[pendingAt] ?? indexW.reduce((a, b) => a + b, 0));
+
+  /** Which insertion point the pointer is nearest, if any. */
+  function edgeInsert(e: React.MouseEvent<HTMLElement>, level: number) {
+    if (!editable || adding) return;
+    const box = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - box.left;
+    const edge = Math.min(EDGE_ZONE, box.width / 3);
+    if (x <= edge) setHoverInsert(level);
+    else if (x >= box.width - edge) setHoverInsert(level + 1);
+    else setHoverInsert(null);
+  }
   // Which measure's remove controls are lit; they repeat per column group.
   const [linkedMeasure, setLinkedMeasure] = useState<number | null>(null);
 
@@ -571,8 +624,10 @@ export function DataTable({
   }, [frame, spec?.rows, spec?.columns]);
 
   function commitAdd(field: string) {
-    setAdding(false);
-    if (spec) onViewChange?.(addField(spec, 'rows', field));
+    const at = addingAt;
+    setAddingAt(null);
+    setHoverInsert(null);
+    if (spec && at !== null) onViewChange?.(addField(spec, 'rows', field, at));
   }
 
   /** Drag state: which field is in flight, so drops know the source. */
@@ -656,16 +711,20 @@ export function DataTable({
       style={{ maxHeight: height }}
       onMouseLeave={() => setHover(null)}
     >
-      <table className={styles.table} style={{ width: totalWidth }}>
+      <table
+        className={styles.table}
+        style={{ width: totalWidth + (pendingAt !== null ? pendingW : 0) }}
+      >
         <colgroup>
-          {indexW.map((w, i) => (
-            <col key={`i${i}`} style={{ width: w }} />
-          ))}
-          {editable && (
-            <col
-              key="e-rows"
-              style={{ width: adding ? ADD_COL_W : EDIT_COL_W }}
-            />
+          {indexCols(
+            rowLevels.length,
+            pendingAt,
+            (i) => (
+              <col key={`i${i}`} style={{ width: indexW[i] }} />
+            ),
+            () => (
+              <col key="pending" style={{ width: pendingW }} />
+            ),
           )}
           {leafW.map((w, i) => (
             <col
@@ -677,74 +736,82 @@ export function DataTable({
           ))}
         </colgroup>
 
-        <thead onMouseOver={() => setHover(null)}>
+        <thead
+          onMouseOver={() => setHover(null)}
+          onMouseLeave={() => !adding && setHoverInsert(null)}
+        >
           {headerRows.map((hrow, level) => (
             <tr key={level} style={{ height: HEADER_H }}>
               {level === 0 &&
-                rowLevels.map((lvl, i) => {
-                  const active =
-                    sort?.key.kind === 'index' && sort.key.level === i;
-                  return (
+                indexCols(
+                  rowLevels.length,
+                  pendingAt,
+                  (i) => {
+                    const lvl = rowLevels[i]!;
+                    const active =
+                      sort?.key.kind === 'index' && sort.key.level === i;
+                    return (
+                      <th
+                        key={`ih${i}`}
+                        rowSpan={depth}
+                        className={`${styles.corner} ${styles.rowHeaderCell} ${styles.indexTint} ${sortable ? styles.sortable : ''}`}
+                        style={{
+                          top: 0,
+                          left: editLeftOffset[i],
+                          ...(i === 0
+                            ? {}
+                            : { borderLeft: '1px solid var(--pv-border)' }),
+                        }}
+                        onMouseMove={(e) => edgeInsert(e, i)}
+                        onClick={() => cycleSort({ kind: 'index', level: i })}
+                      >
+                        <span {...dragProps({ zone: 'rows', index: i })}>
+                          {lvl}
+                        </span>
+                        {sortArrow(active)}
+                        {editable && spec && (
+                          <RemoveField
+                            title={`Remove the ${lvl} row field`}
+                            onRemove={() =>
+                              onViewChange?.(removeField(spec, 'rows', i))
+                            }
+                          />
+                        )}
+                      </th>
+                    );
+                  },
+                  () => (
                     <th
-                      key={`ih${i}`}
+                      key="pending"
                       rowSpan={depth}
-                      className={`${styles.corner} ${styles.rowHeaderCell} ${styles.indexTint} ${sortable ? styles.sortable : ''}`}
-                      style={{
-                        top: 0,
-                        left: leftOffset[i],
-                        ...(i === 0
-                          ? {}
-                          : { borderLeft: '1px solid var(--pv-border)' }),
-                      }}
-                      onClick={() => cycleSort({ kind: 'index', level: i })}
+                      className={`${styles.corner} ${styles.rowHeaderCell} ${styles.indexTint} ${styles.editCell}`}
+                      style={{ top: 0, left: pendingLeft }}
                     >
-                      <span {...dragProps({ zone: 'rows', index: i })}>
-                        {lvl}
-                      </span>
-                      {sortArrow(active)}
-                      {editable && spec && (
+                      <button
+                        type="button"
+                        title="Add a row field here"
+                        aria-label="Add a row field here"
+                        aria-expanded={adding}
+                        className={cls(
+                          styles.addField,
+                          adding && styles.addFieldOpen,
+                        )}
+                        onClick={() => setAddingAt(pendingAt)}
+                      >
+                        +
+                      </button>
+                      {adding && (
                         <RemoveField
-                          title={`Remove the ${lvl} row field`}
-                          onRemove={() =>
-                            onViewChange?.(removeField(spec, 'rows', i))
-                          }
+                          title="Stop adding a row field"
+                          onRemove={() => {
+                            setAddingAt(null);
+                            setHoverInsert(null);
+                          }}
                         />
                       )}
                     </th>
-                  );
-                })}
-              {level === 0 && editable && (
-                <th
-                  key="e-rows"
-                  rowSpan={depth}
-                  className={`${styles.corner} ${styles.rowHeaderCell} ${styles.indexTint} ${styles.editCell}`}
-                  style={{ top: 0 }}
-                  onDragOver={(e) => dragged.current && e.preventDefault()}
-                  onDrop={() =>
-                    onFieldDrop({ zone: 'rows', index: rowLevels.length })
-                  }
-                >
-                  <button
-                    type="button"
-                    title="Add a row field"
-                    aria-label="Add a row field"
-                    aria-expanded={adding}
-                    className={cls(
-                      styles.addField,
-                      adding && styles.addFieldOpen,
-                    )}
-                    onClick={() => setAdding((v) => !v)}
-                  >
-                    +
-                  </button>
-                  {adding && (
-                    <RemoveField
-                      title="Stop adding a row field"
-                      onRemove={() => setAdding(false)}
-                    />
-                  )}
-                </th>
-              )}
+                  ),
+                )}
               {hrow.map((hc, ci) => {
                 const isLeafCol = hc.leafStart === hc.leafEnd;
                 const measure = measureAt(hc);
@@ -831,7 +898,7 @@ export function DataTable({
                 indexColumns={indexColumns}
                 extraTop={extraTop[item.index] ?? 0}
                 zebra={zebra}
-                editCols={editCols}
+                pendingAt={pendingAt}
                 addEntry={adding ? addEntries[item.index] : undefined}
                 onAdd={commitAdd}
                 hover={hover}
@@ -872,7 +939,7 @@ export function DataTable({
                 bodyLeadGap={bodyLeadGap}
                 bottom={(footerLines.length - 1 - fi) * ROW_HEIGHT}
                 leftOffset={leftOffset}
-                editCols={editCols}
+                extraIndexCols={editCols}
                 onRemove={
                   editable
                     ? fi < footerRows.length
@@ -931,8 +998,8 @@ interface RowProps {
   indexColumns: number;
   extraTop: number;
   zebra: boolean;
-  /** 0, or 1 in edit mode: the pending row-field cell after the index group. */
-  editCols: number;
+  /** Where the pending column sits among the index cells, or null. */
+  pendingAt: number | null;
   /** The entry this row shows while the pending column is open. */
   addEntry?: AddEntry;
   onAdd?: (field: string) => void;
@@ -957,7 +1024,7 @@ function Row({
   indexColumns,
   extraTop,
   zebra,
-  editCols,
+  pendingAt,
   addEntry,
   onAdd,
   hover,
@@ -971,66 +1038,72 @@ function Row({
 
   return (
     <tr style={{ height: ROW_HEIGHT + extraTop }}>
-      {rowLevels.map((_, level) => {
-        // Label shown only where this level's group starts.
-        const show =
-          !grouped || !prevPath || !prefixEqual(prevPath, row.path, level + 1);
-        // Merge cells: drop the bottom rule while the group continues below.
-        const continues =
-          grouped && !!nextPath && prefixEqual(nextPath, row.path, level + 1);
-        // Breadcrumb highlight: the label cell carrying an ancestor (or self)
-        // of the hovered row.
-        const lit =
-          !!hoverPath && show && prefixEqual(row.path, hoverPath, level + 1);
-        return (
-          <th
-            key={level}
-            scope="row"
-            className={cls(
-              styles.rowHeaderCell,
-              styles.indexTint,
-              styles.left,
-              lit && styles.rowHover,
+      {indexCols(
+        rowLevels.length,
+        pendingAt,
+        (level) => {
+          // Label shown only where this level's group starts.
+          const show =
+            !grouped ||
+            !prevPath ||
+            !prefixEqual(prevPath, row.path, level + 1);
+          // Merge cells: drop the bottom rule while the group continues below.
+          const continues =
+            grouped && !!nextPath && prefixEqual(nextPath, row.path, level + 1);
+          // Breadcrumb highlight: the label cell carrying an ancestor (or self)
+          // of the hovered row.
+          const lit =
+            !!hoverPath && show && prefixEqual(row.path, hoverPath, level + 1);
+          return (
+            <th
+              key={level}
+              scope="row"
+              className={cls(
+                styles.rowHeaderCell,
+                styles.indexTint,
+                styles.left,
+                lit && styles.rowHover,
+              )}
+              style={{
+                left: leftOffset[level],
+                // Gap only where this level starts a new block; spanning
+                // (blank) cells stay continuous across the gap.
+                ...(gapTop && show ? gapTop : {}),
+                ...(continues ? { borderBottom: 'none' } : {}),
+              }}
+              onMouseEnter={() => onHover({ row: rowIndex, leaf: -1 })}
+            >
+              {show
+                ? (memberFormats[level]?.(row.path[level] ?? null) ?? '')
+                : ''}
+            </th>
+          );
+        },
+        () => (
+          <td key="pending" className={styles.editCell} style={gapTop}>
+            {addEntry?.kind === 'option' && (
+              <button
+                type="button"
+                className={styles.addOption}
+                onClick={() => onAdd?.(addEntry.id)}
+              >
+                {addEntry.label}
+              </button>
             )}
-            style={{
-              left: leftOffset[level],
-              // Gap only where this level starts a new block; spanning
-              // (blank) cells stay continuous across the gap.
-              ...(gapTop && show ? gapTop : {}),
-              ...(continues ? { borderBottom: 'none' } : {}),
-            }}
-            onMouseEnter={() => onHover({ row: rowIndex, leaf: -1 })}
-          >
-            {show
-              ? (memberFormats[level]?.(row.path[level] ?? null) ?? '')
-              : ''}
-          </th>
-        );
-      })}
-      {editCols > 0 && (
-        <td className={styles.editCell} style={gapTop}>
-          {addEntry?.kind === 'option' && (
-            <button
-              type="button"
-              className={styles.addOption}
-              onClick={() => onAdd?.(addEntry.id)}
-            >
-              {addEntry.label}
-            </button>
-          )}
-          {addEntry?.kind === 'custom' && (
-            <button
-              type="button"
-              className={cls(styles.addOption, styles.addCustom)}
-              title="Not built yet"
-            >
-              Custom…
-            </button>
-          )}
-          {addEntry?.kind === 'note' && (
-            <span className={styles.addNote}>{addEntry.text}</span>
-          )}
-        </td>
+            {addEntry?.kind === 'custom' && (
+              <button
+                type="button"
+                className={cls(styles.addOption, styles.addCustom)}
+                title="Not built yet"
+              >
+                Custom…
+              </button>
+            )}
+            {addEntry?.kind === 'note' && (
+              <span className={styles.addNote}>{addEntry.text}</span>
+            )}
+          </td>
+        ),
       )}
       {row.cells.map((cell, i) => {
         const leaf = leaves[i]!;
@@ -1075,7 +1148,8 @@ interface FooterRowProps {
   bodyLeadGap: number;
   bottom: number;
   leftOffset: number[];
-  editCols: number;
+  /** The label cell spans the pending column too, when one is showing. */
+  extraIndexCols: number;
   /** Present in edit mode: drops this line from the footer. */
   onRemove?: () => void;
   onHover: (h: { row: number; leaf: number } | null) => void;
@@ -1091,7 +1165,7 @@ function FooterRow({
   bodyLeadGap,
   bottom,
   leftOffset,
-  editCols,
+  extraIndexCols,
   onRemove,
   onHover,
 }: FooterRowProps) {
@@ -1101,7 +1175,7 @@ function FooterRow({
       {rowLevels.length > 0 && (
         <th
           className={`${styles.summaryLabel} ${styles.indexTint}`}
-          colSpan={rowLevels.length}
+          colSpan={rowLevels.length + extraIndexCols}
           style={{ ...sticky, left: leftOffset[0], zIndex: 3 }}
           onMouseEnter={() => onHover({ row: -1, leaf: -1 })}
         >
@@ -1113,9 +1187,6 @@ function FooterRow({
             />
           )}
         </th>
-      )}
-      {editCols > 0 && (
-        <td className={styles.editCell} style={sticky} aria-hidden="true" />
       )}
       {cells.map((cell, i) => {
         const leaf = leaves[i]!;

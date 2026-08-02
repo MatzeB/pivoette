@@ -62,15 +62,21 @@ function withZone(
   return next;
 }
 
-/** Append a grouping field. A field already on either axis is ignored. */
+/**
+ * Add a grouping field, at `at` or appended. A field already on either axis is
+ * ignored — it would mean grouping by the same thing twice.
+ */
 export function addField(
   spec: ViewSpec,
   zone: FieldZone,
   field: string,
+  at?: number,
 ): ViewSpec {
   const p = pivot(spec);
   if (!p || p.rows.includes(field) || p.columns.includes(field)) return spec;
-  return withZone(p, zone, [...p[zone], field]);
+  const fields = p[zone];
+  const index = Math.min(Math.max(at ?? fields.length, 0), fields.length);
+  return withZone(p, zone, insertAt(fields, index, field));
 }
 
 export function removeField(

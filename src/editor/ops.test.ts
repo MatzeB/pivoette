@@ -204,3 +204,24 @@ describe('serializability', () => {
     expect(base).toEqual(before);
   });
 });
+
+describe('inserting a field at a position', () => {
+  it('places it where asked', () => {
+    expect(p(addField(base, 'rows', 'month', 0)).rows).toEqual([
+      'month',
+      'team',
+      'author',
+    ]);
+    expect(p(addField(base, 'rows', 'month', 1)).rows).toEqual([
+      'team',
+      'month',
+      'author',
+    ]);
+  });
+
+  it('appends without a position, and clamps a silly one', () => {
+    expect(p(addField(base, 'rows', 'month')).rows.at(-1)).toBe('month');
+    expect(p(addField(base, 'rows', 'month', 99)).rows.at(-1)).toBe('month');
+    expect(p(addField(base, 'rows', 'month', -3)).rows[0]).toBe('month');
+  });
+});

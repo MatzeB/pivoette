@@ -326,24 +326,41 @@ describe('<DataTable> editing', () => {
     expect(el.querySelectorAll('button[aria-label^="Add"]')).toHaveLength(0);
   });
 
-  it('offers a single + on the row-index group', async () => {
+  /**
+   * Reveal the pending column by moving the pointer to an index header's edge.
+   * jsdom reports a zero-size box, so the rect is stubbed to make the geometry
+   * explicit rather than relying on 0 <= 0.
+   */
+  async function hoverEdge(
+    el: HTMLElement,
+    level: number,
+    side: 'left' | 'right',
+  ) {
+    const th = [...el.querySelectorAll('thead th')][level] as HTMLElement;
+    th.getBoundingClientRect = () =>
+      ({ left: 0, width: 120, top: 0, height: 20 }) as DOMRect;
+    const e = new MouseEvent('mousemove', { bubbles: true });
+    Object.defineProperty(e, 'clientX', { value: side === 'left' ? 2 : 118 });
+    await act(async () => {
+      th.dispatchEvent(e);
+    });
+  }
+
+  it('shows no + until the pointer nears an index header edge', async () => {
     const el = await render(
-      <DataTable
-        data={data}
-        view={view}
-        editing
-        onViewChange={() => {}}
-        onDisplayChange={() => {}}
-        display={{ footer: [{ label: 'sum', agg: 'sum' }] }}
-      />,
+      <DataTable data={data} view={view} editing onViewChange={() => {}} />,
     );
-    const labels = [...el.querySelectorAll('button[aria-label^="Add"]')].map(
-      (b) => b.getAttribute('aria-label'),
-    );
-    expect(labels).toEqual(['Add a row field']);
+    expect(el.querySelectorAll('button[aria-label^="Add"]')).toHaveLength(0);
+
+    await hoverEdge(el, 0, 'left');
+    expect(
+      [...el.querySelectorAll('button[aria-label^="Add"]')].map((b) =>
+        b.getAttribute('aria-label'),
+      ),
+    ).toEqual(['Add a row field here']);
   });
 
-  it('widens every row by exactly one cell', async () => {
+  it('costs no layout while nothing is hovered', async () => {
     const plain = await render(
       <DataTable
         data={data}
@@ -362,54 +379,49 @@ describe('<DataTable> editing', () => {
         display={{ footer: [{ label: 'sum', agg: 'sum' }] }}
       />,
     );
+    // Editing alone must not change the table's shape any more.
+    expect(await cellCounts(edit)).toEqual(before);
+
+    await hoverEdge(edit, 0, 'left');
     const after = await cellCounts(edit);
     expect(after.head).toBe(before.head + 1);
-    expect(after.foot).toBe(before.foot + 1);
   });
 
   it('expands the pending column when + is pressed', async () => {
-    // The choices themselves live in body rows, which the virtualizer does not
-    // render under jsdom — so what is observable here is the column opening.
     const el = await render(
       <DataTable data={data} view={view} editing onViewChange={() => {}} />,
     );
+    await hoverEdge(el, 0, 'left');
     const add = el.querySelector<HTMLButtonElement>(
-      'button[aria-label="Add a row field"]',
+      'button[aria-label="Add a row field here"]',
     )!;
     const pendingCol = () =>
-      [...el.querySelectorAll('colgroup col')].at(view.rows.length)!;
-
-    expect(add.getAttribute('aria-expanded')).toBe('false');
-    const narrow = (pendingCol() as HTMLElement).style.width;
+      [...el.querySelectorAll('colgroup col')][0] as HTMLElement;
+    const narrow = pendingCol().style.width;
 
     await act(async () => add.click());
-    expect(add.getAttribute('aria-expanded')).toBe('true');
-    expect((pendingCol() as HTMLElement).style.width).not.toBe(narrow);
+    expect(pendingCol().style.width).not.toBe(narrow);
 
-    // An explicit abort control appears alongside the (now lit) +.
     const abort = el.querySelector<HTMLButtonElement>(
       'button[aria-label="Stop adding a row field"]',
     )!;
-    expect(abort).toBeTruthy();
     await act(async () => abort.click());
-    expect((pendingCol() as HTMLElement).style.width).toBe(narrow);
-    expect(
-      el.querySelector('button[aria-label="Stop adding a row field"]'),
-    ).toBeNull();
+    expect(el.querySelectorAll('button[aria-label^="Add"]')).toHaveLength(0);
   });
 
   it('leaves the given spec untouched', async () => {
-    // Committing a choice goes through `addField`, which never mutates; the
-    // click itself is not reachable here because the choices render in body
-    // rows and the virtualizer renders none under jsdom.
+    // Committing a choice goes through `addField`, which never mutates. The
+    // choices themselves render in body rows, which the virtualizer does not
+    // render under jsdom, so what is exercised here is revealing and opening.
     const before = JSON.parse(JSON.stringify(view)) as PivotSpec;
     const el = await render(
       <DataTable data={data} view={view} editing onViewChange={() => {}} />,
     );
+    await hoverEdge(el, 0, 'left');
     await act(async () =>
       el
         .querySelector<HTMLButtonElement>(
-          'button[aria-label="Add a row field"]',
+          'button[aria-label="Add a row field here"]',
         )!
         .click(),
     );
