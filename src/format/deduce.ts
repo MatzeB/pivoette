@@ -38,14 +38,12 @@ const KIND_RULES: Record<string, FormatSpec> = {
 /**
  * Keyed by the composed unit label — what the column is *measured in*. A
  * fallback for data that carries a unit but no kind, so `scale: ['percent']`
- * alone still gets sensible decimals.
+ * alone still gets sensible decimals. Currency symbols deliberately have no
+ * entries here: a column whose unit names a currency is answered by `Intl`
+ * above, and duplicating "these symbols mean two decimals" would be a second
+ * source of truth that disagrees for the likes of JPY.
  */
-const UNIT_RULES: Record<string, FormatSpec> = {
-  '%': ONE_DECIMAL,
-  $: TWO_DECIMALS,
-  '€': TWO_DECIMALS,
-  '£': TWO_DECIMALS,
-};
+const UNIT_RULES: Record<string, FormatSpec> = { '%': ONE_DECIMAL };
 
 /**
  * The format implied by a column's kind, else by its unit. A recognised
@@ -95,4 +93,25 @@ export function resolveFormatSpec(
   const inherited = named?.fnName === fnName ? named.options : undefined;
   const options = { ...inherited, ...explicit.options };
   return Object.keys(options).length > 0 ? { fnName, options } : { fnName };
+}
+
+/**
+ * The whole format pipeline for one column: deduce from metadata, merge the
+ * view's explicit spec over it, then stamp on the view locale so separators
+ * match the locale the currency facts came from. The engine builds every leaf
+ * — flat, measure, and derived — through here.
+ */
+export function columnFormat(
+  src: { format?: FormatSpec; inheritUnitFormat?: boolean },
+  meta: ColumnMeta | undefined,
+  locale: string | undefined,
+): FormatSpec | undefined {
+  const format = resolveFormatSpec(
+    src.format,
+    deduceFormat(meta, locale),
+    src.inheritUnitFormat,
+  );
+  if (!format || !locale || !('fnName' in format)) return format;
+  if (format.options?.locale !== undefined) return format;
+  return { ...format, options: { ...format.options, locale } };
 }

@@ -106,17 +106,8 @@ export interface ValuePlacement {
   level?: number; // omitted = innermost
 }
 
-export interface PivotSpec {
-  mode?: 'pivot';
-  rows: string[];
-  columns: string[];
-  values: ValueSpec[];
-  valuePlacement?: ValuePlacement;
-  /** Derived columns computed after base cells exist. */
-  computed?: ColumnDef[];
-  rowSort?: SortSpec[];
-  columnSort?: SortSpec[];
-  showSummary?: boolean;
+/** Options that mean the same thing in either mode. */
+export interface ViewSpecBase {
   /** Placeholder for empty groups (default ''). */
   emptyDisplay?: string;
   /** data field name -> display header label. */
@@ -128,17 +119,23 @@ export interface PivotSpec {
   locale?: string;
 }
 
-export interface TableSpec {
+export interface PivotSpec extends ViewSpecBase {
+  mode?: 'pivot';
+  rows: string[];
+  columns: string[];
+  values: ValueSpec[];
+  valuePlacement?: ValuePlacement;
+  /** Derived columns computed after base cells exist. */
+  computed?: ColumnDef[];
+  rowSort?: SortSpec[];
+  columnSort?: SortSpec[];
+  showSummary?: boolean;
+}
+
+export interface TableSpec extends ViewSpecBase {
   mode: 'flat';
   columns: ColumnDef[];
   sort?: SortSpec[];
-  emptyDisplay?: string;
-  labels?: Record<string, string>;
-  /** data field name -> metadata, layered over whatever the data supplied. */
-  meta?: Record<string, ColumnMetaInput>;
-  /** BCP-47 locale for number formatting and for currency facts (symbol
-   * placement, fraction digits). Defaults to the runtime's locale. */
-  locale?: string;
 }
 
 export type ViewSpec = PivotSpec | TableSpec;

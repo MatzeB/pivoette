@@ -5,10 +5,10 @@
  */
 import type { CellValue, ColumnType, DataFrame } from '../data/types';
 import type { ColumnMeta } from '../data/meta';
-import { normalizeMeta } from '../data/meta';
+import { mergeMeta, normalizeMeta } from '../data/meta';
 import { requireColumn } from '../data/frame';
 import type { Align, ResolvedColumn } from '../format/context';
-import { deduceFormat, resolveFormatSpec } from '../format/deduce';
+import { columnFormat } from '../format/deduce';
 import { Format, Render } from '../format/builtins';
 import { resolveFormat } from '../format/format';
 import { resolveStyle } from '../format/style';
@@ -27,7 +27,7 @@ import type {
 import { isFlat } from './spec';
 import type { Cell, ResolvedLeaf, ResultRow, ViewResult } from './result';
 import { buildHeader } from './result';
-import { compareValues } from '../util';
+import { compareValues, isNumericType } from '../util';
 
 const NUMERIC_FORMATS = new Set<string>(Object.values(Format));
 
@@ -36,23 +36,21 @@ function isNumericFormat(spec?: FormatSpec): boolean {
 }
 
 function alignFor(type: ColumnType | undefined, format?: FormatSpec): Align {
-  if (isNumericFormat(format)) return 'right';
-  if (type === 'int' || type === 'float') return 'right';
-  return 'left';
+  return isNumericFormat(format) || isNumericType(type) ? 'right' : 'left';
 }
 
 /**
  * Header text for a data field: an explicit `spec.labels` entry wins, then the
- * column's metadata `displayName`, then the raw field name.
+ * column's metadata `displayName`, then the raw field name. Callers pass the
+ * metadata that actually applies — for a display column that is the merged one,
+ * including any `def.meta`.
  */
 function label(
-  frame: DataFrame,
   field: string,
-  labels?: Record<string, string>,
+  labels: Record<string, string> | undefined,
+  meta: ColumnMeta | undefined,
 ): string {
-  return (
-    labels?.[field] ?? frame.columnByName.get(field)?.meta.displayName ?? field
-  );
+  return labels?.[field] ?? meta?.displayName ?? field;
 }
 
 /**
@@ -60,6 +58,15 @@ function label(
  * `{ id: 'price' }` needs no `source`; a computed or composite column has no
  * single source unless it says so.
  */
+/** `label` for a row/column index field, whose metadata comes from the frame. */
+function fieldLabel(
+  frame: DataFrame,
+  field: string,
+  labels?: Record<string, string>,
+): string {
+  return label(field, labels, frame.columnByName.get(field)?.meta);
+}
+
 function sourceField(def: ColumnDef): string | undefined {
   if (def.compute || def.composite) return def.source;
   return def.source ?? def.id;
@@ -77,26 +84,9 @@ function columnMeta(
   const base = source ? frame.columnByName.get(source)?.meta : undefined;
   if (!def.meta) return base;
   return normalizeMeta(
-    {
-      dataName: base?.dataName ?? def.id,
-      type: base?.type ?? 'float',
-      category: base?.category ?? 'data',
-    },
-    { ...base, ...def.meta },
+    base ?? { dataName: def.id, type: 'float', category: 'data' },
+    mergeMeta(base, def.meta),
   );
-}
-
-/**
- * Give a named format the view's locale unless it set one itself, so grouping
- * separators and digits follow the same locale the currency facts came from.
- */
-function withLocale(
-  format: FormatSpec | undefined,
-  locale: string | undefined,
-): FormatSpec | undefined {
-  if (!format || !locale || !('fnName' in format)) return format;
-  if (format.options?.locale !== undefined) return format;
-  return { ...format, options: { ...format.options, locale } };
 }
 
 function makeLeaf(args: {
@@ -127,19 +117,14 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
   const fieldValues = (name: string, row: number): CellValue =>
     frame.columnByName.get(name)?.values[row] ?? null;
 
-  const leaves: ResolvedLeaf[] = spec.columns.map((def) => {
-    const sourceName = sourceField(def);
+  const sourceNames = spec.columns.map(sourceField);
+
+  const leaves: ResolvedLeaf[] = spec.columns.map((def, i) => {
+    const sourceName = sourceNames[i];
     const source = sourceName ? frame.columnByName.get(sourceName) : undefined;
     const meta = columnMeta(frame, def, sourceName);
     // An explicit format wins, merging over any the column's kind implies.
-    const format = withLocale(
-      resolveFormatSpec(
-        def.format,
-        deduceFormat(meta, spec.locale),
-        def.inheritUnitFormat,
-      ),
-      spec.locale,
-    );
+    const format = columnFormat(def, meta, spec.locale);
     const column: ResolvedColumn = {
       id: def.id,
       // def.label > spec.labels > metadata displayName > the field name.
@@ -174,7 +159,7 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
 
   const rows: ResultRow[] = [];
   for (let r = 0; r < frame.length; r++) {
-    const cells: Cell[] = spec.columns.map((def) => {
+    const cells: Cell[] = spec.columns.map((def, ci) => {
       // Resolve inputs (explicit overrides, else sibling fields by name).
       const inputs: Record<string, unknown> = {};
       if (def.composite) {
@@ -190,7 +175,7 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
         }
       }
       let value: unknown;
-      const sourceName = sourceField(def);
+      const sourceName = sourceNames[ci];
       if (def.compute) {
         value = evalExpression(def.compute, { ...inputs, inputs });
       } else if (sourceName) {
@@ -428,14 +413,7 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     if (d.kind === 'measure') {
       baseIndexByKey.set(d.baseKey, i);
       const meta = frame.columnByName.get(d.measure.field)?.meta;
-      const format = withLocale(
-        resolveFormatSpec(
-          d.measure.format,
-          deduceFormat(meta, spec.locale),
-          d.measure.inheritUnitFormat,
-        ),
-        spec.locale,
-      );
+      const format = columnFormat(d.measure, meta, spec.locale);
       const column: ResolvedColumn = {
         id: d.baseKey,
         label: d.measure.label ?? d.measure.id,
@@ -454,14 +432,7 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     }
     // A derived column has no source field; only its own `meta` applies.
     const meta = columnMeta(frame, d.def, undefined);
-    const format = withLocale(
-      resolveFormatSpec(
-        d.def.format,
-        deduceFormat(meta, spec.locale),
-        d.def.inheritUnitFormat,
-      ),
-      spec.locale,
-    );
+    const format = columnFormat(d.def, meta, spec.locale);
     const column: ResolvedColumn = {
       id: d.def.id,
       label: d.def.label ?? d.def.id,
@@ -529,7 +500,7 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     });
   }
 
-  const rowLevels = spec.rows.map((f) => label(frame, f, spec.labels));
+  const rowLevels = spec.rows.map((f) => fieldLabel(frame, f, spec.labels));
   const { forest, depth } = buildHeader(leaves);
   return {
     mode: 'pivot',
@@ -656,7 +627,7 @@ function pivotMeasuresOnRows(
   }
 
   const rowLevels = [
-    ...spec.rows.map((f) => label(frame, f, spec.labels)),
+    ...spec.rows.map((f) => fieldLabel(frame, f, spec.labels)),
     'Measure',
   ];
   const { forest, depth } = buildHeader(leaves);

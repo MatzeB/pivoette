@@ -1,4 +1,4 @@
-import { deduceCategory, normalizeMeta } from './meta';
+import { deduceCategory, mergeMeta, normalizeMeta } from './meta';
 import type { ColumnMetaInput } from './meta';
 import type { DataColumn, DataColumnInput, DataFrame } from './types';
 
@@ -40,12 +40,22 @@ export function withMeta(
   overrides: Record<string, ColumnMetaInput> | undefined,
 ): DataFrame {
   if (!overrides) return frame;
-  return makeFrame(
-    frame.columns.map((col) => {
-      const override = overrides[col.name];
-      return override ? { ...col, meta: { ...col.meta, ...override } } : col;
-    }),
-  );
+  // Only overridden columns are rebuilt, and the frame is assembled directly
+  // rather than through `makeFrame`: re-normalizing untouched columns would
+  // mint fresh ColumnMeta objects and drop their memoized labels for nothing.
+  // Lengths are already validated and the value arrays are shared, not copied.
+  let changed = false;
+  const columns = frame.columns.map((col) => {
+    const override = overrides[col.name];
+    if (!override) return col;
+    changed = true;
+    const meta = normalizeMeta(col.meta, mergeMeta(col.meta, override));
+    return { ...col, type: meta.type, meta };
+  });
+  if (!changed) return frame;
+  const columnByName = new Map<string, DataColumn>();
+  for (const col of columns) columnByName.set(col.name, col);
+  return { columns, length: frame.length, columnByName };
 }
 
 /** Look up a column, throwing a helpful error if the field is unknown. */

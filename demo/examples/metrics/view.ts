@@ -10,30 +10,26 @@ import type { ViewSpec } from '../../../src';
 export const view: ViewSpec = {
   mode: 'flat',
   columns: [
-    { id: 'host', source: 'host' },
-    { id: 'region', source: 'region' },
+    { id: 'host' },
+    { id: 'region' },
     // MiB values run to five digits — no fraction needed.
-    { id: 'memory', source: 'memory', format: { fnName: Format.Integer } },
+    { id: 'memory', format: { fnName: Format.Integer } },
     {
       id: 'latency',
-      source: 'latency',
       format: { fnName: Format.Number, options: { decimals: 2 } },
     },
     // No format: kind `percentage` implies 1 decimal.
     { id: 'cpu' },
     {
       id: 'throughput',
-      source: 'throughput',
       format: { fnName: Format.Number, options: { decimals: 2 } },
     },
     {
       id: 'bandwidth',
-      source: 'bandwidth',
       format: { fnName: Format.Number, options: { decimals: 1 } },
     },
     {
       id: 'floorArea',
-      source: 'floorArea',
       format: { fnName: Format.Number, options: { decimals: 2 } },
     },
   ],

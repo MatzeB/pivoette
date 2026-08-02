@@ -18,6 +18,7 @@
 import { currencyFacts } from './currency';
 import type { CurrencyFacts } from './currency';
 import type { ColumnType } from './types';
+import { isNumericType } from '../util';
 
 export type ColumnCategory = 'index' | 'data';
 
@@ -118,12 +119,14 @@ export const UNIT_SHORT: Record<string, string> = {
 };
 
 /**
- * Kinds whose symbol precedes the number when the unit names no currency
- * `Intl` knows (say `kind: price, unit: credit`). Real currencies get their
- * placement from the locale instead — see `columnCurrency`. Only consulted for
- * a single-factor unit; a rate like `price/duration` reads better as `$/h`.
+ * How a symbol attaches to a number is a property of the *symbol*, not of the
+ * column's kind: `$` leads and hugs, `%` trails and hugs, `MB` trails with a
+ * space. Currencies `Intl` recognises get their placement from the locale
+ * instead (see `columnCurrency`); these sets cover metadata that supplies a
+ * bare symbol with no resolvable unit name.
  */
-const PREFIX_KINDS = new Set<string>([ColumnKind.Price, 'currency']); // kinds, not formats
+const SYMBOL_PREFIX = new Set(['$', '€', '£', '¥', '₹', '₩', '¤']);
+const SYMBOL_TIGHT = new Set(['%']);
 
 export const SCALE_SHORT: Record<string, string> = {
   femto: 'f',
@@ -154,7 +157,7 @@ export const SCALE_SHORT: Record<string, string> = {
  * all-null) indexes the table. Falls straight out of the existing type inference.
  */
 export function deduceCategory(type: ColumnType): ColumnCategory {
-  return type === 'int' || type === 'float' ? 'data' : 'index';
+  return isNumericType(type) ? 'data' : 'index';
 }
 
 const INVERSE = '1/';
@@ -270,6 +273,9 @@ export interface UnitLabels {
   /** True when the label leads the number instead of trailing it ($12.50).
    * Locale-derived for currencies: `$1.00`, but `1,00 €` in de-DE. */
   prefix: boolean;
+  /** True when the label hugs the number ($12.50, 45.6%) rather than standing
+   * off it (15467 MB). */
+  tight: boolean;
 }
 
 interface Factor {
@@ -344,6 +350,7 @@ const EMPTY_LABELS: UnitLabels = {
   scalePart: '',
   unitPart: '',
   prefix: false,
+  tight: false,
 };
 
 const labelCache = new Map<string, WeakMap<ColumnMeta, UnitLabels>>();
@@ -366,17 +373,43 @@ export function unitLabels(
   const factors = factorsOf(meta.unitShort, meta.scaleShort);
   const only = factors.length === 1 ? factors[0]! : undefined;
   const simple = !!only && !only.inverted && only.exponent === 1;
+  const full = compose(factors);
+  // A currency's placement comes from the locale; otherwise the symbol itself
+  // decides. Compound units always trail with a space.
+  const prefix =
+    simple &&
+    (columnCurrency(meta, locale)?.prefix ?? SYMBOL_PREFIX.has(only.unit));
   const labels: UnitLabels = {
-    full: compose(factors),
+    full,
     simple,
     scalePart: simple ? only.scale : '',
     unitPart: simple ? only.unit : '',
-    prefix:
-      simple &&
-      (columnCurrency(meta, locale)?.prefix ?? PREFIX_KINDS.has(kindId(meta))),
+    prefix,
+    tight: prefix || (simple && SYMBOL_TIGHT.has(full)),
   };
   perLocale.set(meta, labels);
   return labels;
+}
+
+/**
+ * Layer raw metadata over existing metadata. Overriding a source field drops
+ * the shortname derived from it, so re-declaring a `mega`/`byte` column as
+ * `{ unit: 'second' }` re-derives `s` instead of keeping a stale `B`. An
+ * explicitly supplied shortname always survives.
+ */
+export function mergeMeta(
+  base: ColumnMeta | undefined,
+  override: ColumnMetaInput | undefined,
+): ColumnMetaInput | undefined {
+  if (!base || !override) return override ?? base;
+  const merged: ColumnMetaInput = { ...base, ...override };
+  if (override.unit !== undefined && override.unitShort === undefined) {
+    delete merged.unitShort;
+  }
+  if (override.scale !== undefined && override.scaleShort === undefined) {
+    delete merged.scaleShort;
+  }
+  return merged;
 }
 
 /**

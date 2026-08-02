@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { DataTable, isFlat } from '../src';
+import { DataTable, isFlat, normalizeMeta, unitLabels } from '../src';
 import type {
   ColumnMetaInput,
+  UnitLabels,
   DataTableDisplay,
   DatasetJson,
   UnitPlacement,
@@ -106,20 +107,30 @@ function initialExample(): string {
 }
 
 /**
- * Every piece of column metadata in play, from either source: the data (metrics
- * ships a `{meta, rows}` document) or the view (ticker annotates plain rows,
- * including a computed column's own `meta`).
+ * The unit labels of every column in play, from either source: the data
+ * (metrics ships a `{meta, rows}` document) or the view (ticker annotates plain
+ * rows, including a computed column's own `meta`).
+ *
+ * Normalizing and asking `unitLabels` — rather than probing the raw input for
+ * `unit`/`scale` keys — is what keeps the controls in step with the table: the
+ * same call decides whether a label exists and whether its halves can be placed
+ * separately.
  */
-function collectMeta(
+function collectLabels(
   data: Row[] | DatasetJson,
   view: ViewSpec,
-): ColumnMetaInput[] {
+): UnitLabels[] {
   const defs = isFlat(view) ? view.columns : (view.computed ?? []);
-  return [
+  const inputs: ColumnMetaInput[] = [
     ...(Array.isArray(data) ? [] : Object.values(data.meta ?? {})),
     ...Object.values(view.meta ?? {}),
     ...defs.map((def) => def.meta).filter((m) => m !== undefined),
   ];
+  return inputs.map((input) =>
+    unitLabels(
+      normalizeMeta({ dataName: '', type: 'float', category: 'data' }, input),
+    ),
+  );
 }
 
 const PLACEMENT_OPTIONS: { id: UnitPlacement; label: string }[] = [
@@ -230,11 +241,9 @@ export function App() {
   // two only where a single column has both halves to place. Ticker's `$` and
   // `%` live on different columns, so one control covers it; metrics has
   // `ms`/`MiB`, where scale and unit really can go to different places.
-  const metas = collectMeta(data, view);
-  const hasUnits = metas.some((m) => m.unit ?? m.scale ?? m.unitShort);
-  const hasSplit = metas.some(
-    (m) => (m.unit ?? m.unitShort) && (m.scale ?? m.scaleShort),
-  );
+  const labels = useMemo(() => collectLabels(data, view), [data, view]);
+  const hasUnits = labels.some((l) => l.full !== '');
+  const hasSplit = labels.some((l) => l.scalePart !== '' && l.unitPart !== '');
 
   function setBoth(v: UnitPlacement) {
     setUnitPlacement(v);

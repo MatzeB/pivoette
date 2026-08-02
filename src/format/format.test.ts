@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { testMeta as meta } from '../test-meta';
 import { deduceFormat, resolveFormatSpec } from './deduce';
-import { normalizeMeta } from '../data/meta';
-import type { ColumnMetaInput } from '../data/meta';
 import { resolveFormat } from './format';
 import type { CellCtx } from './context';
 import type { FormatSpec } from '../pivot/spec';
@@ -69,9 +68,6 @@ describe('intl-backed formatters', () => {
 });
 
 describe('deduceFormat', () => {
-  const meta = (input: ColumnMetaInput) =>
-    normalizeMeta({ dataName: 'x', type: 'float', category: 'data' }, input);
-
   it('maps the known kinds to a format', () => {
     expect(deduceFormat(meta({ kind: 'price' }))).toEqual({
       fnName: 'number',

@@ -1,15 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { testMeta as meta } from '../test-meta';
 import { datasetMeta, fromDataset, fromRows } from './import';
+import { withMeta } from './frame';
 import { kindId, normalizeMeta, unitLabels } from './meta';
-import type { ColumnMeta, ColumnMetaInput } from './meta';
-
-/** Normalize a standalone metadata input for label assertions. */
-function meta(input: ColumnMetaInput): ColumnMeta {
-  return normalizeMeta(
-    { dataName: 'x', type: 'float', category: 'data' },
-    input,
-  );
-}
+import type { ColumnMetaInput } from './meta';
 
 describe('deduction', () => {
   it('categorizes numeric columns as data and the rest as index', () => {
@@ -143,6 +137,7 @@ describe('unitLabels', () => {
       scalePart: 'm',
       unitPart: 's',
       prefix: false,
+      tight: false,
     });
 
     const compound = unitLabels(meta({ unit: ['byte', '1/second'] }));
@@ -229,5 +224,32 @@ describe('currency units', () => {
 
   it('does not prefix a non-currency kind', () => {
     expect(unitLabels(meta({ unit: 'second' })).prefix).toBe(false);
+  });
+});
+
+describe('mergeMeta', () => {
+  it('re-derives a shortname when its source field is overridden', () => {
+    const base = fromRows([{ v: 1 }], { v: { unit: 'byte', scale: 'mega' } });
+    const over = withMeta(base, { v: { unit: 'second' } });
+    const m = over.columnByName.get('v')!.meta;
+    // Not the stale ['B'] from the byte it used to be.
+    expect(m.unitShort).toEqual(['s']);
+    expect(unitLabels(m).full).toBe('Ms');
+  });
+
+  it('keeps an explicitly supplied shortname', () => {
+    const over = withMeta(fromRows([{ v: 1 }], { v: { unit: 'byte' } }), {
+      v: { unit: 'second', unitShort: 'sec' },
+    });
+    expect(over.columnByName.get('v')!.meta.unitShort).toEqual(['sec']);
+  });
+
+  it('leaves untouched columns identical', () => {
+    const base = fromRows([{ a: 1, b: 2 }], { a: { unit: 'byte' } });
+    const over = withMeta(base, { a: { displayName: 'A' } });
+    // `b` keeps its object identity, so its memoized labels survive.
+    expect(over.columnByName.get('b')!.meta).toBe(
+      base.columnByName.get('b')!.meta,
+    );
   });
 });

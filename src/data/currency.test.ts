@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { testMeta as meta } from '../test-meta';
 import { currencyFacts } from './currency';
-import { columnCurrency, normalizeMeta, unitLabels } from './meta';
+import { columnCurrency, unitLabels } from './meta';
 import { deduceFormat } from '../format/deduce';
-import type { ColumnMetaInput } from './meta';
-
-const meta = (input: ColumnMetaInput) =>
-  normalizeMeta({ dataName: 'x', type: 'float', category: 'data' }, input);
 
 describe('currencyFacts', () => {
   it('resolves a long unit name to its ISO code', () => {
@@ -49,10 +46,27 @@ describe('currency-aware metadata', () => {
     expect(unitLabels(money, 'de-DE').prefix).toBe(false);
   });
 
-  it('still prefixes a price whose unit names no known currency', () => {
+  it('trails a price whose unit names no known currency', () => {
+    // How a label attaches is a property of the symbol, not of the kind: an
+    // unrecognised one trails with a space rather than running into the digits.
     const credits = meta({ kind: 'price', unit: 'credit' });
     expect(columnCurrency(credits, 'de-DE')).toBeUndefined();
-    expect(unitLabels(credits, 'de-DE').prefix).toBe(true);
+    const labels = unitLabels(credits, 'de-DE');
+    expect(labels.prefix).toBe(false);
+    expect(labels.tight).toBe(false);
+  });
+
+  it('reads placement off a bare symbol with no resolvable unit name', () => {
+    const bare = meta({ unitShort: '$' });
+    expect(unitLabels(bare, 'en-US')).toMatchObject({
+      prefix: true,
+      tight: true,
+    });
+    // Percent hugs without leading.
+    expect(unitLabels(meta({ scale: 'percent' }), 'en-US')).toMatchObject({
+      prefix: false,
+      tight: true,
+    });
   });
 
   it('ignores a compound unit — a rate is not a currency amount', () => {

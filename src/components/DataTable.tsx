@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import type { CellCtx } from '../format/context';
+import type { CellCtx, FormatFn } from '../format/context';
 import type { CellValue, DataFrame, DatasetJson } from '../data/types';
 import type { ColumnMeta } from '../data/meta';
 import { unitLabels } from '../data/meta';
@@ -54,6 +54,10 @@ export interface DataTableProps {
   display?: DataTableDisplay;
   className?: string;
 }
+
+/** Stable identity: a fresh `[]` default would invalidate the width memo (and
+ * so re-measure every column) on every render, including each hover. */
+const NO_FOOTER: { label: string; agg: string }[] = [];
 
 const ROW_HEIGHT = 30;
 const HEADER_H = 28;
@@ -173,9 +177,14 @@ function unitAffixes(
   unitPlacement: UnitPlacement,
   scalePlacement: UnitPlacement,
   locale?: string,
-): { value: string; header: string; prefix: boolean } {
+): { value: string; header: string; prefix: boolean; tight: boolean } {
   const labels = unitLabels(meta, locale);
-  const out = { value: '', header: '', prefix: labels.prefix };
+  const out = {
+    value: '',
+    header: '',
+    prefix: labels.prefix,
+    tight: labels.tight,
+  };
   if (!labels.full) return out;
   if (!labels.simple) {
     if (unitPlacement !== 'off') out[unitPlacement] += labels.full;
@@ -187,15 +196,30 @@ function unitAffixes(
 }
 
 /**
- * Attach a unit label to a formatted number. Currency-style labels lead the
- * number and sit inside any sign (`-$12.50`); everything else trails it after a
- * space, except a bare `%`, which hugs.
+ * Build a column's formatter, specialized once for its unit label rather than
+ * re-deciding per cell. A leading label sits inside any sign (`-$12.50`); a
+ * `tight` one hugs the digits (`$12.50`, `45.6%`) and the rest stand off with a
+ * space (`15467 MB`). Both facts come from the metadata — see `unitLabels`.
  */
-function decorate(text: string, label: string, prefix: boolean): string {
-  if (!text || !label) return text;
-  if (!prefix) return label === '%' ? text + label : `${text} ${label}`;
-  const sign = text[0] === '-' || text[0] === '+' ? text[0] : '';
-  return sign + label + text.slice(sign.length);
+function wrapFormat(
+  base: FormatFn,
+  label: string,
+  prefix: boolean,
+  tight: boolean,
+): FormatFn {
+  const gap = tight ? '' : ' ';
+  if (!prefix) {
+    return (ctx) => {
+      const text = base(ctx);
+      return text ? text + gap + label : text;
+    };
+  }
+  return (ctx) => {
+    const text = base(ctx);
+    if (!text) return text;
+    const sign = text[0] === '-' || text[0] === '+' ? text[0] : '';
+    return sign + label + gap + text.slice(sign.length);
+  };
 }
 
 function isFrame(
@@ -224,7 +248,7 @@ export function DataTable({
     zebra = false,
     hideRules = false,
     highlightHeaders = true,
-    footer = [],
+    footer = NO_FOOTER,
     unitPlacement = 'off',
     scalePlacement = 'off',
   } = display;
@@ -257,11 +281,9 @@ export function DataTable({
       // Tier-3 cells own their whole rendering; metadata is on `CellCtx` if
       // they want it.
       if (!affix.value || leaf.render) return leaf;
-      const base = leaf.format;
       return {
         ...leaf,
-        format: (ctx: CellCtx) =>
-          decorate(base(ctx), affix.value, affix.prefix),
+        format: wrapFormat(leaf.format, affix.value, affix.prefix, affix.tight),
       };
     });
     return { leaves, headerSuffix };
