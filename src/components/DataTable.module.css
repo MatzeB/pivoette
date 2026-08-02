@@ -300,3 +300,10 @@
   width: 12px;
   height: 12px;
 }
+
+/* Lit because a sibling copy is hovered — the measure header, and so its
+   remove control, repeats once per column group. */
+.removeFieldLinked {
+  opacity: 1;
+  background: var(--pv-remove-bg);
+}

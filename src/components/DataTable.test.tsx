@@ -534,3 +534,44 @@ describe('<DataTable> remove controls', () => {
     expect(v!.showSummary).toBe(false);
   });
 });
+
+describe('<DataTable> linked measure controls', () => {
+  const data = [
+    { b: 'k1', size: 'tiny', n: 1 },
+    { b: 'k1', size: 'big', n: 2 },
+  ];
+  const view: PivotSpec = {
+    rows: ['b'],
+    columns: ['size'],
+    values: [
+      { id: 'mean', field: 'n', agg: 'mean', label: 'mean' },
+      { id: 'max', field: 'n', agg: 'max', label: 'max' },
+    ],
+  };
+
+  it('lights every copy of a measure when one is hovered', async () => {
+    const el = await render(
+      <DataTable data={data} view={view} editing onViewChange={() => {}} />,
+    );
+    const of = (name: string) =>
+      [
+        ...el.querySelectorAll<HTMLElement>('button[aria-label$="measure"]'),
+      ].filter((b) => b.getAttribute('aria-label')!.includes(name));
+    const lit = (els: HTMLElement[]) =>
+      els.filter((b) => b.dataset.linked === 'true').length;
+
+    // One header per column group, so each measure's control repeats.
+    expect(of('max')).toHaveLength(2);
+    expect(lit(of('max'))).toBe(0);
+
+    await act(async () => {
+      of('max')[0]!.dispatchEvent(
+        new MouseEvent('mouseover', { bubbles: true }),
+      );
+    });
+
+    expect(lit(of('max'))).toBe(2);
+    // ...and only that measure.
+    expect(lit(of('mean'))).toBe(0);
+  });
+});

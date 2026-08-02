@@ -84,20 +84,33 @@ export interface DataTableProps {
  * so re-measure every column) on every render, including each hover. */
 const NO_FOOTER: { label: string; agg: string }[] = [];
 
-/** The remove control on an editable field header. */
+/**
+ * The remove control on an editable field header.
+ *
+ * `linked` lights it up without the pointer being on it, so hovering the
+ * control for a measure lights every copy of it: the measure header repeats
+ * once per column group, and they all remove the same thing.
+ */
 function RemoveField({
   title,
   onRemove,
+  linked = false,
+  onLink,
 }: {
   title: string;
   onRemove: () => void;
+  linked?: boolean;
+  onLink?: (on: boolean) => void;
 }) {
   return (
     <button
       type="button"
       title={title}
       aria-label={title}
-      className={styles.removeField}
+      data-linked={linked || undefined}
+      onMouseEnter={() => onLink?.(true)}
+      onMouseLeave={() => onLink?.(false)}
+      className={cls(styles.removeField, linked && styles.removeFieldLinked)}
       onClick={(e) => {
         // The header itself cycles the sort; removing must not also sort.
         e.stopPropagation();
@@ -536,6 +549,8 @@ export function DataTable({
   const [pendingValueField, setPendingValueField] = useState<string | null>(
     null,
   );
+  // Which measure's remove controls are lit; they repeat per column group.
+  const [linkedMeasure, setLinkedMeasure] = useState<number | null>(null);
 
   /** Columns not yet placed on an axis, split by what they can be used for. */
   const { indexOptions, dataOptions } = useMemo(() => {
@@ -729,6 +744,7 @@ export function DataTable({
               )}
               {hrow.map((hc, ci) => {
                 const isLeafCol = hc.leafStart === hc.leafEnd;
+                const measure = measureAt(hc);
                 const active =
                   isLeafCol &&
                   sort?.key.kind === 'leaf' &&
@@ -756,11 +772,13 @@ export function DataTable({
                   >
                     {hc.label}
                     {sortArrow(active)}
-                    {measureAt(hc) !== undefined && (
+                    {measure !== undefined && (
                       <RemoveField
                         title={`Remove the ${hc.label} measure`}
+                        linked={linkedMeasure === measure}
+                        onLink={(on) => setLinkedMeasure(on ? measure : null)}
                         onRemove={() =>
-                          onViewChange?.(removeValue(view, measureAt(hc)!))
+                          onViewChange?.(removeValue(view, measure))
                         }
                       />
                     )}
