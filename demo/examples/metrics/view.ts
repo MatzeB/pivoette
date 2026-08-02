@@ -18,11 +18,8 @@ export const view: ViewSpec = {
       source: 'latency',
       format: { name: 'number', options: { decimals: 2 } },
     },
-    {
-      id: 'cpu',
-      source: 'cpu',
-      format: { name: 'number', options: { decimals: 1 } },
-    },
+    // No format: kind `percentage` implies 1 decimal.
+    { id: 'cpu' },
     {
       id: 'throughput',
       source: 'throughput',

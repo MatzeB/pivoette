@@ -175,8 +175,8 @@ describe('<DataTable> unit decoration', () => {
       scalePlacement: 'value',
     });
     expect(values).toContain('1.50 ms');
-    // A bare percent hugs its number.
-    expect(values).toContain('5%');
+    // A bare percent hugs its number; the 1 decimal is deduced from the unit.
+    expect(values).toContain('5.0%');
   });
 
   it('puts the whole label in the header', async () => {

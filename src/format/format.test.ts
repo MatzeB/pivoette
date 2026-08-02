@@ -82,6 +82,22 @@ describe('deduceFormat', () => {
     });
   });
 
+  it('falls back to the unit when the kind has no rule', () => {
+    // No kind at all: the `%` label still implies 1 decimal.
+    expect(deduceFormat(meta({ scale: 'percent' }))).toEqual({
+      name: 'number',
+      options: { decimals: 1 },
+    });
+    expect(deduceFormat(meta({ unit: 'dollar' }))).toEqual({
+      name: 'number',
+      options: { decimals: 2 },
+    });
+    // A kind rule still wins over the unit fallback.
+    expect(deduceFormat(meta({ kind: 'count', scale: 'percent' }))).toEqual({
+      name: 'integer',
+    });
+  });
+
   it('returns nothing for an unmapped or absent kind', () => {
     expect(deduceFormat(meta({ kind: 'weekday' }))).toBeUndefined();
     expect(deduceFormat(meta({}))).toBeUndefined();
