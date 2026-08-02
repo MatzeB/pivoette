@@ -11,7 +11,8 @@ export const view: ViewSpec = {
   columns: [
     { id: 'host', source: 'host' },
     { id: 'region', source: 'region' },
-    { id: 'memory', source: 'memory', format: { name: 'number' } },
+    // MiB values run to five digits — no fraction needed.
+    { id: 'memory', source: 'memory', format: { name: 'integer' } },
     {
       id: 'latency',
       source: 'latency',
