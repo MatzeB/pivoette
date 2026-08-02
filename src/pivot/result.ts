@@ -92,33 +92,3 @@ export function buildHeader(leaves: ResolvedLeaf[]): {
 
   return { forest: build(leaves, 0), depth: Math.max(depth, 1) };
 }
-
-export interface HeaderCell {
-  label: string;
-  colSpan: number;
-  rowSpan: number;
-}
-
-/** Flatten the header forest into table header rows with col/row spans. */
-export function toHeaderRows(
-  forest: HeaderNode[],
-  depth: number,
-): HeaderCell[][] {
-  const rows: HeaderCell[][] = Array.from({ length: depth }, () => []);
-  function walk(nodes: HeaderNode[], level: number): void {
-    for (const n of nodes) {
-      if (n.leaf) {
-        rows[level]!.push({
-          label: n.label,
-          colSpan: n.span,
-          rowSpan: depth - level,
-        });
-      } else {
-        rows[level]!.push({ label: n.label, colSpan: n.span, rowSpan: 1 });
-        walk(n.children, level + 1);
-      }
-    }
-  }
-  walk(forest, 0);
-  return rows;
-}

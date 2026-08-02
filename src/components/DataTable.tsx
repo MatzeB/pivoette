@@ -8,6 +8,7 @@ import { computeView } from '../pivot/engine';
 import { getAggregation } from '../pivot/aggregations';
 import type { Cell, ResolvedLeaf, ResultRow } from '../pivot/result';
 import type { ViewSpec } from '../pivot/spec';
+import { compareValues } from '../util';
 import styles from './DataTable.module.css';
 
 export interface DataTableDisplay {
@@ -60,13 +61,9 @@ function alignClass(align: 'left' | 'right' | 'center'): string {
   return styles.left!;
 }
 
-function compareValues(a: unknown, b: unknown): number {
-  if (a == null && b == null) return 0;
-  if (a == null) return -1;
-  if (b == null) return 1;
-  if (a < b) return -1;
-  if (a > b) return 1;
-  return 0;
+/** Join truthy class names into a className string. */
+function cls(...items: (string | false | null | undefined)[]): string {
+  return items.filter(Boolean).join(' ');
 }
 
 function makeCtx(
@@ -194,18 +191,24 @@ export function DataTable({
     [result, depth],
   );
 
+  // Column footers (over the displayed cell values); reused for width sizing.
+  const footerRows = useMemo(
+    () =>
+      footer.map(({ label, agg }) => {
+        const reduce = getAggregation(agg).reduce;
+        const cells: Cell[] = leaves.map((_, li) => ({
+          value: reduce(
+            result.rows.map((r) => (r.cells[li]!.value ?? null) as CellValue),
+          ),
+        }));
+        return { label, cells };
+      }),
+    [footer, leaves, result.rows],
+  );
+
   // Measured widths (index columns + leaves) and group-boundary gaps.
   const { indexW, leafW, gapAfter, leftOffset } = useMemo(() => {
     const sample = result.rows.slice(0, 200);
-    // Footer/summary values are often wider than body cells — measure them too.
-    const footerVals = footer.map(({ agg }) => {
-      const reduce = getAggregation(agg).reduce;
-      return leaves.map((_, li) =>
-        reduce(
-          result.rows.map((r) => (r.cells[li]!.value ?? null) as CellValue),
-        ),
-      );
-    });
     const leafW = leaves.map((leaf, li) => {
       if (leaf.render) return 200;
       let w = widthOf(leaf.column.label);
@@ -218,8 +221,8 @@ export function DataTable({
         const t = leaf.format(makeCtx(leaf, summary[li]!, [], frame));
         w = Math.max(w, widthOf(t, true));
       }
-      for (const fv of footerVals) {
-        const t = leaf.format(makeCtx(leaf, { value: fv[li]! }, [], frame));
+      for (const fr of footerRows) {
+        const t = leaf.format(makeCtx(leaf, fr.cells[li]!, [], frame));
         w = Math.max(w, widthOf(t, true));
       }
       return Math.min(360, Math.max(60, Math.ceil(w) + CELL_PAD));
@@ -250,7 +253,16 @@ export function DataTable({
       acc += w;
     }
     return { indexW, leafW, gapAfter, leftOffset };
-  }, [result, leaves, rowLevels, frame, groupSpacing, depth, footer, summary]);
+  }, [
+    result,
+    leaves,
+    rowLevels,
+    frame,
+    groupSpacing,
+    depth,
+    footerRows,
+    summary,
+  ]);
 
   // Index/body separation gap (independent of group spacing).
   const bodyLeadGap = rowLevels.length > 0 ? indexGap : 0;
@@ -328,21 +340,6 @@ export function DataTable({
     );
   }
 
-  // Column footers (over displayed cell values).
-  const footerRows = useMemo(
-    () =>
-      footer.map(({ label, agg }) => {
-        const reduce = getAggregation(agg).reduce;
-        const cells: Cell[] = leaves.map((_, li) => ({
-          value: reduce(
-            result.rows.map((r) => (r.cells[li]!.value ?? null) as CellValue),
-          ),
-        }));
-        return { label, cells };
-      }),
-    [footer, leaves, result.rows],
-  );
-
   // Virtualization.
   const scrollRef = useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
@@ -357,28 +354,28 @@ export function DataTable({
   const paddingBottom =
     items.length > 0 ? totalSize - items[items.length - 1]!.end : 0;
   const totalCols = rowLevels.length + leaves.length;
-
-  const wrapperCls = [
+  const wrapperCls = cls(
     styles.wrapper,
-    frameless ? styles.frameless : '',
-    className ?? '',
-  ]
-    .filter(Boolean)
-    .join(' ');
+    frameless && styles.frameless,
+    className,
+  );
 
-  function leafHeaderCls(hc: HCell): string {
-    const isLeafCol = hc.leafStart === hc.leafEnd;
+  // Footer content lines (column footers first, then the source summary).
+  const footerLines = summary
+    ? [...footerRows, { label: 'Total', cells: summary }]
+    : footerRows;
+  const footerBottom = footerLines.length * ROW_HEIGHT;
+
+  function leafHeaderCls(hc: HCell, isLeafCol: boolean): string {
     const hovered =
       highlightHeaders &&
       hover != null &&
       hover.leaf >= hc.leafStart &&
       hover.leaf <= hc.leafEnd;
-    return [
-      isLeafCol && sortable ? styles.sortable : '',
-      hovered ? styles.headerHi : '',
-    ]
-      .filter(Boolean)
-      .join(' ');
+    return cls(
+      isLeafCol && sortable && styles.sortable,
+      hovered && styles.headerHi,
+    );
   }
 
   return (
@@ -441,7 +438,7 @@ export function DataTable({
                     key={ci}
                     colSpan={hc.colSpan}
                     rowSpan={hc.rowSpan}
-                    className={leafHeaderCls(hc)}
+                    className={leafHeaderCls(hc, isLeafCol)}
                     style={{
                       top: level * HEADER_H,
                       ...edgeGapStyle(
@@ -517,50 +514,34 @@ export function DataTable({
           )}
         </tbody>
 
-        {(summary || footerRows.length > 0) && (
+        {footerLines.length > 0 && (
           <tfoot>
-            {(() => {
-              const lines = [
-                ...footerRows,
-                ...(summary ? [{ label: 'Total', cells: summary }] : []),
-              ];
-              const contentBottom = lines.length * ROW_HEIGHT;
-              // Lineless: a small background gap; otherwise a contiguous
-              // accountant-style double line directly against the data.
-              const separator = (
-                <tr key="fsep" aria-hidden="true">
-                  <td
-                    colSpan={totalCols}
-                    className={hideRules ? styles.footSpace : styles.footDouble}
-                    style={{
-                      position: 'sticky',
-                      bottom: contentBottom,
-                      zIndex: 4,
-                    }}
-                    // Leaving the body into the footer drops the body-row hover.
-                    onMouseEnter={() => setHover({ row: -1, leaf: -1 })}
-                  />
-                </tr>
-              );
-              return [
-                separator,
-                ...lines.map((fr, fi) => (
-                  <FooterRow
-                    key={`f${fi}`}
-                    label={fr.label}
-                    cells={fr.cells}
-                    leaves={leaves}
-                    frame={frame}
-                    rowLevels={rowLevels}
-                    gapAfter={gapAfter}
-                    bodyLeadGap={bodyLeadGap}
-                    bottom={(lines.length - 1 - fi) * ROW_HEIGHT}
-                    leftOffset={leftOffset}
-                    onHover={setHover}
-                  />
-                )),
-              ];
-            })()}
+            {/* Lineless: a small background gap; otherwise a contiguous
+                accountant-style double line directly against the data. */}
+            <tr aria-hidden="true">
+              <td
+                colSpan={totalCols}
+                className={hideRules ? styles.footSpace : styles.footDouble}
+                style={{ position: 'sticky', bottom: footerBottom, zIndex: 4 }}
+                // Leaving the body into the footer drops the body-row hover.
+                onMouseEnter={() => setHover({ row: -1, leaf: -1 })}
+              />
+            </tr>
+            {footerLines.map((fr, fi) => (
+              <FooterRow
+                key={`f${fi}`}
+                label={fr.label}
+                cells={fr.cells}
+                leaves={leaves}
+                frame={frame}
+                rowLevels={rowLevels}
+                gapAfter={gapAfter}
+                bodyLeadGap={bodyLeadGap}
+                bottom={(footerLines.length - 1 - fi) * ROW_HEIGHT}
+                leftOffset={leftOffset}
+                onHover={setHover}
+              />
+            ))}
           </tfoot>
         )}
       </table>
@@ -650,19 +631,16 @@ function Row({
         // of the hovered row.
         const lit =
           !!hoverPath && show && prefixEqual(row.path, hoverPath, level + 1);
-        const cls = [
-          styles.rowHeaderCell,
-          styles.indexTint,
-          styles.left,
-          lit ? styles.rowHover : '',
-        ]
-          .filter(Boolean)
-          .join(' ');
         return (
           <th
             key={level}
             scope="row"
-            className={cls}
+            className={cls(
+              styles.rowHeaderCell,
+              styles.indexTint,
+              styles.left,
+              lit && styles.rowHover,
+            )}
             style={{
               left: leftOffset[level],
               // Gap only where this level starts a new block; spanning
@@ -684,19 +662,16 @@ function Row({
           : leaf.format(ctx);
         const isIndex = rowLevels.length === 0 && i < indexColumns;
         const cellHovered = hoveredRow && hover?.leaf === i;
-        const cls = [
-          alignClass(leaf.column.align),
-          isIndex ? styles.indexTint : '',
-          zebra && rowIndex % 2 === 1 ? styles.zebra : '',
-          hoveredRow ? styles.rowHover : '',
-          cellHovered ? styles.cellHover : '',
-        ]
-          .filter(Boolean)
-          .join(' ');
         return (
           <td
             key={leaf.id}
-            className={cls}
+            className={cls(
+              alignClass(leaf.column.align),
+              isIndex && styles.indexTint,
+              zebra && rowIndex % 2 === 1 && styles.zebra,
+              hoveredRow && styles.rowHover,
+              cellHovered && styles.cellHover,
+            )}
             style={{
               ...leaf.style(ctx),
               ...edgeGapStyle(i, i, gapAfter, bodyLeadGap),

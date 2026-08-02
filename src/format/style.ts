@@ -6,14 +6,11 @@ import type { CSSProperties } from 'react';
 import type { CellCtx, StyleFn } from './context';
 import type { StyleSpec } from '../pivot/spec';
 import { evalExpression } from './expression';
+import { asNumber } from '../util';
 
 type StyleFactory = (options: Record<string, unknown>) => StyleFn;
 
 const registry = new Map<string, StyleFactory>();
-
-function num(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
-}
 
 /** Colour a cell by the sign of its numeric value. */
 registry.set('signColors', (options) => {
@@ -21,7 +18,7 @@ registry.set('signColors', (options) => {
   const negative = options.negative as string | undefined;
   const zero = options.zero as string | undefined;
   return (ctx) => {
-    const n = num(ctx.value);
+    const n = asNumber(ctx.value);
     if (n === null) return {};
     if (n > 0 && positive) return { color: positive };
     if (n < 0 && negative) return { color: negative };

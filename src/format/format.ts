@@ -6,6 +6,7 @@
 import type { CellCtx, FormatFn } from './context';
 import type { FormatSpec } from '../pivot/spec';
 import { evalExpression } from './expression';
+import { asNumber } from '../util';
 
 type FormatFactory = (options: Record<string, unknown>) => FormatFn;
 
@@ -13,12 +14,6 @@ const registry = new Map<string, FormatFactory>();
 
 function opt<T>(options: Record<string, unknown>, key: string): T | undefined {
   return options[key] as T | undefined;
-}
-
-/** Coerce a cell value to a finite number, or null. */
-function asNumber(value: unknown): number | null {
-  if (typeof value === 'number' && Number.isFinite(value)) return value;
-  return null;
 }
 
 const intlCache = new Map<string, Intl.NumberFormat>();

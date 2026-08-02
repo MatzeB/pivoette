@@ -76,11 +76,17 @@ register('count', 'Count', (v) => nonNull(v).length);
 register('countDistinct', 'Distinct', (v) => new Set(nonNull(v)).size);
 register('min', 'Min', (v) => {
   const ns = numbers(v);
-  return ns.length === 0 ? null : Math.min(...ns);
+  if (ns.length === 0) return null;
+  let m = ns[0]!;
+  for (let i = 1; i < ns.length; i++) if (ns[i]! < m) m = ns[i]!;
+  return m;
 });
 register('max', 'Max', (v) => {
   const ns = numbers(v);
-  return ns.length === 0 ? null : Math.max(...ns);
+  if (ns.length === 0) return null;
+  let m = ns[0]!;
+  for (let i = 1; i < ns.length; i++) if (ns[i]! > m) m = ns[i]!;
+  return m;
 });
 register('mean', 'Mean', (v) => mean(numbers(v)));
 register('variance', 'Variance', (v) => variance(numbers(v)));

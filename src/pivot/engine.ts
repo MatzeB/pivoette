@@ -23,6 +23,7 @@ import type {
 import { isFlat } from './spec';
 import type { Cell, ResolvedLeaf, ResultRow, ViewResult } from './result';
 import { buildHeader } from './result';
+import { compareValues } from '../util';
 
 const NUMERIC_FORMATS = new Set([
   'number',
@@ -184,15 +185,6 @@ function sortFlatRows(
   void frame;
 }
 
-function compareValues(a: unknown, b: unknown): number {
-  if (a == null && b == null) return 0;
-  if (a == null) return -1;
-  if (b == null) return 1;
-  if (a < b) return -1;
-  if (a > b) return 1;
-  return 0;
-}
-
 // ---------------------------------------------------------------------------
 // Pivot mode
 // ---------------------------------------------------------------------------
@@ -279,7 +271,11 @@ function group(frame: DataFrame, rows: string[], columns: string[]): Grouping {
 interface BaseDesc {
   kind: 'measure';
   colKey: CellValue[];
+  /** Serialized colKey (precomputed for group lookups). */
+  colKeyStr: string;
   measure: ValueSpec;
+  /** Index of `measure` into `spec.values` (precomputed for field lookup). */
+  measureIndex: number;
   colPath: string[];
   /** lookup key: colKey strings + measure id */
   baseKey: string;
@@ -318,12 +314,15 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
   const baseDescs: BaseDesc[] = [];
   for (const colKey of colKeys) {
     const colStrs = colKey.map((v) => String(v));
-    spec.values.forEach((measure) => {
+    const colKeyStr = keyOf(colKey);
+    spec.values.forEach((measure, measureIndex) => {
       const measLabel = measure.label ?? measure.id;
       baseDescs.push({
         kind: 'measure',
         colKey,
+        colKeyStr,
         measure,
+        measureIndex,
         colPath: includeMeasure ? [...colStrs, measLabel] : colStrs,
         baseKey: baseLookupKey(colKey, measure.id),
       });
@@ -395,9 +394,9 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     const cells: Cell[] = new Array(descs.length);
     descs.forEach((d, i) => {
       if (d.kind === 'measure') {
-        const idxs = byCol?.get(keyOf(d.colKey));
-        const mi = spec.values.indexOf(d.measure);
-        const vals = idxs ? idxs.map((r) => fieldValues[mi]![r] ?? null) : [];
+        const idxs = byCol?.get(d.colKeyStr);
+        const col = fieldValues[d.measureIndex]!;
+        const vals = idxs ? idxs.map((r) => col[r] ?? null) : [];
         const value = idxs ? aggregate(d.measure, vals) : null;
         baseValues.set(d.baseKey, value);
         cells[i] = { value };
@@ -419,9 +418,9 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     summary = new Array(descs.length);
     descs.forEach((d, i) => {
       if (d.kind === 'measure') {
-        const idxs = g.colGroups.get(keyOf(d.colKey));
-        const mi = spec.values.indexOf(d.measure);
-        const vals = idxs ? idxs.map((r) => fieldValues[mi]![r] ?? null) : [];
+        const idxs = g.colGroups.get(d.colKeyStr);
+        const col = fieldValues[d.measureIndex]!;
+        const vals = idxs ? idxs.map((r) => col[r] ?? null) : [];
         const aggId = d.measure.summaryAgg ?? d.measure.agg;
         const value = idxs
           ? aggregate({ ...d.measure, agg: aggId, expression: undefined }, vals)

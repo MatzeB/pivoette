@@ -17,10 +17,9 @@ export type {
 
 // Engine
 export { computeView } from './pivot/engine';
-export { buildHeader, toHeaderRows } from './pivot/result';
+export { buildHeader } from './pivot/result';
 export type {
   Cell,
-  HeaderCell,
   HeaderNode,
   ResolvedLeaf,
   ResultRow,
