@@ -232,43 +232,6 @@
   border-bottom: 0;
 }
 
-/* The column-field and footer strips: a row of draggable chips plus a `+`. */
-.fieldStrip {
-  position: sticky;
-  z-index: 3;
-  padding: 3px 8px;
-  background: var(--pv-bg);
-  border-bottom: 1px solid var(--pv-border);
-  white-space: nowrap;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 6px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--pv-border);
-  background: var(--pv-hover);
-  color: var(--pv-text);
-  font-size: 11px;
-  font-weight: 500;
-  cursor: grab;
-}
-
-.chip:active {
-  cursor: grabbing;
-}
-
-/* Names the zone a strip belongs to, in the index gutter beside it. */
-.zoneLabel {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--pv-muted);
-}
-
 /* Removes a field from its axis. Sits in the corner of the header it acts on,
    and stops its click reaching the header's sort handler. */
 .removeField {
@@ -291,14 +254,6 @@
 .removeField:hover {
   opacity: 1;
   background: var(--pv-remove-bg);
-}
-
-/* Inside a chip the control follows the text rather than floating. */
-.chip .removeField {
-  position: static;
-  margin-left: 4px;
-  width: 12px;
-  height: 12px;
 }
 
 /* Opens the pending row-field column. */
@@ -363,4 +318,16 @@
   font-size: 11px;
   font-style: italic;
   white-space: normal;
+}
+
+/* The not-yet-built Custom entry: offered, but visibly inert. */
+.addCustom {
+  border-style: dashed;
+  color: var(--pv-muted);
+  cursor: default;
+}
+
+.addCustom:hover {
+  background: var(--pv-bg);
+  border-color: var(--pv-border);
 }

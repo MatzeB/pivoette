@@ -118,6 +118,12 @@ function RemoveField({
   );
 }
 
+/** A line in the opened pending column: a field, the Custom placeholder, or a note. */
+type AddEntry =
+  | { kind: 'option'; id: string; label: string }
+  | { kind: 'custom' }
+  | { kind: 'note'; text: string };
+
 /** The pending row-field column: narrow until it is offering its choices. */
 const EDIT_COL_W = 26;
 const ADD_COL_W = 150;
@@ -548,14 +554,20 @@ export function DataTable({
   const [linkedMeasure, setLinkedMeasure] = useState<number | null>(null);
 
   /**
-   * Groupable columns not already on an axis — the choices the pending column
-   * offers. `category` is exactly this split, deduced at import.
+   * What the opened column offers, one entry per body row: the groupable
+   * columns not already on an axis (`category` is exactly that split, deduced
+   * at import), a note when there are none, and the not-yet-built Custom entry.
    */
-  const addOptions = useMemo(() => {
+  const addEntries = useMemo<AddEntry[]>(() => {
     const placed = new Set([...(spec?.rows ?? []), ...(spec?.columns ?? [])]);
-    return frame.columns
+    const options: AddEntry[] = frame.columns
       .filter((c) => c.meta.category === 'index' && !placed.has(c.name))
-      .map((c) => ({ id: c.name, label: c.meta.displayName }));
+      .map((c) => ({ kind: 'option', id: c.name, label: c.meta.displayName }));
+    if (options.length === 0) {
+      options.push({ kind: 'note', text: 'every field is already placed' });
+    }
+    options.push({ kind: 'custom' });
+    return options;
   }, [frame, spec?.rows, spec?.columns]);
 
   function commitAdd(field: string) {
@@ -714,8 +726,8 @@ export function DataTable({
                 >
                   <button
                     type="button"
-                    title={adding ? 'Cancel' : 'Add a row field'}
-                    aria-label={adding ? 'Cancel' : 'Add a row field'}
+                    title="Add a row field"
+                    aria-label="Add a row field"
                     aria-expanded={adding}
                     className={cls(
                       styles.addField,
@@ -725,6 +737,12 @@ export function DataTable({
                   >
                     +
                   </button>
+                  {adding && (
+                    <RemoveField
+                      title="Stop adding a row field"
+                      onRemove={() => setAdding(false)}
+                    />
+                  )}
                 </th>
               )}
               {hrow.map((hc, ci) => {
@@ -772,47 +790,6 @@ export function DataTable({
               })}
             </tr>
           ))}
-          {/* Column fields have no visible handle otherwise: the headers above
-              show members (Sun, Mon), never the field name. */}
-          {editable && (
-            <tr key="colfields" style={{ height: HEADER_H }}>
-              <th
-                colSpan={rowLevels.length + 1}
-                className={`${styles.rowHeaderCell} ${styles.indexTint} ${styles.left}`}
-                style={{ top: depth * HEADER_H, left: 0 }}
-              >
-                <span className={styles.zoneLabel}>columns</span>
-              </th>
-              <td
-                colSpan={leaves.length + 1}
-                className={styles.fieldStrip}
-                style={{ top: depth * HEADER_H }}
-                onDragOver={(e) => dragged.current && e.preventDefault()}
-                onDrop={() =>
-                  onFieldDrop({
-                    zone: 'columns',
-                    index: spec?.columns.length ?? 0,
-                  })
-                }
-              >
-                {(spec?.columns ?? []).map((field, i) => (
-                  <span
-                    key={field}
-                    className={styles.chip}
-                    {...dragProps({ zone: 'columns', index: i })}
-                  >
-                    {frame.columnByName.get(field)?.meta.displayName ?? field}
-                    <RemoveField
-                      title={`Remove the ${field} column field`}
-                      onRemove={() =>
-                        onViewChange?.(removeField(spec!, 'columns', i))
-                      }
-                    />
-                  </span>
-                ))}
-              </td>
-            </tr>
-          )}
           {/* One contiguous rule under the whole header (spans the gaps). */}
           {!hideRules && (
             <tr aria-hidden="true">
@@ -855,12 +832,7 @@ export function DataTable({
                 extraTop={extraTop[item.index] ?? 0}
                 zebra={zebra}
                 editCols={editCols}
-                addOption={adding ? addOptions[item.index] : undefined}
-                addNote={
-                  adding && addOptions.length === 0 && item.index === 0
-                    ? 'every field is already placed'
-                    : undefined
-                }
+                addEntry={adding ? addEntries[item.index] : undefined}
                 onAdd={commitAdd}
                 hover={hover}
                 hoverPath={hover ? rows[hover.row]?.path : undefined}
@@ -961,10 +933,8 @@ interface RowProps {
   zebra: boolean;
   /** 0, or 1 in edit mode: the pending row-field cell after the index group. */
   editCols: number;
-  /** One choice per row while the pending column is open. */
-  addOption?: { id: string; label: string };
-  /** Shown in the first row when there is nothing left to add. */
-  addNote?: string;
+  /** The entry this row shows while the pending column is open. */
+  addEntry?: AddEntry;
   onAdd?: (field: string) => void;
   hover: { row: number; leaf: number } | null;
   hoverPath: unknown[] | undefined;
@@ -988,8 +958,7 @@ function Row({
   extraTop,
   zebra,
   editCols,
-  addOption,
-  addNote,
+  addEntry,
   onAdd,
   hover,
   hoverPath,
@@ -1040,16 +1009,27 @@ function Row({
       })}
       {editCols > 0 && (
         <td className={styles.editCell} style={gapTop}>
-          {addOption && (
+          {addEntry?.kind === 'option' && (
             <button
               type="button"
               className={styles.addOption}
-              onClick={() => onAdd?.(addOption.id)}
+              onClick={() => onAdd?.(addEntry.id)}
             >
-              {addOption.label}
+              {addEntry.label}
             </button>
           )}
-          {addNote && <span className={styles.addNote}>{addNote}</span>}
+          {addEntry?.kind === 'custom' && (
+            <button
+              type="button"
+              className={cls(styles.addOption, styles.addCustom)}
+              title="Not built yet"
+            >
+              Custom…
+            </button>
+          )}
+          {addEntry?.kind === 'note' && (
+            <span className={styles.addNote}>{addEntry.text}</span>
+          )}
         </td>
       )}
       {row.cells.map((cell, i) => {

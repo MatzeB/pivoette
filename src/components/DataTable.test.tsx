@@ -383,22 +383,19 @@ describe('<DataTable> editing', () => {
     const narrow = (pendingCol() as HTMLElement).style.width;
 
     await act(async () => add.click());
-    const open = el.querySelector<HTMLButtonElement>(
-      'button[aria-label="Cancel"]',
-    )!;
-    expect(open.getAttribute('aria-expanded')).toBe('true');
+    expect(add.getAttribute('aria-expanded')).toBe('true');
     expect((pendingCol() as HTMLElement).style.width).not.toBe(narrow);
 
-    await act(async () => open.click());
+    // An explicit abort control appears alongside the (now lit) +.
+    const abort = el.querySelector<HTMLButtonElement>(
+      'button[aria-label="Stop adding a row field"]',
+    )!;
+    expect(abort).toBeTruthy();
+    await act(async () => abort.click());
     expect((pendingCol() as HTMLElement).style.width).toBe(narrow);
-  });
-
-  it('names the column fields, which the headers never show', async () => {
-    const el = await render(
-      <DataTable data={data} view={view} editing onViewChange={() => {}} />,
-    );
-    // Column headers show members (1, 2); the strip shows the field.
-    expect(el.querySelector('thead')!.textContent).toContain('weekday');
+    expect(
+      el.querySelector('button[aria-label="Stop adding a row field"]'),
+    ).toBeNull();
   });
 
   it('leaves the given spec untouched', async () => {
@@ -508,7 +505,6 @@ describe('<DataTable> remove controls', () => {
     expect(kinds).toEqual(
       new Set([
         'Remove the team row field',
-        'Remove the wd column field',
         'Remove the sum measure',
         'Remove the avg measure',
         'Remove the med row',
