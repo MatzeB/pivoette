@@ -425,7 +425,7 @@ export function App() {
           />
           {usesTime && (
             <Select
-              label="zone"
+              label="timezone"
               value={timeZone}
               options={TIME_ZONES}
               onChange={setTimeZone}
