@@ -404,7 +404,7 @@ export function DataTable({
           ))}
         </colgroup>
 
-        <thead>
+        <thead onMouseOver={() => setHover(null)}>
           {headerRows.map((hrow, level) => (
             <tr key={level} style={{ height: HEADER_H }}>
               {level === 0 &&
@@ -518,7 +518,7 @@ export function DataTable({
         </tbody>
 
         {(summary || footerRows.length > 0) && (
-          <tfoot>
+          <tfoot onMouseOver={() => setHover(null)}>
             {(() => {
               const lines = [
                 ...footerRows,
