@@ -53,8 +53,9 @@ export const view: ViewSpec = {
       compute: 'price - basePrice',
       // A computed column has no source field, so it declares its own unit.
       meta: dollar,
-      // Only the sign is overridden; the 2 decimals come from kind `price`.
-      format: { name: 'number', options: { signDisplay: 'exceptZero' } },
+      // Only the sign is overridden; the built-in and its 2 decimals both
+      // come from kind `price`.
+      format: { options: { signDisplay: 'exceptZero' } },
       style: {
         name: 'signColors',
         options: { positive: green, negative: red },
@@ -71,7 +72,7 @@ export const view: ViewSpec = {
       compute: 'basePrice ? ((price - basePrice) / basePrice) * 100 : null',
       meta: { kind: ['percentage'], scale: ['percent'] },
       // Likewise: 1 decimal is deduced from kind `percentage`.
-      format: { name: 'number', options: { signDisplay: 'exceptZero' } },
+      format: { options: { signDisplay: 'exceptZero' } },
       style: {
         name: 'signColors',
         options: { positive: green, negative: red },

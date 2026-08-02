@@ -64,12 +64,18 @@ export function resolveFormatSpec(
   deduced: FormatSpec | undefined,
   inherit = true,
 ): FormatSpec | undefined {
-  if (!inherit) return explicit;
-  if (!explicit || !deduced) return explicit ?? deduced;
-  if (!('name' in explicit) || !('name' in deduced)) return explicit;
-  if (explicit.name !== deduced.name) return explicit;
-  return {
-    name: explicit.name,
-    options: { ...deduced.options, ...explicit.options },
-  };
+  const base = inherit ? deduced : undefined;
+  if (!explicit) return base;
+  // Inline functions and expressions are self-contained.
+  if ('fn' in explicit || 'expression' in explicit) return explicit;
+
+  const named = base && 'name' in base ? base : undefined;
+  // An options-only spec adopts the deduced built-in, falling back to `number`
+  // (every mergeable option — decimals, signDisplay, compact — is numeric).
+  const name = 'name' in explicit ? explicit.name : (named?.name ?? 'number');
+  // Options are inherited only from the same built-in; a different one has its
+  // own defaults and its options may not even mean the same thing.
+  const inherited = named?.name === name ? named.options : undefined;
+  const options = { ...inherited, ...explicit.options };
+  return Object.keys(options).length > 0 ? { name, options } : { name };
 }

@@ -26,8 +26,16 @@ export interface NamedSpec {
   options?: Record<string, unknown>;
 }
 
+/** Options alone, merged into the format deduced from the column's metadata
+ * (or into `number` when nothing is deduced). Lets a view override one setting
+ * without naming the built-in it is overriding. */
+export interface FormatOptionsSpec {
+  options: Record<string, unknown>;
+}
+
 /** Tier 1: text content. */
-export type FormatSpec = NamedSpec | { fn: FormatFn } | { expression: string };
+export type FormatSpec =
+  NamedSpec | FormatOptionsSpec | { fn: FormatFn } | { expression: string };
 /** Tier 2: inline CSS merged onto the default cell. */
 export type StyleSpec = NamedSpec | { fn: StyleFn } | { expression: string };
 /** Tier 3: a full React cell (supersedes format/style default rendering). */

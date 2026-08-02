@@ -142,9 +142,13 @@ export function resolveFormat(
       return result == null ? emptyDisplay : String(result);
     };
   }
-  const factory = registry.get(spec.name);
+  // An options-only spec has no built-in to name; it defaults to `number`.
+  // (The engine normally resolves this against the column's deduced format
+  // first — see `resolveFormatSpec`.)
+  const name = 'name' in spec ? spec.name : 'number';
+  const factory = registry.get(name);
   if (!factory) {
-    throw new Error(`Unknown format "${spec.name}"`);
+    throw new Error(`Unknown format "${name}"`);
   }
   const fn = factory(spec.options ?? {});
   // Centralize null handling so every built-in honors emptyDisplay.

@@ -141,6 +141,22 @@ describe('resolveFormatSpec', () => {
     expect(resolveFormatSpec(spec, deduced)).toBe(spec);
   });
 
+  it('adopts the deduced built-in for an options-only spec', () => {
+    expect(
+      resolveFormatSpec({ options: { signDisplay: 'exceptZero' } }, deduced),
+    ).toEqual({
+      name: 'number',
+      options: { decimals: 1, signDisplay: 'exceptZero' },
+    });
+  });
+
+  it('falls back to `number` for an options-only spec with no deduction', () => {
+    expect(resolveFormatSpec({ options: { decimals: 3 } }, undefined)).toEqual({
+      name: 'number',
+      options: { decimals: 3 },
+    });
+  });
+
   it('uses the explicit format verbatim when inherit is false', () => {
     expect(
       resolveFormatSpec(
@@ -161,5 +177,12 @@ describe('resolveFormatSpec', () => {
       name: 'integer',
     });
     expect(resolveFormatSpec(undefined, undefined)).toBeUndefined();
+  });
+});
+
+describe('resolveFormat with an options-only spec', () => {
+  it('formats as `number` when handed options alone', () => {
+    const fn = resolveFormat({ options: { decimals: 2 } });
+    expect(fn({ value: 1.5 } as unknown as CellCtx)).toBe('1.50');
   });
 });
