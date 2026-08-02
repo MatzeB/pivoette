@@ -111,7 +111,7 @@ function initialExample(): string {
 function hasUnitMeta(data: Row[] | DatasetJson): boolean {
   if (Array.isArray(data) || !data.meta) return false;
   return Object.values(data.meta).some(
-    (m) => m.siUnit ?? m.siScale ?? m.siUnitShort ?? m.siScaleShort,
+    (m) => m.unit ?? m.scale ?? m.unitShort ?? m.scaleShort,
   );
 }
 

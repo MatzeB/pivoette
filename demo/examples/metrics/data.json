@@ -14,10 +14,10 @@
 "kind": [
 "memory"
 ],
-"siUnit": [
+"unit": [
 "byte"
 ],
-"siScale": [
+"scale": [
 "mebi"
 ]
 },
@@ -26,10 +26,10 @@
 "kind": [
 "duration"
 ],
-"siUnit": [
+"unit": [
 "second"
 ],
-"siScale": [
+"scale": [
 "milli"
 ]
 },
@@ -38,7 +38,7 @@
 "kind": [
 "percentage"
 ],
-"siScale": [
+"scale": [
 "percent"
 ]
 },
@@ -48,11 +48,11 @@
 "count",
 "1/duration"
 ],
-"siUnit": [
+"unit": [
 "token",
 "1/second"
 ],
-"siScale": [
+"scale": [
 "kilo",
 null
 ]
@@ -63,11 +63,11 @@ null
 "memory",
 "1/duration"
 ],
-"siUnit": [
+"unit": [
 "byte",
 "1/second"
 ],
-"siScale": [
+"scale": [
 "mega",
 null
 ]
@@ -78,7 +78,7 @@ null
 "length",
 "length"
 ],
-"siUnit": [
+"unit": [
 "meter",
 "meter"
 ]

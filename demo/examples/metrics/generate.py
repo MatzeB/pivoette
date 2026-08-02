@@ -25,40 +25,40 @@ META = {
     "memory": {
         "displayName": "Memory",
         "kind": ["memory"],
-        "siUnit": ["byte"],
-        "siScale": ["mebi"],
+        "unit": ["byte"],
+        "scale": ["mebi"],
     },
     "latency": {
         "displayName": "Latency",
         "kind": ["duration"],
-        "siUnit": ["second"],
-        "siScale": ["milli"],
+        "unit": ["second"],
+        "scale": ["milli"],
     },
     "cpu": {
         "displayName": "CPU",
         "kind": ["percentage"],
-        "siScale": ["percent"],
+        "scale": ["percent"],
     },
     "throughput": {
         # tokens per second: two factors, the second inverted.
         "displayName": "Throughput",
         "kind": ["count", "1/duration"],
-        "siUnit": ["token", "1/second"],
-        "siScale": ["kilo", None],
+        "unit": ["token", "1/second"],
+        "scale": ["kilo", None],
     },
     "bandwidth": {
         # Deliberately decimal, unlike memory above: throughput is quoted in
         # MB/s, so one table shows both a binary and an SI prefix.
         "displayName": "Bandwidth",
         "kind": ["memory", "1/duration"],
-        "siUnit": ["byte", "1/second"],
-        "siScale": ["mega", None],
+        "unit": ["byte", "1/second"],
+        "scale": ["mega", None],
     },
     "floorArea": {
         # length x length: the same factor twice, rendered as an exponent.
         "displayName": "Rack Area",
         "kind": ["length", "length"],
-        "siUnit": ["meter", "meter"],
+        "unit": ["meter", "meter"],
     },
 }
 

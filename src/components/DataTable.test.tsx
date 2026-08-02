@@ -120,13 +120,13 @@ describe('<DataTable> smoke', () => {
 describe('<DataTable> unit decoration', () => {
   const rows = [{ host: 'a', latency: 1.5, bandwidth: 12, cpu: 5 }];
   const meta = {
-    latency: { displayName: 'Latency', siUnit: 'second', siScale: 'milli' },
+    latency: { displayName: 'Latency', unit: 'second', scale: 'milli' },
     bandwidth: {
       displayName: 'Bandwidth',
-      siUnit: ['byte', '1/second'],
-      siScale: ['mega', null],
+      unit: ['byte', '1/second'],
+      scale: ['mega', null],
     },
-    cpu: { displayName: 'CPU', siScale: 'percent' },
+    cpu: { displayName: 'CPU', scale: 'percent' },
   };
   const view: TableSpec = {
     mode: 'flat',
@@ -233,14 +233,14 @@ describe('<DataTable> currency prefix', () => {
   const view: TableSpec = {
     mode: 'flat',
     meta: {
-      price: { displayName: 'Price', kind: ['price'], siUnit: ['dollar'] },
+      price: { displayName: 'Price', kind: ['price'], unit: ['dollar'] },
     },
     columns: [
       { id: 'sym' },
       { id: 'price' },
       {
         id: 'delta',
-        meta: { kind: ['price'], siUnit: ['dollar'] },
+        meta: { kind: ['price'], unit: ['dollar'] },
         format: {
           name: 'number',
           options: { decimals: 2, signDisplay: 'exceptZero' },
@@ -248,7 +248,7 @@ describe('<DataTable> currency prefix', () => {
       },
       {
         id: 'gain',
-        meta: { kind: ['price'], siUnit: ['dollar'] },
+        meta: { kind: ['price'], unit: ['dollar'] },
         format: {
           name: 'number',
           options: { decimals: 2, signDisplay: 'exceptZero' },

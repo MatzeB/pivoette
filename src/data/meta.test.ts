@@ -41,55 +41,47 @@ describe('deduction', () => {
   });
 
   it('deduces shortnames, including inverted factors', () => {
-    const m = meta({ siUnit: ['token', '1/second'], siScale: ['kilo', null] });
-    expect(m.siUnitShort).toEqual(['tok', '1/s']);
-    expect(m.siScaleShort).toEqual(['k', null]);
-    expect(meta({ siScale: 'percent' }).siScaleShort).toEqual(['%']);
-    expect(meta({ siUnit: 'second', siScale: 'milli' }).siUnitShort).toEqual([
-      's',
-    ]);
+    const m = meta({ unit: ['token', '1/second'], scale: ['kilo', null] });
+    expect(m.unitShort).toEqual(['tok', '1/s']);
+    expect(m.scaleShort).toEqual(['k', null]);
+    expect(meta({ scale: 'percent' }).scaleShort).toEqual(['%']);
+    expect(meta({ unit: 'second', scale: 'milli' }).unitShort).toEqual(['s']);
   });
 
   it('deduces IEC binary prefixes alongside the SI ones', () => {
-    expect(unitLabels(meta({ siUnit: 'byte', siScale: 'mebi' })).full).toBe(
-      'MiB',
-    );
-    expect(unitLabels(meta({ siUnit: 'byte', siScale: 'gibi' })).full).toBe(
-      'GiB',
-    );
+    expect(unitLabels(meta({ unit: 'byte', scale: 'mebi' })).full).toBe('MiB');
+    expect(unitLabels(meta({ unit: 'byte', scale: 'gibi' })).full).toBe('GiB');
     // The SI prefix stays distinct from its binary neighbour.
-    expect(unitLabels(meta({ siUnit: 'byte', siScale: 'mega' })).full).toBe(
-      'MB',
-    );
+    expect(unitLabels(meta({ unit: 'byte', scale: 'mega' })).full).toBe('MB');
   });
 
   it('keeps an explicit shortname over the deduced one', () => {
-    expect(meta({ siUnit: 'byte', siUnitShort: 'Byte' }).siUnitShort).toEqual([
+    expect(meta({ unit: 'byte', unitShort: 'Byte' }).unitShort).toEqual([
       'Byte',
     ]);
   });
 
   it('passes an unknown unit through unchanged', () => {
-    expect(meta({ siUnit: 'widget' }).siUnitShort).toEqual(['widget']);
+    expect(meta({ unit: 'widget' }).unitShort).toEqual(['widget']);
   });
 });
 
 describe('normalization', () => {
   it('coerces a scalar to a one-factor array', () => {
-    expect(meta({ siUnit: 'byte' }).siUnit).toEqual(['byte']);
+    expect(meta({ unit: 'byte' }).unit).toEqual(['byte']);
   });
 
   it('pads ragged arrays to the common factor count', () => {
-    const m = meta({ siUnit: ['byte', '1/second'], siScale: ['mega'] });
-    expect(m.siUnit).toEqual(['byte', '1/second']);
-    expect(m.siScale).toEqual(['mega', null]);
-    expect(m.siScaleShort).toEqual(['M', null]);
+    const m = meta({ unit: ['byte', '1/second'], scale: ['mega'] });
+    expect(m.unit).toEqual(['byte', '1/second']);
+    expect(m.scale).toEqual(['mega', null]);
+    expect(m.scaleShort).toEqual(['M', null]);
   });
 
   it('omits unit arrays entirely for a unitless column', () => {
     const m = meta({});
-    expect(m.siUnit).toBeUndefined();
-    expect(m.siUnitShort).toBeUndefined();
+    expect(m.unit).toBeUndefined();
+    expect(m.unitShort).toBeUndefined();
     expect(m.kind).toBeUndefined();
   });
 
@@ -97,8 +89,8 @@ describe('normalization', () => {
     const m = meta({
       displayName: 'Throughput',
       kind: ['count', '1/duration'],
-      siUnit: ['token', '1/second'],
-      siScale: ['kilo', null],
+      unit: ['token', '1/second'],
+      scale: ['kilo', null],
     });
     const again = normalizeMeta(
       { dataName: 'x', type: 'float', category: 'data' },
@@ -112,30 +104,30 @@ describe('unitLabels', () => {
   const full = (input: ColumnMetaInput) => unitLabels(meta(input)).full;
 
   it('composes repeated factors as an exponent', () => {
-    expect(full({ siUnit: ['meter', 'meter'] })).toBe('m²');
+    expect(full({ unit: ['meter', 'meter'] })).toBe('m²');
   });
 
   it('composes inverted factors as a denominator', () => {
-    expect(
-      full({ siUnit: ['token', '1/second'], siScale: ['kilo', null] }),
-    ).toBe('ktok/s');
-    expect(
-      full({ siUnit: ['byte', '1/second'], siScale: ['mega', null] }),
-    ).toBe('MB/s');
+    expect(full({ unit: ['token', '1/second'], scale: ['kilo', null] })).toBe(
+      'ktok/s',
+    );
+    expect(full({ unit: ['byte', '1/second'], scale: ['mega', null] })).toBe(
+      'MB/s',
+    );
   });
 
   it('composes a mixed numerator and a squared denominator', () => {
-    expect(
-      full({ siUnit: ['kilogram', 'meter', '1/second', '1/second'] }),
-    ).toBe('kg·m/s²');
+    expect(full({ unit: ['kilogram', 'meter', '1/second', '1/second'] })).toBe(
+      'kg·m/s²',
+    );
   });
 
   it('renders a bare inverse with a 1 numerator', () => {
-    expect(full({ siUnit: ['1/second'] })).toBe('1/s');
+    expect(full({ unit: ['1/second'] })).toBe('1/s');
   });
 
   it('handles a scale with no unit', () => {
-    expect(full({ siScale: 'percent' })).toBe('%');
+    expect(full({ scale: 'percent' })).toBe('%');
   });
 
   it('is empty for a unitless column', () => {
@@ -144,7 +136,7 @@ describe('unitLabels', () => {
   });
 
   it('splits scale and unit only for a single un-inverted factor', () => {
-    const simple = unitLabels(meta({ siUnit: 'second', siScale: 'milli' }));
+    const simple = unitLabels(meta({ unit: 'second', scale: 'milli' }));
     expect(simple).toEqual({
       full: 'ms',
       simple: true,
@@ -153,13 +145,13 @@ describe('unitLabels', () => {
       prefix: false,
     });
 
-    const compound = unitLabels(meta({ siUnit: ['byte', '1/second'] }));
+    const compound = unitLabels(meta({ unit: ['byte', '1/second'] }));
     expect(compound.simple).toBe(false);
     expect(compound.scalePart).toBe('');
     expect(compound.unitPart).toBe('');
 
     // A single *inverted* factor is not simple either.
-    expect(unitLabels(meta({ siUnit: ['1/second'] })).simple).toBe(false);
+    expect(unitLabels(meta({ unit: ['1/second'] })).simple).toBe(false);
   });
 });
 
@@ -198,10 +190,10 @@ describe('dataset JSON', () => {
       meta: {
         latency: {
           displayName: 'Latency',
-          siUnit: ['second'],
-          siUnitShort: ['s'],
-          siScale: ['milli'],
-          siScaleShort: ['m'],
+          unit: ['second'],
+          unitShort: ['s'],
+          scale: ['milli'],
+          scaleShort: ['m'],
         },
       },
       rows,
@@ -218,24 +210,24 @@ describe('dataset JSON', () => {
 
 describe('currency units', () => {
   it('deduces the symbol and marks it as a prefix', () => {
-    const m = meta({ kind: 'price', siUnit: 'dollar' });
+    const m = meta({ kind: 'price', unit: 'dollar' });
     const labels = unitLabels(m);
     expect(labels.full).toBe('$');
     expect(labels.prefix).toBe(true);
-    expect(unitLabels(meta({ kind: 'price', siUnit: 'euro' })).full).toBe('€');
+    expect(unitLabels(meta({ kind: 'price', unit: 'euro' })).full).toBe('€');
   });
 
   it('does not prefix a compound rate', () => {
     // `$/h` reads better trailing the number than leading it.
     const m = meta({
       kind: ['price', '1/duration'],
-      siUnit: ['dollar', '1/hour'],
+      unit: ['dollar', '1/hour'],
     });
     expect(unitLabels(m).full).toBe('$/h');
     expect(unitLabels(m).prefix).toBe(false);
   });
 
   it('does not prefix a non-currency kind', () => {
-    expect(unitLabels(meta({ siUnit: 'second' })).prefix).toBe(false);
+    expect(unitLabels(meta({ unit: 'second' })).prefix).toBe(false);
   });
 });

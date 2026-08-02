@@ -330,8 +330,8 @@ describe('column metadata wiring', () => {
     host: { displayName: 'Host' },
     latency: {
       displayName: 'Latency',
-      siUnit: 'second',
-      siScale: 'milli',
+      unit: 'second',
+      scale: 'milli',
     },
   };
 
@@ -351,7 +351,7 @@ describe('column metadata wiring', () => {
 
     const [asset, latency, double] = res.leaves;
     expect(latency!.column.meta!.displayName).toBe('Latency');
-    expect(latency!.column.meta!.siUnitShort).toEqual(['s']);
+    expect(latency!.column.meta!.unitShort).toEqual(['s']);
     expect(asset!.column.sources!.map((m) => m.dataName)).toEqual([
       'image',
       'desc',
@@ -422,7 +422,7 @@ describe('view metadata and defaults', () => {
     const res = build({
       mode: 'flat',
       meta: {
-        price: { displayName: 'Price', kind: ['price'], siUnit: ['dollar'] },
+        price: { displayName: 'Price', kind: ['price'], unit: ['dollar'] },
       },
       columns: [{ id: 'price' }],
     });
@@ -440,7 +440,7 @@ describe('view metadata and defaults', () => {
         {
           id: 'delta',
           compute: 'price - basePrice',
-          meta: { kind: ['price'], siUnit: ['dollar'] },
+          meta: { kind: ['price'], unit: ['dollar'] },
         },
       ],
     });
@@ -452,7 +452,7 @@ describe('view metadata and defaults', () => {
   it('keeps an explicit format over the deduced one', () => {
     const res = build({
       mode: 'flat',
-      meta: { price: { kind: ['price'], siUnit: ['dollar'] } },
+      meta: { price: { kind: ['price'], unit: ['dollar'] } },
       columns: [
         { id: 'price', format: { name: 'number', options: { decimals: 0 } } },
       ],

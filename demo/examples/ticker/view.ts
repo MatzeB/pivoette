@@ -4,7 +4,7 @@ import type { ViewSpec } from '../../../src';
 const green = 'light-dark(#137333, #30d158)';
 const red = 'light-dark(#c5221f, #ff453a)';
 
-const money = { kind: ['price'], siUnit: ['dollar'] };
+const money = { kind: ['price'], unit: ['dollar'] };
 
 /**
  * Flat detail table: composite asset column, computed P/L, sign coloring.

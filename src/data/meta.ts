@@ -2,8 +2,8 @@
  * Per-column metadata: display name, index/data category, and a compound unit.
  *
  * A unit is a *product of factors*, described by index-aligned parallel arrays —
- * factor `i` is `kind[i]` / `siUnit[i]` / `siUnitShort[i]` / `siScale[i]` /
- * `siScaleShort[i]`. Repeating a factor squares it (`['meter','meter']` → `m²`)
+ * factor `i` is `kind[i]` / `unit[i]` / `unitShort[i]` / `scale[i]` /
+ * `scaleShort[i]`. Repeating a factor squares it (`['meter','meter']` → `m²`)
  * and a `1/` prefix inverts it (`['token','1/second']` → `tok/s`).
  *
  * `ColumnMeta` holds nothing but JSON primitives and arrays, so it travels
@@ -29,21 +29,21 @@ export interface ColumnMeta {
   /** Semantic dimension per factor, e.g. `['length','length']`. */
   kind?: (string | null)[];
   /** Unit per factor, e.g. `['byte','1/second']`. */
-  siUnit?: (string | null)[];
+  unit?: (string | null)[];
   /** Short unit per factor, e.g. `['B','1/s']`; deduced when missing. */
-  siUnitShort?: (string | null)[];
+  unitShort?: (string | null)[];
   /** Scale per factor, e.g. `['mega',null]`. */
-  siScale?: (string | null)[];
+  scale?: (string | null)[];
   /** Short scale per factor, e.g. `['M',null]`; deduced when missing. */
-  siScaleShort?: (string | null)[];
+  scaleShort?: (string | null)[];
 }
 
 /** Array-valued metadata fields; each accepts a bare string for one factor. */
-type UnitField = 'kind' | 'siUnit' | 'siUnitShort' | 'siScale' | 'siScaleShort';
+type UnitField = 'kind' | 'unit' | 'unitShort' | 'scale' | 'scaleShort';
 
 /**
  * What a caller may supply. Scalars stand in for a one-factor array and ragged
- * arrays are padded, so `{ siUnit: 'second', siScale: 'milli' }` is valid — as
+ * arrays are padded, so `{ unit: 'second', scale: 'milli' }` is valid — as
  * is any previously normalized `ColumnMeta`.
  */
 export type ColumnMetaInput = Partial<Omit<ColumnMeta, UnitField>> & {
@@ -157,10 +157,10 @@ export function deduceCategory(type: ColumnType): ColumnCategory {
 const INVERSE = '1/';
 const UNIT_FIELDS: UnitField[] = [
   'kind',
-  'siUnit',
-  'siUnitShort',
-  'siScale',
-  'siScaleShort',
+  'unit',
+  'unitShort',
+  'scale',
+  'scaleShort',
 ];
 
 /** Coerce a scalar/array/absent field into an array (or undefined). */
@@ -220,18 +220,18 @@ export function normalizeMeta(
   }
 
   const kind = pad(arrays.kind, factors);
-  const siUnit = pad(arrays.siUnit, factors);
-  const siScale = pad(arrays.siScale, factors);
+  const unit = pad(arrays.unit, factors);
+  const scale = pad(arrays.scale, factors);
 
   // Each missing shortname is filled from its long name, per factor.
   const unitShort: (string | null)[] = [];
   const scaleShort: (string | null)[] = [];
   for (let i = 0; i < factors; i++) {
     unitShort.push(
-      arrays.siUnitShort?.[i] || shortOf(siUnit?.[i] ?? null, UNIT_SHORT),
+      arrays.unitShort?.[i] || shortOf(unit?.[i] ?? null, UNIT_SHORT),
     );
     scaleShort.push(
-      arrays.siScaleShort?.[i] || shortOf(siScale?.[i] ?? null, SCALE_SHORT),
+      arrays.scaleShort?.[i] || shortOf(scale?.[i] ?? null, SCALE_SHORT),
     );
   }
 
@@ -244,10 +244,10 @@ export function normalizeMeta(
 
   const fields: [UnitField, (string | null)[] | undefined][] = [
     ['kind', orUndefined(kind)],
-    ['siUnit', orUndefined(siUnit)],
-    ['siUnitShort', orUndefined(unitShort)],
-    ['siScale', orUndefined(siScale)],
-    ['siScaleShort', orUndefined(scaleShort)],
+    ['unit', orUndefined(unit)],
+    ['unitShort', orUndefined(unitShort)],
+    ['scale', orUndefined(scale)],
+    ['scaleShort', orUndefined(scaleShort)],
   ];
   for (const [name, value] of fields) if (value) meta[name] = value;
   return meta;
@@ -353,7 +353,7 @@ export function unitLabels(meta: ColumnMeta | undefined): UnitLabels {
   const cached = labelCache.get(meta);
   if (cached) return cached;
 
-  const factors = factorsOf(meta.siUnitShort, meta.siScaleShort);
+  const factors = factorsOf(meta.unitShort, meta.scaleShort);
   const only = factors.length === 1 ? factors[0]! : undefined;
   const simple = !!only && !only.inverted && only.exponent === 1;
   const labels: UnitLabels = {
