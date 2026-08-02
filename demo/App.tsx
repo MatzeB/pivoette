@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DataTable, isFlat } from '../src';
 import type {
   ColumnMetaInput,
@@ -122,17 +122,33 @@ function collectMeta(
   ];
 }
 
-const PLACEMENTS: UnitPlacement[] = ['off', 'value', 'header'];
+const PLACEMENT_OPTIONS: { id: UnitPlacement; label: string }[] = [
+  { id: 'off', label: 'off' },
+  { id: 'value', label: 'value' },
+  { id: 'header', label: 'header' },
+];
 
-/** Where a metadata-supplied unit/scale label is rendered. */
-function PlacementSelect({
+/** Locale override. '' means "let the runtime decide". */
+const LOCALES: { id: string; label: string }[] = [
+  { id: '', label: 'Auto' },
+  { id: 'en-US', label: 'en-US' },
+  { id: 'en-GB', label: 'en-GB' },
+  { id: 'de-DE', label: 'de-DE' },
+  { id: 'fr-FR', label: 'fr-FR' },
+  { id: 'en-IN', label: 'en-IN' },
+  { id: 'ja-JP', label: 'ja-JP' },
+];
+
+function Select<T extends string>({
   label,
   value,
+  options,
   onChange,
 }: {
   label: string;
-  value: UnitPlacement;
-  onChange: (v: UnitPlacement) => void;
+  value: T;
+  options: { id: T; label: string }[];
+  onChange: (v: T) => void;
 }) {
   return (
     <label
@@ -147,7 +163,7 @@ function PlacementSelect({
       {label}
       <select
         value={value}
-        onChange={(e) => onChange(e.target.value as UnitPlacement)}
+        onChange={(e) => onChange(e.target.value as T)}
         style={{
           padding: '4px 6px',
           borderRadius: 6,
@@ -157,9 +173,9 @@ function PlacementSelect({
           fontSize: 12,
         }}
       >
-        {PLACEMENTS.map((p) => (
-          <option key={p} value={p}>
-            {p}
+        {options.map((o) => (
+          <option key={o.id} value={o.id}>
+            {o.label}
           </option>
         ))}
       </select>
@@ -178,9 +194,18 @@ export function App() {
   // unaffected either way.
   const [unitPlacement, setUnitPlacement] = useState<UnitPlacement>('header');
   const [scalePlacement, setScalePlacement] = useState<UnitPlacement>('header');
+  const [locale, setLocale] = useState('');
 
   const example = EXAMPLES.find((e) => e.id === selected)!;
   const isRegression = example.id === 'regression';
+
+  // Overriding the view's locale changes number separators and, for currency
+  // units, where the symbol sits and how many decimals it takes. Memoized so
+  // the engine is not re-run on unrelated renders.
+  const view = useMemo(
+    () => (locale ? { ...example.view, locale } : example.view),
+    [example.view, locale],
+  );
 
   useEffect(() => {
     if (stress && isRegression && !stressData) {
@@ -205,7 +230,7 @@ export function App() {
   // two only where a single column has both halves to place. Ticker's `$` and
   // `%` live on different columns, so one control covers it; metrics has
   // `ms`/`MiB`, where scale and unit really can go to different places.
-  const metas = collectMeta(data, example.view);
+  const metas = collectMeta(data, view);
   const hasUnits = metas.some((m) => m.unit ?? m.scale ?? m.unitShort);
   const hasSplit = metas.some(
     (m) => (m.unit ?? m.unitShort) && (m.scale ?? m.scaleShort),
@@ -241,7 +266,20 @@ export function App() {
             In-browser pivot-table / data-analysis component — worked examples.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 4, flex: '0 0 auto' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            flex: '0 0 auto',
+            alignItems: 'center',
+          }}
+        >
+          <Select
+            label="locale"
+            value={locale}
+            options={LOCALES}
+            onChange={setLocale}
+          />
           {(['auto', 'light', 'dark'] as Theme[]).map((t) => (
             <button
               key={t}
@@ -324,21 +362,24 @@ export function App() {
         >
           {hasSplit ? (
             <>
-              <PlacementSelect
+              <Select
                 label="unit"
                 value={unitPlacement}
+                options={PLACEMENT_OPTIONS}
                 onChange={setUnitPlacement}
               />
-              <PlacementSelect
+              <Select
                 label="scale"
                 value={scalePlacement}
+                options={PLACEMENT_OPTIONS}
                 onChange={setScalePlacement}
               />
             </>
           ) : (
-            <PlacementSelect
+            <Select
               label="units"
               value={unitPlacement}
+              options={PLACEMENT_OPTIONS}
               onChange={setBoth}
             />
           )}
@@ -348,7 +389,7 @@ export function App() {
       <DataTable
         key={example.id + (stress ? '-stress' : '')}
         data={data}
-        view={example.view}
+        view={view}
         height={560}
         theme={theme}
         display={{ ...example.display, unitPlacement, scalePlacement }}
