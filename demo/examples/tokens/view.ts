@@ -7,8 +7,14 @@ export const view: ViewSpec = {
   columns: [],
   labels: { team: 'Team', project: 'Project', model: 'Model' },
   // The money column takes its 2 decimals from kind `price`; the `$` itself
-  // comes from the unit placement.
-  meta: { costUsd: { kind: ['price'], unit: ['dollar'] } },
+  // comes from the unit placement. The token counts declare their unit too, so
+  // `tok` follows the same placement — the short form is deduced.
+  meta: {
+    costUsd: { kind: ['price'], unit: ['dollar'] },
+    inputTokens: { unit: ['token'] },
+    outputTokens: { unit: ['token'] },
+    cachedTokens: { unit: ['token'] },
+  },
   values: [
     {
       id: 'input',
@@ -48,6 +54,7 @@ export const view: ViewSpec = {
         cached: { colPath: [], value: 'cached' },
       },
       compute: 'input + output + cached',
+      meta: { unit: ['token'] },
       format: { fnName: Format.Number, options: { compact: true } },
     },
   ],

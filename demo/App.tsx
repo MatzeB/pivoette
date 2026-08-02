@@ -95,7 +95,7 @@ const EXAMPLES: Example[] = [
     id: 'tokens',
     title: '4 · AI token spend (multi-level rows)',
     blurb:
-      'Nested rows team → project → model, compact K/M/B token counts, computed Total column, grand-total summary footer.',
+      'Nested rows team → project → model, compact K/M/B token counts, computed Total column, grand-total summary footer. Two units side by side: the counts are `tok`, the price is `$` — both follow the placement toggle.',
     view: tokensView,
     source: tokensSrc,
     data: tokensData as Row[],
