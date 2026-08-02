@@ -337,8 +337,16 @@
 }
 
 /* What a pending removal would take with it. Scoped past `.table th, .table td`
-   and declared after the hover/zebra tints so it reads on any of them. */
+   and declared after the hover/zebra tints so it reads on any of them.
+
+   Painted as a background *image*, not a colour: header and footer cells are
+   sticky and must stay opaque to occlude the rows scrolling under them, so the
+   tint has to composite over whatever background-color the cell already has
+   rather than replace it with something translucent. */
 .table th.removeTint,
 .table td.removeTint {
-  background: light-dark(rgba(197, 34, 31, 0.1), rgba(255, 107, 100, 0.16));
+  background-image: linear-gradient(
+    light-dark(rgba(197, 34, 31, 0.1), rgba(255, 107, 100, 0.16)),
+    light-dark(rgba(197, 34, 31, 0.1), rgba(255, 107, 100, 0.16))
+  );
 }
