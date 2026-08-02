@@ -452,20 +452,6 @@ export function App() {
               onChange={setTimeZone}
             />
           )}
-          <button
-            onClick={() => setEditing((v) => !v)}
-            style={{
-              padding: '5px 10px',
-              borderRadius: 6,
-              border: '1px solid var(--btn-border)',
-              cursor: 'pointer',
-              background: editing ? 'var(--btn-active-bg)' : 'var(--btn-bg)',
-              color: editing ? 'var(--btn-active-fg)' : 'var(--btn-fg)',
-              fontSize: 12,
-            }}
-          >
-            {editing ? 'Done' : 'Edit'}
-          </button>
           {(['auto', 'light', 'dark'] as Theme[]).map((t) => (
             <button
               key={t}
@@ -620,9 +606,32 @@ export function App() {
         )}
       </div>
 
-      <p style={{ color: 'var(--page-muted)', fontSize: 12, marginTop: 10 }}>
-        {rowCount.toLocaleString()} source rows.
-      </p>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          marginTop: 10,
+        }}
+      >
+        <button
+          onClick={() => setEditing((v) => !v)}
+          style={{
+            padding: '4px 10px',
+            borderRadius: 6,
+            border: '1px solid var(--btn-border)',
+            cursor: 'pointer',
+            background: editing ? 'var(--btn-active-bg)' : 'var(--btn-bg)',
+            color: editing ? 'var(--btn-active-fg)' : 'var(--btn-fg)',
+            fontSize: 12,
+          }}
+        >
+          {editing ? 'Done editing' : 'Edit'}
+        </button>
+        <span style={{ color: 'var(--page-muted)', fontSize: 12 }}>
+          {rowCount.toLocaleString()} source rows.
+        </span>
+      </div>
 
       <Panel title="View spec — the config that produces the table above">
         {() => <Source text={example.source} />}
