@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { DataTable } from '../src';
-import type { ViewSpec } from '../src';
+import type { DataTableDisplay, ViewSpec } from '../src';
 
 import { view as tickerView } from './examples/ticker/view';
 import tickerData from './examples/ticker/data.json';
@@ -19,6 +19,7 @@ interface Example {
   blurb: string;
   view: ViewSpec;
   data: Row[];
+  display?: DataTableDisplay;
 }
 
 const EXAMPLES: Example[] = [
@@ -29,22 +30,33 @@ const EXAMPLES: Example[] = [
       'Flat detail table: composite asset cell (image + description, sorted by description), computed P/L $ and %, currency + sign formatting, red/green by sign.',
     view: tickerView,
     data: tickerData as Row[],
+    display: { indexColumns: 1 },
   },
   {
     id: 'benchmark',
     title: '2 · Kernel benchmark (pivot)',
     blurb:
-      'Aggregated pivot with 3-level columns (size → arch → mean/min/max/±var), duration-formatted times, ns² variance shown as a plain number.',
+      'Frameless spacing-based design: grouped size/arch blocks, sticky multi-level header, and a 3-line footer (avg / median / sum).',
     view: benchmarkView,
     data: benchmarkData as Row[],
+    display: {
+      frameless: true,
+      groupSpacing: 14,
+      footer: [
+        { label: 'avg', agg: 'mean' },
+        { label: 'median', agg: 'median' },
+        { label: 'sum', agg: 'sum' },
+      ],
+    },
   },
   {
     id: 'regression',
     title: '3 · Before/after regression',
     blurb:
-      'Per-platform derived Δ% referencing each platform’s own before/after cells; faster is green, regressions red.',
+      'Per-platform derived Δ% referencing each platform’s own before/after cells; faster is green, regressions red. Hover tints the platform group.',
     view: regressionView,
     data: regressionData as Row[],
+    display: { highlightGroups: true, groupSpacing: 8 },
   },
   {
     id: 'tokens',
@@ -198,6 +210,7 @@ export function App() {
         view={example.view}
         height={560}
         theme={theme}
+        display={example.display}
       />
 
       <p style={{ color: 'var(--page-muted)', fontSize: 12, marginTop: 10 }}>

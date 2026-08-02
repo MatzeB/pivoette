@@ -66,6 +66,41 @@ describe('<DataTable> smoke', () => {
     expect(headerText).toContain('Δ%');
   });
 
+  it('renders frameless + group spacing + multi-row footer + sort', async () => {
+    const data = [
+      { b: 'k1', size: 'tiny', arch: 'x86', t: 10 },
+      { b: 'k1', size: 'tiny', arch: 'x86', t: 30 },
+      { b: 'k1', size: 'big', arch: 'AArch64', t: 100 },
+      { b: 'k2', size: 'tiny', arch: 'x86', t: 5 },
+    ];
+    const view: PivotSpec = {
+      rows: ['b'],
+      columns: ['size', 'arch'],
+      values: [
+        { id: 'mean', field: 't', agg: 'mean', label: 'mean' },
+        { id: 'max', field: 't', agg: 'max', label: 'max' },
+      ],
+    };
+    const el = await render(
+      <DataTable
+        data={data}
+        view={view}
+        display={{
+          frameless: true,
+          groupSpacing: 12,
+          footer: [
+            { label: 'avg', agg: 'mean' },
+            { label: 'sum', agg: 'sum' },
+          ],
+        }}
+      />,
+    );
+    expect(el.querySelector('tfoot')!.textContent).toContain('avg');
+    expect(el.querySelector('tfoot')!.textContent).toContain('sum');
+    // colgroup drives fixed widths
+    expect(el.querySelectorAll('colgroup col').length).toBeGreaterThan(0);
+  });
+
   it('renders a flat table with a summary-free header', async () => {
     const data = [{ name: 'a', v: 1 }];
     const view: TableSpec = {

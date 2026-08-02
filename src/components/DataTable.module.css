@@ -7,6 +7,9 @@
   --pv-hover: #f0f7ff;
   --pv-text: #1d1d1f;
   --pv-muted: #6e6e73;
+  --pv-index-bg: #eeeef1;
+  --pv-hi: #dcebff;
+  --pv-group: #f2f7ff;
 
   position: relative;
   overflow: auto;
@@ -17,12 +20,9 @@
   font-size: 13px;
   color: var(--pv-text);
   background: var(--pv-bg);
-  /* Lets inline light-dark() colors (e.g. sign colors) resolve correctly. */
   color-scheme: light dark;
 }
 
-/* Dark palette — applied when the OS prefers dark (unless explicitly forced
-   light) or when the consumer sets data-theme="dark". */
 @media (prefers-color-scheme: dark) {
   .wrapper:not([data-theme='light']) {
     --pv-bg: #161618;
@@ -32,6 +32,9 @@
     --pv-hover: #1c2733;
     --pv-text: #f2f2f7;
     --pv-muted: #a1a1a6;
+    --pv-index-bg: #0f0f11;
+    --pv-hi: #2a3d54;
+    --pv-group: #1a2431;
   }
 }
 
@@ -43,6 +46,9 @@
   --pv-hover: #1c2733;
   --pv-text: #f2f2f7;
   --pv-muted: #a1a1a6;
+  --pv-index-bg: #0f0f11;
+  --pv-hi: #2a3d54;
+  --pv-group: #1a2431;
   color-scheme: dark;
 }
 
@@ -53,7 +59,7 @@
 .table {
   border-collapse: separate;
   border-spacing: 0;
-  width: max-content;
+  table-layout: fixed;
   min-width: 100%;
 }
 
@@ -63,12 +69,13 @@
   border-bottom: 1px solid var(--pv-border);
   border-right: 1px solid var(--pv-border);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   box-sizing: border-box;
 }
 
 .table thead th {
   position: sticky;
-  top: 0;
   z-index: 3;
   background: var(--pv-header-bg);
   font-weight: 600;
@@ -89,11 +96,33 @@
 
 .corner {
   z-index: 4 !important;
-  text-align: left;
+}
+
+/* Darker tint marks index columns. */
+.indexTint {
+  background: var(--pv-index-bg) !important;
 }
 
 .body tr:hover td {
   background: var(--pv-hover);
+}
+
+/* Hover highlight for a cell's column header + ancestors. */
+.headerHi {
+  background: var(--pv-hi) !important;
+}
+
+/* Body cells sharing the hovered top-level column group. */
+.groupTint {
+  background: var(--pv-group);
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.sortable:hover {
+  filter: brightness(0.97);
 }
 
 .numeric {
@@ -110,23 +139,37 @@
 
 .summaryRow td,
 .summaryRow th {
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
   background: var(--pv-summary-bg);
   font-weight: 600;
-  border-top: 2px solid var(--pv-border);
 }
 
 .summaryLabel {
   position: sticky;
   left: 0;
-  z-index: 3;
-  background: var(--pv-summary-bg);
+  z-index: 1;
   text-align: left;
+}
+
+.footTop td,
+.footTop th {
+  border-top: 2px solid var(--pv-border);
 }
 
 .spacer td {
   padding: 0;
   border: none;
+}
+
+/* Line-free variant: spacing instead of inner rules; only a header separator. */
+.frameless th,
+.frameless td {
+  border-right: none;
+  border-bottom: none;
+}
+.frameless thead th {
+  border-bottom: 1px solid var(--pv-border);
+}
+.frameless .footTop td,
+.frameless .footTop th {
+  border-top: 1px solid var(--pv-border);
 }

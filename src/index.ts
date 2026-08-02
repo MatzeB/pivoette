@@ -2,7 +2,7 @@
 
 // Component
 export { DataTable } from './components/DataTable';
-export type { DataTableProps } from './components/DataTable';
+export type { DataTableProps, DataTableDisplay } from './components/DataTable';
 
 // Data model
 export { fromRows } from './data/import';
