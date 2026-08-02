@@ -225,11 +225,15 @@
 /* --- editing chrome ------------------------------------------------------ */
 
 /* The two narrow `+` columns, and their spacer cells in every body row. */
-.editCell {
-  padding: 0;
+/* `.table th, .table td` sets 5px 10px and outranks a bare class, which in a
+   26px column leaves a 6px content box and throws the button off-centre. */
+.table th.editCell,
+.table td.editCell {
+  padding: 0 2px;
   text-align: center;
   background: var(--pv-bg);
   border-bottom: 0;
+  overflow: visible;
 }
 
 /* Removes a field from its axis. Sits in the corner of the header it acts on,
