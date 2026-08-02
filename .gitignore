@@ -10,6 +10,8 @@ dist/
 .DS_Store
 .vscode/
 .idea/
+*.sw[a-p]
+*~
 
 # Logs
 *.log
