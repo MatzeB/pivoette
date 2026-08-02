@@ -20,6 +20,7 @@ import { isFlat } from '../pivot/spec';
 import {
   addField,
   moveField,
+  moveValue,
   removeField,
   removeFooterRow,
   removeValue,
@@ -136,6 +137,9 @@ function indexCols(
   }
   return out;
 }
+
+/** A draggable handle's identity: an axis field, or a measure. */
+type DragRef = FieldRef | { zone: 'values'; index: number };
 
 /** A line in the opened pending column: a field, the Custom placeholder, or a note. */
 type AddEntry =
@@ -636,19 +640,30 @@ export function DataTable({
     if (spec && at !== null) onViewChange?.(addField(spec, 'rows', field, at));
   }
 
-  /** Drag state: which field is in flight, so drops know the source. */
-  const dragged = useRef<FieldRef | null>(null);
+  /** What is in flight: an axis field, or a measure. */
+  const dragged = useRef<DragRef | null>(null);
 
-  function onFieldDrop(to: FieldRef) {
+  /**
+   * Axis fields are interchangeable — dragging one onto the other axis pivots
+   * it — but a measure only reorders among measures, and does so globally: its
+   * header repeats per column group, so where it was grabbed does not matter,
+   * only which measure it was dropped on.
+   */
+  function onFieldDrop(to: DragRef) {
     const from = dragged.current;
     dragged.current = null;
     if (!spec || !from) return;
     if (from.zone === to.zone && from.index === to.index) return;
-    onViewChange?.(moveField(spec, from, to));
+    if (from.zone === 'values' || to.zone === 'values') {
+      if (from.zone !== to.zone) return;
+      onViewChange?.(moveValue(view, from.index, to.index));
+      return;
+    }
+    onViewChange?.(moveField(spec, from as FieldRef, to as FieldRef));
   }
 
-  /** Props shared by every draggable field handle. */
-  function dragProps(ref: FieldRef) {
+  /** Props shared by every draggable handle. */
+  function dragProps(ref: DragRef) {
     if (!editable) return {};
     return {
       draggable: true,
@@ -790,7 +805,10 @@ export function DataTable({
                         onMouseMove={(e) => edgeInsert(e, i)}
                         onClick={() => cycleSort({ kind: 'index', level: i })}
                       >
-                        <span {...dragProps({ zone: 'rows', index: i })}>
+                        <span
+                          className={styles.dragHandle}
+                          {...dragProps({ zone: 'rows', index: i })}
+                        >
                           {lvl}
                         </span>
                         {sortArrow(active)}
@@ -875,7 +893,16 @@ export function DataTable({
                         : undefined
                     }
                   >
-                    {hc.label}
+                    {measure !== undefined ? (
+                      <span
+                        className={styles.dragHandle}
+                        {...dragProps({ zone: 'values', index: measure })}
+                      >
+                        {hc.label}
+                      </span>
+                    ) : (
+                      hc.label
+                    )}
                     {sortArrow(active)}
                     {measure !== undefined && (
                       <RemoveField

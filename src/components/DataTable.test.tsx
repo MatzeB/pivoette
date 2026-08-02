@@ -721,3 +721,66 @@ describe('<DataTable> footer row tint', () => {
     expect(map(el)).toEqual(['.', '...', '...']);
   });
 });
+
+describe('<DataTable> measure drag', () => {
+  const data = [
+    { t: 'A', s: 'x', n: 1 },
+    { t: 'B', s: 'y', n: 2 },
+  ];
+  const view: PivotSpec = {
+    rows: ['t'],
+    columns: ['s'],
+    values: [
+      { id: 'a', field: 'n', agg: 'sum', label: 'sum' },
+      { id: 'b', field: 'n', agg: 'max', label: 'max' },
+      { id: 'c', field: 'n', agg: 'min', label: 'min' },
+    ],
+  };
+
+  function drag(from: HTMLElement, to: HTMLElement) {
+    const dataTransfer = {
+      effectAllowed: '',
+      setData: () => {},
+      getData: () => '',
+    };
+    const fire = (el: HTMLElement, type: string) => {
+      const e = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(e, 'dataTransfer', { value: dataTransfer });
+      el.dispatchEvent(e);
+    };
+    fire(from, 'dragstart');
+    fire(to, 'dragover');
+    fire(to, 'drop');
+  }
+
+  async function mount(onChange: (v: ViewSpec) => void) {
+    const el = await render(
+      <DataTable data={data} view={view} editing onViewChange={onChange} />,
+    );
+    return [
+      ...el.querySelectorAll<HTMLElement>('thead span[draggable="true"]'),
+    ];
+  }
+
+  it('reorders measures regardless of which column group was grabbed', async () => {
+    let next: PivotSpec | undefined;
+    const handles = await mount((v) => (next = v as PivotSpec));
+    const named = (n: string) => handles.filter((h) => h.textContent === n);
+    // Two column groups, so each measure has two handles.
+    expect(named('min')).toHaveLength(2);
+
+    // `min` from the second group, dropped on `sum` in the first.
+    await act(async () => drag(named('min')[1]!, named('sum')[0]!));
+    expect(next!.values.map((v) => v.id)).toEqual(['c', 'a', 'b']);
+  });
+
+  it('ignores a measure dropped on an axis field', async () => {
+    // A measure is not a grouping field; the drop means nothing.
+    let next: PivotSpec | undefined;
+    const handles = await mount((v) => (next = v as PivotSpec));
+    const measure = handles.find((h) => h.textContent === 'max')!;
+    const rowField = handles.find((h) => h.textContent === 't')!;
+    await act(async () => drag(measure, rowField));
+    expect(next).toBeUndefined();
+  });
+});

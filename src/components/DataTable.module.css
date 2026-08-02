@@ -350,3 +350,12 @@
     light-dark(rgba(197, 34, 31, 0.1), rgba(255, 107, 100, 0.16))
   );
 }
+
+/* Grabbable field and measure names in the headers. */
+.dragHandle {
+  cursor: grab;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
