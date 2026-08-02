@@ -23,6 +23,13 @@ import metricsData from './examples/metrics/data.json';
 import { view as commitsView } from './examples/commits/view';
 import commitsData from './examples/commits/data.json';
 
+import tickerSrc from './examples/ticker/view?raw';
+import benchmarkSrc from './examples/benchmark/view?raw';
+import regressionSrc from './examples/regression/view?raw';
+import tokensSrc from './examples/tokens/view?raw';
+import metricsSrc from './examples/metrics/view?raw';
+import commitsSrc from './examples/commits/view?raw';
+
 type Row = Record<string, unknown>;
 
 interface Example {
@@ -32,6 +39,8 @@ interface Example {
   view: ViewSpec;
   /** Rows, or the `{meta, rows}` wire form carrying column metadata. */
   data: Row[] | DatasetJson;
+  /** The example's own `view.ts`, shown verbatim in the panels below. */
+  source: string;
   display?: DataTableDisplay;
 }
 
@@ -42,6 +51,7 @@ const EXAMPLES: Example[] = [
     blurb:
       'Flat detail table: composite asset cell (image + description, sorted by description), computed P/L, red/green by sign. Column metadata is declared in the view over plain JSON rows — the 2-decimal money format is deduced from kind `price`, and the `$` follows the placement toggle (leading the number, inside the sign).',
     view: tickerView,
+    source: tickerSrc,
     data: tickerData as Row[],
     display: { indexColumns: 1 },
   },
@@ -51,6 +61,7 @@ const EXAMPLES: Example[] = [
     blurb:
       'Frameless spacing-based design: grouped size/arch blocks, sticky multi-level header, and a 3-line footer (avg / median / sum).',
     view: benchmarkView,
+    source: benchmarkSrc,
     data: benchmarkData as Row[],
     display: {
       frameless: true,
@@ -70,6 +81,7 @@ const EXAMPLES: Example[] = [
     blurb:
       'Per-platform derived Δ% referencing each platform’s own before/after cells; faster is green, regressions red. Hover shades the row, cell, and index.',
     view: regressionView,
+    source: regressionSrc,
     data: regressionData as Row[],
     display: { groupSpacing: 8 },
   },
@@ -79,6 +91,7 @@ const EXAMPLES: Example[] = [
     blurb:
       'Nested rows team → project → model, compact K/M/B token counts, computed Total column, grand-total summary footer.',
     view: tokensView,
+    source: tokensSrc,
     data: tokensData as Row[],
     display: { rowGroupSpacing: 10 },
   },
@@ -88,6 +101,7 @@ const EXAMPLES: Example[] = [
     blurb:
       'Headers and units come from column metadata shipped with the data. Compound units (ktok/s, MB/s, m²) move as one label; simple ones (ms, MiB) can split scale onto the value and unit into the header.',
     view: metricsView,
+    source: metricsSrc,
     data: metricsData as DatasetJson,
     display: {
       indexColumns: 2,
@@ -101,6 +115,7 @@ const EXAMPLES: Example[] = [
     blurb:
       'The timestamp column declares its own encoding in the data; the view derives a weekday from it with `weekday(committedAt)`. The integers 0–6 sort into calendar order by themselves, and kind `weekday` deduces the format that names them. Locale re-orders and renames the columns; time zone moves commits between them.',
     view: commitsView,
+    source: commitsSrc,
     data: commitsData as DatasetJson,
     display: { groupSpacing: 10, indexGap: 8 },
   },
@@ -191,6 +206,58 @@ function rawView(rows: Row[]): TableSpec {
   };
 }
 
+/** A collapsible panel; its body is mounted only while open. */
+function Panel({
+  title,
+  children,
+}: {
+  title: string;
+  children: () => React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <details
+      open={open}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
+      style={{ marginTop: 6 }}
+    >
+      <summary
+        style={{
+          cursor: 'pointer',
+          fontSize: 13,
+          color: 'var(--page-muted)',
+          marginBottom: 8,
+        }}
+      >
+        {title}
+      </summary>
+      {open && children()}
+    </details>
+  );
+}
+
+/** Monospaced source listing, scrollable rather than page-widening. */
+function Source({ text }: { text: string }) {
+  return (
+    <pre
+      style={{
+        margin: 0,
+        padding: '12px 14px',
+        borderRadius: 8,
+        border: '1px solid var(--btn-border)',
+        background: 'var(--btn-bg)',
+        color: 'var(--page-text)',
+        fontSize: 12,
+        lineHeight: 1.5,
+        maxHeight: 420,
+        overflow: 'auto',
+      }}
+    >
+      {text}
+    </pre>
+  );
+}
+
 /** Time-zone override. '' means 'auto' — the runtime's zone. */
 const TIME_ZONES: { id: string; label: string }[] = [
   { id: '', label: 'Auto' },
@@ -258,7 +325,6 @@ export function App() {
   const [scalePlacement, setScalePlacement] = useState<UnitPlacement>('header');
   const [locale, setLocale] = useState('');
   const [timeZone, setTimeZone] = useState('');
-  const [showSource, setShowSource] = useState(false);
 
   const example = EXAMPLES.find((e) => e.id === selected)!;
   const isRegression = example.id === 'regression';
@@ -301,6 +367,9 @@ export function App() {
   // does not re-derive on every render.
   const sourceData = useMemo(() => sourceRows(data), [data]);
   const sourceView = useMemo(() => rawView(sourceData), [sourceData]);
+  // Only some examples ship metadata with the data; ticker declares its own in
+  // the view, which the view-spec panel already shows.
+  const datasetMeta = Array.isArray(data) ? undefined : data.meta;
 
   // Placement controls appear only where they'd do something, and split into
   // two only where a single column has both halves to place. Ticker's `$` and
@@ -481,23 +550,19 @@ export function App() {
         {rowCount.toLocaleString()} source rows.
       </p>
 
-      <details
-        open={showSource}
-        onToggle={(e) => setShowSource(e.currentTarget.open)}
-        style={{ marginTop: 4 }}
-      >
-        <summary
-          style={{
-            cursor: 'pointer',
-            fontSize: 13,
-            color: 'var(--page-muted)',
-            marginBottom: 10,
-          }}
-        >
-          Source data — the rows as given, before any of the above
-        </summary>
+      <Panel title="View spec — the config that produces the table above">
+        {() => <Source text={example.source} />}
+      </Panel>
+
+      {datasetMeta && (
+        <Panel title="Column metadata — shipped alongside the rows in data.json">
+          {() => <Source text={JSON.stringify(datasetMeta, null, 2)} />}
+        </Panel>
+      )}
+
+      <Panel title="Source data — the rows as given, before any of the above">
         {/* Mounted only while open: the stress fixture is 10k rows. */}
-        {showSource && (
+        {() => (
           <DataTable
             key={example.id + (stress ? '-stress' : '') + '-src'}
             data={sourceData}
@@ -506,7 +571,7 @@ export function App() {
             theme={theme}
           />
         )}
-      </details>
+      </Panel>
     </div>
   );
 }
