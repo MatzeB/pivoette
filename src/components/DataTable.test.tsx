@@ -404,3 +404,48 @@ describe('<DataTable> editing', () => {
     if (next) expect(next.rows.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('<DataTable> field removal', () => {
+  const data = [{ team: 'A', project: 'p', n: 1 }];
+  const view: PivotSpec = {
+    rows: ['team', 'project'],
+    columns: [],
+    values: [{ id: 's', field: 'n', agg: 'sum', label: 'n' }],
+  };
+
+  it('shows a remove control per row field only when editable', async () => {
+    const plain = await render(<DataTable data={data} view={view} />);
+    expect(plain.querySelectorAll('button[aria-label^="Remove"]')).toHaveLength(
+      0,
+    );
+
+    const el = await render(
+      <DataTable data={data} view={view} editing onViewChange={() => {}} />,
+    );
+    expect(
+      [...el.querySelectorAll('button[aria-label^="Remove"]')].map((b) =>
+        b.getAttribute('aria-label'),
+      ),
+    ).toEqual(['Remove the team row field', 'Remove the project row field']);
+  });
+
+  it('removes the field it names, without sorting', async () => {
+    let next: PivotSpec | undefined;
+    const el = await render(
+      <DataTable
+        data={data}
+        view={view}
+        editing
+        onViewChange={(v) => (next = v as PivotSpec)}
+      />,
+    );
+    const remove = el.querySelector<HTMLButtonElement>(
+      'button[aria-label="Remove the team row field"]',
+    )!;
+    await act(async () => remove.click());
+    expect(next!.rows).toEqual(['project']);
+    // The click must not also reach the header's sort handler.
+    expect(el.querySelector('thead')!.textContent).not.toContain('▼');
+    expect(el.querySelector('thead')!.textContent).not.toContain('▲');
+  });
+});

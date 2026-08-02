@@ -20,7 +20,13 @@ import { aggregationIds } from '../pivot/aggregations';
 import { isFlat } from '../pivot/spec';
 import { AddMenu } from '../editor/AddMenu';
 import type { AddOption } from '../editor/AddMenu';
-import { addField, addFooterRow, addValue, moveField } from '../editor/ops';
+import {
+  addField,
+  addFooterRow,
+  addValue,
+  moveField,
+  removeField,
+} from '../editor/ops';
 import type { FieldRef } from '../editor/ops';
 import styles from './DataTable.module.css';
 
@@ -74,6 +80,32 @@ export interface DataTableProps {
 /** Stable identity: a fresh `[]` default would invalidate the width memo (and
  * so re-measure every column) on every render, including each hover. */
 const NO_FOOTER: { label: string; agg: string }[] = [];
+
+/** The remove control on an editable field header. */
+function RemoveField({
+  title,
+  onRemove,
+}: {
+  title: string;
+  onRemove: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      className={styles.removeField}
+      onClick={(e) => {
+        // The header itself cycles the sort; removing must not also sort.
+        e.stopPropagation();
+        onRemove();
+      }}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
+      ×
+    </button>
+  );
+}
 
 /** Width of the narrow `+` columns shown in edit mode. */
 const EDIT_COL_W = 26;
@@ -648,6 +680,14 @@ export function DataTable({
                         {lvl}
                       </span>
                       {sortArrow(active)}
+                      {editable && spec && (
+                        <RemoveField
+                          title={`Remove the ${lvl} row field`}
+                          onRemove={() =>
+                            onViewChange?.(removeField(spec, 'rows', i))
+                          }
+                        />
+                      )}
                     </th>
                   );
                 })}
@@ -750,6 +790,12 @@ export function DataTable({
                     {...dragProps({ zone: 'columns', index: i })}
                   >
                     {frame.columnByName.get(field)?.meta.displayName ?? field}
+                    <RemoveField
+                      title={`Remove the ${field} column field`}
+                      onRemove={() =>
+                        onViewChange?.(removeField(spec!, 'columns', i))
+                      }
+                    />
                   </span>
                 ))}
                 <AddMenu

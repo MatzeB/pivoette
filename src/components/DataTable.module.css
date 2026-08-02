@@ -10,6 +10,12 @@
   --pv-index-bg: #eeeef1;
   --pv-hi: #dcebff;
   --pv-zebra: #f7f7f9;
+  /* Reads on either palette without needing a per-theme override. */
+  --pv-remove: light-dark(#c5221f, #ff6b64);
+  --pv-remove-bg: light-dark(
+    rgba(197, 34, 31, 0.12),
+    rgba(255, 107, 100, 0.18)
+  );
 
   position: relative;
   overflow: auto;
@@ -261,4 +267,36 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--pv-muted);
+}
+
+/* Removes a field from its axis. Sits in the corner of the header it acts on,
+   and stops its click reaching the header's sort handler. */
+.removeField {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  width: 13px;
+  height: 13px;
+  padding: 0;
+  line-height: 1;
+  font-size: 11px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--pv-remove);
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.removeField:hover {
+  opacity: 1;
+  background: var(--pv-remove-bg);
+}
+
+/* Inside a chip the control follows the text rather than floating. */
+.chip .removeField {
+  position: static;
+  margin-left: 4px;
+  width: 12px;
+  height: 12px;
 }
