@@ -20,11 +20,11 @@ import type { FormatSpec } from '../pivot/spec';
 import { Format } from './builtins';
 
 const ONE_DECIMAL: FormatSpec = {
-  name: Format.Number,
+  fnName: Format.Number,
   options: { decimals: 1 },
 };
 const TWO_DECIMALS: FormatSpec = {
-  name: Format.Number,
+  fnName: Format.Number,
   options: { decimals: 2 },
 };
 
@@ -32,7 +32,7 @@ const TWO_DECIMALS: FormatSpec = {
 const KIND_RULES: Record<string, FormatSpec> = {
   price: TWO_DECIMALS,
   percentage: ONE_DECIMAL,
-  count: { name: Format.Integer },
+  count: { fnName: Format.Integer },
 };
 
 /**
@@ -58,7 +58,7 @@ export function deduceFormat(
 /**
  * Combine a view's explicit format with the deduced one. Naming the *same*
  * built-in merges their options, so a column can override one setting and
- * inherit the rest — `{ name: 'number', options: { signDisplay: 'exceptZero' } }`
+ * inherit the rest — `{ fnName: 'number', options: { signDisplay: 'exceptZero' } }`
  * on a percentage keeps the deduced 1 decimal. Naming a different built-in (or
  * supplying an inline fn/expression) replaces the deduction outright.
  *
@@ -76,14 +76,14 @@ export function resolveFormatSpec(
   // Inline functions and expressions are self-contained.
   if ('fn' in explicit || 'expression' in explicit) return explicit;
 
-  const named = base && 'name' in base ? base : undefined;
+  const named = base && 'fnName' in base ? base : undefined;
   // An options-only spec adopts the deduced built-in, falling back to `number`
   // (every mergeable option — decimals, signDisplay, compact — is numeric).
-  const name =
-    'name' in explicit ? explicit.name : (named?.name ?? Format.Number);
+  const fnName =
+    'fnName' in explicit ? explicit.fnName : (named?.fnName ?? Format.Number);
   // Options are inherited only from the same built-in; a different one has its
   // own defaults and its options may not even mean the same thing.
-  const inherited = named?.name === name ? named.options : undefined;
+  const inherited = named?.fnName === fnName ? named.options : undefined;
   const options = { ...inherited, ...explicit.options };
-  return Object.keys(options).length > 0 ? { name, options } : { name };
+  return Object.keys(options).length > 0 ? { fnName, options } : { fnName };
 }

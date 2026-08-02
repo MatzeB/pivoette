@@ -454,7 +454,7 @@ describe('view metadata and defaults', () => {
       mode: 'flat',
       meta: { price: { kind: ['price'], unit: ['dollar'] } },
       columns: [
-        { id: 'price', format: { name: 'number', options: { decimals: 0 } } },
+        { id: 'price', format: { fnName: 'number', options: { decimals: 0 } } },
       ],
     });
     expect(res.leaves[0]!.format({ value: 12.5 } as never)).toBe('13');
@@ -479,7 +479,10 @@ describe('inheritUnitFormat', () => {
         columns: [
           {
             id: 'ratio',
-            format: { name: 'number', options: { signDisplay: 'exceptZero' } },
+            format: {
+              fnName: 'number',
+              options: { signDisplay: 'exceptZero' },
+            },
           },
         ],
       }),
@@ -495,7 +498,10 @@ describe('inheritUnitFormat', () => {
           {
             id: 'ratio',
             inheritUnitFormat: false,
-            format: { name: 'number', options: { signDisplay: 'exceptZero' } },
+            format: {
+              fnName: 'number',
+              options: { signDisplay: 'exceptZero' },
+            },
           },
         ],
       }),

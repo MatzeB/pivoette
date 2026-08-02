@@ -9,7 +9,7 @@ import { normalizeMeta } from '../data/meta';
 import { requireColumn } from '../data/frame';
 import type { Align, ResolvedColumn } from '../format/context';
 import { deduceFormat, resolveFormatSpec } from '../format/deduce';
-import { Format } from '../format/builtins';
+import { Format, Render } from '../format/builtins';
 import { resolveFormat } from '../format/format';
 import { resolveStyle } from '../format/style';
 import { resolveRender } from '../format/render';
@@ -32,7 +32,7 @@ import { compareValues } from '../util';
 const NUMERIC_FORMATS = new Set<string>(Object.values(Format));
 
 function isNumericFormat(spec?: FormatSpec): boolean {
-  return !!spec && 'name' in spec && NUMERIC_FORMATS.has(spec.name);
+  return !!spec && 'fnName' in spec && NUMERIC_FORMATS.has(spec.fnName);
 }
 
 function alignFor(type: ColumnType | undefined, format?: FormatSpec): Align {
@@ -148,7 +148,7 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
       column,
       format,
       style: def.style,
-      render: def.composite ? { name: 'imageText' } : def.render,
+      render: def.composite ? { fnName: Render.ImageText } : def.render,
       emptyDisplay,
     });
   });

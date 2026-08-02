@@ -37,7 +37,7 @@ export const view: ViewSpec = {
     {
       id: 'symbol',
       style: {
-        name: Style.Static,
+        fnName: Style.Static,
         options: {
           fontFamily:
             'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
@@ -58,7 +58,7 @@ export const view: ViewSpec = {
       // come from kind `price`.
       format: { options: { signDisplay: 'exceptZero' } },
       style: {
-        name: Style.SignColors,
+        fnName: Style.SignColors,
         options: { positive: green, negative: red },
       },
     },
@@ -75,7 +75,7 @@ export const view: ViewSpec = {
       // Likewise: 1 decimal is deduced from kind `percentage`.
       format: { options: { signDisplay: 'exceptZero' } },
       style: {
-        name: Style.SignColors,
+        fnName: Style.SignColors,
         options: { positive: green, negative: red },
       },
     },

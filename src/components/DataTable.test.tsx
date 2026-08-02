@@ -135,12 +135,12 @@ describe('<DataTable> unit decoration', () => {
       {
         id: 'latency',
         source: 'latency',
-        format: { name: 'number', options: { decimals: 2 } },
+        format: { fnName: 'number', options: { decimals: 2 } },
       },
       {
         id: 'bandwidth',
         source: 'bandwidth',
-        format: { name: 'number', options: { decimals: 1 } },
+        format: { fnName: 'number', options: { decimals: 1 } },
       },
       { id: 'cpu', source: 'cpu' },
     ],
@@ -242,7 +242,7 @@ describe('<DataTable> currency prefix', () => {
         id: 'delta',
         meta: { kind: ['price'], unit: ['dollar'] },
         format: {
-          name: 'number',
+          fnName: 'number',
           options: { decimals: 2, signDisplay: 'exceptZero' },
         },
       },
@@ -250,7 +250,7 @@ describe('<DataTable> currency prefix', () => {
         id: 'gain',
         meta: { kind: ['price'], unit: ['dollar'] },
         format: {
-          name: 'number',
+          fnName: 'number',
           options: { decimals: 2, signDisplay: 'exceptZero' },
         },
       },

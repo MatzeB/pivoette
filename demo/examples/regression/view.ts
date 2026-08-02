@@ -20,7 +20,7 @@ export const view: ViewSpec = {
       field: 'timeNs',
       agg: 'mean',
       label: 'mean',
-      format: { name: Format.Duration },
+      format: { fnName: Format.Duration },
     },
   ],
   computed: [
@@ -35,11 +35,11 @@ export const view: ViewSpec = {
       compute: 'before ? (after - before) / before : null',
       place: { after: 'after' },
       format: {
-        name: Format.Percent,
+        fnName: Format.Percent,
         options: { decimals: 1, signDisplay: 'exceptZero' },
       },
       style: {
-        name: Style.SignColors,
+        fnName: Style.SignColors,
         options: { negative: green, positive: red },
       },
     },

@@ -20,9 +20,11 @@ export interface CellRef {
   value: string;
 }
 
-/** A built-in referenced by name, with options. */
+/** A registered function referenced by name, with its options. The companion
+ * to the inline `{ fn }` form: the name of a function rather than the function
+ * itself, which is what keeps a `ViewSpec` serializable. */
 export interface NamedSpec {
-  name: string;
+  fnName: string;
   options?: Record<string, unknown>;
 }
 

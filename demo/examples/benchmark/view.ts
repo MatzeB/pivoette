@@ -12,21 +12,21 @@ export const view: ViewSpec = {
       field: 'timeNs',
       agg: 'mean',
       label: 'mean',
-      format: { name: Format.Duration },
+      format: { fnName: Format.Duration },
     },
     {
       id: 'min',
       field: 'timeNs',
       agg: 'min',
       label: 'min',
-      format: { name: Format.Duration },
+      format: { fnName: Format.Duration },
     },
     {
       id: 'max',
       field: 'timeNs',
       agg: 'max',
       label: 'max',
-      format: { name: Format.Duration },
+      format: { fnName: Format.Duration },
     },
     {
       id: 'variance',
@@ -34,7 +34,7 @@ export const view: ViewSpec = {
       agg: 'variance',
       label: '± var',
       // Variance is in ns² — deliberately NOT duration-scaled.
-      format: { name: Format.Number, options: { decimals: 0, prefix: '± ' } },
+      format: { fnName: Format.Number, options: { decimals: 0, prefix: '± ' } },
     },
   ],
 };

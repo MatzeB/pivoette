@@ -74,8 +74,8 @@ export function resolveStyle(spec: StyleSpec | undefined): StyleFn {
       return (result as CSSProperties) ?? {};
     };
   }
-  const factory = registry.get(spec.name);
-  if (!factory) throw new Error(`Unknown style "${spec.name}"`);
+  const factory = registry.get(spec.fnName);
+  if (!factory) throw new Error(`Unknown style "${spec.fnName}"`);
   return factory(spec.options ?? {});
 }
 

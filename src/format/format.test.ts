@@ -23,7 +23,7 @@ const fmt = (spec: FormatSpec, value: unknown) =>
 
 describe('duration formatter', () => {
   it('auto-scales across ns / µs / ms / s / m with 3 sig figs', () => {
-    const d: FormatSpec = { name: 'duration' };
+    const d: FormatSpec = { fnName: 'duration' };
     expect(fmt(d, 999)).toBe('999 ns');
     expect(fmt(d, 1_000)).toBe('1.00 µs');
     expect(fmt(d, 1_500_000)).toBe('1.50 ms');
@@ -33,20 +33,20 @@ describe('duration formatter', () => {
   });
 
   it('honors a prefix (e.g. ± spread)', () => {
-    expect(fmt({ name: 'duration', options: { prefix: '± ' } }, 5_000)).toBe(
+    expect(fmt({ fnName: 'duration', options: { prefix: '± ' } }, 5_000)).toBe(
       '± 5.00 µs',
     );
   });
 
   it('renders null as the empty display', () => {
-    expect(resolveFormat({ name: 'duration' }, '—')(ctx(null))).toBe('—');
+    expect(resolveFormat({ fnName: 'duration' }, '—')(ctx(null))).toBe('—');
   });
 });
 
 describe('intl-backed formatters', () => {
   it('currency with explicit + sign', () => {
     const spec: FormatSpec = {
-      name: 'currency',
+      fnName: 'currency',
       options: { decimals: 2, signDisplay: 'exceptZero' },
     };
     expect(fmt(spec, 12.5)).toBe('+$12.50');
@@ -54,15 +54,15 @@ describe('intl-backed formatters', () => {
   });
 
   it('percent with decimals', () => {
-    expect(fmt({ name: 'percent', options: { decimals: 1 } }, 0.125)).toBe(
+    expect(fmt({ fnName: 'percent', options: { decimals: 1 } }, 0.125)).toBe(
       '12.5%',
     );
   });
 
   it('compact notation gives K/M/B', () => {
-    expect(fmt({ name: 'number', options: { compact: true } }, 1_500_000)).toBe(
-      '1.5M',
-    );
+    expect(
+      fmt({ fnName: 'number', options: { compact: true } }, 1_500_000),
+    ).toBe('1.5M');
   });
 });
 
@@ -72,12 +72,14 @@ describe('deduceFormat', () => {
 
   it('maps the known kinds to a format', () => {
     expect(deduceFormat(meta({ kind: 'price' }))).toEqual({
-      name: 'number',
+      fnName: 'number',
       options: { decimals: 2 },
     });
-    expect(deduceFormat(meta({ kind: 'count' }))).toEqual({ name: 'integer' });
+    expect(deduceFormat(meta({ kind: 'count' }))).toEqual({
+      fnName: 'integer',
+    });
     expect(deduceFormat(meta({ kind: 'percentage' }))).toEqual({
-      name: 'number',
+      fnName: 'number',
       options: { decimals: 1 },
     });
   });
@@ -85,16 +87,16 @@ describe('deduceFormat', () => {
   it('falls back to the unit when the kind has no rule', () => {
     // No kind at all: the `%` label still implies 1 decimal.
     expect(deduceFormat(meta({ scale: 'percent' }))).toEqual({
-      name: 'number',
+      fnName: 'number',
       options: { decimals: 1 },
     });
     expect(deduceFormat(meta({ unit: 'dollar' }))).toEqual({
-      name: 'number',
+      fnName: 'number',
       options: { decimals: 2 },
     });
     // A kind rule still wins over the unit fallback.
     expect(deduceFormat(meta({ kind: 'count', scale: 'percent' }))).toEqual({
-      name: 'integer',
+      fnName: 'integer',
     });
   });
 
@@ -110,29 +112,32 @@ describe('deduceFormat', () => {
 });
 
 describe('resolveFormatSpec', () => {
-  const deduced = { name: 'number', options: { decimals: 1 } };
+  const deduced = { fnName: 'number', options: { decimals: 1 } };
 
   it('merges options when both name the same built-in', () => {
     expect(
       resolveFormatSpec(
-        { name: 'number', options: { signDisplay: 'exceptZero' } },
+        { fnName: 'number', options: { signDisplay: 'exceptZero' } },
         deduced,
       ),
     ).toEqual({
-      name: 'number',
+      fnName: 'number',
       options: { decimals: 1, signDisplay: 'exceptZero' },
     });
   });
 
   it('lets the explicit option win on a conflict', () => {
     expect(
-      resolveFormatSpec({ name: 'number', options: { decimals: 3 } }, deduced),
-    ).toEqual({ name: 'number', options: { decimals: 3 } });
+      resolveFormatSpec(
+        { fnName: 'number', options: { decimals: 3 } },
+        deduced,
+      ),
+    ).toEqual({ fnName: 'number', options: { decimals: 3 } });
   });
 
   it('replaces outright when the built-ins differ', () => {
-    expect(resolveFormatSpec({ name: 'integer' }, deduced)).toEqual({
-      name: 'integer',
+    expect(resolveFormatSpec({ fnName: 'integer' }, deduced)).toEqual({
+      fnName: 'integer',
     });
   });
 
@@ -145,14 +150,14 @@ describe('resolveFormatSpec', () => {
     expect(
       resolveFormatSpec({ options: { signDisplay: 'exceptZero' } }, deduced),
     ).toEqual({
-      name: 'number',
+      fnName: 'number',
       options: { decimals: 1, signDisplay: 'exceptZero' },
     });
   });
 
   it('falls back to `number` for an options-only spec with no deduction', () => {
     expect(resolveFormatSpec({ options: { decimals: 3 } }, undefined)).toEqual({
-      name: 'number',
+      fnName: 'number',
       options: { decimals: 3 },
     });
   });
@@ -160,11 +165,11 @@ describe('resolveFormatSpec', () => {
   it('uses the explicit format verbatim when inherit is false', () => {
     expect(
       resolveFormatSpec(
-        { name: 'number', options: { signDisplay: 'exceptZero' } },
+        { fnName: 'number', options: { signDisplay: 'exceptZero' } },
         deduced,
         false,
       ),
-    ).toEqual({ name: 'number', options: { signDisplay: 'exceptZero' } });
+    ).toEqual({ fnName: 'number', options: { signDisplay: 'exceptZero' } });
   });
 
   it('opts out of deduction entirely when inherit is false', () => {
@@ -173,8 +178,8 @@ describe('resolveFormatSpec', () => {
 
   it('passes either side through when the other is absent', () => {
     expect(resolveFormatSpec(undefined, deduced)).toBe(deduced);
-    expect(resolveFormatSpec({ name: 'integer' }, undefined)).toEqual({
-      name: 'integer',
+    expect(resolveFormatSpec({ fnName: 'integer' }, undefined)).toEqual({
+      fnName: 'integer',
     });
     expect(resolveFormatSpec(undefined, undefined)).toBeUndefined();
   });

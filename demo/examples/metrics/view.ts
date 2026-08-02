@@ -13,28 +13,28 @@ export const view: ViewSpec = {
     { id: 'host', source: 'host' },
     { id: 'region', source: 'region' },
     // MiB values run to five digits — no fraction needed.
-    { id: 'memory', source: 'memory', format: { name: Format.Integer } },
+    { id: 'memory', source: 'memory', format: { fnName: Format.Integer } },
     {
       id: 'latency',
       source: 'latency',
-      format: { name: Format.Number, options: { decimals: 2 } },
+      format: { fnName: Format.Number, options: { decimals: 2 } },
     },
     // No format: kind `percentage` implies 1 decimal.
     { id: 'cpu' },
     {
       id: 'throughput',
       source: 'throughput',
-      format: { name: Format.Number, options: { decimals: 2 } },
+      format: { fnName: Format.Number, options: { decimals: 2 } },
     },
     {
       id: 'bandwidth',
       source: 'bandwidth',
-      format: { name: Format.Number, options: { decimals: 1 } },
+      format: { fnName: Format.Number, options: { decimals: 1 } },
     },
     {
       id: 'floorArea',
       source: 'floorArea',
-      format: { name: Format.Number, options: { decimals: 2 } },
+      format: { fnName: Format.Number, options: { decimals: 2 } },
     },
   ],
   sort: [{ field: 'host', direction: 'asc' }],

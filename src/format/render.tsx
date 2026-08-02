@@ -56,8 +56,8 @@ export function resolveRender(
         ctx,
       }) as ReactNode;
   }
-  const factory = registry.get(spec.name);
-  if (!factory) throw new Error(`Unknown renderer "${spec.name}"`);
+  const factory = registry.get(spec.fnName);
+  if (!factory) throw new Error(`Unknown renderer "${spec.fnName}"`);
   return factory(spec.options ?? {});
 }
 
