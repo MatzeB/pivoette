@@ -672,3 +672,52 @@ describe('<DataTable> remove tint', () => {
     expect(corner.className).toContain('removeTint');
   });
 });
+
+describe('<DataTable> footer row tint', () => {
+  const data = [
+    { t: 'A', s: 'x', n: 1 },
+    { t: 'B', s: 'y', n: 2 },
+  ];
+  const view: PivotSpec = {
+    rows: ['t'],
+    columns: ['s'],
+    showSummary: true,
+    values: [{ id: 'a', field: 'n', agg: 'sum', label: 'sum' }],
+  };
+
+  /** Tint map per footer row, including the aria-hidden rule row. */
+  const map = (el: HTMLElement) =>
+    [...el.querySelectorAll('tfoot tr')].map((r) =>
+      [...r.children]
+        .map((c) => (c.className.includes('removeTint') ? 'T' : '.'))
+        .join(''),
+    );
+
+  it('tints only the row whose control is hovered', async () => {
+    const el = await render(
+      <DataTable
+        data={data}
+        view={view}
+        editing
+        onViewChange={() => {}}
+        onDisplayChange={() => {}}
+        display={{ footer: [{ label: 'med', agg: 'median' }] }}
+      />,
+    );
+    expect(map(el)).toEqual(['.', '...', '...']);
+
+    const x = el.querySelector<HTMLElement>(
+      'button[aria-label="Remove the med row"]',
+    )!;
+    await act(async () => {
+      x.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+    });
+    // Label and both value cells; the Total row below is untouched.
+    expect(map(el)).toEqual(['.', 'TTT', '...']);
+
+    await act(async () => {
+      x.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }));
+    });
+    expect(map(el)).toEqual(['.', '...', '...']);
+  });
+});

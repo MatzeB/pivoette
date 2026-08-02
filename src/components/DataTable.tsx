@@ -1221,11 +1221,18 @@ function FooterRow({
   onHover,
 }: FooterRowProps) {
   const sticky: CSSProperties = { position: 'sticky', bottom, zIndex: 1 };
+  // What this row's own remove control would take is the whole row, so the
+  // state is local rather than shared with the column tints.
+  const [removing, setRemoving] = useState(false);
   return (
     <tr className={styles.summaryRow} style={{ height: ROW_HEIGHT }}>
       {rowLevels.length > 0 && (
         <th
-          className={`${styles.summaryLabel} ${styles.indexTint}`}
+          className={cls(
+            styles.summaryLabel,
+            styles.indexTint,
+            removing && styles.removeTint,
+          )}
           colSpan={rowLevels.length + extraIndexCols}
           style={{ ...sticky, left: leftOffset[0], zIndex: 3 }}
           onMouseEnter={() => onHover({ row: -1, leaf: -1 })}
@@ -1234,6 +1241,7 @@ function FooterRow({
           {onRemove && (
             <RemoveField
               title={`Remove the ${label} row`}
+              onLink={setRemoving}
               onRemove={onRemove}
             />
           )}
@@ -1250,7 +1258,7 @@ function FooterRow({
             key={leaf.id}
             className={cls(
               alignClass(leaf.column.align),
-              tintLeaves?.has(i) && styles.removeTint,
+              (removing || tintLeaves?.has(i)) && styles.removeTint,
             )}
             style={{
               ...leaf.style(ctx),
