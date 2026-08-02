@@ -14,7 +14,19 @@ export const view: ViewSpec = {
       // Composite: image + description in one cell, sorted by description.
       composite: { fields: ['image', 'description'], sortKey: 'description' },
     },
-    { id: 'symbol', label: 'Symbol', source: 'symbol' },
+    {
+      id: 'symbol',
+      label: 'Symbol',
+      source: 'symbol',
+      style: {
+        name: 'static',
+        options: {
+          fontFamily:
+            'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+          letterSpacing: '0.02em',
+        },
+      },
+    },
     {
       id: 'price',
       label: 'Price',
