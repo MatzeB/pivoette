@@ -598,3 +598,77 @@ describe('<DataTable> linked measure controls', () => {
     expect(lit(of('mean'))).toBe(0);
   });
 });
+
+describe('<DataTable> remove tint', () => {
+  const data = [
+    { t: 'A', s: 'x', n: 1 },
+    { t: 'B', s: 'y', n: 2 },
+  ];
+  const view: PivotSpec = {
+    rows: ['t'],
+    columns: ['s'],
+    showSummary: true,
+    values: [
+      { id: 'a', field: 'n', agg: 'sum', label: 'sum' },
+      { id: 'b', field: 'n', agg: 'max', label: 'max' },
+    ],
+  };
+
+  async function mounted() {
+    return render(
+      <DataTable
+        data={data}
+        view={view}
+        editing
+        onViewChange={() => {}}
+        display={{ footer: [{ label: 'sum', agg: 'sum' }] }}
+      />,
+    );
+  }
+
+  const tinted = (el: HTMLElement) =>
+    el.querySelectorAll('[class*="removeTint"]').length;
+
+  async function hover(el: HTMLElement, label: string, on: boolean) {
+    const b = el.querySelector<HTMLElement>(`button[aria-label="${label}"]`)!;
+    await act(async () => {
+      b.dispatchEvent(
+        new MouseEvent(on ? 'mouseover' : 'mouseout', { bubbles: true }),
+      );
+    });
+  }
+
+  it('tints nothing until a remove control is hovered', async () => {
+    const el = await mounted();
+    expect(tinted(el)).toBe(0);
+  });
+
+  it('tints only the hovered measure, in every column group', async () => {
+    const el = await mounted();
+    await hover(el, 'Remove the max measure', true);
+    // Two column groups: two leaf headers plus that measure's cell in each of
+    // the two footer lines. (Body rows are virtualized away under jsdom.)
+    expect(tinted(el)).toBe(6);
+
+    const cells = [...el.querySelectorAll('tfoot td')];
+    const isTinted = cells.map((c) => c.className.includes('removeTint'));
+    // Alternating, because the measures alternate across the groups.
+    expect(isTinted.filter(Boolean)).toHaveLength(4);
+    expect(isTinted).not.toEqual(isTinted.map(() => true));
+  });
+
+  it('clears when the pointer leaves', async () => {
+    const el = await mounted();
+    await hover(el, 'Remove the max measure', true);
+    expect(tinted(el)).toBeGreaterThan(0);
+    await hover(el, 'Remove the max measure', false);
+    expect(tinted(el)).toBe(0);
+  });
+
+  it('tints the index column for a row field', async () => {
+    const el = await mounted();
+    await hover(el, 'Remove the t row field', true);
+    const corner = el.querySelector('thead th')!;
+    expect(corner.className).toContain('removeTint');
+  });
+});

@@ -603,8 +603,14 @@ export function DataTable({
     else if (x >= box.width - edge) setHoverInsert(level + 1);
     else setHoverInsert(null);
   }
-  // Which measure's remove controls are lit; they repeat per column group.
-  const [linkedMeasure, setLinkedMeasure] = useState<number | null>(null);
+  /** Which field a remove control is pointing at, so the column it would drop
+   * can be tinted — and so a measure's controls, which repeat per column
+   * group, all light together. */
+  const [removeHover, setRemoveHover] = useState<
+    { kind: 'row'; level: number } | { kind: 'measure'; index: number } | null
+  >(null);
+  const linkedMeasure =
+    removeHover?.kind === 'measure' ? removeHover.index : null;
 
   /**
    * What the opened column offers, one entry per body row: the groupable
@@ -662,6 +668,19 @@ export function DataTable({
       },
     };
   }
+
+  /** The cells a pending removal would take with it. */
+  const tintLevel = removeHover?.kind === 'row' ? removeHover.level : undefined;
+  const tintLeaves = useMemo(() => {
+    if (removeHover?.kind !== 'measure') return undefined;
+    const id = spec?.values[removeHover.index]?.id;
+    if (id === undefined) return undefined;
+    const set = new Set<number>();
+    leaves.forEach((leaf, i) => {
+      if (leaf.column.value?.id === id) set.add(i);
+    });
+    return set;
+  }, [removeHover, leaves, spec]);
 
   const totalCols = rowLevels.length + leaves.length + editCols;
   const wrapperCls = cls(
@@ -754,7 +773,13 @@ export function DataTable({
                       <th
                         key={`ih${i}`}
                         rowSpan={depth}
-                        className={`${styles.corner} ${styles.rowHeaderCell} ${styles.indexTint} ${sortable ? styles.sortable : ''}`}
+                        className={cls(
+                          styles.corner,
+                          styles.rowHeaderCell,
+                          styles.indexTint,
+                          sortable && styles.sortable,
+                          tintLevel === i && styles.removeTint,
+                        )}
                         style={{
                           top: 0,
                           left: editLeftOffset[i],
@@ -772,6 +797,11 @@ export function DataTable({
                         {editable && spec && (
                           <RemoveField
                             title={`Remove the ${lvl} row field`}
+                            onLink={(on) =>
+                              setRemoveHover(
+                                on ? { kind: 'row', level: i } : null,
+                              )
+                            }
                             onRemove={() =>
                               onViewChange?.(removeField(spec, 'rows', i))
                             }
@@ -824,7 +854,12 @@ export function DataTable({
                     key={ci}
                     colSpan={hc.colSpan}
                     rowSpan={hc.rowSpan}
-                    className={leafHeaderCls(hc, isLeafCol)}
+                    className={cls(
+                      leafHeaderCls(hc, isLeafCol),
+                      isLeafCol &&
+                        tintLeaves?.has(hc.leafStart) &&
+                        styles.removeTint,
+                    )}
                     style={{
                       top: level * HEADER_H,
                       ...edgeGapStyle(
@@ -846,7 +881,11 @@ export function DataTable({
                       <RemoveField
                         title={`Remove the ${hc.label} measure`}
                         linked={linkedMeasure === measure}
-                        onLink={(on) => setLinkedMeasure(on ? measure : null)}
+                        onLink={(on) =>
+                          setRemoveHover(
+                            on ? { kind: 'measure', index: measure } : null,
+                          )
+                        }
                         onRemove={() =>
                           onViewChange?.(removeValue(view, measure))
                         }
@@ -899,6 +938,8 @@ export function DataTable({
                 extraTop={extraTop[item.index] ?? 0}
                 zebra={zebra}
                 pendingAt={pendingAt}
+                tintLevel={tintLevel}
+                tintLeaves={tintLeaves}
                 addEntry={adding ? addEntries[item.index] : undefined}
                 onAdd={commitAdd}
                 hover={hover}
@@ -940,6 +981,7 @@ export function DataTable({
                 bottom={(footerLines.length - 1 - fi) * ROW_HEIGHT}
                 leftOffset={leftOffset}
                 extraIndexCols={editCols}
+                tintLeaves={tintLeaves}
                 onRemove={
                   editable
                     ? fi < footerRows.length
@@ -1000,6 +1042,9 @@ interface RowProps {
   zebra: boolean;
   /** Where the pending column sits among the index cells, or null. */
   pendingAt: number | null;
+  /** Cells a pending removal would take: an index level, and/or leaf columns. */
+  tintLevel?: number;
+  tintLeaves?: Set<number>;
   /** The entry this row shows while the pending column is open. */
   addEntry?: AddEntry;
   onAdd?: (field: string) => void;
@@ -1025,6 +1070,8 @@ function Row({
   extraTop,
   zebra,
   pendingAt,
+  tintLevel,
+  tintLeaves,
   addEntry,
   onAdd,
   hover,
@@ -1063,6 +1110,7 @@ function Row({
                 styles.indexTint,
                 styles.left,
                 lit && styles.rowHover,
+                tintLevel === level && styles.removeTint,
               )}
               style={{
                 left: leftOffset[level],
@@ -1122,6 +1170,7 @@ function Row({
               zebra && rowIndex % 2 === 1 && styles.zebra,
               hoveredRow && styles.rowHover,
               cellHovered && styles.cellHover,
+              tintLeaves?.has(i) && styles.removeTint,
             )}
             style={{
               ...leaf.style(ctx),
@@ -1150,6 +1199,7 @@ interface FooterRowProps {
   leftOffset: number[];
   /** The label cell spans the pending column too, when one is showing. */
   extraIndexCols: number;
+  tintLeaves?: Set<number>;
   /** Present in edit mode: drops this line from the footer. */
   onRemove?: () => void;
   onHover: (h: { row: number; leaf: number } | null) => void;
@@ -1166,6 +1216,7 @@ function FooterRow({
   bottom,
   leftOffset,
   extraIndexCols,
+  tintLeaves,
   onRemove,
   onHover,
 }: FooterRowProps) {
@@ -1197,7 +1248,10 @@ function FooterRow({
         return (
           <td
             key={leaf.id}
-            className={alignClass(leaf.column.align)}
+            className={cls(
+              alignClass(leaf.column.align),
+              tintLeaves?.has(i) && styles.removeTint,
+            )}
             style={{
               ...leaf.style(ctx),
               ...edgeGapStyle(i, i, gapAfter, bodyLeadGap),

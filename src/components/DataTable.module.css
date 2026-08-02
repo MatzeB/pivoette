@@ -335,3 +335,10 @@
   background: var(--pv-bg);
   border-color: var(--pv-border);
 }
+
+/* What a pending removal would take with it. Scoped past `.table th, .table td`
+   and declared after the hover/zebra tints so it reads on any of them. */
+.table th.removeTint,
+.table td.removeTint {
+  background: light-dark(rgba(197, 34, 31, 0.1), rgba(255, 107, 100, 0.16));
+}
