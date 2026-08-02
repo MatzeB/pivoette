@@ -1,3 +1,4 @@
+import { Format } from '../../../src';
 import type { ViewSpec } from '../../../src';
 
 /** Aggregated pivot: 3-level columns, four measures, duration formatting. */
@@ -11,21 +12,21 @@ export const view: ViewSpec = {
       field: 'timeNs',
       agg: 'mean',
       label: 'mean',
-      format: { name: 'duration' },
+      format: { name: Format.Duration },
     },
     {
       id: 'min',
       field: 'timeNs',
       agg: 'min',
       label: 'min',
-      format: { name: 'duration' },
+      format: { name: Format.Duration },
     },
     {
       id: 'max',
       field: 'timeNs',
       agg: 'max',
       label: 'max',
-      format: { name: 'duration' },
+      format: { name: Format.Duration },
     },
     {
       id: 'variance',
@@ -33,7 +34,7 @@ export const view: ViewSpec = {
       agg: 'variance',
       label: '± var',
       // Variance is in ns² — deliberately NOT duration-scaled.
-      format: { name: 'number', options: { decimals: 0, prefix: '± ' } },
+      format: { name: Format.Number, options: { decimals: 0, prefix: '± ' } },
     },
   ],
 };

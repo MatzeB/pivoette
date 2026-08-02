@@ -17,15 +17,22 @@
 import { kindId, unitLabels } from '../data/meta';
 import type { ColumnMeta } from '../data/meta';
 import type { FormatSpec } from '../pivot/spec';
+import { Format } from './builtins';
 
-const ONE_DECIMAL: FormatSpec = { name: 'number', options: { decimals: 1 } };
-const TWO_DECIMALS: FormatSpec = { name: 'number', options: { decimals: 2 } };
+const ONE_DECIMAL: FormatSpec = {
+  name: Format.Number,
+  options: { decimals: 1 },
+};
+const TWO_DECIMALS: FormatSpec = {
+  name: Format.Number,
+  options: { decimals: 2 },
+};
 
 /** Keyed by `kindId` — what the column *is*. */
 const KIND_RULES: Record<string, FormatSpec> = {
   price: TWO_DECIMALS,
   percentage: ONE_DECIMAL,
-  count: { name: 'integer' },
+  count: { name: Format.Integer },
 };
 
 /**
@@ -72,7 +79,8 @@ export function resolveFormatSpec(
   const named = base && 'name' in base ? base : undefined;
   // An options-only spec adopts the deduced built-in, falling back to `number`
   // (every mergeable option — decimals, signDisplay, compact — is numeric).
-  const name = 'name' in explicit ? explicit.name : (named?.name ?? 'number');
+  const name =
+    'name' in explicit ? explicit.name : (named?.name ?? Format.Number);
   // Options are inherited only from the same built-in; a different one has its
   // own defaults and its options may not even mean the same thing.
   const inherited = named?.name === name ? named.options : undefined;

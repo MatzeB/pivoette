@@ -1,3 +1,4 @@
+import { Style } from '../../../src';
 import type { ViewSpec } from '../../../src';
 
 // light-dark() adapts to the table's color-scheme automatically.
@@ -36,7 +37,7 @@ export const view: ViewSpec = {
     {
       id: 'symbol',
       style: {
-        name: 'static',
+        name: Style.Static,
         options: {
           fontFamily:
             'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
@@ -57,7 +58,7 @@ export const view: ViewSpec = {
       // come from kind `price`.
       format: { options: { signDisplay: 'exceptZero' } },
       style: {
-        name: 'signColors',
+        name: Style.SignColors,
         options: { positive: green, negative: red },
       },
     },
@@ -74,7 +75,7 @@ export const view: ViewSpec = {
       // Likewise: 1 decimal is deduced from kind `percentage`.
       format: { options: { signDisplay: 'exceptZero' } },
       style: {
-        name: 'signColors',
+        name: Style.SignColors,
         options: { positive: green, negative: red },
       },
     },

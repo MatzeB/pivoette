@@ -1,3 +1,4 @@
+import { Format, Style } from '../../../src';
 import type { ViewSpec } from '../../../src';
 
 // light-dark() adapts to the table's color-scheme automatically.
@@ -19,7 +20,7 @@ export const view: ViewSpec = {
       field: 'timeNs',
       agg: 'mean',
       label: 'mean',
-      format: { name: 'duration' },
+      format: { name: Format.Duration },
     },
   ],
   computed: [
@@ -34,11 +35,11 @@ export const view: ViewSpec = {
       compute: 'before ? (after - before) / before : null',
       place: { after: 'after' },
       format: {
-        name: 'percent',
+        name: Format.Percent,
         options: { decimals: 1, signDisplay: 'exceptZero' },
       },
       style: {
-        name: 'signColors',
+        name: Style.SignColors,
         options: { negative: green, positive: red },
       },
     },

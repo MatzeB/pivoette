@@ -5,6 +5,7 @@
  */
 import type { CellCtx, FormatFn } from './context';
 import type { FormatSpec } from '../pivot/spec';
+import { Format } from './builtins';
 import { evalExpression } from './expression';
 import { asNumber } from '../util';
 
@@ -145,7 +146,7 @@ export function resolveFormat(
   // An options-only spec has no built-in to name; it defaults to `number`.
   // (The engine normally resolves this against the column's deduced format
   // first — see `resolveFormatSpec`.)
-  const name = 'name' in spec ? spec.name : 'number';
+  const name = 'name' in spec ? spec.name : Format.Number;
   const factory = registry.get(name);
   if (!factory) {
     throw new Error(`Unknown format "${name}"`);

@@ -9,6 +9,7 @@ import { normalizeMeta } from '../data/meta';
 import { requireColumn } from '../data/frame';
 import type { Align, ResolvedColumn } from '../format/context';
 import { deduceFormat, resolveFormatSpec } from '../format/deduce';
+import { Format } from '../format/builtins';
 import { resolveFormat } from '../format/format';
 import { resolveStyle } from '../format/style';
 import { resolveRender } from '../format/render';
@@ -28,13 +29,7 @@ import type { Cell, ResolvedLeaf, ResultRow, ViewResult } from './result';
 import { buildHeader } from './result';
 import { compareValues } from '../util';
 
-const NUMERIC_FORMATS = new Set([
-  'number',
-  'integer',
-  'currency',
-  'percent',
-  'duration',
-]);
+const NUMERIC_FORMATS = new Set<string>(Object.values(Format));
 
 function isNumericFormat(spec?: FormatSpec): boolean {
   return !!spec && 'name' in spec && NUMERIC_FORMATS.has(spec.name);

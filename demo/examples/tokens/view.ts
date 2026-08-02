@@ -1,3 +1,4 @@
+import { Format } from '../../../src';
 import type { ViewSpec } from '../../../src';
 
 /** Multi-level rows (team > project > model), compact tokens, summary footer. */
@@ -11,28 +12,28 @@ export const view: ViewSpec = {
       field: 'inputTokens',
       agg: 'sum',
       label: 'Input',
-      format: { name: 'number', options: { compact: true } },
+      format: { name: Format.Number, options: { compact: true } },
     },
     {
       id: 'output',
       field: 'outputTokens',
       agg: 'sum',
       label: 'Output',
-      format: { name: 'number', options: { compact: true } },
+      format: { name: Format.Number, options: { compact: true } },
     },
     {
       id: 'cached',
       field: 'cachedTokens',
       agg: 'sum',
       label: 'Cached',
-      format: { name: 'number', options: { compact: true } },
+      format: { name: Format.Number, options: { compact: true } },
     },
     {
       id: 'price',
       field: 'costUsd',
       agg: 'sum',
       label: 'Price',
-      format: { name: 'currency', options: { decimals: 2 } },
+      format: { name: Format.Currency, options: { decimals: 2 } },
     },
   ],
   computed: [
@@ -45,7 +46,7 @@ export const view: ViewSpec = {
         cached: { colPath: [], value: 'cached' },
       },
       compute: 'input + output + cached',
-      format: { name: 'number', options: { compact: true } },
+      format: { name: Format.Number, options: { compact: true } },
     },
   ],
   showSummary: true,

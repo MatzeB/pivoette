@@ -54,6 +54,7 @@ export { isFlat } from './pivot/spec';
 export type {
   CellRef,
   ColumnDef,
+  FormatOptionsSpec,
   CompositeSpec,
   Direction,
   FormatSpec,
@@ -79,6 +80,7 @@ export { deduceFormat } from './format/deduce';
 export { registerFormat, resolveFormat } from './format/format';
 export { registerStyle, resolveStyle } from './format/style';
 export { registerRender, resolveRender } from './format/render';
+export { Format, Render, Style } from './format/builtins';
 export { compileExpression, evalExpression } from './format/expression';
 export type {
   Align,
