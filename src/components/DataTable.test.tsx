@@ -1081,6 +1081,17 @@ describe('<DataTable> column drag image', () => {
       header.dispatchEvent(e);
     });
 
+    // Every leaf cell carries the marker the ghost gathers by. The body's
+    // cells cannot be checked here — the virtualizer renders no rows under
+    // jsdom — which is how a missing marker on them once went unnoticed.
+    const table = el.querySelector('table')!;
+    const leaves = view.values.length;
+    expect(table.querySelectorAll('thead [data-leaf]')).toHaveLength(leaves);
+    expect(table.querySelectorAll('tfoot [data-leaf]')).toHaveLength(leaves);
+    expect(table.querySelectorAll('[data-leaf]')).toHaveLength(leaves * 2);
+    // The ghost's clones are pictures and carry no marker of their own.
+    expect(image!.querySelectorAll('[data-leaf]')).toHaveLength(0);
+
     expect(image!.style.overflow).toBe('hidden');
     // One cell per rendered row of that column, and only that column.
     const rows = [...image!.querySelectorAll('tr')];

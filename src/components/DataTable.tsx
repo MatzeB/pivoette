@@ -1331,6 +1331,7 @@ function Row({
         return (
           <td
             key={leaf.id}
+            data-leaf={i}
             className={cls(
               alignClass(leaf.column.align),
               isIndex && styles.indexTint,
@@ -1378,8 +1379,10 @@ function ghostFrom(
       const clone = cell.cloneNode(true) as HTMLElement;
       clone.style.position = 'static';
       clone.style.width = `${cell.getBoundingClientRect().width}px`;
-      // Controls in the ghost would be misleading; it is a picture.
+      // A ghost is a picture: it carries no controls, and does not advertise
+      // itself as a leaf cell for the next gather to pick up.
       clone.querySelectorAll('button').forEach((b) => b.remove());
+      clone.removeAttribute('data-leaf');
       tr.appendChild(clone);
     }
     body.appendChild(tr);
