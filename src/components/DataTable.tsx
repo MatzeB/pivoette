@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { CellCtx, FormatFn } from '../format/context';
@@ -559,6 +559,22 @@ export function DataTable({
 
   // Virtualization.
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * The scroller's vertical scrollbar width, so frame-pinned overlays can sit
+   * clear of it. Measured rather than assumed: it is 0 with overlay scrollbars
+   * and ~15px with classic ones.
+   */
+  const [scrollbarW, setScrollbarW] = useState(0);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const measure = () => setScrollbarW(el.offsetWidth - el.clientWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
@@ -747,7 +763,7 @@ export function DataTable({
       {/* Pinned to the frame, so a wide table can scroll under them. Each sits
           in the band of the header row it would remove. */}
       {editable && spec && spec.columns.length > 0 && (
-        <div className={styles.columnControls}>
+        <div className={styles.columnControls} style={{ right: scrollbarW }}>
           {spec.columns.map((field, level) => (
             <RemoveField
               key={field}
