@@ -1434,13 +1434,26 @@ function useDragImage() {
         ...source.querySelectorAll<HTMLElement>(`[data-leaf="${leaf}"]`),
       ];
       if (cells.length === 0) return;
-      const width = cells[0]!.getBoundingClientRect().width;
-      // Only what is on screen; the body is virtualized anyway.
+
+      // The virtualizer overscans, so document order starts above the
+      // viewport — taking the first N showed rows the reader cannot see.
+      // Sticky header and footer cells intersect too, which is what we want.
+      const port = source.parentElement?.getBoundingClientRect();
+      const onScreen = port
+        ? cells.filter((c) => {
+            const box = c.getBoundingClientRect();
+            return box.bottom > port.top && box.top < port.bottom;
+          })
+        : cells;
+      // Without layout (jsdom) nothing intersects; fall back to all of them.
+      const use = onScreen.length > 0 ? onScreen : cells;
+
+      const width = use[0]!.getBoundingClientRect().width;
       show(
         e,
         ghostFrom(
           source,
-          cells.slice(0, 18).map((c) => [c]),
+          use.slice(0, 24).map((c) => [c]),
           width,
         ),
       );

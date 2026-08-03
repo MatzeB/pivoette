@@ -1101,3 +1101,69 @@ describe('<DataTable> column drag image', () => {
     expect(image!.textContent).not.toContain('max');
   });
 });
+
+describe('<DataTable> column ghost viewport', () => {
+  const view: PivotSpec = {
+    rows: ['a'],
+    columns: [],
+    values: [
+      { id: 'm', field: 'n', agg: 'sum', label: 'sum' },
+      { id: 'x', field: 'n', agg: 'max', label: 'max' },
+    ],
+  };
+
+  async function ghostOf(el: HTMLElement) {
+    const th = el.querySelector<HTMLElement>('th[data-leaf="0"]')!;
+    let image: HTMLElement | undefined;
+    const e = new Event('dragstart', { bubbles: true, cancelable: true });
+    Object.defineProperty(e, 'dataTransfer', {
+      value: {
+        effectAllowed: '',
+        setData: () => {},
+        setDragImage: (x: HTMLElement) => (image = x),
+      },
+    });
+    await act(async () => {
+      th.dispatchEvent(e);
+    });
+    return image!;
+  }
+
+  it('shows the visible part of the column, not the overscanned start', async () => {
+    const el = await render(
+      <DataTable
+        data={[{ a: 'x', n: 1 }]}
+        view={view}
+        editing
+        onViewChange={() => {}}
+        display={{ footer: [{ label: 'avg', agg: 'mean' }] }}
+      />,
+    );
+
+    // Without layout every rect is empty, so nothing intersects: fall back to
+    // the whole column rather than an empty ghost.
+    expect((await ghostOf(el)).querySelectorAll('tr')).toHaveLength(2);
+
+    // With a viewport that ends above the footer cell, only the header
+    // survives — the virtualizer overscans, so document order alone would
+    // have shown rows scrolled out of sight.
+    const table = el.querySelector('table')!;
+    const rect = (top: number, bottom: number) => () =>
+      ({
+        top,
+        bottom,
+        left: 0,
+        right: 80,
+        width: 80,
+        height: bottom - top,
+      }) as DOMRect;
+    (table.parentElement as HTMLElement).getBoundingClientRect = rect(0, 50);
+    const cells = [...table.querySelectorAll<HTMLElement>('[data-leaf="0"]')];
+    cells[0]!.getBoundingClientRect = rect(0, 20);
+    cells[1]!.getBoundingClientRect = rect(200, 220);
+
+    const ghost = await ghostOf(el);
+    expect(ghost.querySelectorAll('tr')).toHaveLength(1);
+    expect(ghost.textContent).toContain('sum');
+  });
+});
