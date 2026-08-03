@@ -1000,6 +1000,27 @@ describe('<DataTable> computed columns and footer order', () => {
     ]);
   });
 
+  it('drags with the label cell as its ghost, not the whole row', async () => {
+    // A row's default drag image is a snapshot of its full width — the entire
+    // footer area — which reads as dragging the table rather than the line.
+    const el = await mount();
+    const row = el.querySelector<HTMLElement>('tfoot tr[draggable="true"]')!;
+    let image: Element | undefined;
+    const e = new Event('dragstart', { bubbles: true, cancelable: true });
+    Object.defineProperty(e, 'dataTransfer', {
+      value: {
+        effectAllowed: '',
+        setData: () => {},
+        setDragImage: (el: Element) => (image = el),
+      },
+    });
+    await act(async () => {
+      row.dispatchEvent(e);
+    });
+    expect(image?.tagName).toBe('TH');
+    expect(image?.textContent).toContain('avg');
+  });
+
   it('reorders footer rows by dragging', async () => {
     let d: DataTableDisplay | undefined;
     const el = await mount(

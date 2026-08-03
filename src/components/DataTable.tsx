@@ -1361,7 +1361,7 @@ interface FooterRowProps {
   extraIndexCols: number;
   tintLeaves?: Set<number>;
   /** Drag handle props; absent for the grand total, which is not in the list. */
-  drag?: Record<string, unknown>;
+  drag?: React.HTMLAttributes<HTMLTableRowElement> & { draggable?: boolean };
   /** Present in edit mode: drops this line from the footer. */
   onRemove?: () => void;
   onHover: (h: { row: number; leaf: number } | null) => void;
@@ -1387,10 +1387,30 @@ function FooterRow({
   // What this row's own remove control would take is the whole row, so the
   // state is local rather than shared with the column tints.
   const [removing, setRemoving] = useState(false);
+
+  /**
+   * The whole row is grabbable, but a row's default drag image is a snapshot of
+   * its full width — the entire footer area. Pointing the drag image at the
+   * label cell keeps the grab area large and the ghost small.
+   */
+  const labelRef = useRef<HTMLTableCellElement>(null);
+  const rowDrag = drag && {
+    ...drag,
+    onDragStart: (e: React.DragEvent<HTMLTableRowElement>) => {
+      drag.onDragStart?.(e);
+      if (labelRef.current)
+        e.dataTransfer.setDragImage(labelRef.current, 12, 12);
+    },
+  };
   return (
-    <tr className={styles.summaryRow} style={{ height: ROW_HEIGHT }} {...drag}>
+    <tr
+      className={styles.summaryRow}
+      style={{ height: ROW_HEIGHT }}
+      {...rowDrag}
+    >
       {rowLevels.length > 0 && (
         <th
+          ref={labelRef}
           className={cls(
             styles.summaryLabel,
             styles.indexTint,
