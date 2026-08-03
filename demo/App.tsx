@@ -347,6 +347,25 @@ export function App() {
     setEditedDisplay(null);
   }, [selected]);
 
+  // `e` toggles editing, except while a form control has focus — the locale
+  // and placement selects would otherwise swallow or fight for the key.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'e' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = e.target as HTMLElement | null;
+      if (
+        el?.isContentEditable ||
+        (el && /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName))
+      ) {
+        return;
+      }
+      e.preventDefault();
+      setEditing((v) => !v);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
   // Overriding the view's locale changes number separators and, for currency
   // units, where the symbol sits and how many decimals it takes. Memoized so
   // the engine is not re-run on unrelated renders.
@@ -629,7 +648,21 @@ export function App() {
           {editing ? 'Done editing' : 'Edit'}
         </button>
         <span style={{ color: 'var(--page-muted)', fontSize: 12 }}>
-          {rowCount.toLocaleString()} source rows.
+          {rowCount.toLocaleString()} source rows · press{' '}
+          <kbd
+            style={{
+              padding: '1px 5px',
+              borderRadius: 4,
+              border: '1px solid var(--btn-border)',
+              background: 'var(--btn-bg)',
+              color: 'var(--btn-fg)',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+              fontSize: 11,
+            }}
+          >
+            e
+          </kbd>{' '}
+          to {editing ? 'stop editing' : 'edit'}
         </span>
       </div>
 
