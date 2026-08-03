@@ -671,6 +671,7 @@ export function DataTable({
 
   /** What is in flight: an axis field, or a measure. */
   const dragged = useRef<DragRef | null>(null);
+  const dragImage = useDragImage();
 
   /**
    * Axis fields are interchangeable — dragging one onto the other axis pivots
@@ -700,7 +701,7 @@ export function DataTable({
    * The grabbable part of a handle — just the label, so text stays selectable
    * around it and the drag image is the name itself.
    */
-  function dragSource(ref: DragRef) {
+  function dragSource(ref: DragRef, image?: (e: React.DragEvent) => void) {
     if (!editable) return {};
     return {
       draggable: true,
@@ -709,6 +710,7 @@ export function DataTable({
         e.dataTransfer.effectAllowed = 'move';
         // Firefox needs data set for a drag to start at all.
         e.dataTransfer.setData('text/plain', ref.zone + ':' + ref.index);
+        image?.(e);
       },
       onDragEnd: () => {
         dragged.current = null;
@@ -962,6 +964,7 @@ export function DataTable({
                   return (
                     <th
                       key={ci}
+                      data-leaf={isLeafCol ? hc.leafStart : undefined}
                       colSpan={hc.colSpan}
                       rowSpan={hc.rowSpan}
                       className={cls(
@@ -981,7 +984,11 @@ export function DataTable({
                       }}
                       {...(measure !== undefined
                         ? {
-                            ...dragSource({ zone: 'values', index: measure }),
+                            ...dragSource(
+                              { zone: 'values', index: measure },
+                              // The column you grabbed, not just its header.
+                              (e) => dragImage.column(e, hc.leafStart),
+                            ),
                             ...dropTarget({ zone: 'values', index: measure }),
                           }
                         : columnLevel !== undefined
@@ -1347,6 +1354,97 @@ function Row({
   );
 }
 
+/**
+ * Build a drag image out of cells the browser would otherwise render badly.
+ *
+ * Cells here are `position: sticky`, so a default snapshot spans their sticky
+ * offsets — dragging a footer row looks like dragging the whole footer, and a
+ * column has no element to snapshot at all. Cloning the cells into a throwaway
+ * table, with the stickiness removed, gives a ghost that is exactly the row or
+ * column. The clone is hosted inside the table's own container so the palette
+ * variables still resolve.
+ */
+function ghostFrom(
+  source: HTMLTableElement,
+  rows: HTMLElement[][],
+  width: number,
+): HTMLElement {
+  const ghost = document.createElement('table');
+  ghost.className = source.className;
+  const body = document.createElement('tbody');
+  for (const cells of rows) {
+    const tr = document.createElement('tr');
+    for (const cell of cells) {
+      const clone = cell.cloneNode(true) as HTMLElement;
+      clone.style.position = 'static';
+      clone.style.width = `${cell.getBoundingClientRect().width}px`;
+      // Controls in the ghost would be misleading; it is a picture.
+      clone.querySelectorAll('button').forEach((b) => b.remove());
+      tr.appendChild(clone);
+    }
+    body.appendChild(tr);
+  }
+  ghost.appendChild(body);
+  ghost.style.width = `${width}px`;
+
+  // A row is as wide as the whole table, which on a horizontally scrolled one
+  // runs off the screen. Clip the ghost to what is actually visible, and shift
+  // it by the scroll offset so it shows the part being looked at.
+  const host = source.parentElement;
+  const visible = host?.clientWidth ?? width;
+  ghost.style.marginLeft = `${-(host?.scrollLeft ?? 0)}px`;
+
+  const clip = document.createElement('div');
+  Object.assign(clip.style, {
+    position: 'fixed',
+    top: '-10000px',
+    left: '0',
+    width: `${Math.min(width, visible)}px`,
+    overflow: 'hidden',
+    pointerEvents: 'none',
+  });
+  clip.appendChild(ghost);
+  (host ?? document.body).appendChild(clip);
+  return clip;
+}
+
+function useDragImage() {
+  /** The snapshot is taken synchronously, so the clone can go next frame. */
+  const show = (e: React.DragEvent, ghost: HTMLElement) => {
+    e.dataTransfer.setDragImage(ghost, 16, 14);
+    requestAnimationFrame(() => ghost.remove());
+  };
+  return {
+    /** The dragged row, on its own. */
+    row: (e: React.DragEvent<HTMLTableRowElement>) => {
+      const row = e.currentTarget;
+      const source = row.closest('table');
+      if (!source) return;
+      const width = row.getBoundingClientRect().width;
+      show(e, ghostFrom(source, [[...row.children] as HTMLElement[]], width));
+    },
+    /** Every rendered cell of one leaf column, header to footer. */
+    column: (e: React.DragEvent, leaf: number) => {
+      const source = e.currentTarget.closest('table');
+      if (!source) return;
+      const cells = [
+        ...source.querySelectorAll<HTMLElement>(`[data-leaf="${leaf}"]`),
+      ];
+      if (cells.length === 0) return;
+      const width = cells[0]!.getBoundingClientRect().width;
+      // Only what is on screen; the body is virtualized anyway.
+      show(
+        e,
+        ghostFrom(
+          source,
+          cells.slice(0, 18).map((c) => [c]),
+          width,
+        ),
+      );
+    },
+  };
+}
+
 interface FooterRowProps {
   label: string;
   cells: Cell[];
@@ -1388,18 +1486,12 @@ function FooterRow({
   // state is local rather than shared with the column tints.
   const [removing, setRemoving] = useState(false);
 
-  /**
-   * The whole row is grabbable, but a row's default drag image is a snapshot of
-   * its full width — the entire footer area. Pointing the drag image at the
-   * label cell keeps the grab area large and the ghost small.
-   */
-  const labelRef = useRef<HTMLTableCellElement>(null);
+  const dragImage = useDragImage();
   const rowDrag = drag && {
     ...drag,
     onDragStart: (e: React.DragEvent<HTMLTableRowElement>) => {
       drag.onDragStart?.(e);
-      if (labelRef.current)
-        e.dataTransfer.setDragImage(labelRef.current, 12, 12);
+      dragImage.row(e);
     },
   };
   return (
@@ -1410,7 +1502,6 @@ function FooterRow({
     >
       {rowLevels.length > 0 && (
         <th
-          ref={labelRef}
           className={cls(
             styles.summaryLabel,
             styles.indexTint,
@@ -1439,6 +1530,7 @@ function FooterRow({
         return (
           <td
             key={leaf.id}
+            data-leaf={i}
             className={cls(
               alignClass(leaf.column.align),
               (removing || tintLeaves?.has(i)) && styles.removeTint,

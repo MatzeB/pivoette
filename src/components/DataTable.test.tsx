@@ -1000,9 +1000,10 @@ describe('<DataTable> computed columns and footer order', () => {
     ]);
   });
 
-  it('drags with the label cell as its ghost, not the whole row', async () => {
-    // A row's default drag image is a snapshot of its full width — the entire
-    // footer area — which reads as dragging the table rather than the line.
+  it('drags with a clone of the row as its ghost', async () => {
+    // The cells are sticky, so the browser's own snapshot spans their sticky
+    // offsets and looks like the whole footer; the clone is exactly the row,
+    // clipped to the visible width.
     const el = await mount();
     const row = el.querySelector<HTMLElement>('tfoot tr[draggable="true"]')!;
     let image: Element | undefined;
@@ -1017,8 +1018,12 @@ describe('<DataTable> computed columns and footer order', () => {
     await act(async () => {
       row.dispatchEvent(e);
     });
-    expect(image?.tagName).toBe('TH');
+    expect(image?.tagName).toBe('DIV');
+    expect((image as HTMLElement).style.overflow).toBe('hidden');
+    expect(image?.querySelector('tr')).toBeTruthy();
     expect(image?.textContent).toContain('avg');
+    // Controls would be misleading in a picture of the row.
+    expect(image?.querySelector('button')).toBeNull();
   });
 
   it('reorders footer rows by dragging', async () => {
@@ -1036,5 +1041,52 @@ describe('<DataTable> computed columns and footer order', () => {
       fire(rows[0]!, 'drop');
     });
     expect(d!.footer!.map((f) => f.agg)).toEqual(['sum', 'mean']);
+  });
+});
+
+describe('<DataTable> column drag image', () => {
+  const data = [{ t: 'A', n: 1 }];
+  const view: PivotSpec = {
+    rows: ['t'],
+    columns: [],
+    values: [
+      { id: 'a', field: 'n', agg: 'sum', label: 'sum' },
+      { id: 'b', field: 'n', agg: 'max', label: 'max' },
+    ],
+  };
+
+  it('drags a measure with its own column as the ghost', async () => {
+    // A column is not an element, so there is nothing for the browser to
+    // snapshot; the cells are gathered by their `data-leaf` marker.
+    const el = await render(
+      <DataTable
+        data={data}
+        view={view}
+        editing
+        onViewChange={() => {}}
+        display={{ footer: [{ label: 'avg', agg: 'mean' }] }}
+      />,
+    );
+    const header = el.querySelector<HTMLElement>('th[data-leaf="0"]')!;
+    let image: HTMLElement | undefined;
+    const e = new Event('dragstart', { bubbles: true, cancelable: true });
+    Object.defineProperty(e, 'dataTransfer', {
+      value: {
+        effectAllowed: '',
+        setData: () => {},
+        setDragImage: (el: HTMLElement) => (image = el),
+      },
+    });
+    await act(async () => {
+      header.dispatchEvent(e);
+    });
+
+    expect(image!.style.overflow).toBe('hidden');
+    // One cell per rendered row of that column, and only that column.
+    const rows = [...image!.querySelectorAll('tr')];
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.every((r) => r.children.length === 1)).toBe(true);
+    expect(image!.textContent).toContain('sum');
+    expect(image!.textContent).not.toContain('max');
   });
 });
