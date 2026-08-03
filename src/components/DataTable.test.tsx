@@ -904,6 +904,28 @@ describe('<DataTable> column level drag', () => {
     expect(next!.columns).toEqual(['arch', 'size']);
   });
 
+  it('accepts a drop anywhere in the cell, not just on the label', async () => {
+    // The label is a fraction of the cell's box; requiring the pointer to be
+    // exactly on the text is what made this silently do nothing in a browser.
+    let next: PivotSpec | undefined;
+    const el = await render(
+      <DataTable
+        data={data}
+        view={view}
+        editing
+        onViewChange={(v) => (next = v as PivotSpec)}
+      />,
+    );
+    const rows = [...el.querySelectorAll('thead tr')];
+    const source = rows[1]!.querySelector<HTMLElement>(
+      'span[draggable="true"]',
+    )!;
+    // Drop on the <th> itself, with no label under the pointer.
+    const targetCell = [...rows[0]!.querySelectorAll<HTMLElement>('th')][1]!;
+    await act(async () => drag(source, targetCell));
+    expect(next!.columns).toEqual(['arch', 'size']);
+  });
+
   it('pivots a column field dropped on a row field', async () => {
     let next: PivotSpec | undefined;
     const handles = await mount((v) => (next = v as PivotSpec));

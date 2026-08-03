@@ -684,8 +684,11 @@ export function DataTable({
     onViewChange?.(moveField(spec, from as FieldRef, to as FieldRef));
   }
 
-  /** Props shared by every draggable handle. */
-  function dragProps(ref: DragRef) {
+  /**
+   * The grabbable part of a handle — just the label, so text stays selectable
+   * around it and the drag image is the name itself.
+   */
+  function dragSource(ref: DragRef) {
     if (!editable) return {};
     return {
       draggable: true,
@@ -695,6 +698,20 @@ export function DataTable({
         // Firefox needs data set for a drag to start at all.
         e.dataTransfer.setData('text/plain', ref.zone + ':' + ref.index);
       },
+      onDragEnd: () => {
+        dragged.current = null;
+      },
+    };
+  }
+
+  /**
+   * The droppable part — the whole cell, not the label. A header's text is a
+   * fraction of its box, so accepting a drop only on the label would mean most
+   * of the cell silently refuses one.
+   */
+  function dropTarget(ref: DragRef) {
+    if (!editable) return {};
+    return {
       onDragOver: (e: React.DragEvent) => {
         if (dragged.current) e.preventDefault();
       },
@@ -843,12 +860,13 @@ export function DataTable({
                               ? {}
                               : { borderLeft: '1px solid var(--pv-border)' }),
                           }}
+                          {...dropTarget({ zone: 'rows', index: i })}
                           onMouseMove={(e) => edgeInsert(e, i)}
                           onClick={() => cycleSort({ kind: 'index', level: i })}
                         >
                           <span
                             className={styles.dragHandle}
-                            {...dragProps({ zone: 'rows', index: i })}
+                            {...dragSource({ zone: 'rows', index: i })}
                           >
                             {lvl}
                           </span>
@@ -933,6 +951,11 @@ export function DataTable({
                           bodyLeadGap,
                         ),
                       }}
+                      {...(measure !== undefined
+                        ? dropTarget({ zone: 'values', index: measure })
+                        : columnLevel !== undefined
+                          ? dropTarget({ zone: 'columns', index: columnLevel })
+                          : {})}
                       onClick={
                         isLeafCol
                           ? () =>
@@ -943,7 +966,7 @@ export function DataTable({
                       {measure !== undefined ? (
                         <span
                           className={styles.dragHandle}
-                          {...dragProps({ zone: 'values', index: measure })}
+                          {...dragSource({ zone: 'values', index: measure })}
                         >
                           {hc.label}
                         </span>
@@ -952,7 +975,7 @@ export function DataTable({
                         // way any repeated measure header reorders its measure.
                         <span
                           className={styles.dragHandle}
-                          {...dragProps({
+                          {...dragSource({
                             zone: 'columns',
                             index: columnLevel,
                           })}
