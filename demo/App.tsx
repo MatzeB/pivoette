@@ -3,6 +3,7 @@ import {
   DataTable,
   ViewEditor,
   fromRows,
+  parseCsv,
   isFlat,
   normalizeMeta,
   unitLabels,
@@ -22,7 +23,8 @@ import tickerData from './examples/ticker/data.json';
 import { view as benchmarkView } from './examples/benchmark/view';
 import benchmarkData from './examples/benchmark/data.json';
 import { view as regressionView } from './examples/regression/view';
-import regressionData from './examples/regression/data.json';
+// CSV rather than JSON, to exercise the csv importer end to end.
+import regressionCsv from './examples/regression/data.csv?raw';
 import { view as tokensView } from './examples/tokens/view';
 import tokensData from './examples/tokens/data.json';
 import { view as metricsView } from './examples/metrics/view';
@@ -86,10 +88,10 @@ const EXAMPLES: Example[] = [
     id: 'regression',
     title: '3 · Before/after regression',
     blurb:
-      'Per-platform derived Δ% referencing each platform’s own before/after cells; faster is green, regressions red. Hover shades the row, cell, and index.',
+      'Loaded from CSV via `parseCsv` — column types are inferred per column, so `timeNs` arrives as numbers. Per-platform derived Δ% referencing each platform’s own before/after cells; faster is green, regressions red.',
     view: regressionView,
     source: regressionSrc,
-    data: regressionData as Row[],
+    data: parseCsv(regressionCsv),
     display: { groupSpacing: 8 },
   },
   {

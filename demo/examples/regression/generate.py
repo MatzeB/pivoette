@@ -5,7 +5,7 @@ Writes the small showcase `data.json` (~60 apps). Pass `--stress` to also write
 a large `stress.json` (~10k apps) for the virtualization smoke test / demo
 toggle; that file is git-ignored (not committed) to keep the repo small.
 """
-import json
+import csv
 import os
 import random
 import sys
@@ -58,15 +58,21 @@ def gen(n_apps: int, samples: int, seed: int) -> list:
 def main() -> None:
     here = os.path.dirname(__file__)
     rows = gen(n_apps=60, samples=5, seed=11)
-    out = os.path.join(here, "data.json")
-    with open(out, "w") as f:
-        json.dump(rows, f, indent=0)
+    # CSV rather than JSON, so one example exercises the csv importer.
+    out = os.path.join(here, "data.csv")
+    with open(out, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(rows)
     print(f"wrote {len(rows)} rows (60 apps) -> {out}")
 
     if "--stress" in sys.argv:
         big = gen(n_apps=10000, samples=1, seed=99)
+        # The stress fixture stays JSON: it is gitignored and only fetched.
         sout = os.path.join(here, "stress.json")
         with open(sout, "w") as f:
+            import json
+
             json.dump(big, f, indent=0)
         print(f"wrote {len(big)} rows (10000 apps) -> {sout}")
 

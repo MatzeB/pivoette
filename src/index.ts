@@ -10,6 +10,8 @@ export type {
 
 // Data model
 export { datasetMeta, fromDataset, fromRows } from './data/import';
+export { fromCsv, parseCsv, parseCsvRows } from './data/csv';
+export type { CsvOptions } from './data/csv';
 export { makeFrame, requireColumn, withMeta } from './data/frame';
 export type {
   CellValue,

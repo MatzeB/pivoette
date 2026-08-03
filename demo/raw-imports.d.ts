@@ -3,6 +3,11 @@
  * example's own source, comments and all, rather than a re-serialization of the
  * parsed object.
  */
+declare module '*.csv?raw' {
+  const content: string;
+  export default content;
+}
+
 declare module '*?raw' {
   const content: string;
   export default content;
