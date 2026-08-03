@@ -359,3 +359,20 @@
 .dragHandle:active {
   cursor: grabbing;
 }
+
+/* Column-axis remove controls, stacked in the corner: the column headers show
+   members, not field names, so there is no per-field header to hang them on,
+   and the corner is sticky in both axes so they stay reachable when a wide
+   table is scrolled. */
+.columnControls {
+  position: absolute;
+  top: 1px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.columnControls > button {
+  position: static;
+}

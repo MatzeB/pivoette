@@ -611,7 +611,10 @@ export function DataTable({
    * can be tinted — and so a measure's controls, which repeat per column
    * group, all light together. */
   const [removeHover, setRemoveHover] = useState<
-    { kind: 'row'; level: number } | { kind: 'measure'; index: number } | null
+    | { kind: 'row'; level: number }
+    | { kind: 'column'; level: number }
+    | { kind: 'measure'; index: number }
+    | null
   >(null);
   const linkedMeasure =
     removeHover?.kind === 'measure' ? removeHover.index : null;
@@ -686,6 +689,9 @@ export function DataTable({
 
   /** The cells a pending removal would take with it. */
   const tintLevel = removeHover?.kind === 'row' ? removeHover.level : undefined;
+  /** A whole column-header row, when a column field's control is hovered. */
+  const tintHeaderRow =
+    removeHover?.kind === 'column' ? removeHover.level : undefined;
   const tintLeaves = useMemo(() => {
     if (removeHover?.kind !== 'measure') return undefined;
     const id = spec?.values[removeHover.index]?.id;
@@ -812,6 +818,27 @@ export function DataTable({
                           {lvl}
                         </span>
                         {sortArrow(active)}
+                        {editable && spec && i === rowLevels.length - 1 && (
+                          <span className={styles.columnControls}>
+                            {spec.columns.map((field, level) => (
+                              <RemoveField
+                                key={field}
+                                title={`Remove the ${field} column field`}
+                                linked={tintHeaderRow === level}
+                                onLink={(on) =>
+                                  setRemoveHover(
+                                    on ? { kind: 'column', level } : null,
+                                  )
+                                }
+                                onRemove={() =>
+                                  onViewChange?.(
+                                    removeField(spec, 'columns', level),
+                                  )
+                                }
+                              />
+                            ))}
+                          </span>
+                        )}
                         {editable && spec && (
                           <RemoveField
                             title={`Remove the ${lvl} row field`}
@@ -874,8 +901,8 @@ export function DataTable({
                     rowSpan={hc.rowSpan}
                     className={cls(
                       leafHeaderCls(hc, isLeafCol),
-                      isLeafCol &&
-                        tintLeaves?.has(hc.leafStart) &&
+                      ((isLeafCol && tintLeaves?.has(hc.leafStart)) ||
+                        tintHeaderRow === level) &&
                         styles.removeTint,
                     )}
                     style={{

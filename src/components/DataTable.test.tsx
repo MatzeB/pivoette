@@ -517,6 +517,7 @@ describe('<DataTable> remove controls', () => {
     expect(kinds).toEqual(
       new Set([
         'Remove the team row field',
+        'Remove the wd column field',
         'Remove the sum measure',
         'Remove the avg measure',
         'Remove the med row',
@@ -782,5 +783,77 @@ describe('<DataTable> measure drag', () => {
     const rowField = handles.find((h) => h.textContent === 't')!;
     await act(async () => drag(measure, rowField));
     expect(next).toBeUndefined();
+  });
+});
+
+describe('<DataTable> column-field controls', () => {
+  const data = [
+    { t: 'A', size: 'tiny', arch: 'x86', n: 1 },
+    { t: 'B', size: 'big', arch: 'arm', n: 2 },
+  ];
+  const view: PivotSpec = {
+    rows: ['t'],
+    columns: ['size', 'arch'],
+    values: [{ id: 'a', field: 'n', agg: 'sum', label: 'sum' }],
+  };
+
+  async function mount(onChange: (v: ViewSpec) => void = () => {}) {
+    const el = await render(
+      <DataTable data={data} view={view} editing onViewChange={onChange} />,
+    );
+    return {
+      el,
+      controls: [
+        ...el.querySelectorAll<HTMLElement>(
+          'button[aria-label$="column field"]',
+        ),
+      ],
+    };
+  }
+
+  /** Tinted cells per header row. */
+  const perRow = (el: HTMLElement) =>
+    [...el.querySelectorAll('thead tr')].map(
+      (r) =>
+        [...r.children].filter((c) => c.className.includes('removeTint'))
+          .length,
+    );
+
+  it('offers one per column field', async () => {
+    const { controls } = await mount();
+    expect(controls.map((b) => b.getAttribute('aria-label'))).toEqual([
+      'Remove the size column field',
+      'Remove the arch column field',
+    ]);
+  });
+
+  it('tints the header row each one would drop', async () => {
+    const { el, controls } = await mount();
+    expect(perRow(el).every((n) => n === 0)).toBe(true);
+
+    await act(async () => {
+      controls[0]!.dispatchEvent(
+        new MouseEvent('mouseover', { bubbles: true }),
+      );
+    });
+    // The outer level's own row, and nothing else.
+    expect(perRow(el)[0]).toBeGreaterThan(0);
+    expect(perRow(el)[1]).toBe(0);
+
+    await act(async () => {
+      controls[0]!.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }));
+      controls[1]!.dispatchEvent(
+        new MouseEvent('mouseover', { bubbles: true }),
+      );
+    });
+    expect(perRow(el)[0]).toBe(0);
+    expect(perRow(el)[1]).toBeGreaterThan(0);
+  });
+
+  it('removes the field it names', async () => {
+    let next: PivotSpec | undefined;
+    const { controls } = await mount((v) => (next = v as PivotSpec));
+    await act(async () => controls[0]!.click());
+    expect(next!.columns).toEqual(['arch']);
   });
 });
