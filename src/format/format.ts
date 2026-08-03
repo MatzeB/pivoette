@@ -7,7 +7,7 @@ import type { CellCtx, FormatFn } from './context';
 import type { FormatSpec } from '../pivot/spec';
 import { Format } from './builtins';
 import { ordinalToIsoDay } from '../data/temporal';
-import { evalExpression } from './expression';
+import { evalCell } from './expression';
 import { asNumber } from '../util';
 
 type FormatFactory = (options: Record<string, unknown>) => FormatFn;
@@ -42,10 +42,16 @@ function numberFormat(options: Record<string, unknown>): Intl.NumberFormat {
   return nf;
 }
 
-function affix(options: Record<string, unknown>, body: string): string {
+/**
+ * Resolve the affixes once per column. The overwhelmingly common case is
+ * neither, and this runs for every cell — plus 200 times per column while
+ * widths are measured — so the no-affix path returns the body untouched.
+ */
+function affixer(options: Record<string, unknown>): (body: string) => string {
   const prefix = opt<string>(options, 'prefix') ?? '';
   const suffix = opt<string>(options, 'suffix') ?? '';
-  return `${prefix}${body}${suffix}`;
+  if (!prefix && !suffix) return (body) => body;
+  return (body) => `${prefix}${body}${suffix}`;
 }
 
 /** Numeric built-in shared by number/integer. */
@@ -53,10 +59,11 @@ function intlBuiltin(base: Record<string, unknown>): FormatFactory {
   return (options) => {
     const merged = { ...base, ...options };
     const nf = numberFormat(merged);
+    const affix = affixer(merged);
     return (ctx) => {
       const n = asNumber(ctx.value);
       if (n === null) return ctx.value == null ? '' : String(ctx.value);
-      return affix(merged, nf.format(n));
+      return affix(nf.format(n));
     };
   };
 }
@@ -93,6 +100,7 @@ function sig3(n: number): string {
 registry.set('duration', (options) => {
   const baseUnit = opt<string>(options, 'baseUnit') ?? 'ns';
   const baseFactor = BASE_UNIT_NS[baseUnit] ?? 1;
+  const affix = affixer(options);
   return (ctx) => {
     const raw = asNumber(ctx.value);
     if (raw === null) return ctx.value == null ? '' : String(ctx.value);
@@ -105,7 +113,7 @@ registry.set('duration', (options) => {
     }
     const scaled = abs / chosen.ns;
     const body = `${neg ? '-' : ''}${sig3(scaled)} ${chosen.suffix}`;
-    return affix(options, body);
+    return affix(body);
   };
 });
 
@@ -142,11 +150,11 @@ function nameFormat(
 registry.set('weekday', (options) => {
   const locale = opt<string>(options, 'locale');
   const width = opt<NameWidth>(options, 'width') ?? 'short';
+  const fmt = nameFormat(locale, 'weekday', width);
   return (ctx) => {
     const n = asNumber(ctx.value);
     if (n === null) return String(ctx.value);
-    const ms = REF_WEEK(ordinalToIsoDay(n, locale));
-    return nameFormat(locale, 'weekday', width).format(ms);
+    return fmt.format(REF_WEEK(ordinalToIsoDay(n, locale)));
   };
 });
 
@@ -154,10 +162,11 @@ registry.set('weekday', (options) => {
 registry.set('month', (options) => {
   const locale = opt<string>(options, 'locale');
   const width = opt<NameWidth>(options, 'width') ?? 'short';
+  const fmt = nameFormat(locale, 'month', width);
   return (ctx) => {
     const n = asNumber(ctx.value);
     if (n === null || n < 1 || n > 12) return String(ctx.value);
-    return nameFormat(locale, 'month', width).format(REF_MONTH(n));
+    return fmt.format(REF_MONTH(n));
   };
 });
 
@@ -177,13 +186,7 @@ export function resolveFormat(
   if ('expression' in spec) {
     const src = spec.expression;
     return (ctx: CellCtx) => {
-      const result = evalExpression(src, {
-        value: ctx.value,
-        inputs: ctx.inputs,
-        row: ctx.rowPath,
-        col: ctx.colPath,
-        ctx,
-      });
+      const result = evalCell(src, ctx);
       return result == null ? emptyDisplay : String(result);
     };
   }

@@ -78,7 +78,6 @@ export interface ColumnDef {
   style?: StyleSpec;
   render?: RenderSpec;
   composite?: CompositeSpec;
-  sort?: SortSpec;
   /** Where a derived column lands in the leaf order. */
   place?: 'append' | { after: string };
   /** Pivot: repeat once per member of these column level(s); `inputs.colPath`s become relative. */
@@ -114,10 +113,9 @@ export interface ValueSpec {
   summaryAgg?: string;
 }
 
-/** Where the measures level sits; default innermost column level. */
+/** Which axis the measures level sits on; it is always the innermost level. */
 export interface ValuePlacement {
   axis: 'columns' | 'rows';
-  level?: number; // omitted = innermost
 }
 
 /** A virtual column computed from the others, usable as a grouping field. */

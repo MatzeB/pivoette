@@ -9,13 +9,9 @@
  */
 import { compileExpression } from '../format/expression';
 import { makeFrame } from './frame';
+import { inferType } from './import';
 import { decodeTime, isTimestamp, temporalHelpers } from './temporal';
-import type {
-  CellValue,
-  ColumnType,
-  DataColumnInput,
-  DataFrame,
-} from './types';
+import type { CellValue, DataColumnInput, DataFrame } from './types';
 import type { DerivedField } from '../pivot/spec';
 
 /**
@@ -72,26 +68,7 @@ export function deriveColumns(
       }
       values[r] = (out ?? null) as CellValue;
     }
-    columns.push({
-      name,
-      type: inferDerived(values),
-      values,
-      meta: field.meta,
-    });
+    columns.push({ name, type: inferType(values), values, meta: field.meta });
   }
   return makeFrame(columns);
-}
-
-/** Narrow inference for computed output: numbers or, failing that, strings. */
-function inferDerived(values: CellValue[]): ColumnType {
-  let sawValue = false;
-  let allInts = true;
-  for (const v of values) {
-    if (v === null || v === undefined) continue;
-    sawValue = true;
-    if (typeof v !== 'number') return 'string';
-    if (!Number.isInteger(v)) allInts = false;
-  }
-  if (!sawValue) return 'string';
-  return allInts ? 'int' : 'float';
 }

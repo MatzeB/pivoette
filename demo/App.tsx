@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   DataTable,
   ViewEditor,
+  fromRows,
   isFlat,
   normalizeMeta,
   unitLabels,
@@ -196,19 +197,14 @@ function sourceRows(data: Row[] | DatasetJson): Row[] {
  * a weekday, the ratio rather than a percentage.
  */
 function rawView(rows: Row[]): TableSpec {
-  const fields: string[] = [];
-  const seen = new Set<string>();
-  for (const row of rows) {
-    for (const key of Object.keys(row)) {
-      if (!seen.has(key)) {
-        seen.add(key);
-        fields.push(key);
-      }
-    }
-  }
+  // `fromRows` already unions the keys in first-seen order.
   return {
     mode: 'flat',
-    columns: fields.map((id) => ({ id, label: id, inheritUnitFormat: false })),
+    columns: fromRows(rows).columns.map((c) => ({
+      id: c.name,
+      label: c.name,
+      inheritUnitFormat: false,
+    })),
   };
 }
 
@@ -405,7 +401,7 @@ export function App() {
 
   // The collapsible at the bottom renders these; both memoized so opening it
   // does not re-derive on every render.
-  const sourceData = useMemo(() => sourceRows(data), [data]);
+  const sourceData = sourceRows(data);
   const sourceView = useMemo(() => rawView(sourceData), [sourceData]);
   // Only some examples ship metadata with the data; ticker declares its own in
   // the view, which the view-spec panel already shows.

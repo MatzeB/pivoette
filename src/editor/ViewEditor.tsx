@@ -13,15 +13,13 @@ import type { ViewSpec } from '../pivot/spec';
 import type { DataTableDisplay } from '../components/DataTable';
 import type { DataFrame } from '../data/types';
 import {
-  moveField,
-  moveFooterRow,
-  moveValue,
+  applyDrop,
   removeField,
   removeFooterRow,
   removeValue,
   setValueAgg,
 } from './ops';
-import type { FieldZone } from './ops';
+import type { DragRef, FieldZone } from './ops';
 import styles from './ViewEditor.module.css';
 
 export interface ViewEditorProps {
@@ -94,12 +92,6 @@ function Section({
   );
 }
 
-/** What is being dragged: which list, and its position in it. */
-interface DragRef {
-  list: FieldZone | 'values' | 'footer';
-  index: number;
-}
-
 export function ViewEditor({
   view,
   onViewChange,
@@ -129,31 +121,13 @@ export function ViewEditor({
   const name = (field: string) =>
     frame?.columnByName.get(field)?.meta.displayName ?? field;
 
-  /** Apply a drop. Rows and columns are interchangeable — dragging between the
-   * two sections pivots the field, exactly as dragging in the table does — but
-   * a measure only reorders among measures. */
   function drop(to: DragRef) {
     const from = dragged.current;
     dragged.current = null;
     setOver(null);
-    if (!from || (from.list === to.list && from.index === to.index)) return;
-    if (from.list === 'values' || to.list === 'values') {
-      if (from.list !== to.list) return;
-      onViewChange(moveValue(view, from.index, to.index));
-      return;
+    if (from) {
+      applyDrop(from, to, { view, display, onViewChange, onDisplayChange });
     }
-    if (from.list === 'footer' || to.list === 'footer') {
-      if (from.list !== to.list || !display || !onDisplayChange) return;
-      onDisplayChange(moveFooterRow(display, from.index, to.index));
-      return;
-    }
-    onViewChange(
-      moveField(
-        view,
-        { zone: from.list, index: from.index },
-        { zone: to.list, index: to.index },
-      ),
-    );
   }
 
   /** Handlers for one draggable entry. */
@@ -164,7 +138,7 @@ export function ViewEditor({
         dragged.current = ref;
         e.dataTransfer.effectAllowed = 'move';
         // Firefox will not start a drag without data on the transfer.
-        e.dataTransfer.setData('text/plain', `${ref.list}:${ref.index}`);
+        e.dataTransfer.setData('text/plain', `${ref.zone}:${ref.index}`);
       },
       onDragOver: (e: React.DragEvent) => {
         if (!dragged.current) return;
@@ -184,7 +158,7 @@ export function ViewEditor({
   }
 
   const isOver = (ref: DragRef) =>
-    over?.list === ref.list && over.index === ref.index;
+    over?.zone === ref.zone && over.index === ref.index;
 
   const zone = (title: string, key: FieldZone) => {
     const fields = view[key];
@@ -194,8 +168,8 @@ export function ViewEditor({
           <Row
             key={field}
             label={name(field)}
-            drag={dragProps({ list: key, index: i })}
-            over={isOver({ list: key, index: i })}
+            drag={dragProps({ zone: key, index: i })}
+            over={isOver({ zone: key, index: i })}
             onRemove={() => onViewChange(removeField(view, key, i))}
           />
         ))}
@@ -215,8 +189,8 @@ export function ViewEditor({
           <Row
             key={value.id}
             label={value.label ?? name(value.field)}
-            drag={dragProps({ list: 'values', index: i })}
-            over={isOver({ list: 'values', index: i })}
+            drag={dragProps({ zone: 'values', index: i })}
+            over={isOver({ zone: 'values', index: i })}
             // The last measure cannot go: there would be nothing to aggregate.
             onRemove={
               view.values.length > 1
@@ -248,8 +222,8 @@ export function ViewEditor({
             <Row
               key={`${f.agg}${i}`}
               label={f.label}
-              drag={dragProps({ list: 'footer', index: i })}
-              over={isOver({ list: 'footer', index: i })}
+              drag={dragProps({ zone: 'footer', index: i })}
+              over={isOver({ zone: 'footer', index: i })}
               onRemove={() => onDisplayChange(removeFooterRow(display, i))}
             />
           ))}

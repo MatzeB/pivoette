@@ -21,7 +21,7 @@ function isInteger(n: number): boolean {
  *  - `string` otherwise (incl. booleans coerced at read time)
  * An all-null column defaults to `string`.
  */
-function inferType(values: CellValue[]): ColumnType {
+export function inferType(values: CellValue[]): ColumnType {
   let sawValue = false;
   let allNumbers = true;
   let allIntegers = true;

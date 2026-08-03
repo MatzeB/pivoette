@@ -5,7 +5,7 @@
 import type { ReactNode } from 'react';
 import type { CellCtx, CellRender } from './context';
 import type { RenderSpec } from '../pivot/spec';
-import { evalExpression } from './expression';
+import { evalCell } from './expression';
 
 type RenderFactory = (options: Record<string, unknown>) => CellRender;
 
@@ -47,14 +47,7 @@ export function resolveRender(
   if ('fn' in spec) return spec.fn;
   if ('expression' in spec) {
     const src = spec.expression;
-    return (ctx: CellCtx) =>
-      evalExpression(src, {
-        value: ctx.value,
-        inputs: ctx.inputs,
-        row: ctx.rowPath,
-        col: ctx.colPath,
-        ctx,
-      }) as ReactNode;
+    return (ctx: CellCtx) => evalCell(src, ctx) as ReactNode;
   }
   const factory = registry.get(spec.fnName);
   if (!factory) throw new Error(`Unknown renderer "${spec.fnName}"`);

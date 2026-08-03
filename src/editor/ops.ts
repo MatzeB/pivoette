@@ -11,6 +11,7 @@
  */
 import type { DataTableDisplay } from '../components/DataTable';
 import { isFlat } from '../pivot/spec';
+import { clampIndex } from '../util';
 import type { PivotSpec, SortSpec, ValueSpec, ViewSpec } from '../pivot/spec';
 
 /** The two axes a grouping field can live on. */
@@ -22,9 +23,53 @@ export interface FieldRef {
   index: number;
 }
 
+/** Anything draggable: an axis field, a measure, or a footer row. */
+export type DragRef =
+  | FieldRef
+  | { zone: 'values'; index: number }
+  | { zone: 'footer'; index: number };
+
+/** Where a drop can send its changes. */
+export interface DropTargets {
+  view: ViewSpec;
+  display?: DataTableDisplay;
+  onViewChange?: (next: ViewSpec) => void;
+  onDisplayChange?: (next: DataTableDisplay) => void;
+}
+
+/**
+ * What a drop means, in one place: axis fields are interchangeable — dropping
+ * one on the other axis pivots it — while measures and footer rows only
+ * reorder among their own kind, since neither means anything on an axis.
+ *
+ * The table and the side panel both route through here so their drag
+ * behaviour cannot drift apart.
+ */
+export function applyDrop(from: DragRef, to: DragRef, at: DropTargets): void {
+  if (from.zone === to.zone && from.index === to.index) return;
+
+  if (from.zone === 'values' || to.zone === 'values') {
+    if (from.zone !== to.zone) return;
+    at.onViewChange?.(moveValue(at.view, from.index, to.index));
+    return;
+  }
+  if (from.zone === 'footer' || to.zone === 'footer') {
+    if (from.zone !== to.zone || !at.display) return;
+    at.onDisplayChange?.(moveFooterRow(at.display, from.index, to.index));
+    return;
+  }
+  at.onViewChange?.(moveField(at.view, from, to));
+}
+
 // Immutable array edits. Written out rather than using `toSpliced`, which is
 // ES2023 — the package targets ES2022 and that is not worth widening for three
 // call sites.
+/** Move an item within an array, clamping the destination. */
+function reorder<T>(arr: readonly T[], from: number, to: number): T[] {
+  const rest = removeAt(arr, from);
+  return insertAt(rest, clampIndex(to, rest.length), arr[from]!);
+}
+
 function removeAt<T>(arr: readonly T[], i: number): T[] {
   return [...arr.slice(0, i), ...arr.slice(i + 1)];
 }
@@ -75,7 +120,7 @@ export function addField(
   const p = pivot(spec);
   if (!p || p.rows.includes(field) || p.columns.includes(field)) return spec;
   const fields = p[zone];
-  const index = Math.min(Math.max(at ?? fields.length, 0), fields.length);
+  const index = clampIndex(at ?? fields.length, fields.length);
   return withZone(p, zone, insertAt(fields, index, field));
 }
 
@@ -104,15 +149,13 @@ export function moveField(
   if (field === undefined) return spec;
 
   if (from.zone === to.zone) {
-    const rest = removeAt(p[from.zone], from.index);
     // Clamp: dropping past the end appends.
-    const at = Math.min(Math.max(to.index, 0), rest.length);
-    return withZone(p, from.zone, insertAt(rest, at, field));
+    return withZone(p, from.zone, reorder(p[from.zone], from.index, to.index));
   }
 
   const source = removeAt(p[from.zone], from.index);
   const target = p[to.zone];
-  const at = Math.min(Math.max(to.index, 0), target.length);
+  const at = clampIndex(to.index, target.length);
   const moved: PivotSpec = {
     ...p,
     [from.zone]: source,
@@ -166,9 +209,7 @@ export function moveValue(spec: ViewSpec, from: number, to: number): ViewSpec {
   const p = pivot(spec);
   const value = p?.values[from];
   if (!p || !value) return spec;
-  const rest = removeAt(p.values, from);
-  const at = Math.min(Math.max(to, 0), rest.length);
-  return { ...p, values: insertAt(rest, at, value) };
+  return { ...p, values: reorder(p.values, from, to) };
 }
 
 /** Derived columns are a separate list from the measures. */
@@ -206,9 +247,7 @@ export function moveFooterRow(
   const footer = display.footer ?? [];
   const row = footer[from];
   if (!row) return display;
-  const rest = removeAt(footer, from);
-  const at = Math.min(Math.max(to, 0), rest.length);
-  return { ...display, footer: insertAt(rest, at, row) };
+  return { ...display, footer: reorder(footer, from, to) };
 }
 
 export function removeFooterRow(

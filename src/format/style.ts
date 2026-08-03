@@ -5,7 +5,7 @@
 import type { CSSProperties } from 'react';
 import type { CellCtx, StyleFn } from './context';
 import type { StyleSpec } from '../pivot/spec';
-import { evalExpression } from './expression';
+import { evalCell } from './expression';
 import { asNumber } from '../util';
 
 type StyleFactory = (options: Record<string, unknown>) => StyleFn;
@@ -37,13 +37,7 @@ registry.set('conditional', (options) => {
     (options.rules as { when: string; style: CSSProperties }[]) ?? [];
   return (ctx) => {
     for (const rule of rules) {
-      const matched = evalExpression(rule.when, {
-        value: ctx.value,
-        inputs: ctx.inputs,
-        row: ctx.rowPath,
-        col: ctx.colPath,
-        ctx,
-      });
+      const matched = evalCell(rule.when, ctx);
       if (matched) return { ...base, ...rule.style };
     }
     return base;
@@ -56,7 +50,8 @@ registry.set('static', (options) => {
   return () => style;
 });
 
-const NO_STYLE: StyleFn = () => ({});
+const EMPTY: CSSProperties = {};
+const NO_STYLE: StyleFn = () => EMPTY;
 
 export function resolveStyle(spec: StyleSpec | undefined): StyleFn {
   if (!spec) return NO_STYLE;
@@ -64,13 +59,7 @@ export function resolveStyle(spec: StyleSpec | undefined): StyleFn {
   if ('expression' in spec) {
     const src = spec.expression;
     return (ctx: CellCtx) => {
-      const result = evalExpression(src, {
-        value: ctx.value,
-        inputs: ctx.inputs,
-        row: ctx.rowPath,
-        col: ctx.colPath,
-        ctx,
-      });
+      const result = evalCell(src, ctx);
       return (result as CSSProperties) ?? {};
     };
   }

@@ -46,8 +46,18 @@ export interface CurrencyFacts {
 /** ISO 4217 codes are three uppercase letters. */
 const ISO_CODE = /^[A-Z]{3}$/;
 
+/** Bare symbols, for metadata that gives one instead of a name. */
+const SYMBOL_CODE: Record<string, string> = {
+  $: 'USD',
+  '€': 'EUR',
+  '£': 'GBP',
+  '¥': 'JPY',
+  '₹': 'INR',
+  '₩': 'KRW',
+};
+
 function codeOf(unit: string): string | undefined {
-  const named = CURRENCY_CODE[unit.toLowerCase()];
+  const named = CURRENCY_CODE[unit.toLowerCase()] ?? SYMBOL_CODE[unit];
   if (named) return named;
   return ISO_CODE.test(unit) ? unit : undefined;
 }

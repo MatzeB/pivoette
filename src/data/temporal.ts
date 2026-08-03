@@ -9,6 +9,7 @@
  * a commit falls on depends on where you are standing.
  */
 import type { ColumnMeta } from './meta';
+import { asNumber } from '../util';
 
 /** `'auto'` and absent both mean the runtime's zone — what `Intl` does for
  * `undefined`. Anything else passes through as an IANA name. */
@@ -51,10 +52,11 @@ export function firstDayOfWeek(locale?: string): number {
 
 /** Epoch millis from an RFC3339 / ISO-8601 string. Null if unparseable. */
 export function parseTime(value: unknown): number | null {
-  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  const ms = asNumber(value);
+  if (ms !== null) return ms;
   if (typeof value !== 'string') return null;
-  const ms = Date.parse(value);
-  return Number.isNaN(ms) ? null : ms;
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? null : parsed;
 }
 
 /**
@@ -163,9 +165,8 @@ export function temporalHelpers(
 ): Record<string, (v: unknown) => number | string | null> {
   const tz = resolveTimeZone(timeZone);
   const first = firstDayOfWeek(locale);
-  const at = (v: unknown) => (typeof v === 'number' ? v : parseTime(v));
   const part = <T>(v: unknown, f: (p: TimeParts, ms: number) => T) => {
-    const ms = at(v);
+    const ms = parseTime(v);
     return ms === null ? null : f(timeParts(ms, tz), ms);
   };
   return {

@@ -15,20 +15,18 @@ import type {
   ResultRow,
 } from '../pivot/result';
 import type { ViewSpec } from '../pivot/spec';
-import { compareValues } from '../util';
+import { cls, compareValues } from '../util';
 import { isFlat } from '../pivot/spec';
 import {
   addField,
-  moveField,
-  moveFooterRow,
-  moveValue,
+  applyDrop,
   removeComputed,
   removeField,
   removeFooterRow,
   removeValue,
   setShowSummary,
 } from '../editor/ops';
-import type { FieldRef } from '../editor/ops';
+import type { DragRef } from '../editor/ops';
 import styles from './DataTable.module.css';
 
 export interface DataTableDisplay {
@@ -144,12 +142,6 @@ function indexCols(
   return out;
 }
 
-/** A draggable handle's identity: an axis field, a measure, or a footer row. */
-type DragRef =
-  | FieldRef
-  | { zone: 'values'; index: number }
-  | { zone: 'footer'; index: number };
-
 /** A line in the opened pending column: a field, the Custom placeholder, or a note. */
 type AddEntry =
   | { kind: 'option'; id: string; label: string }
@@ -176,11 +168,6 @@ function alignClass(align: 'left' | 'right' | 'center'): string {
   if (align === 'right') return styles.numeric!;
   if (align === 'center') return styles.center!;
   return styles.left!;
-}
-
-/** Join truthy class names into a className string. */
-function cls(...items: (string | false | null | undefined)[]): string {
-  return items.filter(Boolean).join(' ');
 }
 
 function makeCtx(
@@ -218,25 +205,16 @@ function headerRowsRanged(
   function walk(nodes: import('../pivot/result').HeaderNode[], level: number) {
     for (const n of nodes) {
       const start = cursor;
-      if (n.leaf) {
-        rows[level]!.push({
-          label: n.label,
-          colSpan: n.span,
-          rowSpan: depth - level,
-          leafStart: start,
-          leafEnd: start + n.span - 1,
-        });
-        cursor += n.span;
-      } else {
-        rows[level]!.push({
-          label: n.label,
-          colSpan: n.span,
-          rowSpan: 1,
-          leafStart: start,
-          leafEnd: start + n.span - 1,
-        });
-        walk(n.children, level + 1);
-      }
+      rows[level]!.push({
+        label: n.label,
+        colSpan: n.span,
+        // A leaf reaches the bottom of the header; a group is one row tall.
+        rowSpan: n.leaf ? depth - level : 1,
+        leafStart: start,
+        leafEnd: start + n.span - 1,
+      });
+      if (n.leaf) cursor += n.span;
+      else walk(n.children, level + 1);
     }
   }
   walk(forest, 0);
@@ -608,6 +586,12 @@ export function DataTable({
   const pendingAt = editable ? (addingAt ?? hoverInsert) : null;
   const editCols = pendingAt !== null ? 1 : 0;
 
+  /** Depends only on the column, so it is resolved once rather than per cell. */
+  const cellGap = useMemo(
+    () => leaves.map((_, i) => edgeGapStyle(i, i, gapAfter, bodyLeadGap)),
+    [leaves, gapAfter, bodyLeadGap],
+  );
+
   const pendingW = adding ? ADD_COL_W : EDIT_COL_W;
   /** Sticky offsets with the pending column spliced into the index group. */
   const editLeftOffset = useMemo(
@@ -642,8 +626,6 @@ export function DataTable({
     | { kind: 'computed'; index: number }
     | null
   >(null);
-  const linkedMeasure =
-    removeHover?.kind === 'measure' ? removeHover.index : null;
 
   /**
    * What the opened column offers, one entry per body row: the groupable
@@ -671,30 +653,13 @@ export function DataTable({
 
   /** What is in flight: an axis field, or a measure. */
   const dragged = useRef<DragRef | null>(null);
-  const dragImage = useDragImage();
 
-  /**
-   * Axis fields are interchangeable — dragging one onto the other axis pivots
-   * it — but a measure only reorders among measures, and does so globally: its
-   * header repeats per column group, so where it was grabbed does not matter,
-   * only which measure it was dropped on.
-   */
   function onFieldDrop(to: DragRef) {
     const from = dragged.current;
     dragged.current = null;
-    if (!spec || !from) return;
-    if (from.zone === to.zone && from.index === to.index) return;
-    if (from.zone === 'values' || to.zone === 'values') {
-      if (from.zone !== to.zone) return;
-      onViewChange?.(moveValue(view, from.index, to.index));
-      return;
+    if (from) {
+      applyDrop(from, to, { view, display, onViewChange, onDisplayChange });
     }
-    if (from.zone === 'footer' || to.zone === 'footer') {
-      if (from.zone !== to.zone) return;
-      onDisplayChange?.(moveFooterRow(display, from.index, to.index));
-      return;
-    }
-    onViewChange?.(moveField(spec, from as FieldRef, to as FieldRef));
   }
 
   /**
@@ -773,27 +738,36 @@ export function DataTable({
    * column-member header never is. Absent while one measure remains, since
    * removing it is a no-op and a dead control is worse than none.
    */
-  function measureAt(hc: HCell): number | undefined {
-    if (!editable || !spec || spec.values.length <= 1) return undefined;
-    if (hc.leafStart !== hc.leafEnd) return undefined;
-    const value = leaves[hc.leafStart]?.column.value;
-    if (!value || hc.label !== (value.label ?? value.id)) return undefined;
-    const at = spec.values.findIndex((v) => v.id === value.id);
-    return at >= 0 ? at : undefined;
-  }
-
   /**
-   * The derived column a header cell removes, if any. Derived columns are their
-   * own list, so they need their own control — a measure's `×` cannot reach
-   * them.
+   * What a header cell's remove control would drop, if anything. Only the cell
+   * that *is* the measure or derived level qualifies — its text is that
+   * column's own label, which a column-member header never is.
    */
-  function computedAt(hc: HCell): number | undefined {
-    if (!editable || !spec?.computed?.length) return undefined;
-    if (hc.leafStart !== hc.leafEnd) return undefined;
-    const def = leaves[hc.leafStart]?.column.def;
-    if (!def || hc.label !== (def.label ?? def.id)) return undefined;
-    const at = spec.computed.findIndex((c) => c.id === def.id);
-    return at >= 0 ? at : undefined;
+  function removableAt(
+    hc: HCell,
+  ): { kind: 'measure' | 'computed'; index: number; noun: string } | undefined {
+    if (!editable || !spec || hc.leafStart !== hc.leafEnd) return undefined;
+    const column = leaves[hc.leafStart]?.column;
+    if (!column) return undefined;
+
+    // Removing the last measure is a no-op, so it offers no control.
+    if (column.value && spec.values.length > 1) {
+      const own = column.value;
+      if (hc.label !== (own.label ?? own.id)) return undefined;
+      const index = spec.values.findIndex((v) => v.id === own.id);
+      return index >= 0
+        ? { kind: 'measure', index, noun: 'measure' }
+        : undefined;
+    }
+    if (column.def && spec.computed?.length) {
+      const own = column.def;
+      if (hc.label !== (own.label ?? own.id)) return undefined;
+      const index = spec.computed.findIndex((c) => c.id === own.id);
+      return index >= 0
+        ? { kind: 'computed', index, noun: 'column' }
+        : undefined;
+    }
+    return undefined;
   }
 
   function leafHeaderCls(hc: HCell, isLeafCol: boolean): string {
@@ -950,9 +924,10 @@ export function DataTable({
                   )}
                 {hrow.map((hc, ci) => {
                   const isLeafCol = hc.leafStart === hc.leafEnd;
-                  const measure = measureAt(hc);
+                  const removable = removableAt(hc);
+                  const measure =
+                    removable?.kind === 'measure' ? removable.index : undefined;
                   /** Column levels come first in the header; the rest is measures. */
-                  const derived = computedAt(hc);
                   const columnLevel =
                     editable && spec && level < spec.columns.length
                       ? level
@@ -1012,34 +987,29 @@ export function DataTable({
                     >
                       {hc.label}
                       {sortArrow(active)}
-                      {measure !== undefined && (
+                      {removable && (
                         <RemoveField
-                          title={`Remove the ${hc.label} measure`}
-                          linked={linkedMeasure === measure}
-                          onLink={(on) =>
-                            setRemoveHover(
-                              on ? { kind: 'measure', index: measure } : null,
-                            )
-                          }
-                          onRemove={() =>
-                            onViewChange?.(removeValue(view, measure))
-                          }
-                        />
-                      )}
-                      {derived !== undefined && (
-                        <RemoveField
-                          title={`Remove the ${hc.label} column`}
+                          title={`Remove the ${hc.label} ${removable.noun}`}
                           linked={
-                            removeHover?.kind === 'computed' &&
-                            removeHover.index === derived
+                            removeHover?.kind === removable.kind &&
+                            removeHover.index === removable.index
                           }
                           onLink={(on) =>
                             setRemoveHover(
-                              on ? { kind: 'computed', index: derived } : null,
+                              on
+                                ? {
+                                    kind: removable.kind,
+                                    index: removable.index,
+                                  }
+                                : null,
                             )
                           }
                           onRemove={() =>
-                            onViewChange?.(removeComputed(view, derived))
+                            onViewChange?.(
+                              removable.kind === 'measure'
+                                ? removeValue(view, removable.index)
+                                : removeComputed(view, removable.index),
+                            )
                           }
                         />
                       )}
@@ -1078,14 +1048,12 @@ export function DataTable({
                   row={row}
                   prevPath={grouped ? prev?.path : undefined}
                   nextPath={grouped ? next?.path : undefined}
-                  grouped={grouped}
                   rowLevels={rowLevels}
                   memberFormats={rowMemberFormats}
                   leaves={leaves}
                   frame={frame}
                   leftOffset={leftOffset}
-                  gapAfter={gapAfter}
-                  bodyLeadGap={bodyLeadGap}
+                  cellGap={cellGap}
                   indexColumns={indexColumns}
                   extraTop={extraTop[item.index] ?? 0}
                   zebra={zebra}
@@ -1132,8 +1100,7 @@ export function DataTable({
                   leaves={leaves}
                   frame={frame}
                   rowLevels={rowLevels}
-                  gapAfter={gapAfter}
-                  bodyLeadGap={bodyLeadGap}
+                  cellGap={cellGap}
                   bottom={(footerLines.length - 1 - fi) * ROW_HEIGHT}
                   leftOffset={leftOffset}
                   extraIndexCols={editCols}
@@ -1194,16 +1161,16 @@ function prefixEqual(a: unknown[], b: unknown[], n: number): boolean {
 interface RowProps {
   rowIndex: number;
   row: ResultRow;
+  /** Undefined when an index sort has flattened the grouping. */
   prevPath: unknown[] | undefined;
   nextPath: unknown[] | undefined;
-  grouped: boolean;
   rowLevels: string[];
   memberFormats: MemberFormat[];
   leaves: ResolvedLeaf[];
   frame: DataFrame;
   leftOffset: number[];
-  gapAfter: number[];
-  bodyLeadGap: number;
+  /** Per-column gap style, resolved once rather than per cell. */
+  cellGap: CSSProperties[];
   indexColumns: number;
   extraTop: number;
   zebra: boolean;
@@ -1225,14 +1192,12 @@ function Row({
   row,
   prevPath,
   nextPath,
-  grouped,
   rowLevels,
   memberFormats,
   leaves,
   frame,
   leftOffset,
-  gapAfter,
-  bodyLeadGap,
+  cellGap,
   indexColumns,
   extraTop,
   zebra,
@@ -1257,13 +1222,10 @@ function Row({
         pendingAt,
         (level) => {
           // Label shown only where this level's group starts.
-          const show =
-            !grouped ||
-            !prevPath ||
-            !prefixEqual(prevPath, row.path, level + 1);
+          const show = !prevPath || !prefixEqual(prevPath, row.path, level + 1);
           // Merge cells: drop the bottom rule while the group continues below.
           const continues =
-            grouped && !!nextPath && prefixEqual(nextPath, row.path, level + 1);
+            !!nextPath && prefixEqual(nextPath, row.path, level + 1);
           // Breadcrumb highlight: the label cell carrying an ancestor (or self)
           // of the hovered row.
           const lit =
@@ -1342,7 +1304,7 @@ function Row({
             )}
             style={{
               ...leaf.style(ctx),
-              ...edgeGapStyle(i, i, gapAfter, bodyLeadGap),
+              ...cellGap[i],
               ...gapTop,
             }}
             onMouseEnter={() => onHover({ row: rowIndex, leaf: i })}
@@ -1411,7 +1373,7 @@ function ghostFrom(
   return clip;
 }
 
-function useDragImage() {
+const dragImage = (() => {
   /** The snapshot is taken synchronously, so the clone can go next frame. */
   const show = (e: React.DragEvent, ghost: HTMLElement) => {
     e.dataTransfer.setDragImage(ghost, 16, 14);
@@ -1459,7 +1421,7 @@ function useDragImage() {
       );
     },
   };
-}
+})();
 
 interface FooterRowProps {
   label: string;
@@ -1467,8 +1429,8 @@ interface FooterRowProps {
   leaves: ResolvedLeaf[];
   frame: DataFrame;
   rowLevels: string[];
-  gapAfter: number[];
-  bodyLeadGap: number;
+  /** Per-column gap style, resolved once rather than per cell. */
+  cellGap: CSSProperties[];
   bottom: number;
   leftOffset: number[];
   /** The label cell spans the pending column too, when one is showing. */
@@ -1487,8 +1449,7 @@ function FooterRow({
   leaves,
   frame,
   rowLevels,
-  gapAfter,
-  bodyLeadGap,
+  cellGap,
   bottom,
   leftOffset,
   extraIndexCols,
@@ -1502,7 +1463,6 @@ function FooterRow({
   // state is local rather than shared with the column tints.
   const [removing, setRemoving] = useState(false);
 
-  const dragImage = useDragImage();
   const rowDrag = drag && {
     ...drag,
     onDragStart: (e: React.DragEvent<HTMLTableRowElement>) => {
@@ -1553,7 +1513,7 @@ function FooterRow({
             )}
             style={{
               ...leaf.style(ctx),
-              ...edgeGapStyle(i, i, gapAfter, bodyLeadGap),
+              ...cellGap[i],
               ...sticky,
             }}
             // Footer sentinel row (-1): lights the column header, no body row.

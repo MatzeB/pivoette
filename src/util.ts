@@ -16,6 +16,16 @@ export function compareValues(a: unknown, b: unknown): number {
   return 0;
 }
 
+/** Join truthy class names into a className string. */
+export function cls(...items: (string | false | null | undefined)[]): string {
+  return items.filter(Boolean).join(' ');
+}
+
+/** Restrict an insertion index to `[0, length]`. */
+export function clampIndex(index: number, length: number): number {
+  return Math.min(Math.max(index, 0), length);
+}
+
 /** True for the column types that hold numbers (and so right-align by default). */
 export function isNumericType(type: ColumnType | undefined): boolean {
   return type === 'int' || type === 'float';

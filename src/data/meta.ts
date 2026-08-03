@@ -130,12 +130,10 @@ export const UNIT_SHORT: Record<string, string> = {
 
 /**
  * How a symbol attaches to a number is a property of the *symbol*, not of the
- * column's kind: `$` leads and hugs, `%` trails and hugs, `MB` trails with a
- * space. Currencies `Intl` recognises get their placement from the locale
- * instead (see `columnCurrency`); these sets cover metadata that supplies a
- * bare symbol with no resolvable unit name.
+ * column's kind. Currencies get their placement from the locale — including
+ * ones written as a bare symbol, which `currencyFacts` now resolves — so all
+ * that is left here is `%`, which hugs without leading.
  */
-const SYMBOL_PREFIX = new Set(['$', '€', '£', '¥', '₹', '₩', '¤']);
 const SYMBOL_TIGHT = new Set(['%']);
 
 export const SCALE_SHORT: Record<string, string> = {
@@ -390,9 +388,7 @@ export function unitLabels(
   const full = compose(factors);
   // A currency's placement comes from the locale; otherwise the symbol itself
   // decides. Compound units always trail with a space.
-  const prefix =
-    simple &&
-    (columnCurrency(meta, locale)?.prefix ?? SYMBOL_PREFIX.has(only.unit));
+  const prefix = simple && (columnCurrency(meta, locale)?.prefix ?? false);
   const labels: UnitLabels = {
     full,
     simple,
@@ -435,8 +431,13 @@ export function columnCurrency(
   meta: ColumnMeta | undefined,
   locale?: string,
 ): CurrencyFacts | undefined {
-  if (!meta || meta.unit?.length !== 1) return undefined;
-  return currencyFacts(meta.unit[0], locale);
+  if (!meta) return undefined;
+  // A single factor only: `$/h` is a rate, not a currency amount. The
+  // shortname is tried too, so `{ unitShort: '$' }` is answered by the same
+  // Intl-backed path as `{ unit: 'dollar' }` rather than a parallel table.
+  const long = meta.unit?.length === 1 ? meta.unit[0] : undefined;
+  const short = meta.unitShort?.length === 1 ? meta.unitShort[0] : undefined;
+  return currencyFacts(long, locale) ?? currencyFacts(short, locale);
 }
 
 const kindCache = new WeakMap<ColumnMeta, string>();

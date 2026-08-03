@@ -9,14 +9,15 @@ import { mergeMeta, normalizeMeta } from '../data/meta';
 import { requireColumn, withMeta } from '../data/frame';
 import { deriveColumns } from '../data/derive';
 import type { Align, ResolvedColumn } from '../format/context';
-import { columnFormat, deduceFormat } from '../format/deduce';
+import { columnFormat } from '../format/deduce';
 import { Format, Render } from '../format/builtins';
 import { resolveFormat } from '../format/format';
 import { resolveStyle } from '../format/style';
 import { resolveRender } from '../format/render';
-import { evalExpression } from '../format/expression';
+import { compileExpression, evalExpression } from '../format/expression';
 import { getAggregation } from './aggregations';
 import type {
+  CellRef,
   ColumnDef,
   FormatSpec,
   PivotSpec,
@@ -60,11 +61,6 @@ function label(
   return labels?.[field] ?? meta?.displayName ?? field;
 }
 
-/**
- * The data field a column projects. A plain projection defaults to its `id`, so
- * `{ id: 'price' }` needs no `source`; a computed or composite column has no
- * single source unless it says so.
- */
 /** `label` for a row/column index field, whose metadata comes from the frame. */
 function fieldLabel(
   frame: DataFrame,
@@ -74,6 +70,11 @@ function fieldLabel(
   return label(field, labels, frame.columnByName.get(field)?.meta);
 }
 
+/**
+ * The data field a column projects. A plain projection defaults to its `id`, so
+ * `{ id: 'price' }` needs no `source`; a computed or composite column has no
+ * single source unless it says so.
+ */
 function sourceField(def: ColumnDef): string | undefined {
   if (def.compute || def.composite) return def.source;
   return def.source ?? def.id;
@@ -108,9 +109,11 @@ function memberFormat(
   locale: string | undefined,
 ): MemberFormat {
   const meta = frame.columnByName.get(field)?.meta;
-  const spec = deduceFormat(meta, locale);
+  // Same pipeline the leaf columns use, so a member and a cell of the same
+  // field cannot format differently.
+  const spec = columnFormat({}, meta, locale);
   if (!spec) return (v: CellValue) => String(v ?? '');
-  const fn = resolveFormat(withLocaleOption(spec, locale));
+  const fn = resolveFormat(spec);
   const column: ResolvedColumn = {
     id: field,
     label: field,
@@ -128,21 +131,6 @@ function memberFormat(
           column,
           frame,
         });
-}
-
-/** Stamp the view locale onto a named format that did not set one. */
-function withLocaleOption(
-  format: FormatSpec,
-  locale: string | undefined,
-): FormatSpec {
-  if (
-    !locale ||
-    !('fnName' in format) ||
-    format.options?.locale !== undefined
-  ) {
-    return format;
-  }
-  return { ...format, options: { ...format.options, locale } };
 }
 
 function makeLeaf(args: {
@@ -210,25 +198,36 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
     });
   });
 
-  // Row-level input scope: all source fields by name.
+  // Row-level input scope: every source field by name, built once per row and
+  // shared by the cells that do not add to it. Rebuilding it per cell cost
+  // rows x columns x fields, and each `Cell.inputs` retains its object for the
+  // life of the result.
   const allFields = frame.columns.map((c) => c.name);
+  const allValues = frame.columns.map((c) => c.values);
 
   const rows: ResultRow[] = [];
   for (let r = 0; r < frame.length; r++) {
+    const rowScope: Record<string, unknown> = {};
+    for (let f = 0; f < allFields.length; f++) {
+      rowScope[allFields[f]!] = allValues[f]![r] ?? null;
+    }
+
     const cells: Cell[] = spec.columns.map((def, ci) => {
-      // Resolve inputs (explicit overrides, else sibling fields by name).
-      const inputs: Record<string, unknown> = {};
+      // Resolve inputs (explicit overrides, else the shared row scope).
+      let inputs: Record<string, unknown>;
       if (def.composite) {
         const [imgField, textField] = def.composite.fields;
-        inputs.image = imgField ? fieldValues(imgField, r) : null;
-        inputs.text = textField ? fieldValues(textField, r) : null;
-      } else {
-        for (const f of allFields) inputs[f] = fieldValues(f, r);
-        if (def.inputs) {
-          for (const [alias, ref] of Object.entries(def.inputs)) {
-            if (typeof ref === 'string') inputs[alias] = fieldValues(ref, r);
-          }
+        inputs = {
+          image: imgField ? fieldValues(imgField, r) : null,
+          text: textField ? fieldValues(textField, r) : null,
+        };
+      } else if (def.inputs) {
+        inputs = { ...rowScope };
+        for (const [alias, ref] of Object.entries(def.inputs)) {
+          if (typeof ref === 'string') inputs[alias] = fieldValues(ref, r);
         }
+      } else {
+        inputs = rowScope;
       }
       let value: unknown;
       const sourceName = sourceNames[ci];
@@ -247,7 +246,7 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
     rows.push({ path: [], cells });
   }
 
-  sortFlatRows(rows, spec, frame);
+  sortFlatRows(rows, spec);
 
   const { forest, depth } = buildHeader(leaves);
   return {
@@ -262,11 +261,7 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
   };
 }
 
-function sortFlatRows(
-  rows: ResultRow[],
-  spec: TableSpec,
-  frame: DataFrame,
-): void {
+function sortFlatRows(rows: ResultRow[], spec: TableSpec): void {
   if (!spec.sort || spec.sort.length === 0) return;
   const colIndex = new Map(spec.columns.map((c, i) => [c.id, i]));
   const specs = spec.sort
@@ -286,7 +281,6 @@ function sortFlatRows(
       let a: unknown;
       let b: unknown;
       if (sortField) {
-        // find original row via cell inputs is unavailable; recompute is costly.
         a = ra.cells[idx]?.inputs?.[sortField] ?? ra.cells[idx]?.inputs?.text;
         b = rb.cells[idx]?.inputs?.[sortField] ?? rb.cells[idx]?.inputs?.text;
       } else {
@@ -298,7 +292,6 @@ function sortFlatRows(
     }
     return 0;
   });
-  void frame;
 }
 
 // ---------------------------------------------------------------------------
@@ -438,6 +431,16 @@ interface DerivedDesc {
   def: ColumnDef;
   prefix: CellValue[];
   colPath: string[];
+  /**
+   * Everything about this column that does not vary by row, resolved once:
+   * where each alias reads from, and the compiled expression with its fixed
+   * argument list. Recomputing these per cell dominated pivot time — the
+   * lookup keys are `map(String).join('')` and `evalExpression` rebuilds its
+   * cache key from scratch on every call.
+   */
+  aliases: { name: string; lookupKey: string }[];
+  argNames: string[];
+  compiled?: (...args: unknown[]) => unknown;
 }
 
 type Desc = BaseDesc | DerivedDesc;
@@ -497,11 +500,27 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
         ? distinctPrefixes(colKeys, def.repeatPer.length)
         : [[]];
     for (const prefix of prefixes) {
+      const aliases = Object.entries(def.inputs ?? {})
+        .filter(([, ref]) => typeof ref !== 'string') // the flat-only form
+        .map(([name, ref]) => {
+          const cellRef = ref as CellRef;
+          const path =
+            prefix.length > 0
+              ? [...prefix, ...cellRef.colPath]
+              : cellRef.colPath;
+          return { name, lookupKey: baseLookupKey(path, cellRef.value) };
+        });
+      const argNames = [...aliases.map((a) => a.name), 'inputs', 'row'];
       const derived: DerivedDesc = {
         kind: 'derived',
         def,
         prefix,
         colPath: [...prefix.map((v) => String(v)), def.label ?? def.id],
+        aliases,
+        argNames,
+        compiled: def.compute
+          ? compileExpression(def.compute, argNames)
+          : undefined,
       };
       const at = derivedInsertIndex(descs, def, prefix);
       descs.splice(at, 0, derived);
@@ -630,18 +649,23 @@ function derivedCell(
   rowPath: CellValue[],
 ): Cell {
   const inputs: Record<string, unknown> = {};
-  if (d.def.inputs) {
-    for (const [alias, ref] of Object.entries(d.def.inputs)) {
-      if (typeof ref === 'string') continue; // flat-only form
-      const effective =
-        d.prefix.length > 0 ? [...d.prefix, ...ref.colPath] : ref.colPath;
-      inputs[alias] =
-        baseValues.get(baseLookupKey(effective, ref.value)) ?? null;
+  const argv: unknown[] = new Array(d.argNames.length);
+  d.aliases.forEach((alias, i) => {
+    const value = baseValues.get(alias.lookupKey) ?? null;
+    inputs[alias.name] = value;
+    argv[i] = value;
+  });
+  argv[d.aliases.length] = inputs;
+  argv[d.aliases.length + 1] = rowPath;
+
+  let value: unknown = null;
+  if (d.compiled) {
+    try {
+      value = d.compiled(...argv);
+    } catch {
+      value = null;
     }
   }
-  const value = d.def.compute
-    ? evalExpression(d.def.compute, { ...inputs, inputs, row: rowPath })
-    : null;
   return { value: scaled(value as CellValue, d.def.factor), inputs };
 }
 
@@ -708,6 +732,7 @@ function pivotMeasuresOnRows(
     (m) => requireColumn(frame, m.field).values,
   );
 
+  const colKeyStrs = colKeys.map(keyOf);
   const colMember = spec.columns.map((f) =>
     memberFormat(frame, f, spec.locale),
   );
@@ -730,8 +755,8 @@ function pivotMeasuresOnRows(
   for (const rowKey of rowKeys) {
     const byCol = g.groups.get(keyOf(rowKey));
     spec.values.forEach((measure, mi) => {
-      const cells: Cell[] = colKeys.map((colKey) => {
-        const idxs = byCol?.get(keyOf(colKey));
+      const cells: Cell[] = colKeys.map((_colKey, ci) => {
+        const idxs = byCol?.get(colKeyStrs[ci]!);
         const vals = idxs ? idxs.map((r) => fieldValues[mi]![r] ?? null) : [];
         return {
           value: idxs ? scaled(aggregate(measure, vals), measure.factor) : null,

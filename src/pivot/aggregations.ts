@@ -3,6 +3,7 @@
  * default, matching pandas). Numeric reducers ignore non-numeric values.
  */
 import type { CellValue } from '../data/types';
+import { asNumber } from '../util';
 
 export type Reducer = (values: CellValue[]) => CellValue;
 
@@ -21,7 +22,8 @@ function nonNull(values: CellValue[]): CellValue[] {
 function numbers(values: CellValue[]): number[] {
   const out: number[] = [];
   for (const v of values) {
-    if (typeof v === 'number' && Number.isFinite(v)) out.push(v);
+    const n = asNumber(v);
+    if (n !== null) out.push(n);
   }
   return out;
 }
@@ -96,7 +98,7 @@ register('std', 'Std dev', (v) => {
 });
 register('median', 'Median', percentile(0.5));
 register('p25', 'P25', percentile(0.25));
-register('p50', 'P50', percentile(0.5));
+register('p50', 'P50', percentile(0.5)); // an alias for median
 register('p75', 'P75', percentile(0.75));
 register('first', 'First', (v) => {
   const nn = nonNull(v);

@@ -6,6 +6,8 @@
  * privileges. Pivoette is a client-side tool over local, trusted data — do NOT
  * feed untrusted expression strings into a config.
  */
+import type { CellCtx } from './context';
+
 const cache = new Map<string, (...args: unknown[]) => unknown>();
 
 export function compileExpression(
@@ -39,4 +41,18 @@ export function evalExpression(
   } catch {
     return undefined;
   }
+}
+
+/**
+ * Evaluate an expression against a cell. The scope every cell hook exposes,
+ * defined once so the three registries cannot drift apart.
+ */
+export function evalCell(src: string, ctx: CellCtx): unknown {
+  return evalExpression(src, {
+    value: ctx.value,
+    inputs: ctx.inputs,
+    row: ctx.rowPath,
+    col: ctx.colPath,
+    ctx,
+  });
 }
