@@ -904,6 +904,11 @@ export function DataTable({
                 {hrow.map((hc, ci) => {
                   const isLeafCol = hc.leafStart === hc.leafEnd;
                   const measure = measureAt(hc);
+                  /** Column levels come first in the header; the rest is measures. */
+                  const columnLevel =
+                    editable && spec && level < spec.columns.length
+                      ? level
+                      : undefined;
                   const active =
                     isLeafCol &&
                     sort?.key.kind === 'leaf' &&
@@ -939,6 +944,18 @@ export function DataTable({
                         <span
                           className={styles.dragHandle}
                           {...dragProps({ zone: 'values', index: measure })}
+                        >
+                          {hc.label}
+                        </span>
+                      ) : columnLevel !== undefined ? (
+                        // Any member header of a level reorders that level, the
+                        // way any repeated measure header reorders its measure.
+                        <span
+                          className={styles.dragHandle}
+                          {...dragProps({
+                            zone: 'columns',
+                            index: columnLevel,
+                          })}
                         >
                           {hc.label}
                         </span>

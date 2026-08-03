@@ -857,3 +857,59 @@ describe('<DataTable> column-field controls', () => {
     expect(next!.columns).toEqual(['arch']);
   });
 });
+
+describe('<DataTable> column level drag', () => {
+  const data = [
+    { t: 'A', size: 'tiny', arch: 'x86', n: 1 },
+    { t: 'B', size: 'big', arch: 'arm', n: 2 },
+  ];
+  const view: PivotSpec = {
+    rows: ['t'],
+    columns: ['size', 'arch'],
+    values: [{ id: 'a', field: 'n', agg: 'sum', label: 'sum' }],
+  };
+
+  function drag(from: HTMLElement, to: HTMLElement) {
+    const dataTransfer = {
+      effectAllowed: '',
+      setData: () => {},
+      getData: () => '',
+    };
+    const fire = (el: HTMLElement, type: string) => {
+      const e = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(e, 'dataTransfer', { value: dataTransfer });
+      el.dispatchEvent(e);
+    };
+    fire(from, 'dragstart');
+    fire(to, 'dragover');
+    fire(to, 'drop');
+  }
+
+  async function mount(onChange: (v: ViewSpec) => void) {
+    const el = await render(
+      <DataTable data={data} view={view} editing onViewChange={onChange} />,
+    );
+    const rows = [...el.querySelectorAll('thead tr')];
+    /** Draggable handles in header row `r`; row 0 leads with the row field. */
+    return (r: number) => [
+      ...rows[r]!.querySelectorAll<HTMLElement>('span[draggable="true"]'),
+    ];
+  }
+
+  it('reorders the axis when a level is dropped on another', async () => {
+    let next: PivotSpec | undefined;
+    const handles = await mount((v) => (next = v as PivotSpec));
+    // Any member of a level is a handle for it, as with measures.
+    await act(async () => drag(handles(1)[0]!, handles(0)[1]!));
+    expect(next!.columns).toEqual(['arch', 'size']);
+  });
+
+  it('pivots a column field dropped on a row field', async () => {
+    let next: PivotSpec | undefined;
+    const handles = await mount((v) => (next = v as PivotSpec));
+    // handles(0)[0] is the row field's own header.
+    await act(async () => drag(handles(1)[0]!, handles(0)[0]!));
+    expect(next!.rows).toEqual(['arch', 't']);
+    expect(next!.columns).toEqual(['size']);
+  });
+});
