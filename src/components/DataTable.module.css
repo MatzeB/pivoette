@@ -358,12 +358,14 @@
   );
 }
 
-/* Grabbable field and measure names in the headers. */
-.dragHandle {
+/* Whole header cells are the drag handles, so grabbing does not mean aiming
+   at the text. Keyed off the attribute rather than a class, since `draggable`
+   is exactly the condition. */
+.table th[draggable='true'] {
   cursor: grab;
 }
 
-.dragHandle:active {
+.table th[draggable='true']:active {
   cursor: grabbing;
 }
 

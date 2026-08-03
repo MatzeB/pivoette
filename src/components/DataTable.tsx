@@ -106,6 +106,7 @@ function RemoveField({
       title={title}
       aria-label={title}
       data-linked={linked || undefined}
+      draggable={false}
       style={style}
       onMouseEnter={() => onLink?.(true)}
       onMouseLeave={() => onLink?.(false)}
@@ -860,16 +861,12 @@ export function DataTable({
                               ? {}
                               : { borderLeft: '1px solid var(--pv-border)' }),
                           }}
+                          {...dragSource({ zone: 'rows', index: i })}
                           {...dropTarget({ zone: 'rows', index: i })}
                           onMouseMove={(e) => edgeInsert(e, i)}
                           onClick={() => cycleSort({ kind: 'index', level: i })}
                         >
-                          <span
-                            className={styles.dragHandle}
-                            {...dragSource({ zone: 'rows', index: i })}
-                          >
-                            {lvl}
-                          </span>
+                          {lvl}
                           {sortArrow(active)}
                           {editable && spec && (
                             <RemoveField
@@ -952,9 +949,21 @@ export function DataTable({
                         ),
                       }}
                       {...(measure !== undefined
-                        ? dropTarget({ zone: 'values', index: measure })
+                        ? {
+                            ...dragSource({ zone: 'values', index: measure }),
+                            ...dropTarget({ zone: 'values', index: measure }),
+                          }
                         : columnLevel !== undefined
-                          ? dropTarget({ zone: 'columns', index: columnLevel })
+                          ? {
+                              ...dragSource({
+                                zone: 'columns',
+                                index: columnLevel,
+                              }),
+                              ...dropTarget({
+                                zone: 'columns',
+                                index: columnLevel,
+                              }),
+                            }
                           : {})}
                       onClick={
                         isLeafCol
@@ -963,28 +972,7 @@ export function DataTable({
                           : undefined
                       }
                     >
-                      {measure !== undefined ? (
-                        <span
-                          className={styles.dragHandle}
-                          {...dragSource({ zone: 'values', index: measure })}
-                        >
-                          {hc.label}
-                        </span>
-                      ) : columnLevel !== undefined ? (
-                        // Any member header of a level reorders that level, the
-                        // way any repeated measure header reorders its measure.
-                        <span
-                          className={styles.dragHandle}
-                          {...dragSource({
-                            zone: 'columns',
-                            index: columnLevel,
-                          })}
-                        >
-                          {hc.label}
-                        </span>
-                      ) : (
-                        hc.label
-                      )}
+                      {hc.label}
                       {sortArrow(active)}
                       {measure !== undefined && (
                         <RemoveField

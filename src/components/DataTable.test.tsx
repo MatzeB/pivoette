@@ -758,15 +758,15 @@ describe('<DataTable> measure drag', () => {
     const el = await render(
       <DataTable data={data} view={view} editing onViewChange={onChange} />,
     );
-    return [
-      ...el.querySelectorAll<HTMLElement>('thead span[draggable="true"]'),
-    ];
+    return [...el.querySelectorAll<HTMLElement>('thead th[draggable="true"]')];
   }
 
   it('reorders measures regardless of which column group was grabbed', async () => {
     let next: PivotSpec | undefined;
     const handles = await mount((v) => (next = v as PivotSpec));
-    const named = (n: string) => handles.filter((h) => h.textContent === n);
+    // The cell's text now includes its remove control, so match the prefix.
+    const named = (n: string) =>
+      handles.filter((h) => h.textContent?.startsWith(n));
     // Two column groups, so each measure has two handles.
     expect(named('min')).toHaveLength(2);
 
@@ -779,8 +779,8 @@ describe('<DataTable> measure drag', () => {
     // A measure is not a grouping field; the drop means nothing.
     let next: PivotSpec | undefined;
     const handles = await mount((v) => (next = v as PivotSpec));
-    const measure = handles.find((h) => h.textContent === 'max')!;
-    const rowField = handles.find((h) => h.textContent === 't')!;
+    const measure = handles.find((h) => h.textContent?.startsWith('max'))!;
+    const rowField = handles.find((h) => h.textContent?.startsWith('t'))!;
     await act(async () => drag(measure, rowField));
     expect(next).toBeUndefined();
   });
@@ -892,7 +892,7 @@ describe('<DataTable> column level drag', () => {
     const rows = [...el.querySelectorAll('thead tr')];
     /** Draggable handles in header row `r`; row 0 leads with the row field. */
     return (r: number) => [
-      ...rows[r]!.querySelectorAll<HTMLElement>('span[draggable="true"]'),
+      ...rows[r]!.querySelectorAll<HTMLElement>('th[draggable="true"]'),
     ];
   }
 
@@ -917,9 +917,7 @@ describe('<DataTable> column level drag', () => {
       />,
     );
     const rows = [...el.querySelectorAll('thead tr')];
-    const source = rows[1]!.querySelector<HTMLElement>(
-      'span[draggable="true"]',
-    )!;
+    const source = rows[1]!.querySelector<HTMLElement>('th[draggable="true"]')!;
     // Drop on the <th> itself, with no label under the pointer.
     const targetCell = [...rows[0]!.querySelectorAll<HTMLElement>('th')][1]!;
     await act(async () => drag(source, targetCell));
