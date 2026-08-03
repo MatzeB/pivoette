@@ -1,4 +1,4 @@
-.wrapper {
+.frame {
   /* Light palette (default). */
   --pv-bg: #ffffff;
   --pv-border: #e2e2e5;
@@ -18,7 +18,8 @@
   );
 
   position: relative;
-  overflow: auto;
+  /* Clips the scroller to the rounded corners. */
+  overflow: hidden;
   border: 1px solid var(--pv-border);
   border-radius: 8px;
   font-family:
@@ -30,7 +31,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .wrapper:not([data-theme='light']) {
+  .frame:not([data-theme='light']) {
     --pv-bg: #161618;
     --pv-border: #3a3a3d;
     --pv-header-bg: #232326;
@@ -44,7 +45,7 @@
   }
 }
 
-.wrapper[data-theme='dark'] {
+.frame[data-theme='dark'] {
   --pv-bg: #161618;
   --pv-border: #3a3a3d;
   --pv-header-bg: #232326;
@@ -58,7 +59,7 @@
   color-scheme: dark;
 }
 
-.wrapper[data-theme='light'] {
+.frame[data-theme='light'] {
   color-scheme: light;
 }
 
@@ -99,6 +100,12 @@
   border: none !important;
   background: var(--pv-border);
   z-index: 3;
+}
+
+/* The scroll area. Kept separate from `.frame` so overlays can sit at the
+   frame's corner rather than scrolling away with the content. */
+.wrapper {
+  overflow: auto;
 }
 
 /* Row-index (leading) headers/cells. */
@@ -364,15 +371,19 @@
    members, not field names, so there is no per-field header to hang them on,
    and the corner is sticky in both axes so they stay reachable when a wide
    table is scrolled. */
+/* Column-axis remove controls. Pinned to the frame's top-right so they stay
+   put on a table wide enough to scroll, and each sits in the band of the header
+   row it would drop. */
 .columnControls {
   position: absolute;
-  top: 1px;
-  right: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+  top: 0;
+  right: 0;
+  z-index: 6;
+  pointer-events: none;
 }
 
 .columnControls > button {
-  position: static;
+  position: absolute;
+  right: 3px;
+  pointer-events: auto;
 }

@@ -601,26 +601,6 @@ export function App() {
               onViewChange={setEdited}
               onDisplayChange={setEditedDisplay}
             />
-            {(edited || editedDisplay) && (
-              <button
-                onClick={() => {
-                  setEdited(null);
-                  setEditedDisplay(null);
-                }}
-                style={{
-                  marginTop: 10,
-                  padding: '5px 10px',
-                  borderRadius: 6,
-                  border: '1px solid var(--btn-border)',
-                  background: 'var(--btn-bg)',
-                  color: 'var(--btn-fg)',
-                  cursor: 'pointer',
-                  fontSize: 12,
-                }}
-              >
-                Reset to the example
-              </button>
-            )}
           </div>
         )}
       </div>
@@ -647,6 +627,27 @@ export function App() {
         >
           {editing ? 'Done editing' : 'Edit'}
         </button>
+        {editing && (
+          <button
+            disabled={!edited && !editedDisplay}
+            onClick={() => {
+              setEdited(null);
+              setEditedDisplay(null);
+            }}
+            style={{
+              padding: '4px 10px',
+              borderRadius: 6,
+              border: '1px solid var(--btn-border)',
+              background: 'var(--btn-bg)',
+              color: 'var(--btn-fg)',
+              cursor: edited || editedDisplay ? 'pointer' : 'default',
+              opacity: edited || editedDisplay ? 1 : 0.45,
+              fontSize: 12,
+            }}
+          >
+            Reset to the example
+          </button>
+        )}
         <span style={{ color: 'var(--page-muted)', fontSize: 12 }}>
           {rowCount.toLocaleString()} source rows · press{' '}
           <kbd

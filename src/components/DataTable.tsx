@@ -92,11 +92,13 @@ function RemoveField({
   onRemove,
   linked = false,
   onLink,
+  style,
 }: {
   title: string;
   onRemove: () => void;
   linked?: boolean;
   onLink?: (on: boolean) => void;
+  style?: CSSProperties;
 }) {
   return (
     <button
@@ -104,6 +106,7 @@ function RemoveField({
       title={title}
       aria-label={title}
       data-linked={linked || undefined}
+      style={style}
       onMouseEnter={() => onLink?.(true)}
       onMouseLeave={() => onLink?.(false)}
       className={cls(styles.removeField, linked && styles.removeFieldLinked)}
@@ -704,11 +707,7 @@ export function DataTable({
   }, [removeHover, leaves, spec]);
 
   const totalCols = rowLevels.length + leaves.length + editCols;
-  const wrapperCls = cls(
-    styles.wrapper,
-    frameless && styles.frameless,
-    className,
-  );
+  const frameCls = cls(styles.frame, frameless && styles.frameless, className);
 
   // Footer content lines (column footers first, then the source summary).
   const footerLines = summary
@@ -744,311 +743,316 @@ export function DataTable({
   }
 
   return (
-    <div
-      ref={scrollRef}
-      className={wrapperCls}
-      data-theme={theme === 'auto' ? undefined : theme}
-      style={{ maxHeight: height }}
-      onMouseLeave={() => setHover(null)}
-    >
-      <table
-        className={styles.table}
-        style={{ width: totalWidth + (pendingAt !== null ? pendingW : 0) }}
-      >
-        <colgroup>
-          {indexCols(
-            rowLevels.length,
-            pendingAt,
-            (i) => (
-              <col key={`i${i}`} style={{ width: indexW[i] }} />
-            ),
-            () => (
-              <col key="pending" style={{ width: pendingW }} />
-            ),
-          )}
-          {leafW.map((w, i) => (
-            <col
-              key={`l${i}`}
-              style={{
-                width: w + gapAfter[i]! + (i === 0 ? bodyLeadGap : 0),
-              }}
+    <div className={frameCls} data-theme={theme === 'auto' ? undefined : theme}>
+      {/* Pinned to the frame, so a wide table can scroll under them. Each sits
+          in the band of the header row it would remove. */}
+      {editable && spec && spec.columns.length > 0 && (
+        <div className={styles.columnControls}>
+          {spec.columns.map((field, level) => (
+            <RemoveField
+              key={field}
+              title={`Remove the ${field} column field`}
+              style={{ top: level * HEADER_H + 5 }}
+              linked={tintHeaderRow === level}
+              onLink={(on) =>
+                setRemoveHover(on ? { kind: 'column', level } : null)
+              }
+              onRemove={() =>
+                onViewChange?.(removeField(spec, 'columns', level))
+              }
             />
           ))}
-        </colgroup>
-
-        <thead
-          onMouseOver={() => setHover(null)}
-          onMouseLeave={() => !adding && setHoverInsert(null)}
+        </div>
+      )}
+      <div
+        ref={scrollRef}
+        className={styles.wrapper}
+        style={{ maxHeight: height }}
+        onMouseLeave={() => setHover(null)}
+      >
+        <table
+          className={styles.table}
+          style={{ width: totalWidth + (pendingAt !== null ? pendingW : 0) }}
         >
-          {headerRows.map((hrow, level) => (
-            <tr key={level} style={{ height: HEADER_H }}>
-              {level === 0 &&
-                indexCols(
-                  rowLevels.length,
-                  pendingAt,
-                  (i) => {
-                    const lvl = rowLevels[i]!;
-                    const active =
-                      sort?.key.kind === 'index' && sort.key.level === i;
-                    return (
-                      <th
-                        key={`ih${i}`}
-                        rowSpan={depth}
-                        className={cls(
-                          styles.corner,
-                          styles.rowHeaderCell,
-                          styles.indexTint,
-                          sortable && styles.sortable,
-                          tintLevel === i && styles.removeTint,
-                        )}
-                        style={{
-                          top: 0,
-                          left: editLeftOffset[i],
-                          ...(i === 0
-                            ? {}
-                            : { borderLeft: '1px solid var(--pv-border)' }),
-                        }}
-                        onMouseMove={(e) => edgeInsert(e, i)}
-                        onClick={() => cycleSort({ kind: 'index', level: i })}
-                      >
-                        <span
-                          className={styles.dragHandle}
-                          {...dragProps({ zone: 'rows', index: i })}
+          <colgroup>
+            {indexCols(
+              rowLevels.length,
+              pendingAt,
+              (i) => (
+                <col key={`i${i}`} style={{ width: indexW[i] }} />
+              ),
+              () => (
+                <col key="pending" style={{ width: pendingW }} />
+              ),
+            )}
+            {leafW.map((w, i) => (
+              <col
+                key={`l${i}`}
+                style={{
+                  width: w + gapAfter[i]! + (i === 0 ? bodyLeadGap : 0),
+                }}
+              />
+            ))}
+          </colgroup>
+
+          <thead
+            onMouseOver={() => setHover(null)}
+            onMouseLeave={() => !adding && setHoverInsert(null)}
+          >
+            {headerRows.map((hrow, level) => (
+              <tr key={level} style={{ height: HEADER_H }}>
+                {level === 0 &&
+                  indexCols(
+                    rowLevels.length,
+                    pendingAt,
+                    (i) => {
+                      const lvl = rowLevels[i]!;
+                      const active =
+                        sort?.key.kind === 'index' && sort.key.level === i;
+                      return (
+                        <th
+                          key={`ih${i}`}
+                          rowSpan={depth}
+                          className={cls(
+                            styles.corner,
+                            styles.rowHeaderCell,
+                            styles.indexTint,
+                            sortable && styles.sortable,
+                            tintLevel === i && styles.removeTint,
+                          )}
+                          style={{
+                            top: 0,
+                            left: editLeftOffset[i],
+                            ...(i === 0
+                              ? {}
+                              : { borderLeft: '1px solid var(--pv-border)' }),
+                          }}
+                          onMouseMove={(e) => edgeInsert(e, i)}
+                          onClick={() => cycleSort({ kind: 'index', level: i })}
                         >
-                          {lvl}
-                        </span>
-                        {sortArrow(active)}
-                        {editable && spec && i === rowLevels.length - 1 && (
-                          <span className={styles.columnControls}>
-                            {spec.columns.map((field, level) => (
-                              <RemoveField
-                                key={field}
-                                title={`Remove the ${field} column field`}
-                                linked={tintHeaderRow === level}
-                                onLink={(on) =>
-                                  setRemoveHover(
-                                    on ? { kind: 'column', level } : null,
-                                  )
-                                }
-                                onRemove={() =>
-                                  onViewChange?.(
-                                    removeField(spec, 'columns', level),
-                                  )
-                                }
-                              />
-                            ))}
+                          <span
+                            className={styles.dragHandle}
+                            {...dragProps({ zone: 'rows', index: i })}
+                          >
+                            {lvl}
                           </span>
-                        )}
-                        {editable && spec && (
+                          {sortArrow(active)}
+                          {editable && spec && (
+                            <RemoveField
+                              title={`Remove the ${lvl} row field`}
+                              onLink={(on) =>
+                                setRemoveHover(
+                                  on ? { kind: 'row', level: i } : null,
+                                )
+                              }
+                              onRemove={() =>
+                                onViewChange?.(removeField(spec, 'rows', i))
+                              }
+                            />
+                          )}
+                        </th>
+                      );
+                    },
+                    () => (
+                      <th
+                        key="pending"
+                        rowSpan={depth}
+                        className={`${styles.corner} ${styles.rowHeaderCell} ${styles.indexTint} ${styles.editCell}`}
+                        style={{ top: 0, left: pendingLeft }}
+                      >
+                        <button
+                          type="button"
+                          title="Add a row field here"
+                          aria-label="Add a row field here"
+                          aria-expanded={adding}
+                          className={cls(
+                            styles.addField,
+                            adding && styles.addFieldOpen,
+                          )}
+                          onClick={() => setAddingAt(pendingAt)}
+                        >
+                          +
+                        </button>
+                        {adding && (
                           <RemoveField
-                            title={`Remove the ${lvl} row field`}
-                            onLink={(on) =>
-                              setRemoveHover(
-                                on ? { kind: 'row', level: i } : null,
-                              )
-                            }
-                            onRemove={() =>
-                              onViewChange?.(removeField(spec, 'rows', i))
-                            }
+                            title="Stop adding a row field"
+                            onRemove={() => {
+                              setAddingAt(null);
+                              setHoverInsert(null);
+                            }}
                           />
                         )}
                       </th>
-                    );
-                  },
-                  () => (
+                    ),
+                  )}
+                {hrow.map((hc, ci) => {
+                  const isLeafCol = hc.leafStart === hc.leafEnd;
+                  const measure = measureAt(hc);
+                  const active =
+                    isLeafCol &&
+                    sort?.key.kind === 'leaf' &&
+                    sort.key.index === hc.leafStart;
+                  return (
                     <th
-                      key="pending"
-                      rowSpan={depth}
-                      className={`${styles.corner} ${styles.rowHeaderCell} ${styles.indexTint} ${styles.editCell}`}
-                      style={{ top: 0, left: pendingLeft }}
+                      key={ci}
+                      colSpan={hc.colSpan}
+                      rowSpan={hc.rowSpan}
+                      className={cls(
+                        leafHeaderCls(hc, isLeafCol),
+                        ((isLeafCol && tintLeaves?.has(hc.leafStart)) ||
+                          tintHeaderRow === level) &&
+                          styles.removeTint,
+                      )}
+                      style={{
+                        top: level * HEADER_H,
+                        ...edgeGapStyle(
+                          hc.leafStart,
+                          hc.leafEnd,
+                          gapAfter,
+                          bodyLeadGap,
+                        ),
+                      }}
+                      onClick={
+                        isLeafCol
+                          ? () =>
+                              cycleSort({ kind: 'leaf', index: hc.leafStart })
+                          : undefined
+                      }
                     >
-                      <button
-                        type="button"
-                        title="Add a row field here"
-                        aria-label="Add a row field here"
-                        aria-expanded={adding}
-                        className={cls(
-                          styles.addField,
-                          adding && styles.addFieldOpen,
-                        )}
-                        onClick={() => setAddingAt(pendingAt)}
-                      >
-                        +
-                      </button>
-                      {adding && (
+                      {measure !== undefined ? (
+                        <span
+                          className={styles.dragHandle}
+                          {...dragProps({ zone: 'values', index: measure })}
+                        >
+                          {hc.label}
+                        </span>
+                      ) : (
+                        hc.label
+                      )}
+                      {sortArrow(active)}
+                      {measure !== undefined && (
                         <RemoveField
-                          title="Stop adding a row field"
-                          onRemove={() => {
-                            setAddingAt(null);
-                            setHoverInsert(null);
-                          }}
+                          title={`Remove the ${hc.label} measure`}
+                          linked={linkedMeasure === measure}
+                          onLink={(on) =>
+                            setRemoveHover(
+                              on ? { kind: 'measure', index: measure } : null,
+                            )
+                          }
+                          onRemove={() =>
+                            onViewChange?.(removeValue(view, measure))
+                          }
                         />
                       )}
                     </th>
-                  ),
-                )}
-              {hrow.map((hc, ci) => {
-                const isLeafCol = hc.leafStart === hc.leafEnd;
-                const measure = measureAt(hc);
-                const active =
-                  isLeafCol &&
-                  sort?.key.kind === 'leaf' &&
-                  sort.key.index === hc.leafStart;
-                return (
-                  <th
-                    key={ci}
-                    colSpan={hc.colSpan}
-                    rowSpan={hc.rowSpan}
-                    className={cls(
-                      leafHeaderCls(hc, isLeafCol),
-                      ((isLeafCol && tintLeaves?.has(hc.leafStart)) ||
-                        tintHeaderRow === level) &&
-                        styles.removeTint,
-                    )}
-                    style={{
-                      top: level * HEADER_H,
-                      ...edgeGapStyle(
-                        hc.leafStart,
-                        hc.leafEnd,
-                        gapAfter,
-                        bodyLeadGap,
-                      ),
-                    }}
-                    onClick={
-                      isLeafCol
-                        ? () => cycleSort({ kind: 'leaf', index: hc.leafStart })
-                        : undefined
-                    }
-                  >
-                    {measure !== undefined ? (
-                      <span
-                        className={styles.dragHandle}
-                        {...dragProps({ zone: 'values', index: measure })}
-                      >
-                        {hc.label}
-                      </span>
-                    ) : (
-                      hc.label
-                    )}
-                    {sortArrow(active)}
-                    {measure !== undefined && (
-                      <RemoveField
-                        title={`Remove the ${hc.label} measure`}
-                        linked={linkedMeasure === measure}
-                        onLink={(on) =>
-                          setRemoveHover(
-                            on ? { kind: 'measure', index: measure } : null,
-                          )
-                        }
-                        onRemove={() =>
-                          onViewChange?.(removeValue(view, measure))
-                        }
-                      />
-                    )}
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
-          {/* One contiguous rule under the whole header (spans the gaps). */}
-          {!hideRules && (
-            <tr aria-hidden="true">
-              <td
-                colSpan={totalCols}
-                className={styles.headerRule}
-                style={{ top: depth * HEADER_H }}
-              />
-            </tr>
-          )}
-        </thead>
-
-        <tbody className={styles.body}>
-          {paddingTop > 0 && (
-            <tr className={styles.spacer} style={{ height: paddingTop }}>
-              <td colSpan={totalCols} />
-            </tr>
-          )}
-          {items.map((item) => {
-            const row = rows[item.index]!;
-            const prev = item.index > 0 ? rows[item.index - 1] : undefined;
-            const next =
-              item.index < rows.length - 1 ? rows[item.index + 1] : undefined;
-            return (
-              <Row
-                key={item.index}
-                rowIndex={item.index}
-                row={row}
-                prevPath={grouped ? prev?.path : undefined}
-                nextPath={grouped ? next?.path : undefined}
-                grouped={grouped}
-                rowLevels={rowLevels}
-                memberFormats={rowMemberFormats}
-                leaves={leaves}
-                frame={frame}
-                leftOffset={leftOffset}
-                gapAfter={gapAfter}
-                bodyLeadGap={bodyLeadGap}
-                indexColumns={indexColumns}
-                extraTop={extraTop[item.index] ?? 0}
-                zebra={zebra}
-                pendingAt={pendingAt}
-                tintLevel={tintLevel}
-                tintLeaves={tintLeaves}
-                addEntry={adding ? addEntries[item.index] : undefined}
-                onAdd={commitAdd}
-                hover={hover}
-                hoverPath={hover ? rows[hover.row]?.path : undefined}
-                onHover={setHover}
-              />
-            );
-          })}
-          {paddingBottom > 0 && (
-            <tr className={styles.spacer} style={{ height: paddingBottom }}>
-              <td colSpan={totalCols} />
-            </tr>
-          )}
-        </tbody>
-
-        {(footerLines.length > 0 || editable) && (
-          <tfoot>
-            {/* Lineless: a small background gap; otherwise a contiguous
-                accountant-style double line directly against the data. */}
-            <tr aria-hidden="true">
-              <td
-                colSpan={totalCols}
-                className={hideRules ? styles.footSpace : styles.footDouble}
-                style={{ position: 'sticky', bottom: footerBottom, zIndex: 4 }}
-                // Leaving the body into the footer drops the body-row hover.
-                onMouseEnter={() => setHover({ row: -1, leaf: -1 })}
-              />
-            </tr>
-            {footerLines.map((fr, fi) => (
-              <FooterRow
-                key={`f${fi}`}
-                label={fr.label}
-                cells={fr.cells}
-                leaves={leaves}
-                frame={frame}
-                rowLevels={rowLevels}
-                gapAfter={gapAfter}
-                bodyLeadGap={bodyLeadGap}
-                bottom={(footerLines.length - 1 - fi) * ROW_HEIGHT}
-                leftOffset={leftOffset}
-                extraIndexCols={editCols}
-                tintLeaves={tintLeaves}
-                onRemove={
-                  editable
-                    ? fi < footerRows.length
-                      ? () => onDisplayChange?.(removeFooterRow(display, fi))
-                      : () => onViewChange?.(setShowSummary(view, false))
-                    : undefined
-                }
-                onHover={setHover}
-              />
+                  );
+                })}
+              </tr>
             ))}
-          </tfoot>
-        )}
-      </table>
+            {/* One contiguous rule under the whole header (spans the gaps). */}
+            {!hideRules && (
+              <tr aria-hidden="true">
+                <td
+                  colSpan={totalCols}
+                  className={styles.headerRule}
+                  style={{ top: depth * HEADER_H }}
+                />
+              </tr>
+            )}
+          </thead>
+
+          <tbody className={styles.body}>
+            {paddingTop > 0 && (
+              <tr className={styles.spacer} style={{ height: paddingTop }}>
+                <td colSpan={totalCols} />
+              </tr>
+            )}
+            {items.map((item) => {
+              const row = rows[item.index]!;
+              const prev = item.index > 0 ? rows[item.index - 1] : undefined;
+              const next =
+                item.index < rows.length - 1 ? rows[item.index + 1] : undefined;
+              return (
+                <Row
+                  key={item.index}
+                  rowIndex={item.index}
+                  row={row}
+                  prevPath={grouped ? prev?.path : undefined}
+                  nextPath={grouped ? next?.path : undefined}
+                  grouped={grouped}
+                  rowLevels={rowLevels}
+                  memberFormats={rowMemberFormats}
+                  leaves={leaves}
+                  frame={frame}
+                  leftOffset={leftOffset}
+                  gapAfter={gapAfter}
+                  bodyLeadGap={bodyLeadGap}
+                  indexColumns={indexColumns}
+                  extraTop={extraTop[item.index] ?? 0}
+                  zebra={zebra}
+                  pendingAt={pendingAt}
+                  tintLevel={tintLevel}
+                  tintLeaves={tintLeaves}
+                  addEntry={adding ? addEntries[item.index] : undefined}
+                  onAdd={commitAdd}
+                  hover={hover}
+                  hoverPath={hover ? rows[hover.row]?.path : undefined}
+                  onHover={setHover}
+                />
+              );
+            })}
+            {paddingBottom > 0 && (
+              <tr className={styles.spacer} style={{ height: paddingBottom }}>
+                <td colSpan={totalCols} />
+              </tr>
+            )}
+          </tbody>
+
+          {(footerLines.length > 0 || editable) && (
+            <tfoot>
+              {/* Lineless: a small background gap; otherwise a contiguous
+                accountant-style double line directly against the data. */}
+              <tr aria-hidden="true">
+                <td
+                  colSpan={totalCols}
+                  className={hideRules ? styles.footSpace : styles.footDouble}
+                  style={{
+                    position: 'sticky',
+                    bottom: footerBottom,
+                    zIndex: 4,
+                  }}
+                  // Leaving the body into the footer drops the body-row hover.
+                  onMouseEnter={() => setHover({ row: -1, leaf: -1 })}
+                />
+              </tr>
+              {footerLines.map((fr, fi) => (
+                <FooterRow
+                  key={`f${fi}`}
+                  label={fr.label}
+                  cells={fr.cells}
+                  leaves={leaves}
+                  frame={frame}
+                  rowLevels={rowLevels}
+                  gapAfter={gapAfter}
+                  bodyLeadGap={bodyLeadGap}
+                  bottom={(footerLines.length - 1 - fi) * ROW_HEIGHT}
+                  leftOffset={leftOffset}
+                  extraIndexCols={editCols}
+                  tintLeaves={tintLeaves}
+                  onRemove={
+                    editable
+                      ? fi < footerRows.length
+                        ? () => onDisplayChange?.(removeFooterRow(display, fi))
+                        : () => onViewChange?.(setShowSummary(view, false))
+                      : undefined
+                  }
+                  onHover={setHover}
+                />
+              ))}
+            </tfoot>
+          )}
+        </table>
+      </div>
     </div>
   );
 }
