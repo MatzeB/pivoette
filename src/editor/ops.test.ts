@@ -4,6 +4,7 @@ import {
   addFooterRow,
   addValue,
   moveField,
+  moveFooterRow,
   moveValue,
   removeField,
   removeFooterRow,
@@ -223,5 +224,33 @@ describe('inserting a field at a position', () => {
     expect(p(addField(base, 'rows', 'month')).rows.at(-1)).toBe('month');
     expect(p(addField(base, 'rows', 'month', 99)).rows.at(-1)).toBe('month');
     expect(p(addField(base, 'rows', 'month', -3)).rows[0]).toBe('month');
+  });
+});
+
+describe('reordering footer rows', () => {
+  const display = {
+    footer: [
+      { label: 'avg', agg: 'mean' },
+      { label: 'median', agg: 'median' },
+      { label: 'sum', agg: 'sum' },
+    ],
+  };
+
+  it('moves a row and clamps out-of-range targets', () => {
+    expect(moveFooterRow(display, 2, 0).footer?.map((f) => f.agg)).toEqual([
+      'sum',
+      'mean',
+      'median',
+    ]);
+    expect(moveFooterRow(display, 0, 9).footer?.map((f) => f.agg)).toEqual([
+      'median',
+      'sum',
+      'mean',
+    ]);
+  });
+
+  it('is a no-op for a position that is not there', () => {
+    expect(moveFooterRow(display, 7, 0)).toBe(display);
+    expect(moveFooterRow({}, 0, 1)).toEqual({});
   });
 });

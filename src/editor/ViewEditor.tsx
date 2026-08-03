@@ -14,6 +14,7 @@ import type { DataTableDisplay } from '../components/DataTable';
 import type { DataFrame } from '../data/types';
 import {
   moveField,
+  moveFooterRow,
   moveValue,
   removeField,
   removeFooterRow,
@@ -95,7 +96,7 @@ function Section({
 
 /** What is being dragged: which list, and its position in it. */
 interface DragRef {
-  list: FieldZone | 'values';
+  list: FieldZone | 'values' | 'footer';
   index: number;
 }
 
@@ -139,6 +140,11 @@ export function ViewEditor({
     if (from.list === 'values' || to.list === 'values') {
       if (from.list !== to.list) return;
       onViewChange(moveValue(view, from.index, to.index));
+      return;
+    }
+    if (from.list === 'footer' || to.list === 'footer') {
+      if (from.list !== to.list || !display || !onDisplayChange) return;
+      onDisplayChange(moveFooterRow(display, from.index, to.index));
       return;
     }
     onViewChange(
@@ -242,6 +248,8 @@ export function ViewEditor({
             <Row
               key={`${f.agg}${i}`}
               label={f.label}
+              drag={dragProps({ list: 'footer', index: i })}
+              over={isOver({ list: 'footer', index: i })}
               onRemove={() => onDisplayChange(removeFooterRow(display, i))}
             />
           ))}

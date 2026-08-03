@@ -933,3 +933,87 @@ describe('<DataTable> column level drag', () => {
     expect(next!.columns).toEqual(['size']);
   });
 });
+
+describe('<DataTable> computed columns and footer order', () => {
+  const data = [{ a: 'x', n: 2 }];
+  const view: PivotSpec = {
+    rows: ['a'],
+    columns: [],
+    showSummary: true,
+    values: [{ id: 'm', field: 'n', agg: 'sum', label: 'm' }],
+    computed: [{ id: 'twice', label: 'Twice', compute: 'm * 2' }],
+  };
+  const display: DataTableDisplay = {
+    footer: [
+      { label: 'avg', agg: 'mean' },
+      { label: 'sum', agg: 'sum' },
+    ],
+  };
+
+  function fire(el: HTMLElement, type: string) {
+    const e = new Event(type, { bubbles: true, cancelable: true });
+    Object.defineProperty(e, 'dataTransfer', {
+      value: { effectAllowed: '', setData: () => {}, getData: () => '' },
+    });
+    el.dispatchEvent(e);
+  }
+
+  async function mount(
+    onView: (v: ViewSpec) => void = () => {},
+    onDisplay: (d: DataTableDisplay) => void = () => {},
+  ) {
+    return render(
+      <DataTable
+        data={data}
+        view={view}
+        editing
+        onViewChange={onView}
+        onDisplayChange={onDisplay}
+        display={display}
+      />,
+    );
+  }
+
+  it('offers a remove control on a derived column', async () => {
+    // Derived columns are their own list, so a measure's control cannot
+    // reach them.
+    let next: PivotSpec | undefined;
+    const el = await mount((v) => (next = v as PivotSpec));
+    const x = el.querySelector<HTMLButtonElement>(
+      'button[aria-label="Remove the Twice column"]',
+    )!;
+    expect(x).toBeTruthy();
+    await act(async () => x.click());
+    expect(next!.computed).toEqual([]);
+    expect(next!.values).toHaveLength(1);
+  });
+
+  it('makes only the listed footer rows draggable', async () => {
+    const el = await mount();
+    const rows = [...el.querySelectorAll<HTMLElement>('tfoot tr')];
+    // The rule row and the grand total have no position in `display.footer`.
+    expect(rows.map((r) => r.getAttribute('draggable'))).toEqual([
+      null,
+      'true',
+      'true',
+      null,
+    ]);
+  });
+
+  it('reorders footer rows by dragging', async () => {
+    let d: DataTableDisplay | undefined;
+    const el = await mount(
+      () => {},
+      (x) => (d = x),
+    );
+    const rows = [
+      ...el.querySelectorAll<HTMLElement>('tfoot tr[draggable="true"]'),
+    ];
+    await act(async () => {
+      fire(rows[1]!, 'dragstart');
+      fire(rows[0]!, 'dragover');
+      fire(rows[0]!, 'drop');
+    });
+    expect(d!.footer!.map((f) => f.agg)).toEqual(['sum', 'mean']);
+  });
+});

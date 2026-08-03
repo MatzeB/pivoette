@@ -171,6 +171,14 @@ export function moveValue(spec: ViewSpec, from: number, to: number): ViewSpec {
   return { ...p, values: insertAt(rest, at, value) };
 }
 
+/** Derived columns are a separate list from the measures. */
+export function removeComputed(spec: ViewSpec, index: number): ViewSpec {
+  const p = pivot(spec);
+  const computed = p?.computed;
+  if (!p || !computed || index < 0 || index >= computed.length) return spec;
+  return { ...p, computed: removeAt(computed, index) };
+}
+
 /** The grand-total row is part of the view, not of `display.footer`. */
 export function setShowSummary(spec: ViewSpec, on: boolean): ViewSpec {
   const p = pivot(spec);
@@ -188,6 +196,19 @@ export function addFooterRow(
     ...display,
     footer: [...(display.footer ?? []), { label: agg, agg }],
   };
+}
+
+export function moveFooterRow(
+  display: DataTableDisplay,
+  from: number,
+  to: number,
+): DataTableDisplay {
+  const footer = display.footer ?? [];
+  const row = footer[from];
+  if (!row) return display;
+  const rest = removeAt(footer, from);
+  const at = Math.min(Math.max(to, 0), rest.length);
+  return { ...display, footer: insertAt(rest, at, row) };
 }
 
 export function removeFooterRow(

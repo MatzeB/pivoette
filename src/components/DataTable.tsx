@@ -20,7 +20,9 @@ import { isFlat } from '../pivot/spec';
 import {
   addField,
   moveField,
+  moveFooterRow,
   moveValue,
+  removeComputed,
   removeField,
   removeFooterRow,
   removeValue,
@@ -142,8 +144,11 @@ function indexCols(
   return out;
 }
 
-/** A draggable handle's identity: an axis field, or a measure. */
-type DragRef = FieldRef | { zone: 'values'; index: number };
+/** A draggable handle's identity: an axis field, a measure, or a footer row. */
+type DragRef =
+  | FieldRef
+  | { zone: 'values'; index: number }
+  | { zone: 'footer'; index: number };
 
 /** A line in the opened pending column: a field, the Custom placeholder, or a note. */
 type AddEntry =
@@ -634,6 +639,7 @@ export function DataTable({
     | { kind: 'row'; level: number }
     | { kind: 'column'; level: number }
     | { kind: 'measure'; index: number }
+    | { kind: 'computed'; index: number }
     | null
   >(null);
   const linkedMeasure =
@@ -680,6 +686,11 @@ export function DataTable({
     if (from.zone === 'values' || to.zone === 'values') {
       if (from.zone !== to.zone) return;
       onViewChange?.(moveValue(view, from.index, to.index));
+      return;
+    }
+    if (from.zone === 'footer' || to.zone === 'footer') {
+      if (from.zone !== to.zone) return;
+      onDisplayChange?.(moveFooterRow(display, from.index, to.index));
       return;
     }
     onViewChange?.(moveField(spec, from as FieldRef, to as FieldRef));
@@ -730,12 +741,17 @@ export function DataTable({
   const tintHeaderRow =
     removeHover?.kind === 'column' ? removeHover.level : undefined;
   const tintLeaves = useMemo(() => {
-    if (removeHover?.kind !== 'measure') return undefined;
-    const id = spec?.values[removeHover.index]?.id;
+    const measured = removeHover?.kind === 'measure';
+    const derived = removeHover?.kind === 'computed';
+    if (!measured && !derived) return undefined;
+    const id = measured
+      ? spec?.values[removeHover.index]?.id
+      : spec?.computed?.[removeHover!.index]?.id;
     if (id === undefined) return undefined;
     const set = new Set<number>();
     leaves.forEach((leaf, i) => {
-      if (leaf.column.value?.id === id) set.add(i);
+      const own = measured ? leaf.column.value?.id : leaf.column.def?.id;
+      if (own === id) set.add(i);
     });
     return set;
   }, [removeHover, leaves, spec]);
@@ -761,6 +777,20 @@ export function DataTable({
     const value = leaves[hc.leafStart]?.column.value;
     if (!value || hc.label !== (value.label ?? value.id)) return undefined;
     const at = spec.values.findIndex((v) => v.id === value.id);
+    return at >= 0 ? at : undefined;
+  }
+
+  /**
+   * The derived column a header cell removes, if any. Derived columns are their
+   * own list, so they need their own control — a measure's `×` cannot reach
+   * them.
+   */
+  function computedAt(hc: HCell): number | undefined {
+    if (!editable || !spec?.computed?.length) return undefined;
+    if (hc.leafStart !== hc.leafEnd) return undefined;
+    const def = leaves[hc.leafStart]?.column.def;
+    if (!def || hc.label !== (def.label ?? def.id)) return undefined;
+    const at = spec.computed.findIndex((c) => c.id === def.id);
     return at >= 0 ? at : undefined;
   }
 
@@ -920,6 +950,7 @@ export function DataTable({
                   const isLeafCol = hc.leafStart === hc.leafEnd;
                   const measure = measureAt(hc);
                   /** Column levels come first in the header; the rest is measures. */
+                  const derived = computedAt(hc);
                   const columnLevel =
                     editable && spec && level < spec.columns.length
                       ? level
@@ -985,6 +1016,23 @@ export function DataTable({
                           }
                           onRemove={() =>
                             onViewChange?.(removeValue(view, measure))
+                          }
+                        />
+                      )}
+                      {derived !== undefined && (
+                        <RemoveField
+                          title={`Remove the ${hc.label} column`}
+                          linked={
+                            removeHover?.kind === 'computed' &&
+                            removeHover.index === derived
+                          }
+                          onLink={(on) =>
+                            setRemoveHover(
+                              on ? { kind: 'computed', index: derived } : null,
+                            )
+                          }
+                          onRemove={() =>
+                            onViewChange?.(removeComputed(view, derived))
                           }
                         />
                       )}
@@ -1083,6 +1131,16 @@ export function DataTable({
                   leftOffset={leftOffset}
                   extraIndexCols={editCols}
                   tintLeaves={tintLeaves}
+                  drag={
+                    // The grand total is not part of `display.footer`, so it
+                    // has no position in the list to move.
+                    editable && fi < footerRows.length
+                      ? {
+                          ...dragSource({ zone: 'footer', index: fi }),
+                          ...dropTarget({ zone: 'footer', index: fi }),
+                        }
+                      : undefined
+                  }
                   onRemove={
                     editable
                       ? fi < footerRows.length
@@ -1302,6 +1360,8 @@ interface FooterRowProps {
   /** The label cell spans the pending column too, when one is showing. */
   extraIndexCols: number;
   tintLeaves?: Set<number>;
+  /** Drag handle props; absent for the grand total, which is not in the list. */
+  drag?: Record<string, unknown>;
   /** Present in edit mode: drops this line from the footer. */
   onRemove?: () => void;
   onHover: (h: { row: number; leaf: number } | null) => void;
@@ -1319,6 +1379,7 @@ function FooterRow({
   leftOffset,
   extraIndexCols,
   tintLeaves,
+  drag,
   onRemove,
   onHover,
 }: FooterRowProps) {
@@ -1327,7 +1388,7 @@ function FooterRow({
   // state is local rather than shared with the column tints.
   const [removing, setRemoving] = useState(false);
   return (
-    <tr className={styles.summaryRow} style={{ height: ROW_HEIGHT }}>
+    <tr className={styles.summaryRow} style={{ height: ROW_HEIGHT }} {...drag}>
       {rowLevels.length > 0 && (
         <th
           className={cls(
