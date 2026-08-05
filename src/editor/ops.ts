@@ -12,10 +12,10 @@
 import type { DataTableDisplay } from '../components/DataTable';
 import { isFlat } from '../pivot/spec';
 import { clampIndex } from '../util';
-import type { PivotSpec, SortSpec, ValueSpec, ViewSpec } from '../pivot/spec';
+import type { AxisField, ColumnDef, ViewSpec } from '../pivot/spec';
 
 /** The two axes a grouping field can live on. */
-export type FieldZone = 'rows' | 'columns';
+export type FieldZone = 'pivotRows' | 'pivotColumns';
 
 /** A field's position: which axis, and where in that axis's order. */
 export interface FieldRef {
@@ -23,10 +23,10 @@ export interface FieldRef {
   index: number;
 }
 
-/** Anything draggable: an axis field, a measure, or a footer row. */
+/** Anything draggable: an axis field, a displayed column, or a footer row. */
 export type DragRef =
   | FieldRef
-  | { zone: 'values'; index: number }
+  | { zone: 'columns'; index: number }
   | { zone: 'footer'; index: number };
 
 /** Where a drop can send its changes. */
@@ -39,18 +39,18 @@ export interface DropTargets {
 
 /**
  * What a drop means, in one place: axis fields are interchangeable — dropping
- * one on the other axis pivots it — while measures and footer rows only
+ * one on the other axis pivots it — while columns and footer rows only
  * reorder among their own kind, since neither means anything on an axis.
  *
- * The table and the side panel both route through here so their drag
+ * The table and the editor panel both route through here so their drag
  * behaviour cannot drift apart.
  */
 export function applyDrop(from: DragRef, to: DragRef, at: DropTargets): void {
   if (from.zone === to.zone && from.index === to.index) return;
 
-  if (from.zone === 'values' || to.zone === 'values') {
+  if (from.zone === 'columns' || to.zone === 'columns') {
     if (from.zone !== to.zone) return;
-    at.onViewChange?.(moveValue(at.view, from.index, to.index));
+    at.onViewChange?.(moveColumn(at.view, from.index, to.index));
     return;
   }
   if (from.zone === 'footer' || to.zone === 'footer') {
@@ -82,29 +82,14 @@ function replaceAt<T>(arr: readonly T[], i: number, value: T): T[] {
   return out;
 }
 
-function pivot(spec: ViewSpec): PivotSpec | undefined {
+/** The spec, if it is a pivot — the only kind these operations apply to. */
+function pivot(spec: ViewSpec): ViewSpec | undefined {
   return isFlat(spec) ? undefined : spec;
 }
 
-/** Drop sort entries naming a field that is no longer on that axis. */
-function pruneSort(
-  sort: SortSpec[] | undefined,
-  fields: string[],
-): SortSpec[] | undefined {
-  if (!sort) return undefined;
-  const kept = sort.filter((s) => fields.includes(s.field));
-  return kept.length === sort.length ? sort : kept;
-}
-
-function withZone(
-  spec: PivotSpec,
-  zone: FieldZone,
-  fields: string[],
-): ViewSpec {
-  const next: PivotSpec = { ...spec, [zone]: fields };
-  next.rowSort = pruneSort(spec.rowSort, next.rows);
-  next.columnSort = pruneSort(spec.columnSort, next.columns);
-  return next;
+/** An axis, defaulted. A pivot may legitimately declare only one of the two. */
+function axis(spec: ViewSpec, zone: FieldZone): AxisField[] {
+  return spec[zone] ?? [];
 }
 
 /**
@@ -118,10 +103,12 @@ export function addField(
   at?: number,
 ): ViewSpec {
   const p = pivot(spec);
-  if (!p || p.rows.includes(field) || p.columns.includes(field)) return spec;
-  const fields = p[zone];
+  if (!p) return spec;
+  const onAxis = (z: FieldZone) => axis(p, z).some((a) => a.field === field);
+  if (onAxis('pivotRows') || onAxis('pivotColumns')) return spec;
+  const fields = axis(p, zone);
   const index = clampIndex(at ?? fields.length, fields.length);
-  return withZone(p, zone, insertAt(fields, index, field));
+  return { ...p, [zone]: insertAt(fields, index, { field }) };
 }
 
 export function removeField(
@@ -130,13 +117,18 @@ export function removeField(
   index: number,
 ): ViewSpec {
   const p = pivot(spec);
-  if (!p || index < 0 || index >= p[zone].length) return spec;
-  return withZone(p, zone, removeAt(p[zone], index));
+  const fields = p ? axis(p, zone) : [];
+  if (!p || index < 0 || index >= fields.length) return spec;
+  return { ...p, [zone]: removeAt(fields, index) };
 }
 
 /**
  * Move a field within an axis, or between them. The cross-axis case is what
  * makes the table an actual pivot rather than a fixed layout.
+ *
+ * The whole `AxisField` moves, so the level's label and sort follow the field
+ * it describes — which is the point of them living on the entry rather than in
+ * a map the move would have to fix up.
  */
 export function moveField(
   spec: ViewSpec,
@@ -145,79 +137,86 @@ export function moveField(
 ): ViewSpec {
   const p = pivot(spec);
   if (!p) return spec;
-  const field = p[from.zone][from.index];
+  const field = axis(p, from.zone)[from.index];
   if (field === undefined) return spec;
 
   if (from.zone === to.zone) {
     // Clamp: dropping past the end appends.
-    return withZone(p, from.zone, reorder(p[from.zone], from.index, to.index));
+    return {
+      ...p,
+      [from.zone]: reorder(axis(p, from.zone), from.index, to.index),
+    };
   }
 
-  const source = removeAt(p[from.zone], from.index);
-  const target = p[to.zone];
+  const target = axis(p, to.zone);
   const at = clampIndex(to.index, target.length);
-  const moved: PivotSpec = {
+  return {
     ...p,
-    [from.zone]: source,
+    [from.zone]: removeAt(axis(p, from.zone), from.index),
     [to.zone]: insertAt(target, at, field),
   };
-  return withZone(moved, from.zone, moved[from.zone]);
 }
 
-// --- measures ---------------------------------------------------------------
+// --- columns ----------------------------------------------------------------
+
+/** How many of the view's columns aggregate. */
+function measureCount(spec: ViewSpec): number {
+  return spec.columns.filter((c) => c.agg !== undefined).length;
+}
 
 /** A stable, readable id for a new measure, unique within the spec. */
-function valueId(values: ValueSpec[], field: string, agg: string): string {
+function columnId(columns: ColumnDef[], field: string, agg: string): string {
   const base = `${agg}_${field}`;
-  if (!values.some((v) => v.id === base)) return base;
+  if (!columns.some((c) => c.id === base)) return base;
   let n = 2;
-  while (values.some((v) => v.id === `${base}_${n}`)) n++;
+  while (columns.some((c) => c.id === `${base}_${n}`)) n++;
   return `${base}_${n}`;
 }
 
-export function addValue(spec: ViewSpec, field: string, agg: string): ViewSpec {
+export function addColumn(
+  spec: ViewSpec,
+  field: string,
+  agg: string,
+): ViewSpec {
   const p = pivot(spec);
   if (!p) return spec;
-  const id = valueId(p.values, field, agg);
+  const id = columnId(p.columns, field, agg);
   return {
     ...p,
-    values: [...p.values, { id, field, agg, label: `${agg} ${field}` }],
+    columns: [
+      ...p.columns,
+      { id, source: field, agg, label: `${agg} ${field}` },
+    ],
   };
 }
 
-/** Removing the last measure would leave nothing to aggregate, so it is a no-op. */
-export function removeValue(spec: ViewSpec, index: number): ViewSpec {
+/**
+ * Remove a column. Removing the last measure would leave a pivot with nothing
+ * to aggregate, so that one case is a no-op.
+ */
+export function removeColumn(spec: ViewSpec, index: number): ViewSpec {
   const p = pivot(spec);
-  if (!p || p.values.length <= 1 || index < 0 || index >= p.values.length) {
-    return spec;
-  }
-  return { ...p, values: removeAt(p.values, index) };
+  const column = p?.columns[index];
+  if (!p || !column) return spec;
+  if (column.agg !== undefined && measureCount(p) <= 1) return spec;
+  return { ...p, columns: removeAt(p.columns, index) };
 }
 
-export function setValueAgg(
+export function setColumnAgg(
   spec: ViewSpec,
   index: number,
   agg: string,
 ): ViewSpec {
   const p = pivot(spec);
-  const value = p?.values[index];
-  if (!p || !value) return spec;
-  return { ...p, values: replaceAt(p.values, index, { ...value, agg }) };
+  const column = p?.columns[index];
+  if (!p || !column) return spec;
+  return { ...p, columns: replaceAt(p.columns, index, { ...column, agg }) };
 }
 
-export function moveValue(spec: ViewSpec, from: number, to: number): ViewSpec {
+export function moveColumn(spec: ViewSpec, from: number, to: number): ViewSpec {
   const p = pivot(spec);
-  const value = p?.values[from];
-  if (!p || !value) return spec;
-  return { ...p, values: reorder(p.values, from, to) };
-}
-
-/** Derived columns are a separate list from the measures. */
-export function removeComputed(spec: ViewSpec, index: number): ViewSpec {
-  const p = pivot(spec);
-  const computed = p?.computed;
-  if (!p || !computed || index < 0 || index >= computed.length) return spec;
-  return { ...p, computed: removeAt(computed, index) };
+  if (!p || !p.columns[from]) return spec;
+  return { ...p, columns: reorder(p.columns, from, to) };
 }
 
 /** The grand-total row is part of the view, not of `display.footer`. */

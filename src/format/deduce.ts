@@ -119,3 +119,36 @@ export function columnFormat(
   if (format.options?.locale !== undefined) return format;
   return { ...format, options: { ...format.options, locale } };
 }
+
+/**
+ * `columnFormat` for a column that chose its own scale.
+ *
+ * Rescaling changes which side of the decimal point the numbers land on, so a
+ * fixed fraction-digit count is the wrong question — a column that deduced
+ * nothing wants significant digits instead of `Intl`'s three fraction digits.
+ * An explicit precision was a decision about the *displayed* number, so it
+ * still holds and is left alone.
+ */
+export function scaledColumnFormat(
+  src: { format?: FormatSpec; inheritUnitFormat?: boolean },
+  meta: ColumnMeta,
+  locale: string | undefined,
+): FormatSpec | undefined {
+  const format = columnFormat(src, meta, locale);
+  if (format && ('fn' in format || 'expression' in format)) return format;
+  const options = format && 'fnName' in format ? format.options : undefined;
+  if (
+    options?.decimals !== undefined ||
+    options?.significantDigits !== undefined
+  ) {
+    return format;
+  }
+  return {
+    fnName: format && 'fnName' in format ? format.fnName : Format.Number,
+    options: {
+      ...options,
+      significantDigits: 3,
+      ...(locale ? { locale } : {}),
+    },
+  };
+}

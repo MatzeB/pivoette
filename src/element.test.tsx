@@ -38,9 +38,9 @@ const good = {
   data: { csv: 'region,quarter,revenue\nEU,Q1,120\nUS,Q1,340\n' },
   meta: { revenue: { kind: ['price'], unit: ['dollar'] } },
   view: {
-    rows: ['region'],
-    columns: ['quarter'],
-    values: [{ id: 'rev', field: 'revenue', agg: 'sum', label: 'Revenue' }],
+    pivotRows: [{ field: 'region' }],
+    pivotColumns: [{ field: 'quarter' }],
+    columns: [{ id: 'rev', source: 'revenue', agg: 'sum', label: 'Revenue' }],
   },
 };
 
@@ -65,9 +65,8 @@ describe('<pivoette-table>', () => {
     const el = await mount({
       data: { csv: 'a\n1\n' },
       view: {
-        rows: ['nope'],
-        columns: [],
-        values: [{ id: 'x', field: 'ghost', agg: 'bogus' }],
+        pivotRows: [{ field: 'nope' }],
+        columns: [{ id: 'x', source: 'ghost', agg: 'bogus' }],
       },
     });
     const text = el.shadowRoot!.textContent ?? '';

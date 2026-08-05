@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { fromDataset, fromRows } from './import';
 import { deriveColumns } from './derive';
 import { computeView } from '../pivot/engine';
-import type { PivotSpec } from '../pivot/spec';
+import type { ViewSpec } from '../pivot/spec';
 
 const rows = [
   { at: '2026-03-14T23:00:00Z', who: 'a', n: 1 }, // Sat UTC / Sun Tokyo
@@ -69,14 +69,13 @@ describe('deriveColumns', () => {
 });
 
 describe('computeView prepares its own frame', () => {
-  const spec: PivotSpec = {
+  const spec: ViewSpec = {
     derive: { wd: { compute: 'weekday(at)', meta: { kind: ['weekday'] } } },
     timeZone: 'UTC',
     locale: 'en-US',
-    rows: ['who'],
-    columns: ['wd'],
-    columnSort: [{ field: 'wd', direction: 'asc' }],
-    values: [{ id: 's', field: 'n', agg: 'sum', label: 'n' }],
+    pivotRows: [{ field: 'who' }],
+    pivotColumns: [{ field: 'wd', sort: 'asc' }],
+    columns: [{ id: 's', source: 'n', agg: 'sum', label: 'n' }],
   };
 
   it('applies derive and meta without the component', () => {
@@ -103,8 +102,8 @@ describe('computeView prepares its own frame', () => {
   it('formats row members too, and leaves plain fields alone', () => {
     const res = computeView(fromDataset(dataset), {
       ...spec,
-      rows: ['wd'],
-      columns: [],
+      pivotRows: [{ field: 'wd' }],
+      pivotColumns: [],
     });
     expect(res.rowMemberFormats[0]!(1)).toBe('Mon');
     // `who` has no deduced format, so it stays as-is.

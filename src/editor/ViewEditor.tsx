@@ -1,6 +1,6 @@
 /**
- * A panel showing a `ViewSpec`'s field lists directly: rows, columns, values,
- * and the footer aggregations.
+ * A panel showing a `ViewSpec`'s lists directly: the two pivot axes, the
+ * displayed columns, and the footer aggregations.
  *
  * Adding happens in the table — every list has its own `+` on the grid — so
  * this is for seeing what is configured, reordering it, and removing it. All of
@@ -9,15 +9,15 @@
 import { useRef, useState } from 'react';
 import { aggregationIds } from '../pivot/aggregations';
 import { isFlat } from '../pivot/spec';
-import type { ViewSpec } from '../pivot/spec';
+import type { AxisField, ViewSpec } from '../pivot/spec';
 import type { DataTableDisplay } from '../components/DataTable';
 import type { DataFrame } from '../data/types';
 import {
   applyDrop,
+  removeColumn,
   removeField,
   removeFooterRow,
-  removeValue,
-  setValueAgg,
+  setColumnAgg,
 } from './ops';
 import type { DragRef, FieldZone } from './ops';
 import styles from './ViewEditor.module.css';
@@ -29,6 +29,11 @@ export interface ViewEditorProps {
   onDisplayChange?: (next: DataTableDisplay) => void;
   /** Supplies display names; falls back to raw field names without it. */
   frame?: DataFrame;
+  /**
+   * Palette, matching `DataTable`'s own prop. The panel renders outside the
+   * table, so it cannot inherit the table's — pass the same value to both.
+   */
+  theme?: 'auto' | 'light' | 'dark';
   className?: string;
 }
 
@@ -98,14 +103,20 @@ export function ViewEditor({
   display,
   onDisplayChange,
   frame,
+  theme = 'auto',
   className,
 }: ViewEditorProps) {
   const dragged = useRef<DragRef | null>(null);
   const [over, setOver] = useState<DragRef | null>(null);
+  // `auto` is the absence of the attribute: the palette's media query decides.
+  const paletteFor = theme === 'auto' ? undefined : theme;
 
   if (isFlat(view)) {
     return (
-      <div className={`${styles.root} ${className ?? ''}`}>
+      <div
+        className={`${styles.root} ${className ?? ''}`}
+        data-theme={paletteFor}
+      >
         <Section title="Columns" empty={view.columns.length === 0}>
           {view.columns.map((def) => (
             <Row key={def.id} label={def.label ?? def.id} />
@@ -120,6 +131,8 @@ export function ViewEditor({
 
   const name = (field: string) =>
     frame?.columnByName.get(field)?.meta.displayName ?? field;
+  /** Same precedence the engine gives an axis level's header. */
+  const axisName = (a: AxisField) => a.label ?? name(a.field);
 
   function drop(to: DragRef) {
     const from = dragged.current;
@@ -161,13 +174,13 @@ export function ViewEditor({
     over?.zone === ref.zone && over.index === ref.index;
 
   const zone = (title: string, key: FieldZone) => {
-    const fields = view[key];
+    const fields = view[key] ?? [];
     return (
       <Section title={title} empty={fields.length === 0}>
-        {fields.map((field, i) => (
+        {fields.map((axisField, i) => (
           <Row
-            key={field}
-            label={name(field)}
+            key={axisField.field}
+            label={axisName(axisField)}
             drag={dragProps({ zone: key, index: i })}
             over={isOver({ zone: key, index: i })}
             onRemove={() => onViewChange(removeField(view, key, i))}
@@ -180,38 +193,45 @@ export function ViewEditor({
   const footer = display?.footer ?? [];
 
   return (
-    <div className={`${styles.root} ${className ?? ''}`}>
-      {zone('Rows', 'rows')}
-      {zone('Columns', 'columns')}
+    <div
+      className={`${styles.root} ${className ?? ''}`}
+      data-theme={paletteFor}
+    >
+      {zone('Pivot rows', 'pivotRows')}
+      {zone('Pivot columns', 'pivotColumns')}
 
-      <Section title="Values" empty={view.values.length === 0}>
-        {view.values.map((value, i) => (
+      <Section title="Columns" empty={view.columns.length === 0}>
+        {view.columns.map((column, i) => (
           <Row
-            key={value.id}
-            label={value.label ?? name(value.field)}
-            drag={dragProps({ zone: 'values', index: i })}
-            over={isOver({ zone: 'values', index: i })}
-            // The last measure cannot go: there would be nothing to aggregate.
+            key={column.id}
+            label={column.label ?? name(column.source ?? column.id)}
+            drag={dragProps({ zone: 'columns', index: i })}
+            over={isOver({ zone: 'columns', index: i })}
+            // `removeColumn` refuses to drop the last measure, since there
+            // would be nothing left to aggregate; offer no control for it.
             onRemove={
-              view.values.length > 1
-                ? () => onViewChange(removeValue(view, i))
-                : undefined
+              removeColumn(view, i) === view
+                ? undefined
+                : () => onViewChange(removeColumn(view, i))
             }
           >
-            <select
-              className={styles.agg}
-              value={value.agg}
-              title="Aggregation"
-              onChange={(e) =>
-                onViewChange(setValueAgg(view, i, e.target.value))
-              }
-            >
-              {aggregationIds().map((id) => (
-                <option key={id} value={id}>
-                  {id}
-                </option>
-              ))}
-            </select>
+            {/* Only a measure has an aggregation to choose. */}
+            {column.agg !== undefined && (
+              <select
+                className={styles.agg}
+                value={column.agg}
+                title="Aggregation"
+                onChange={(e) =>
+                  onViewChange(setColumnAgg(view, i, e.target.value))
+                }
+              >
+                {aggregationIds().map((id) => (
+                  <option key={id} value={id}>
+                    {id}
+                  </option>
+                ))}
+              </select>
+            )}
           </Row>
         ))}
       </Section>

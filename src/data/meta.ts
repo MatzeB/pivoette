@@ -158,6 +158,89 @@ export const SCALE_SHORT: Record<string, string> = {
   percent: '%',
 };
 
+/**
+ * What each scale is worth numerically.
+ *
+ * This is data *about* scales, not a licence to transform: nothing in this file
+ * multiplies anything, and the invariant at the top of the file stands. The
+ * table exists so the format layer can answer "how far is `nano` from `micro`"
+ * when a column asks to choose its own scale — see `format/ladders.ts`.
+ *
+ * Deliberately narrower than `SCALE_SHORT`: a scale may be labelled without
+ * being measurable. An unregistered scale still composes into a header, it just
+ * cannot auto-scale. Note `centi` and `percent` share a magnitude and differ
+ * only in symbol, which is why scales are named rather than written as numbers.
+ */
+const SCALE_FACTOR: Record<string, number> = {
+  femto: 1e-15,
+  pico: 1e-12,
+  nano: 1e-9,
+  micro: 1e-6,
+  milli: 1e-3,
+  centi: 1e-2,
+  deci: 1e-1,
+  kilo: 1e3,
+  mega: 1e6,
+  giga: 1e9,
+  tera: 1e12,
+  peta: 1e15,
+  kibi: 2 ** 10,
+  mebi: 2 ** 20,
+  gibi: 2 ** 30,
+  tebi: 2 ** 40,
+  pebi: 2 ** 50,
+  percent: 1e-2,
+};
+
+/**
+ * Units that are a multiple of a base unit rather than a scaled one. Time is
+ * the reason this exists: `minute` is 60 seconds, which no SI prefix expresses.
+ */
+const UNIT_FACTOR: Record<string, number> = {
+  minute: 60,
+  hour: 3600,
+  day: 86400,
+  week: 604800,
+};
+
+export function scaleFactor(scale: string): number | undefined {
+  return SCALE_FACTOR[scale];
+}
+
+export function unitFactor(unit: string): number | undefined {
+  return UNIT_FACTOR[unit];
+}
+
+/**
+ * What one stored value is worth in the column's base unit, from its declared
+ * `unit` and `scale` — so a column of nanoseconds reports `1e-9`. This is the
+ * point a ladder scales *from*; the declared scale is the starting position,
+ * never something the ladder overrides.
+ *
+ * `undefined` means "not measurable", and the caller must then decline to
+ * auto-scale rather than guess: a compound or multi-factor unit (`tok/s`, `m²`)
+ * has no single magnitude, and an unregistered scale name has no magnitude at
+ * all — both remain perfectly good *labels*.
+ */
+export function storedMagnitude(
+  meta: ColumnMeta | undefined,
+): number | undefined {
+  if (!meta) return undefined;
+  const factors = Math.max(meta.unit?.length ?? 0, meta.scale?.length ?? 0);
+  if (factors > 1) return undefined;
+
+  const unit = meta.unit?.[0] ?? null;
+  const scale = meta.scale?.[0] ?? null;
+  if (unit === null && scale === null) return undefined;
+  // An inverted factor (`1/second`) is a rate, not a magnitude to scale along.
+  if (unit?.startsWith('1/')) return undefined;
+
+  const scalePart = scale === null ? 1 : SCALE_FACTOR[scale];
+  if (scalePart === undefined) return undefined;
+  const unitPart = unit === null ? 1 : (UNIT_FACTOR[unit] ?? 1);
+  return scalePart * unitPart;
+}
+
 // --- normalization ----------------------------------------------------------
 
 /**

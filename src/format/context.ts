@@ -6,7 +6,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { DataFrame } from '../data/types';
 import type { ColumnMeta } from '../data/meta';
-import type { ColumnDef, ValueSpec } from '../pivot/spec';
+import type { ColumnDef, ComputedMember } from '../pivot/spec';
 
 export type Align = 'left' | 'right' | 'center';
 
@@ -15,10 +15,9 @@ export interface ResolvedColumn {
   id: string;
   label: string;
   align: Align;
-  /** Present for flat / computed columns. */
-  def?: ColumnDef;
-  /** Present for measure columns. */
-  value?: ValueSpec;
+  /** The spec entry this column came from: a `view.columns` entry, or an axis
+   * level's computed member. */
+  def?: ColumnDef | ComputedMember;
   /** Metadata of the source field behind this column (flat source / measure). */
   meta?: ColumnMeta;
   /** Metadata of every source field, for composite multi-field columns. */

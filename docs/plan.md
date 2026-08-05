@@ -50,7 +50,7 @@ pivoette/
 │   │   ├── frame.ts                    # DataFrame factory + columnByName lookup
 │   │   └── import.ts                   # fromRows(rows: Record<string, unknown>[]) + type inference
 │   ├── pivot/
-│   │   ├── spec.ts                     # ViewSpec = PivotSpec | TableSpec, ValueSpec, ColumnDef, CellRef, SortSpec
+│   │   ├── spec.ts                     # ViewSpec, AxisField, ColumnDef, CellRef, SortSpec, isFlat
 │   │   ├── aggregations.ts             # aggregation registry
 │   │   ├── result.ts                   # engine output: multi-level index trees, cells, summaryRow
 │   │   └── engine.ts                   # computeView(frame, spec) -> result (pivot + flat + derived cols)
@@ -91,71 +91,62 @@ interface DataFrame {
   keys → `null`. Plain arrays keep null handling trivial; the `DataFrame` interface hides representation so
   a TypedArray/validity-bitmap backend can be swapped in later without touching the engine.
 
-## Pivot spec (`pivot/spec.ts`)
+## View spec (`pivot/spec.ts`)
+
+> The authoritative types live in `src/pivot/spec.ts`, which carries a doc comment per key.
+> The sketch below is the shape and the reasoning; it is not kept in sync field-for-field.
 
 ```ts
-interface SortSpec {
+interface AxisField {
   field: string;
-  direction: 'asc' | 'desc';
-} // by index label value
-interface ValueSpec {
-  id: string;
-  field: string;
-  agg: string;
-  label?: string;
-  format?: FormatSpec;
-  style?: StyleSpec;
-  expression?: string;
-  summaryAgg?: string;
-} // footer override; default = agg
+  label?: string; // header text for this level
+  sort?: 'asc' | 'desc'; // priority is level order, outermost first
+  meta?: ColumnMetaInput; // layered over the data's
+}
 
-// Generic measure placement: which axis the measures level lives on, and at what depth among
-// that axis's field levels. Default = innermost column level.
-interface ValuePlacement {
-  axis: 'columns' | 'rows';
-  level?: number;
-} // level omitted = innermost
-
-interface PivotSpec {
-  rows: string[];
-  columns: string[];
-  values: ValueSpec[];
-  valuePlacement?: ValuePlacement; // default { axis: 'columns' }  (innermost)
-  rowSort?: SortSpec[];
-  columnSort?: SortSpec[];
+interface ViewSpec {
+  pivotRows?: AxisField[];
+  pivotColumns?: AxisField[];
+  columns: ColumnDef[]; // every displayed column, in order
+  columnAxis?: 'pivotRows' | 'pivotColumns'; // where the columns level sits; default pivotColumns
+  sort?: SortSpec[]; // flat only: sort rows by column id
   showSummary?: boolean; // grand-total footer row
   emptyDisplay?: string; // placeholder for empty groups (default "")
-  labels?: Record<string, string>; // data field name -> display header label
 }
 ```
 
-`rows`/`columns` are ordered field names → multi-level (pandas-style) indexes. `values` are the measures.
-The measures form their own level, inserted per `valuePlacement` (default: innermost column level; a UI
-toggle moves it to rows, and the generic `level` allows any depth). Filtering is intentionally out of scope
-(assume data is pre-filtered upstream).
+`pivotRows`/`pivotColumns` are ordered field lists → multi-level (pandas-style) indexes. The columns that
+aggregate form their own level, inserted per `columnAxis` (default: innermost column level; a UI toggle
+moves it to rows). Filtering is intentionally out of scope (assume data is pre-filtered upstream).
 
-**Display labels are decoupled from data field names.** `labels` maps a data field (e.g. `app`) to its
-header text (e.g. `Application`); it applies to row/column field headers in both modes (`TableSpec` carries
-the same `labels?`). Per-item overrides still win: `ValueSpec.label` (measures), `ColumnDef.label`
-(flat/computed columns — required for computed ones like `Δ%`, which have no source field). Optional value
-relabeling (e.g. member `before` → `Before`) can layer on later via the same map keyed by field+value.
+**One vocabulary, not two.** There is no `mode` flag and no separate measure type: `columns` is always the
+displayed columns, and a view is a pivot exactly when it groups or aggregates (see `isFlat`). What a column
+_is_ follows from which key it sets — `agg` for a measure, `compute` for a derived column, neither for a
+plain projection — so the flat and pivot arms of the spec collapsed into one.
+
+**Display labels are decoupled from data field names**, and each label sits on the thing it names:
+`AxisField.label` for an index level, `ColumnDef.label` for a displayed column (required for computed ones
+like `Δ%`, which have no source field). Keeping them there rather than in a map keyed by field name is what
+stops a label from naming a field that is not on the axis — and lets the label and sort travel with a field
+when the editor pivots it to the other axis.
 
 ### Flat/detail mode & display columns (`pivot/spec.ts`, `display/`)
 
 Not every table is aggregated — the stock-ticker example (below) is a **flat detail table**: one output row
-per source row, no grouping. Flat mode = pivot with no `rows`/`columns` grouping; it shares the entire
-downstream **display-column layer** with pivot output. A displayed column:
+per source row, no grouping. Flat is not a mode but the absence of one: a view with no axes and no `agg`.
+It shares the entire downstream **display-column layer** with pivot output. A displayed column:
 
 ```ts
 interface CellRef {
   colPath: string[];
-  value: string;
-} // address a pivot leaf: column-key path + measure id
+  column: string;
+} // address a pivot leaf: column-key path + column id
 
 interface ColumnDef {
   id: string;
   label?: string;
-  source?: string; // flat: a data field; pivot: a measure/value id
+  source?: string; // the data field this column reads; defaults to `id`
+  agg?: string; // aggregate `source` over each group — this is what makes a measure
   compute?: string; // JS expr over named `inputs` (+ row context) -> value
   inputs?: Record<string, CellRef | string>; // alias -> cell ref (pivot) or column id (flat);
   //   flat mode defaults to sibling columns by id, so `inputs` is optional there
@@ -167,41 +158,60 @@ interface ColumnDef {
     fields: string[];
     sortKey: string; // field/expr used to SORT this column (e.g. the description)
   };
-  sort?: SortSpec;
   place?: 'append' | { after: string }; // where a derived column lands in the leaf order
-  repeatPer?: string[]; // pivot: repeat once per member of these column level(s);
-  //   `inputs.colPath`s are then relative to each group
 }
-
-interface TableSpec {
-  // flat mode
-  mode: 'flat';
-  columns: ColumnDef[]; // projection incl. computed & composite columns
-  sort?: SortSpec[];
-}
-type ViewSpec = PivotSpec | TableSpec; // the top-level configuration language
 ```
+
+A column that belongs to a _pivot level_ rather than to the innermost columns level is a
+`ComputedMember` on that `AxisField` instead — see "Computed members" below.
 
 **Computed columns, unified.** A computed column runs `compute` over named `inputs`:
 
 - **Flat mode** (ticker) — inputs default to sibling columns by id: win/loss `$` = `current - base`,
   win/loss `%` = `(current - base)/base`.
 - **Pivot mode** (before/after) — inputs are explicit **cell references** addressing leaves across the
-  column dimension: `inputs: { before: {colPath:['before'], value:'mean'}, after:{colPath:['after'],
-value:'mean'} }`, `compute: '(after - before)/before'`. The engine evaluates these **after** base cells
-  exist, appending them as extra leaf columns (`place`). `PivotSpec` gains an optional
-  `computed?: ColumnDef[]` for such derived columns.
-- **Per-group repetition** — a derived column may repeat once per member of a column level via
-  `repeatPer: string[]` (e.g. `['platform']`); its `inputs` `colPath`s are then **relative**, resolved by
-  prefixing the current group's path. So one Δ% definition yields a Δ% column inside _each_ platform group,
-  each referencing that platform's own before/after. `place: { after: 'after' }` positions it within the
-  group.
+  column dimension: `inputs: { before: {colPath:['before'], column:'mean'}, after:{colPath:['after'],
+column:'mean'} }`, `compute: '(after - before)/before'`. The engine evaluates these **after** base cells
+  exist, appending them as extra leaf columns (`place`). They sit in the same `columns` list as the
+  measures; `normalizeView` is what splits the two apart for the engine.
+- **Computed members** — a Δ% sitting beside `before` and `after` is not an innermost column at all: it is
+  an extra _member of the revision level_. It is declared there, as `AxisField.computed`, and its `inputs`
+  name sibling members (`{ member: 'before' }`) rather than paths. How often it repeats is then read off the
+  axis — once per distinct combination of the levels outside it — so one Δ% definition yields a Δ% inside
+  _each_ platform group, and moving `platform` to `pivotRows` leaves a single correct Δ% rather than a
+  dangling reference. `place: { after: 'after' }` positions it among the level's members. Omitting a ref's
+  `column` reads whichever measure the cell sits under, so the one expression covers every measure.
+  Supported on the innermost `pivotColumns` level: an outer level's synthetic member would have to produce
+  a subtree, and a row level would have to synthesize rows.
+
+## Scale ladders (`format/ladders.ts`)
+
+Presenting a measured number takes three decisions: _which_ magnitude to show it in, _converting_ it, and
+_labelling_ it. Conversion is `ColumnDef.factor`; labelling is `unit`/`scale` metadata through `unitLabels`.
+Choosing had no home, so a formatter that needed one (the old `duration` built-in) did all three privately —
+and its unit became characters inside a string that the placement toggles could not see or move.
+
+A **ladder** does only the choosing: an ordered list of rungs, each a magnitude in the column's base unit
+plus the `scale`/`unit` names that label it. `chooseStep` picks the rung that puts the column's median
+absolute value in `[1, 1000)`; the caller converts with the rung's factor and labels from its metadata,
+through the same path every other unit takes. Ladders are a registry (`si`, `duration`, `bytes` ship;
+`registerLadder` adds more), because time is not an SI ladder — `s → min → h` is 60×/3600×, no prefix at all.
+
+`SCALE_FACTOR` in `data/meta.ts` gives scale names their magnitudes. It is deliberately narrower than
+`SCALE_SHORT`: a scale may be labelled without being measurable, so an unregistered name still renders in a
+header and simply cannot auto-scale. Scales stay _names_ rather than numbers because a name carries the
+symbol too, and magnitudes collide where symbols do not — `centi` and `percent` are both 1e-2.
+
+Selection runs as one post-pass in `computeView`, since a scale is chosen from data and leaves are built
+before any cell exists. Leaves are grouped by `scalePool ?? id` — "one scale per column" is a pool of one,
+so there is no second code path — and only `leaf.format` is rewrapped: `Cell.value` stays in stored units,
+so sorting, styles and derived expressions keep meaning what they did.
 
 ## Aggregations (`pivot/aggregations.ts`)
 
 Registry of `{ id, label, reduce(values, type) }` where each reducer applies its own null policy (skipna by
 default, matching pandas). Ship: **sum, count, countDistinct, min, max, mean** (with `avg` alias),
-**median, std, variance, first, last, percentile (p25/p50/p75)**. Note `avg`≡`mean`. A `ValueSpec.expression`
+**median, std, variance, first, last, percentile (p25/p50/p75)**. Note `avg`≡`mean`. A `ColumnDef.expression`
 selects a **custom** aggregation: `compileExpression` builds a `Function` receiving the group's value array.
 
 ## Engine (`pivot/engine.ts`)
@@ -214,13 +224,13 @@ columns, formatting, and styling.
 
 1. For each row, compute a row-key tuple (from `spec.rows`) and column-key tuple (from `spec.columns`);
    group source row indices by (serialized rowKey → colKey).
-2. Collect distinct row/column keys; build ordered multi-level index trees, honoring `rowSort`/`columnSort`
+2. Collect distinct row/column keys; build ordered multi-level index trees, honoring each `AxisField.sort`
    (else first-seen order). Insert the **measures level** into the row or column index per
-   `valuePlacement` (default innermost column level), producing the final leaf-column order.
-3. For each (rowKey × colKey × valueSpec) run the aggregation over the source column's grouped values.
+   `columnAxis` (default innermost column level), producing the final leaf-column order.
+3. For each (rowKey × colKey × measure) run the aggregation over the source column's grouped values.
    Empty groups render as `spec.emptyDisplay`.
 4. **Summary footer** (when `showSummary`): compute a totals row **from source**, not from displayed
-   cells — mechanically a `rows: []` pivot over the same columns/values, so grand-total `mean`/`median`/
+   cells — mechanically a `pivotRows: []` pivot over the same columns, so grand-total `mean`/`median`/
    `countDistinct`/`std` are correct (each cell uses `valueSpec.summaryAgg ?? valueSpec.agg`).
 5. Emit `PivotResult` = `{ rowIndex, columnIndex, rows: [{ path, cells }], summaryRow? }` with header trees
    carrying span info for rowspan/colspan rendering.
@@ -320,7 +330,7 @@ the **before/after** generator emits _two_ outputs: the small `data.json` showca
 `stress.json` (~10k+ rows — many synthetic applications) used by a virtualization smoke test and an optional
 demo toggle. This exercises the perf path with on-theme data instead of a throwaway dataset.
 
-**1. Stock ticker (flat mode).** One row per symbol; `mode: 'flat'`. Columns:
+**1. Stock ticker (flat).** One row per symbol; no axes and no `agg`. Columns:
 
 - `asset` — **composite**: small preview image (URL) + text description in one cell; **sorts by the
   description text** (`composite.sortKey`).
@@ -339,8 +349,8 @@ This one example validates flat mode, composite columns with a distinct sort key
 
 - `rows: ['benchmark']`.
 - `columns: ['dataSize', 'architecture']` — level 1 `tiny|small|medium|large`, level 2 `x86|AArch64`.
-- `values: [mean, min, max, variance]` of `timeNs` → the innermost (3rd) column level via default
-  `valuePlacement`. Header tree ≈ 4 × 2 × 4 leaf columns.
+- `columns: [mean, min, max, variance]` of `timeNs` → the innermost (3rd) column level via default
+  `columnAxis`. Header tree ≈ 4 × 2 × 4 leaf columns.
 - **mean/min/max** formatted with the **`duration`** built-in (ns…h, 3 sig figs, right-aligned). The
   **variance** column is deliberately _not_ time-scaled (variance is in ns², not a duration) — it uses a
   plain `number` format with `prefix: '± '`. `showSummary` off (a grand-total across benchmarks isn't
@@ -353,16 +363,16 @@ placement, and the `duration` formatter — complementing the flat ticker (examp
 `{ app, platform, revision, timeNs }` where `platform ∈ {Intel, AMD, GPU}`, `revision ∈ {before, after}`.
 Config:
 
-- `rows: ['app']`, with `labels: { app: 'Application' }` — showing the header text differs from the data
+- `pivotRows: [{ field: 'app', label: 'Application' }]` — showing the header text differs from the data
   field name. (The `Δ%` computed column likewise carries an arbitrary `label`, since it has no source field.)
 - `columns: ['platform', 'revision']` — level 1 `Intel|AMD|GPU`, level 2 `before|after`.
-- `values: [mean]` of `timeNs` (base metric), `duration`-formatted.
-- `computed: [{ id:'delta', label:'Δ%', repeatPer:['platform'],
- inputs:{ before:{colPath:['before'],value:'mean'}, after:{colPath:['after'],value:'mean'} },
+- `columns: [mean]` of `timeNs` (base metric), `duration`-formatted.
+- on the `revision` level: `computed: [{ id:'delta', label:'Δ%',
+ inputs:{ before:{member:'before'}, after:{member:'after'} },
  compute:'(after - before)/before', place:{ after:'after' },
  format:{ name:'percent', options:{ signDisplay:'exceptZero' } },
  style:{ name:'signColors', options:{ negative:'green', positive:'red' } } }]` — so each platform group
-  shows **before · after · Δ%**, with Δ% referencing that platform's own cells (relative `colPath`).
+  shows **before · after · Δ%**, with Δ% referencing that platform's own cells.
 
 Note the **domain-inverted coloring**: for benchmark _time_, a negative delta (faster) is green and a
 positive delta (regression) is red — the opposite of the ticker's P/L — demonstrating why style is a
@@ -374,9 +384,9 @@ of deep columns. Source rows `{ team, project, model, inputTokens, outputTokens,
 one per usage record. Config:
 
 - `rows: ['team', 'project', 'model']` → **3-level nested row index**; `team`/`project` cells span their
-  children (rowspan). `labels: { team:'Team', project:'Project', model:'Model' }`.
+  children (rowspan), each `AxisField` carrying its own `label`.
 - `columns: []` → no column grouping, so the measures themselves become the columns.
-- `values: [sum(inputTokens) 'Input', sum(outputTokens) 'Output', sum(cachedTokens) 'Cached',
+- `columns: [sum(inputTokens) 'Input', sum(outputTokens) 'Output', sum(cachedTokens) 'Cached',
 sum(costUsd) 'Price']` — token sums use `number` with `compact` (K/M/B), right-aligned; Price uses
   `currency` USD.
 - `computed: [{ id:'total', label:'Total', compute:'input + output + cached',
@@ -385,18 +395,18 @@ sum(costUsd) 'Price']` — token sums use `number` with `compact` (K/M/B), right
 - `showSummary: true` → a **meaningful grand-total footer** (all sums additive, so the footer equals the
   column totals — the correct/simple case, complementing example 2's non-additive caveat).
 
-This is the anchor for **multi-level rows**: rowspan header rendering, per-level `rowSort`, and the natural
+This is the anchor for **multi-level rows**: rowspan header rendering, per-level sort, and the natural
 future home for inline per-level subtotals (per team / per project). It also re-uses compact-number and
-currency formatting and shows labels renaming every row field.
+currency formatting and shows every row level carrying its own label.
 
 ## Verification
 
 - **Unit (`pnpm test`)**: deterministic Vitest suites for `import` (type inference, nulls), each
   aggregation (incl. null policy, median/percentile/distinct), and `computePivot` (single- and multi-level
-  rows/columns, multiple values, measure placement columns↔rows, sorting) against a small fixed fixture with
+  axes, multiple measures, measure placement columns↔rows, sorting) against a small fixed fixture with
   hand-computed expected values. Include a **summary-footer correctness** test proving grand-total `mean` is
   computed from source (≠ mean-of-group-means) for unequal group sizes.
-  Add tests for **computed columns** (`plChange`/`plPercent` values), **composite sort** (asset column
+  Add tests for **computed columns** (`plChange`/`plPercent`), **composite sort** (asset column
   orders by description, not image URL), the **`duration` formatter** (boundary scaling: e.g. 999 ns →
   `999 ns`, 1_000 ns → `1.00 µs`, 1_500_000 ns → `1.50 ms`, 90e9 ns → `1.50 m`; 3-sig-fig rounding; `± `
   prefix), **per-group derived columns** (Δ% appears once per platform, each referencing that platform's

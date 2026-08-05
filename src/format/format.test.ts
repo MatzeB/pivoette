@@ -20,28 +20,6 @@ function ctx(value: unknown): CellCtx {
 const fmt = (spec: FormatSpec, value: unknown) =>
   resolveFormat(spec)(ctx(value));
 
-describe('duration formatter', () => {
-  it('auto-scales across ns / µs / ms / s / m with 3 sig figs', () => {
-    const d: FormatSpec = { fnName: 'duration' };
-    expect(fmt(d, 999)).toBe('999 ns');
-    expect(fmt(d, 1_000)).toBe('1.00 µs');
-    expect(fmt(d, 1_500_000)).toBe('1.50 ms');
-    expect(fmt(d, 2_000_000_000)).toBe('2.00 s');
-    expect(fmt(d, 90_000_000_000)).toBe('1.50 m'); // 90 s = 1.5 min
-    expect(fmt(d, 3_600_000_000_000)).toBe('1.00 h');
-  });
-
-  it('honors a prefix (e.g. ± spread)', () => {
-    expect(fmt({ fnName: 'duration', options: { prefix: '± ' } }, 5_000)).toBe(
-      '± 5.00 µs',
-    );
-  });
-
-  it('renders null as the empty display', () => {
-    expect(resolveFormat({ fnName: 'duration' }, '—')(ctx(null))).toBe('—');
-  });
-});
-
 describe('intl-backed formatters', () => {
   it('number with explicit + sign', () => {
     // Money is a plain 2-decimal number; the `$` is a unit label placed by the

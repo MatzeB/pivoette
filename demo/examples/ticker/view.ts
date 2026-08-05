@@ -20,7 +20,6 @@ const dollar = { kind: ['price'], unit: ['dollar'] };
  * the column id.
  */
 export const view: ViewSpec = {
-  mode: 'flat',
   meta: {
     symbol: { displayName: 'Symbol' },
     description: { displayName: 'Asset' },
