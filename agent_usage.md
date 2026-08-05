@@ -25,9 +25,9 @@ Only two fields are required: `data` and `view`.
     "csv": "region,quarter,revenue\nEU,Q1,120\nEU,Q2,150\nUS,Q1,340\nUS,Q2,310\n"
   },
   "view": {
-    "rows": ["region"],
-    "columns": ["quarter"],
-    "values": [{ "id": "rev", "field": "revenue", "agg": "sum" }]
+    "pivotRows": [{ "field": "region" }],
+    "pivotColumns": [{ "field": "quarter" }],
+    "columns": [{ "id": "rev", "source": "revenue", "agg": "sum" }]
   }
 }
 ```
@@ -37,8 +37,9 @@ Only two fields are required: `data` and `view`.
 | **EU** | 120 | 150 |
 | **US** | 340 | 310 |
 
-That is the whole model: `rows` and `columns` name fields to **group by**,
-`values` names fields to **aggregate**. Everything below is refinement.
+That is the whole model: `pivotRows` and `pivotColumns` name fields to
+**group by**, and `columns` is what gets displayed — here, aggregated.
+Everything below is refinement.
 
 ---
 
@@ -84,53 +85,31 @@ browser can cache the data separately.
 
 ---
 
-## 3. `view` — pivot mode
+## 3. `view` — columns, and the axes to pivot them over
+
+There is one vocabulary for both kinds of table. `columns` is always the list of
+displayed columns. `pivotRows` and `pivotColumns` are optional axes to group
+them over.
 
 ```jsonc
 {
-  "rows": ["author"], // group down the page; [] for no row grouping
-  "columns": ["weekday"], // group across the page; [] for no column grouping
-  "values": [
-    // at least one measure
-    { "id": "added", "field": "linesAdded", "agg": "sum", "label": "Added" },
+  "pivotRows": [{ "field": "author" }], // group down the page
+  "pivotColumns": [{ "field": "weekday", "sort": "asc" }], // group across
+  "columns": [
+    { "id": "added", "source": "linesAdded", "agg": "sum", "label": "Added" },
   ],
-  "rowSort": [{ "field": "added", "direction": "desc" }],
-  "columnSort": [{ "field": "weekday" }],
-  "showSummary": true, // grand total row/column
+  "showSummary": true, // grand total row
   "locale": "de-DE", // defaults to the reader's
   "timeZone": "Europe/Berlin", // defaults to "auto"
 }
 ```
 
-Nesting is by array order: `"rows": ["team", "author"]` puts authors inside
-teams.
-
-### Aggregations (`agg`)
-
-`sum` · `count` · `countDistinct` · `min` · `max` · `mean` (`avg`) · `variance` ·
-`std` · `median` · `p25` · `p50` · `p75` · `first` · `last`
-
-All but `count` and `countDistinct` need a **numeric** column.
-
-### `values` entries
-
-| Field        | Meaning                                                      |
-| ------------ | ------------------------------------------------------------ |
-| `id`         | Required, unique. Referenced by sorts and computed columns.  |
-| `field`      | Required. The column to aggregate.                           |
-| `agg`        | Required.                                                    |
-| `label`      | Header text. Defaults to a name derived from the field.      |
-| `factor`     | Multiply before formatting (see §5).                         |
-| `summaryAgg` | Aggregation for the footer, if it should differ from `agg`.  |
-| `format`     | `{ "options": { … } }` to tweak the deduced format (see §5). |
-
-### Flat mode
-
-For a plain table with no grouping, set `mode: "flat"` and list columns:
+**A view is a pivot if it groups or aggregates** — that is, if it declares
+`pivotRows`/`pivotColumns`, or any column has an `agg`. Otherwise it is flat:
+one output row per source row. There is no mode flag.
 
 ```json
 {
-  "mode": "flat",
   "columns": [
     { "id": "symbol" },
     { "id": "price", "label": "Last" },
@@ -140,7 +119,46 @@ For a plain table with no grouping, set `mode: "flat"` and list columns:
 }
 ```
 
-`source` defaults to `id`, so a plain projection is just `{ "id": "price" }`.
+That is a flat table: no axes, no `agg`. `source` defaults to `id`, so a plain
+projection is just `{ "id": "price" }`.
+
+Nesting is by array order: `"pivotRows": [{"field": "team"}, {"field":
+"author"}]` puts authors inside teams.
+
+### Axis entries (`pivotRows` / `pivotColumns`)
+
+| Field   | Meaning                                                           |
+| ------- | ----------------------------------------------------------------- |
+| `field` | Required. The column to group by.                                 |
+| `label` | Header text for the level. Defaults to the field's `displayName`. |
+| `sort`  | `"asc"` or `"desc"`. Priority is level order, outermost first.    |
+| `meta`  | Metadata for this field, layered over the data's (see §4).        |
+
+Without `sort`, a level keeps the order its members were first seen in.
+
+### Aggregations (`agg`)
+
+`sum` · `count` · `countDistinct` · `min` · `max` · `mean` (`avg`) · `variance` ·
+`std` · `median` · `p25` · `p50` · `p75` · `first` · `last`
+
+All but `count` and `countDistinct` need a **numeric** column.
+
+### `columns` entries
+
+Which of three keys a column sets is what the column _is_: `agg` makes it a
+measure, `compute` makes it derived (§6), neither makes it a plain projection.
+In a pivot every column needs one of the two — a bare projection means nothing
+once rows have been collapsed into groups.
+
+| Field        | Meaning                                                      |
+| ------------ | ------------------------------------------------------------ |
+| `id`         | Required, unique. Referenced by sorts and computed columns.  |
+| `source`     | The field to read. Defaults to `id`.                         |
+| `agg`        | Aggregate `source` over each group; makes this a measure.    |
+| `label`      | Header text. Defaults to a name derived from the field.      |
+| `factor`     | Multiply before formatting (see §5).                         |
+| `summaryAgg` | Aggregation for the footer, if it should differ from `agg`.  |
+| `format`     | `{ "options": { … } }` to tweak the deduced format (see §5). |
 
 ---
 
@@ -202,7 +220,8 @@ can be written as a bare string: `"unit": "byte"` means `["byte"]`.
 
 > **Units are labels. They never transform a number.** Declaring
 > `scale: ["mega"]` does not divide by a million — it says the values already
-> _are_ megabytes. To convert, use `factor` (§5).
+> _are_ megabytes. To convert, use `factor` (§5), or `autoScale` (§5) to have
+> the scale chosen from the data.
 
 ### Currencies
 
@@ -234,7 +253,7 @@ replacing it:
 ```json
 {
   "id": "mem",
-  "field": "rssBytes",
+  "source": "rssBytes",
   "agg": "max",
   "format": { "options": { "maximumFractionDigits": 0 } }
 }
@@ -249,7 +268,7 @@ displayed as `5.2%`:
 ```json
 {
   "id": "rate",
-  "field": "errorRate",
+  "source": "errorRate",
   "agg": "mean",
   "factor": 100,
   "meta": { "kind": ["percentage"], "scale": ["percent"] }
@@ -258,11 +277,75 @@ displayed as `5.2%`:
 
 `factor` is applied by the engine, so it holds for sorting and footers too.
 
+### `autoScale` — let the data pick the scale
+
+`factor` is a decision you make in advance. When the right scale depends on how
+big the numbers turn out to be, `autoScale` reads it off the data instead:
+nanoseconds display as `4.34 µs` without the spec saying so.
+
+```json
+{
+  "meta": {
+    "timeNs": { "kind": ["duration"], "unit": ["second"], "scale": ["nano"] }
+  },
+  "view": {
+    "pivotRows": [{ "field": "app" }],
+    "columns": [
+      { "id": "mean", "source": "timeNs", "agg": "mean", "autoScale": true }
+    ]
+  }
+}
+```
+
+The declared `scale` is the point it scales **from**, so a column must say what
+its numbers already are. The chosen scale is ordinary metadata, which is what
+makes it move with the unit placement (§7) like any other label.
+
+| Spelling                                          | Meaning                                                                                                                                                         |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `"autoScale": true`                               | Pick the ladder from `kind` — `duration`, `memory`, else `si`.                                                                                                  |
+| `"autoScale": "si"`                               | Name the ladder: `si`, `duration`, or `bytes`.                                                                                                                  |
+| `"autoScale": { "ladder": "si", "per": "value" }` | `per: "value"` lets each cell pick its own rung, the way `1.24 ms` and `117 ns` can sit in one column. Its label rides the value and cannot move to the header. |
+
+Only the display changes: the stored value is untouched, so sorting, styles and
+any expression over the value keep meaning what they did.
+
+**`scalePool`** makes related columns choose together, so a row cannot end up
+half in `ns` and half in `µs`:
+
+```json
+{
+  "columns": [
+    {
+      "id": "mean",
+      "source": "timeNs",
+      "agg": "mean",
+      "autoScale": true,
+      "scalePool": "times"
+    },
+    {
+      "id": "max",
+      "source": "timeNs",
+      "agg": "max",
+      "autoScale": true,
+      "scalePool": "times"
+    }
+  ]
+}
+```
+
+It defaults to the column's own `id` — a pool of one — so leaving it off is what
+gives each column its own scale.
+
+A column can only scale along a unit with a known magnitude. A compound unit
+(`tok/s`, `m²`) has none, and neither does an unregistered scale name — both are
+still perfectly good _labels_, they just cannot be a starting point.
+
 ---
 
 ## 6. `derive` — virtual columns
 
-Computed before grouping, so `rows`/`columns` may name them. Each is a JS
+Computed before grouping, so the pivot axes may name them. Each is a JS
 expression over the source fields.
 
 ```json
@@ -279,9 +362,9 @@ expression over the source fields.
       },
       "churn": { "compute": "linesAdded + linesRemoved" }
     },
-    "rows": ["author"],
-    "columns": ["weekday"],
-    "values": [{ "id": "churn", "field": "churn", "agg": "sum" }]
+    "pivotRows": [{ "field": "author" }],
+    "pivotColumns": [{ "field": "weekday" }],
+    "columns": [{ "id": "churn", "agg": "sum" }]
   }
 }
 ```
@@ -313,7 +396,7 @@ All optional, all with sensible defaults.
 | `rowGroupSpacing`  | `0`     | Px gap between row-index blocks                          |
 | `indexGap`         | `0`     | Px gap between index columns and data                    |
 | `highlightHeaders` | `true`  | Highlight the hovered cell's column header               |
-| `indexColumns`     | `0`     | Flat mode: leading columns tinted as an index            |
+| `indexColumns`     | `0`     | Flat view: leading columns tinted as an index            |
 
 Top-level siblings of `display`: `title`, `height` (number of px or a CSS
 length, default `420`), and `theme` (`"auto"` \| `"light"` \| `"dark"`).
@@ -344,11 +427,11 @@ Commit activity by author and weekday:
         "meta": { "kind": ["weekday"] }
       }
     },
-    "rows": ["author"],
-    "columns": ["weekday"],
-    "values": [
-      { "id": "added", "field": "linesAdded", "agg": "sum", "label": "+" },
-      { "id": "removed", "field": "linesRemoved", "agg": "sum", "label": "−" }
+    "pivotRows": [{ "field": "author", "sort": "asc" }],
+    "pivotColumns": [{ "field": "weekday" }],
+    "columns": [
+      { "id": "added", "source": "linesAdded", "agg": "sum", "label": "+" },
+      { "id": "removed", "source": "linesRemoved", "agg": "sum", "label": "−" }
     ],
     "showSummary": true
   },
@@ -367,11 +450,12 @@ Commit activity by author and weekday:
 
 Check each of these — they are the mistakes that actually happen:
 
-1. **Every name in `rows`, `columns`, and `values[].field` is a real column** —
+1. **Every `pivotRows`/`pivotColumns` `field` and every `columns[].source` is a
+   real column** —
    spelled as it appears in the CSV header, or defined in `derive`.
 2. **Aggregated fields are numeric.** If a column has any non-numeric value it
    is a string column, and only `count`/`countDistinct` will work on it.
-3. **`values[].id` values are unique.**
+3. **`columns[].id` values are unique.**
 4. **`data` has exactly one of `csv` / `rows` / `url`.**
 5. **You declared units instead of hand-writing formats.**
 6. **Grouping fields have few distinct values.** Grouping by a near-unique

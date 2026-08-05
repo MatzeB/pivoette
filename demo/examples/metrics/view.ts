@@ -8,7 +8,7 @@ import type { ViewSpec } from '../../../src';
  * labels are composed from the metadata and placed by the demo's unit toggles.
  */
 export const view: ViewSpec = {
-  mode: 'flat',
+  // No axes and no `agg`: this is a flat table, one row per source row.
   columns: [
     { id: 'host' },
     { id: 'region' },

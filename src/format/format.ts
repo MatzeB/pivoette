@@ -30,6 +30,14 @@ function numberFormat(options: Record<string, unknown>): Intl.NumberFormat {
       nfOpts.minimumFractionDigits = decimals;
       nfOpts.maximumFractionDigits = decimals;
     }
+    // Significant digits rather than fraction digits: what an auto-scaled
+    // column wants, since it does not know in advance which side of the
+    // decimal point its numbers will land on.
+    const sig = opt<number>(options, 'significantDigits');
+    if (sig != null) {
+      nfOpts.minimumSignificantDigits = sig;
+      nfOpts.maximumSignificantDigits = sig;
+    }
     if (opt<boolean>(options, 'compact')) nfOpts.notation = 'compact';
     const signDisplay = opt<Intl.NumberFormatOptions['signDisplay']>(
       options,
@@ -70,52 +78,6 @@ function intlBuiltin(base: Record<string, unknown>): FormatFactory {
 
 registry.set('number', intlBuiltin({}));
 registry.set('integer', intlBuiltin({ decimals: 0 }));
-
-// --- duration (SI-time) -----------------------------------------------------
-
-const DURATION_UNITS: { suffix: string; ns: number }[] = [
-  { suffix: 'ns', ns: 1 },
-  { suffix: 'µs', ns: 1e3 },
-  { suffix: 'ms', ns: 1e6 },
-  { suffix: 's', ns: 1e9 },
-  { suffix: 'm', ns: 60e9 },
-  { suffix: 'h', ns: 3600e9 },
-];
-
-const BASE_UNIT_NS: Record<string, number> = {
-  ns: 1,
-  us: 1e3,
-  µs: 1e3,
-  ms: 1e6,
-  s: 1e9,
-};
-
-/** Format a number to 3 significant figures without exponent notation. */
-function sig3(n: number): string {
-  if (n === 0) return '0';
-  const p = n.toPrecision(3);
-  return p.includes('e') ? String(Math.round(n)) : p;
-}
-
-registry.set('duration', (options) => {
-  const baseUnit = opt<string>(options, 'baseUnit') ?? 'ns';
-  const baseFactor = BASE_UNIT_NS[baseUnit] ?? 1;
-  const affix = affixer(options);
-  return (ctx) => {
-    const raw = asNumber(ctx.value);
-    if (raw === null) return ctx.value == null ? '' : String(ctx.value);
-    const ns = raw * baseFactor;
-    const neg = ns < 0;
-    const abs = Math.abs(ns);
-    let chosen = DURATION_UNITS[0]!;
-    for (const unit of DURATION_UNITS) {
-      if (abs >= unit.ns) chosen = unit;
-    }
-    const scaled = abs / chosen.ns;
-    const body = `${neg ? '-' : ''}${sig3(scaled)} ${chosen.suffix}`;
-    return affix(body);
-  };
-});
 
 // --- calendar names ---------------------------------------------------------
 

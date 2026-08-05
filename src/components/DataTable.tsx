@@ -16,14 +16,13 @@ import type {
 } from '../pivot/result';
 import type { ViewSpec } from '../pivot/spec';
 import { cls, compareValues } from '../util';
-import { isFlat } from '../pivot/spec';
+import { autoScaleOf, isFlat } from '../pivot/spec';
 import {
   addField,
   applyDrop,
-  removeComputed,
+  removeColumn,
   removeField,
   removeFooterRow,
-  removeValue,
   setShowSummary,
 } from '../editor/ops';
 import type { DragRef } from '../editor/ops';
@@ -247,6 +246,14 @@ function widthOf(text: string, bold = false): number {
 // --- unit decoration --------------------------------------------------------
 
 /**
+ * Whether this column chose a scale per cell rather than once. Such a column
+ * has already written its own label, so the placement toggles leave it alone.
+ */
+function perValueScale(leaf: ResolvedLeaf): boolean {
+  return autoScaleOf(leaf.column.def)?.per === 'value';
+}
+
+/**
  * Split a column's unit label across the value and header slots. A *simple*
  * unit (one un-inverted factor) places its scale and unit halves independently,
  * so `{scale:'value', unit:'header'}` gives `1.20 m` under `Latency (s)`. A
@@ -355,6 +362,9 @@ export function DataTable({
       return { leaves: result.leaves, headerSuffix };
     }
     const leaves = result.leaves.map((leaf, i) => {
+      // A per-value scale writes its own label, because the label differs cell
+      // by cell — there is no single one to hoist into the header.
+      if (perValueScale(leaf)) return leaf;
       const affix = unitAffixes(
         leaf.column.meta,
         unitPlacement,
@@ -620,10 +630,9 @@ export function DataTable({
    * can be tinted — and so a measure's controls, which repeat per column
    * group, all light together. */
   const [removeHover, setRemoveHover] = useState<
-    | { kind: 'row'; level: number }
-    | { kind: 'column'; level: number }
-    | { kind: 'measure'; index: number }
-    | { kind: 'computed'; index: number }
+    | { kind: 'pivotRow'; level: number }
+    | { kind: 'pivotColumn'; level: number }
+    | { kind: 'column'; index: number }
     | null
   >(null);
 
@@ -633,7 +642,11 @@ export function DataTable({
    * at import), a note when there are none, and the not-yet-built Custom entry.
    */
   const addEntries = useMemo<AddEntry[]>(() => {
-    const placed = new Set([...(spec?.rows ?? []), ...(spec?.columns ?? [])]);
+    const placed = new Set(
+      [...(spec?.pivotRows ?? []), ...(spec?.pivotColumns ?? [])].map(
+        (a) => a.field,
+      ),
+    );
     const options: AddEntry[] = frame.columns
       .filter((c) => c.meta.category === 'index' && !placed.has(c.name))
       .map((c) => ({ kind: 'option', id: c.name, label: c.meta.displayName }));
@@ -642,13 +655,15 @@ export function DataTable({
     }
     options.push({ kind: 'custom' });
     return options;
-  }, [frame, spec?.rows, spec?.columns]);
+  }, [frame, spec?.pivotRows, spec?.pivotColumns]);
 
   function commitAdd(field: string) {
     const at = addingAt;
     setAddingAt(null);
     setHoverInsert(null);
-    if (spec && at !== null) onViewChange?.(addField(spec, 'rows', field, at));
+    if (spec && at !== null) {
+      onViewChange?.(addField(spec, 'pivotRows', field, at));
+    }
   }
 
   /** What is in flight: an axis field, or a measure. */
@@ -703,22 +718,19 @@ export function DataTable({
   }
 
   /** The cells a pending removal would take with it. */
-  const tintLevel = removeHover?.kind === 'row' ? removeHover.level : undefined;
+  const tintLevel =
+    removeHover?.kind === 'pivotRow' ? removeHover.level : undefined;
   /** A whole column-header row, when a column field's control is hovered. */
   const tintHeaderRow =
-    removeHover?.kind === 'column' ? removeHover.level : undefined;
+    removeHover?.kind === 'pivotColumn' ? removeHover.level : undefined;
   const tintLeaves = useMemo(() => {
-    const measured = removeHover?.kind === 'measure';
-    const derived = removeHover?.kind === 'computed';
-    if (!measured && !derived) return undefined;
-    const id = measured
-      ? spec?.values[removeHover.index]?.id
-      : spec?.computed?.[removeHover!.index]?.id;
+    if (removeHover?.kind !== 'column') return undefined;
+    // A measure repeats once per column group, so tint every leaf it produced.
+    const id = spec?.columns[removeHover.index]?.id;
     if (id === undefined) return undefined;
     const set = new Set<number>();
     leaves.forEach((leaf, i) => {
-      const own = measured ? leaf.column.value?.id : leaf.column.def?.id;
-      if (own === id) set.add(i);
+      if (leaf.column.def?.id === id) set.add(i);
     });
     return set;
   }, [removeHover, leaves, spec]);
@@ -733,41 +745,23 @@ export function DataTable({
   const footerBottom = footerLines.length * ROW_HEIGHT;
 
   /**
-   * The measure a header cell removes, if any. Only the cell that *is* the
-   * measure level qualifies — its text is the measure's own label, which a
-   * column-member header never is. Absent while one measure remains, since
-   * removing it is a no-op and a dead control is worse than none.
-   */
-  /**
    * What a header cell's remove control would drop, if anything. Only the cell
-   * that *is* the measure or derived level qualifies — its text is that
-   * column's own label, which a column-member header never is.
+   * that *is* the column's own level qualifies — its text is that column's
+   * label, which a column-member header never is. Absent when the removal
+   * would be a no-op (the last measure), since a dead control is worse than
+   * none.
    */
-  function removableAt(
-    hc: HCell,
-  ): { kind: 'measure' | 'computed'; index: number; noun: string } | undefined {
+  function removableAt(hc: HCell): { index: number; noun: string } | undefined {
     if (!editable || !spec || hc.leafStart !== hc.leafEnd) return undefined;
-    const column = leaves[hc.leafStart]?.column;
-    if (!column) return undefined;
-
-    // Removing the last measure is a no-op, so it offers no control.
-    if (column.value && spec.values.length > 1) {
-      const own = column.value;
-      if (hc.label !== (own.label ?? own.id)) return undefined;
-      const index = spec.values.findIndex((v) => v.id === own.id);
-      return index >= 0
-        ? { kind: 'measure', index, noun: 'measure' }
-        : undefined;
-    }
-    if (column.def && spec.computed?.length) {
-      const own = column.def;
-      if (hc.label !== (own.label ?? own.id)) return undefined;
-      const index = spec.computed.findIndex((c) => c.id === own.id);
-      return index >= 0
-        ? { kind: 'computed', index, noun: 'column' }
-        : undefined;
-    }
-    return undefined;
+    const own = leaves[hc.leafStart]?.column.def;
+    if (!own) return undefined;
+    if (hc.label !== (own.label ?? own.id)) return undefined;
+    // A computed axis member is not in `view.columns`, so it finds no index —
+    // removing it means editing the level it belongs to, not this list.
+    const index = spec.columns.findIndex((c) => c.id === own.id);
+    if (index < 0 || removeColumn(spec, index) === spec) return undefined;
+    const agg = 'agg' in own ? own.agg : undefined;
+    return { index, noun: agg !== undefined ? 'measure' : 'column' };
   }
 
   function leafHeaderCls(hc: HCell, isLeafCol: boolean): string {
@@ -786,19 +780,19 @@ export function DataTable({
     <div className={frameCls} data-theme={theme === 'auto' ? undefined : theme}>
       {/* Pinned to the frame, so a wide table can scroll under them. Each sits
           in the band of the header row it would remove. */}
-      {editable && spec && spec.columns.length > 0 && (
+      {editable && spec && (spec.pivotColumns?.length ?? 0) > 0 && (
         <div className={styles.columnControls} style={{ right: scrollbarW }}>
-          {spec.columns.map((field, level) => (
+          {spec.pivotColumns!.map((axisField, level) => (
             <RemoveField
-              key={field}
-              title={`Remove the ${field} column field`}
+              key={axisField.field}
+              title={`Remove the ${axisField.field} column field`}
               style={{ top: level * HEADER_H + 5 }}
               linked={tintHeaderRow === level}
               onLink={(on) =>
-                setRemoveHover(on ? { kind: 'column', level } : null)
+                setRemoveHover(on ? { kind: 'pivotColumn', level } : null)
               }
               onRemove={() =>
-                onViewChange?.(removeField(spec, 'columns', level))
+                onViewChange?.(removeField(spec, 'pivotColumns', level))
               }
             />
           ))}
@@ -867,8 +861,8 @@ export function DataTable({
                               ? {}
                               : { borderLeft: '1px solid var(--pv-border)' }),
                           }}
-                          {...dragSource({ zone: 'rows', index: i })}
-                          {...dropTarget({ zone: 'rows', index: i })}
+                          {...dragSource({ zone: 'pivotRows', index: i })}
+                          {...dropTarget({ zone: 'pivotRows', index: i })}
                           onMouseMove={(e) => edgeInsert(e, i)}
                           onClick={() => cycleSort({ kind: 'index', level: i })}
                         >
@@ -879,11 +873,13 @@ export function DataTable({
                               title={`Remove the ${lvl} row field`}
                               onLink={(on) =>
                                 setRemoveHover(
-                                  on ? { kind: 'row', level: i } : null,
+                                  on ? { kind: 'pivotRow', level: i } : null,
                                 )
                               }
                               onRemove={() =>
-                                onViewChange?.(removeField(spec, 'rows', i))
+                                onViewChange?.(
+                                  removeField(spec, 'pivotRows', i),
+                                )
                               }
                             />
                           )}
@@ -925,11 +921,9 @@ export function DataTable({
                 {hrow.map((hc, ci) => {
                   const isLeafCol = hc.leafStart === hc.leafEnd;
                   const removable = removableAt(hc);
-                  const measure =
-                    removable?.kind === 'measure' ? removable.index : undefined;
-                  /** Column levels come first in the header; the rest is measures. */
+                  /** Axis levels come first in the header; the rest is columns. */
                   const columnLevel =
-                    editable && spec && level < spec.columns.length
+                    editable && spec && level < (spec.pivotColumns?.length ?? 0)
                       ? level
                       : undefined;
                   const active =
@@ -957,23 +951,26 @@ export function DataTable({
                           bodyLeadGap,
                         ),
                       }}
-                      {...(measure !== undefined
+                      {...(removable !== undefined
                         ? {
                             ...dragSource(
-                              { zone: 'values', index: measure },
+                              { zone: 'columns', index: removable.index },
                               // The column you grabbed, not just its header.
                               (e) => dragImage.column(e, hc.leafStart),
                             ),
-                            ...dropTarget({ zone: 'values', index: measure }),
+                            ...dropTarget({
+                              zone: 'columns',
+                              index: removable.index,
+                            }),
                           }
                         : columnLevel !== undefined
                           ? {
                               ...dragSource({
-                                zone: 'columns',
+                                zone: 'pivotColumns',
                                 index: columnLevel,
                               }),
                               ...dropTarget({
-                                zone: 'columns',
+                                zone: 'pivotColumns',
                                 index: columnLevel,
                               }),
                             }
@@ -991,25 +988,18 @@ export function DataTable({
                         <RemoveField
                           title={`Remove the ${hc.label} ${removable.noun}`}
                           linked={
-                            removeHover?.kind === removable.kind &&
+                            removeHover?.kind === 'column' &&
                             removeHover.index === removable.index
                           }
                           onLink={(on) =>
                             setRemoveHover(
                               on
-                                ? {
-                                    kind: removable.kind,
-                                    index: removable.index,
-                                  }
+                                ? { kind: 'column', index: removable.index }
                                 : null,
                             )
                           }
                           onRemove={() =>
-                            onViewChange?.(
-                              removable.kind === 'measure'
-                                ? removeValue(view, removable.index)
-                                : removeComputed(view, removable.index),
-                            )
+                            onViewChange?.(removeColumn(view, removable.index))
                           }
                         />
                       )}

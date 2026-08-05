@@ -1,0 +1,66 @@
+/**
+ * The component palette, in one place.
+ *
+ * It used to live on the table's frame, which was fine while the frame was the
+ * only thing that rendered. The editor panel sits *outside* the table — below
+ * it, in the demo — so it has to take the same palette from somewhere, or it
+ * shows a light panel against a dark table.
+ *
+ * A palette is claimed with `composes: palette from '../theme.module.css'`.
+ * `data-theme` on the same element pins it; without the attribute it follows
+ * the system.
+ */
+.palette {
+  /* Light palette (default). */
+  --pv-bg: #ffffff;
+  --pv-border: #e2e2e5;
+  --pv-header-bg: #f5f5f7;
+  --pv-summary-bg: #fafafa;
+  --pv-hover: #f0f7ff;
+  --pv-text: #1d1d1f;
+  --pv-muted: #6e6e73;
+  --pv-index-bg: #eeeef1;
+  --pv-hi: #dcebff;
+  --pv-zebra: #f7f7f9;
+  /* Reads on either palette without needing a per-theme override. */
+  --pv-remove: light-dark(#c5221f, #ff6b64);
+  --pv-remove-bg: light-dark(
+    rgba(197, 34, 31, 0.12),
+    rgba(255, 107, 100, 0.18)
+  );
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  .palette:not([data-theme='light']) {
+    --pv-bg: #161618;
+    --pv-border: #3a3a3d;
+    --pv-header-bg: #232326;
+    --pv-summary-bg: #1d1d20;
+    --pv-hover: #1c2733;
+    --pv-text: #f2f2f7;
+    --pv-muted: #a1a1a6;
+    --pv-index-bg: #0f0f11;
+    --pv-hi: #2a3d54;
+    --pv-zebra: #1c1c1f;
+  }
+}
+
+.palette[data-theme='dark'] {
+  --pv-bg: #161618;
+  --pv-border: #3a3a3d;
+  --pv-header-bg: #232326;
+  --pv-summary-bg: #1d1d20;
+  --pv-hover: #1c2733;
+  --pv-text: #f2f2f7;
+  --pv-muted: #a1a1a6;
+  --pv-index-bg: #0f0f11;
+  --pv-hi: #2a3d54;
+  --pv-zebra: #1c1c1f;
+  color-scheme: dark;
+}
+
+.palette[data-theme='light'] {
+  color-scheme: light;
+}

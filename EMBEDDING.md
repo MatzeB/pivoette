@@ -40,9 +40,9 @@ Either inline the bundle:
     {
       "data": { "csv": "region,q,rev\nEU,Q1,120\n" },
       "view": {
-        "rows": ["region"],
-        "columns": ["q"],
-        "values": [{ "id": "rev", "field": "rev", "agg": "sum" }]
+        "pivotRows": [{ "field": "region" }],
+        "pivotColumns": [{ "field": "q" }],
+        "columns": [{ "id": "rev", "agg": "sum" }]
       }
     }
   </script>
@@ -84,8 +84,8 @@ before render and reports _every_ problem at once, in the page:
 
 > This table's spec has problems:
 >
-> - view.rows[0]: no column named "regoin". Available: region, quarter, revenue
-> - view.values[0]: unknown agg "total". Available: sum, count, …
+> - view.pivotRows[0]: no column named "regoin". Available: region, quarter, revenue
+> - view.columns[0]: unknown agg "total". Available: sum, count, …
 
 So a mistake shows up as a fixable list rather than a blank box — and the agent
 can be shown that text to correct itself in one pass.
@@ -96,8 +96,8 @@ do) does not tear down and rebuild the table.
 
 ## ⚠️ Before you ship this: `compute` is code execution
 
-`ViewSpec` supports `derive[].compute`, `values[].expression`, and
-`compute`/`expression` on columns. These are **JavaScript expressions evaluated
+`ViewSpec` supports `derive[].compute` and `compute`/`expression` on
+`columns` entries. These are **JavaScript expressions evaluated
 with `new Function`** (`src/format/expression.ts`). That is what makes derived
 columns and custom aggregations work.
 

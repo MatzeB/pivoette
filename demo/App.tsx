@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   DataTable,
   ViewEditor,
+  autoScaleOf,
   fromRows,
   parseCsv,
-  isFlat,
   normalizeMeta,
   unitLabels,
 } from '../src';
@@ -13,7 +13,6 @@ import type {
   UnitLabels,
   DataTableDisplay,
   DatasetJson,
-  TableSpec,
   UnitPlacement,
   ViewSpec,
 } from '../src';
@@ -156,11 +155,10 @@ function collectLabels(
   data: Row[] | DatasetJson,
   view: ViewSpec,
 ): UnitLabels[] {
-  const defs = isFlat(view) ? view.columns : (view.computed ?? []);
   const inputs: ColumnMetaInput[] = [
     ...(Array.isArray(data) ? [] : Object.values(data.meta ?? {})),
     ...Object.values(view.meta ?? {}),
-    ...defs.map((def) => def.meta).filter((m) => m !== undefined),
+    ...view.columns.map((def) => def.meta).filter((m) => m !== undefined),
   ];
   return inputs.map((input) =>
     unitLabels(
@@ -168,6 +166,12 @@ function collectLabels(
     ),
   );
 }
+
+/** Whether an auto-scaled column picks one scale or one per cell. */
+const SCALE_PER_OPTIONS: { id: 'column' | 'value'; label: string }[] = [
+  { id: 'column', label: 'per column' },
+  { id: 'value', label: 'per value' },
+];
 
 const PLACEMENT_OPTIONS: { id: UnitPlacement; label: string }[] = [
   { id: 'off', label: 'off' },
@@ -198,10 +202,9 @@ function sourceRows(data: Row[] | DatasetJson): Row[] {
  * metadata. What you see is what was in the JSON — the RFC3339 text rather than
  * a weekday, the ratio rather than a percentage.
  */
-function rawView(rows: Row[]): TableSpec {
+function rawView(rows: Row[]): ViewSpec {
   // `fromRows` already unions the keys in first-seen order.
   return {
-    mode: 'flat',
     columns: fromRows(rows).columns.map((c) => ({
       id: c.name,
       label: c.name,
@@ -327,6 +330,11 @@ export function App() {
   // unaffected either way.
   const [unitPlacement, setUnitPlacement] = useState<UnitPlacement>('header');
   const [scalePlacement, setScalePlacement] = useState<UnitPlacement>('header');
+  // One scale for the column, or one per cell. The tradeoff is the point: a
+  // column-wide scale can hoist its label into the header and be scanned at a
+  // glance; a per-cell one keeps every value in its own natural unit but must
+  // carry the label, so `4.34 µs` and `521 ns` sit side by side.
+  const [scalePer, setScalePer] = useState<'column' | 'value'>('column');
   const [locale, setLocale] = useState('');
   const [timeZone, setTimeZone] = useState('');
 
@@ -340,10 +348,17 @@ export function App() {
   const [editedDisplay, setEditedDisplay] = useState<DataTableDisplay | null>(
     null,
   );
-  useEffect(() => {
+  // Dropped during render, not in an effect. An effect runs after the paint,
+  // which leaves one render with the previous example's spec over this
+  // example's data — and the engine throws on a field that is not there,
+  // taking the whole page down rather than showing the new example.
+  const [editedFor, setEditedFor] = useState(selected);
+  const staleEdit = editedFor !== selected;
+  if (staleEdit) {
+    setEditedFor(selected);
     setEdited(null);
     setEditedDisplay(null);
-  }, [selected]);
+  }
 
   // `e` toggles editing, except while a form control has focus — the locale
   // and placement selects would otherwise swallow or fight for the key.
@@ -367,17 +382,37 @@ export function App() {
   // Overriding the view's locale changes number separators and, for currency
   // units, where the symbol sits and how many decimals it takes. Memoized so
   // the engine is not re-run on unrelated renders.
-  const baseView = edited ?? example.view;
+  // The re-render React schedules above is what actually clears these; reading
+  // through `staleEdit` keeps the discarded pass coherent too.
+  const baseView = (staleEdit ? null : edited) ?? example.view;
   const view = useMemo(() => {
-    if (!locale && !timeZone) return baseView;
+    const scaled =
+      scalePer === 'column'
+        ? baseView
+        : {
+            ...baseView,
+            columns: baseView.columns.map((c) =>
+              autoScaleOf(c) === undefined
+                ? c
+                : // A pool exists to pick *one* scale, so it means nothing once
+                  // every cell picks its own — drop it rather than leave the
+                  // spec self-contradictory.
+                  {
+                    ...c,
+                    autoScale: { per: 'value' as const },
+                    scalePool: undefined,
+                  },
+            ),
+          };
+    if (!locale && !timeZone) return scaled;
     return {
-      ...baseView,
+      ...scaled,
       ...(locale ? { locale } : {}),
       ...(timeZone ? { timeZone } : {}),
     };
-  }, [baseView, locale, timeZone]);
+  }, [baseView, locale, timeZone, scalePer]);
 
-  const display = editedDisplay ?? example.display ?? {};
+  const display = (staleEdit ? null : editedDisplay) ?? example.display ?? {};
 
   // Only a view that derives something can be affected by the zone.
   const usesTime = view.derive !== undefined;
@@ -416,6 +451,8 @@ export function App() {
   const labels = useMemo(() => collectLabels(data, view), [data, view]);
   const hasUnits = labels.some((l) => l.full !== '');
   const hasSplit = labels.some((l) => l.scalePart !== '' && l.unitPart !== '');
+  /** Only a view that lets the data pick a scale has anything to switch. */
+  const hasAutoScale = view.columns.some((c) => autoScaleOf(c) !== undefined);
 
   function setBoth(v: UnitPlacement) {
     setUnitPlacement(v);
@@ -572,36 +609,44 @@ export function App() {
               onChange={setBoth}
             />
           )}
+          {hasAutoScale && (
+            <Select
+              label="scaling"
+              value={scalePer}
+              options={SCALE_PER_OPTIONS}
+              onChange={setScalePer}
+            />
+          )}
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-        <div style={{ flex: '1 1 auto', minWidth: 0 }}>
-          <DataTable
-            key={example.id + (stress ? '-stress' : '')}
-            data={data}
+      <DataTable
+        key={example.id + (stress ? '-stress' : '')}
+        data={data}
+        view={view}
+        height={560}
+        theme={theme}
+        display={{ ...display, unitPlacement, scalePlacement }}
+        editing={editing}
+        onViewChange={setEdited}
+        onDisplayChange={setEditedDisplay}
+      />
+
+      {/* Below the table rather than beside it: the panel used to take its
+          width out of the table, which is the one thing being edited. */}
+      {editing && (
+        <div style={{ marginTop: 10 }}>
+          {/* No `frame`: the panel shows the spec, so raw field names are the
+              right identifiers here — they are what the config says. */}
+          <ViewEditor
             view={view}
-            height={560}
+            display={display}
             theme={theme}
-            display={{ ...display, unitPlacement, scalePlacement }}
-            editing={editing}
             onViewChange={setEdited}
             onDisplayChange={setEditedDisplay}
           />
         </div>
-        {editing && (
-          <div style={{ flex: '0 0 auto' }}>
-            {/* No `frame`: the panel shows the spec, so raw field names are
-                the right identifiers here — they are what the config says. */}
-            <ViewEditor
-              view={view}
-              display={display}
-              onViewChange={setEdited}
-              onDisplayChange={setEditedDisplay}
-            />
-          </div>
-        )}
-      </div>
+      )}
 
       <div
         style={{

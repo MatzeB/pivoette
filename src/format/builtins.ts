@@ -13,7 +13,6 @@
 export const Format = {
   Number: 'number',
   Integer: 'integer',
-  Duration: 'duration',
   /** Locale weekday ordinal (0 = the locale's first day) -> name. */
   Weekday: 'weekday',
   /** 1..12 -> month name. */

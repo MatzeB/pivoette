@@ -20,13 +20,11 @@ export const view: ViewSpec = {
       meta: { displayName: 'Weekday', kind: ['weekday'] },
     },
   },
-  rows: ['author'],
-  columns: ['weekday'],
-  rowSort: [{ field: 'author', direction: 'asc' }],
-  columnSort: [{ field: 'weekday', direction: 'asc' }],
-  values: [
-    { id: 'added', field: 'linesAdded', agg: 'sum', label: '+' },
-    { id: 'removed', field: 'linesRemoved', agg: 'sum', label: '−' },
+  pivotRows: [{ field: 'author', sort: 'asc' }],
+  pivotColumns: [{ field: 'weekday', sort: 'asc' }],
+  columns: [
+    { id: 'added', source: 'linesAdded', agg: 'sum', label: '+' },
+    { id: 'removed', source: 'linesRemoved', agg: 'sum', label: '−' },
   ],
   showSummary: true,
 };

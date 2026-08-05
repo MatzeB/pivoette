@@ -1,15 +1,28 @@
 /**
- * The view engine. `computeView` dispatches on mode:
+ * The view engine. `computeView` dispatches on whether the spec groups:
  *  - flat: one output row per source row through the display-column layer.
  *  - pivot: group + aggregate into a multi-level table, then derived columns.
  */
 import type { CellValue, ColumnType, DataFrame } from '../data/types';
-import type { ColumnMeta } from '../data/meta';
-import { mergeMeta, normalizeMeta } from '../data/meta';
+import type { ColumnMeta, ColumnMetaInput } from '../data/meta';
+import {
+  mergeMeta,
+  normalizeMeta,
+  storedMagnitude,
+  unitLabels,
+} from '../data/meta';
 import { requireColumn, withMeta } from '../data/frame';
 import { deriveColumns } from '../data/derive';
-import type { Align, ResolvedColumn } from '../format/context';
-import { columnFormat } from '../format/deduce';
+import type { Align, FormatFn, ResolvedColumn } from '../format/context';
+import { columnFormat, scaledColumnFormat } from '../format/deduce';
+import {
+  chooseStep,
+  defaultLadder,
+  getLadder,
+  hasLadder,
+  metaForStep,
+} from '../format/ladders';
+import type { ScaleStep } from '../format/ladders';
 import { Format, Render } from '../format/builtins';
 import { resolveFormat } from '../format/format';
 import { resolveStyle } from '../format/style';
@@ -17,16 +30,16 @@ import { resolveRender } from '../format/render';
 import { compileExpression, evalExpression } from '../format/expression';
 import { getAggregation } from './aggregations';
 import type {
+  AxisField,
   CellRef,
   ColumnDef,
+  ComputedMember,
   FormatSpec,
-  PivotSpec,
-  SortSpec,
-  TableSpec,
-  ValueSpec,
+  MeasureColumn,
+  NormalizedView,
   ViewSpec,
 } from './spec';
-import { isFlat } from './spec';
+import { autoScaleOf, axisFields, isFlat, normalizeView } from './spec';
 import type {
   Cell,
   MemberFormat,
@@ -48,26 +61,15 @@ function alignFor(type: ColumnType | undefined, format?: FormatSpec): Align {
 }
 
 /**
- * Header text for a data field: an explicit `spec.labels` entry wins, then the
- * column's metadata `displayName`, then the raw field name. Callers pass the
- * metadata that actually applies — for a display column that is the merged one,
- * including any `def.meta`.
+ * Header text for an axis level: the entry's own `label` wins, then the field's
+ * metadata `displayName`, then the raw field name.
  */
-function label(
-  field: string,
-  labels: Record<string, string> | undefined,
-  meta: ColumnMeta | undefined,
-): string {
-  return labels?.[field] ?? meta?.displayName ?? field;
-}
-
-/** `label` for a row/column index field, whose metadata comes from the frame. */
-function fieldLabel(
-  frame: DataFrame,
-  field: string,
-  labels?: Record<string, string>,
-): string {
-  return label(field, labels, frame.columnByName.get(field)?.meta);
+function axisLabel(frame: DataFrame, axis: AxisField): string {
+  return (
+    axis.label ??
+    frame.columnByName.get(axis.field)?.meta.displayName ??
+    axis.field
+  );
 }
 
 /**
@@ -80,13 +82,19 @@ function sourceField(def: ColumnDef): string | undefined {
   return def.source ?? def.id;
 }
 
+/** The field a measure aggregates. It always has one, so `id` is the default
+ * even for a measure that also carries a `compute`. */
+function measureSource(measure: MeasureColumn): string {
+  return measure.source ?? measure.id;
+}
+
 /**
  * Metadata for a displayed column: the source field's, with any `def.meta`
  * layered on top (the only way a computed column gets a unit).
  */
 function columnMeta(
   frame: DataFrame,
-  def: ColumnDef,
+  def: { id: string; meta?: ColumnMetaInput },
   source: string | undefined,
 ): ColumnMeta | undefined {
   const base = source ? frame.columnByName.get(source)?.meta : undefined;
@@ -156,7 +164,7 @@ function makeLeaf(args: {
 // Flat mode
 // ---------------------------------------------------------------------------
 
-function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
+function computeFlat(frame: DataFrame, spec: ViewSpec): ViewResult {
   const emptyDisplay = spec.emptyDisplay ?? '';
   const fieldValues = (name: string, row: number): CellValue =>
     frame.columnByName.get(name)?.values[row] ?? null;
@@ -171,13 +179,8 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
     const format = columnFormat(def, meta, spec.locale);
     const column: ResolvedColumn = {
       id: def.id,
-      // def.label > spec.labels > metadata displayName > the field name.
-      label:
-        def.label ??
-        spec.labels?.[sourceName ?? def.id] ??
-        meta?.displayName ??
-        sourceName ??
-        def.id,
+      // def.label > metadata displayName > the field name.
+      label: def.label ?? meta?.displayName ?? sourceName ?? def.id,
       align: alignFor(source?.type, format),
       def,
       meta,
@@ -261,7 +264,7 @@ function computeFlat(frame: DataFrame, spec: TableSpec): ViewResult {
   };
 }
 
-function sortFlatRows(rows: ResultRow[], spec: TableSpec): void {
+function sortFlatRows(rows: ResultRow[], spec: ViewSpec): void {
   if (!spec.sort || spec.sort.length === 0) return;
   const colIndex = new Map(spec.columns.map((c, i) => [c.id, i]));
   const specs = spec.sort
@@ -305,7 +308,7 @@ function keyOf(tuple: CellValue[]): string {
 /**
  * Order index keys so the multi-level index actually nests.
  *
- * *Every* level takes part in the comparison, outermost first: a level named by
+ * *Every* level takes part in the comparison, outermost first: a level with a
  * `sort` uses that direction, and any other keeps the order its members were
  * first encountered in. Comparing all levels lexicographically is what
  * guarantees keys sharing a prefix end up adjacent — which the merged index
@@ -313,18 +316,15 @@ function keyOf(tuple: CellValue[]): string {
  * (Before this, grouping by `team > project` only looked right because the
  * source rows happened to arrive grouped that way.)
  */
-function sortTuples(
-  keys: CellValue[][],
-  fields: string[],
-  sort?: SortSpec[],
-): CellValue[][] {
+function sortTuples(keys: CellValue[][], fields: AxisField[]): CellValue[][] {
   if (fields.length === 0) return keys;
 
+  // Sort priority is level order, which is why the direction lives on the
+  // level rather than in a list that would have to declare its own.
   const direction = new Map<number, number>();
-  for (const s of sort ?? []) {
-    const level = fields.indexOf(s.field);
-    if (level >= 0) direction.set(level, s.direction === 'desc' ? -1 : 1);
-  }
+  fields.forEach((f, level) => {
+    if (f.sort) direction.set(level, f.sort === 'desc' ? -1 : 1);
+  });
 
   // Encounter order of each level's members, used where no sort was asked for.
   const firstSeen = fields.map(() => new Map<string, number>());
@@ -360,7 +360,7 @@ function scaled(value: CellValue, factor: number | undefined): CellValue {
   return n === null ? value : n * factor;
 }
 
-function aggregate(measure: ValueSpec, values: CellValue[]): CellValue {
+function aggregate(measure: MeasureColumn, values: CellValue[]): CellValue {
   if (measure.expression) {
     return evalExpression(measure.expression, { values }) as CellValue;
   }
@@ -418,8 +418,8 @@ interface BaseDesc {
   colKey: CellValue[];
   /** Serialized colKey (precomputed for group lookups). */
   colKeyStr: string;
-  measure: ValueSpec;
-  /** Index of `measure` into `spec.values` (precomputed for field lookup). */
+  measure: MeasureColumn;
+  /** Index of `measure` into the measure list (precomputed for field lookup). */
   measureIndex: number;
   colPath: string[];
   /** lookup key: colKey strings + measure id */
@@ -428,7 +428,7 @@ interface BaseDesc {
 
 interface DerivedDesc {
   kind: 'derived';
-  def: ColumnDef;
+  def: ColumnDef | ComputedMember;
   prefix: CellValue[];
   colPath: string[];
   /**
@@ -449,36 +449,48 @@ function baseLookupKey(colKey: CellValue[], measureId: string): string {
   return colKey.map((v) => String(v)).join('') + '' + measureId;
 }
 
-function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
+function computePivot(
+  frame: DataFrame,
+  spec: ViewSpec,
+  norm: NormalizedView,
+): ViewResult {
   const emptyDisplay = spec.emptyDisplay ?? '';
-  const placement = spec.valuePlacement?.axis ?? 'columns';
-  const g = group(frame, spec.rows, spec.columns);
+  const { pivotRows, pivotColumns, measures } = norm;
+  const g = group(frame, axisFields(pivotRows), axisFields(pivotColumns));
   // Index members keep their raw value for grouping and sorting; these render
   // them. A weekday column groups on 0..6 and displays Mon..Sun.
-  const colMember = spec.columns.map((f) =>
-    memberFormat(frame, f, spec.locale),
+  const colMember = pivotColumns.map((a) =>
+    memberFormat(frame, a.field, spec.locale),
   );
-  const rowMemberFormats = spec.rows.map((f) =>
-    memberFormat(frame, f, spec.locale),
+  const rowMemberFormats = pivotRows.map((a) =>
+    memberFormat(frame, a.field, spec.locale),
   );
-  const rowKeys = sortTuples(g.rowKeys, spec.rows, spec.rowSort);
-  const colKeys = sortTuples(g.colKeys, spec.columns, spec.columnSort);
+  const rowKeys = sortTuples(g.rowKeys, pivotRows);
+  const colKeys = sortTuples(g.colKeys, pivotColumns);
 
-  if (placement === 'rows') {
-    return pivotMeasuresOnRows(frame, spec, rowKeys, colKeys, g, emptyDisplay);
+  if ((spec.columnAxis ?? 'pivotColumns') === 'pivotRows') {
+    return pivotMeasuresOnRows(
+      frame,
+      spec,
+      norm,
+      rowKeys,
+      colKeys,
+      g,
+      emptyDisplay,
+    );
   }
 
-  const fieldValues = spec.values.map(
-    (m) => requireColumn(frame, m.field).values,
+  const fieldValues = measures.map(
+    (m) => requireColumn(frame, measureSource(m)).values,
   );
-  const includeMeasure = spec.values.length > 1 || spec.columns.length === 0;
+  const includeMeasure = measures.length > 1 || pivotColumns.length === 0;
 
   // Build base measure descriptors in colKey × measure order.
   const baseDescs: BaseDesc[] = [];
   for (const colKey of colKeys) {
     const colStrs = colKey.map((v, i) => colMember[i]!(v));
     const colKeyStr = keyOf(colKey);
-    spec.values.forEach((measure, measureIndex) => {
+    measures.forEach((measure, measureIndex) => {
       const measLabel = measure.label ?? measure.id;
       baseDescs.push({
         kind: 'measure',
@@ -492,38 +504,77 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     });
   }
 
-  // Weave derived columns into the descriptor order.
+  // Weave derived columns into the descriptor order. Two sources, and the
+  // difference is where they sit: a `view.columns` entry is one more innermost
+  // column, while an axis level's `computed` member is a peer of that level's
+  // real members and so repeats once per distinct outer prefix.
   const descs: Desc[] = [...baseDescs];
-  for (const def of spec.computed ?? []) {
-    const prefixes =
-      def.repeatPer && def.repeatPer.length > 0
-        ? distinctPrefixes(colKeys, def.repeatPer.length)
-        : [[]];
-    for (const prefix of prefixes) {
-      const aliases = Object.entries(def.inputs ?? {})
-        .filter(([, ref]) => typeof ref !== 'string') // the flat-only form
-        .map(([name, ref]) => {
-          const cellRef = ref as CellRef;
-          const path =
-            prefix.length > 0
-              ? [...prefix, ...cellRef.colPath]
-              : cellRef.colPath;
-          return { name, lookupKey: baseLookupKey(path, cellRef.value) };
-        });
-      const argNames = [...aliases.map((a) => a.name), 'inputs', 'row'];
-      const derived: DerivedDesc = {
-        kind: 'derived',
-        def,
-        prefix,
-        colPath: [...prefix.map((v) => String(v)), def.label ?? def.id],
-        aliases,
-        argNames,
-        compiled: def.compute
-          ? compileExpression(def.compute, argNames)
-          : undefined,
-      };
-      const at = derivedInsertIndex(descs, def, prefix);
-      descs.splice(at, 0, derived);
+  for (const def of norm.derived) {
+    const aliases = Object.entries(def.inputs ?? {})
+      .filter(([, ref]) => typeof ref !== 'string') // the flat-only form
+      .map(([name, ref]) => {
+        const cellRef = ref as CellRef;
+        return {
+          name,
+          lookupKey: baseLookupKey(cellRef.colPath, cellRef.column),
+        };
+      });
+    const argNames = [...aliases.map((a) => a.name), 'inputs', 'row'];
+    const derived: DerivedDesc = {
+      kind: 'derived',
+      def,
+      prefix: [],
+      colPath: [def.label ?? def.id],
+      aliases,
+      argNames,
+      compiled: def.compute
+        ? compileExpression(def.compute, argNames)
+        : undefined,
+    };
+    descs.splice(derivedInsertIndex(descs, def.place, []), 0, derived);
+  }
+
+  // Computed members of the innermost column level. How often one repeats is
+  // read off the axis — once per distinct combination of the levels outside it
+  // — rather than declared, which is what keeps it correct when a level is
+  // moved to the other axis or dropped.
+  const innermost = pivotColumns[pivotColumns.length - 1];
+  for (const member of innermost?.computed ?? []) {
+    const outerLevels = pivotColumns.length - 1;
+    for (const prefix of distinctPrefixes(colKeys, outerLevels)) {
+      // One per measure, as a real member of this level would be: the member
+      // spans the measures sublevel rather than replacing it.
+      const perMeasure = includeMeasure ? measures : [undefined];
+      const block: DerivedDesc[] = perMeasure.map((measure) => {
+        const aliases = Object.entries(member.inputs ?? {}).map(
+          ([name, ref]) => ({
+            name,
+            // An omitted `column` reads the measure this cell is under, which
+            // is what makes one expression yield a Δ for each of them.
+            lookupKey: baseLookupKey(
+              [...prefix, ref.member],
+              ref.column ?? measure?.id ?? measures[0]!.id,
+            ),
+          }),
+        );
+        const argNames = [...aliases.map((a) => a.name), 'inputs', 'row'];
+        const label = member.label ?? member.id;
+        return {
+          kind: 'derived' as const,
+          def: member,
+          prefix,
+          colPath: [
+            ...prefix.map((v) => String(v)),
+            label,
+            ...(measure ? [measure.label ?? measure.id] : []),
+          ],
+          aliases,
+          argNames,
+          compiled: compileExpression(member.compute, argNames),
+        };
+      });
+      const at = derivedInsertIndex(descs, member.place, prefix);
+      descs.splice(at, 0, ...block);
     }
   }
 
@@ -532,13 +583,15 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
   const leaves: ResolvedLeaf[] = descs.map((d, i) => {
     if (d.kind === 'measure') {
       baseIndexByKey.set(d.baseKey, i);
-      const meta = frame.columnByName.get(d.measure.field)?.meta;
+      // Same path every other column takes, so a measure can carry its own
+      // `meta` rather than being stuck with the source field's.
+      const meta = columnMeta(frame, d.measure, measureSource(d.measure));
       const format = columnFormat(d.measure, meta, spec.locale);
       const column: ResolvedColumn = {
         id: d.baseKey,
         label: d.measure.label ?? d.measure.id,
         align: alignFor('float', format),
-        value: d.measure,
+        def: d.measure,
         meta,
       };
       return makeLeaf({
@@ -628,7 +681,7 @@ function computePivot(frame: DataFrame, spec: PivotSpec): ViewResult {
     });
   }
 
-  const rowLevels = spec.rows.map((f) => fieldLabel(frame, f, spec.labels));
+  const rowLevels = pivotRows.map((a) => axisLabel(frame, a));
   const { forest, depth } = buildHeader(leaves);
   return {
     mode: 'pivot',
@@ -685,11 +738,10 @@ function distinctPrefixes(colKeys: CellValue[][], len: number): CellValue[][] {
 
 function derivedInsertIndex(
   descs: Desc[],
-  def: ColumnDef,
+  place: ColumnDef['place'],
   prefix: CellValue[],
 ): number {
-  const after =
-    def.place && def.place !== 'append' ? def.place.after : undefined;
+  const after = place && place !== 'append' ? place.after : undefined;
   if (after === undefined) {
     // Append after the last base leaf of this prefix (or global end).
     if (prefix.length === 0) return descs.length;
@@ -722,19 +774,21 @@ function prefixMatches(colKey: CellValue[], prefix: CellValue[]): boolean {
 /** Measures placed as the innermost ROW level (no derived/summary support). */
 function pivotMeasuresOnRows(
   frame: DataFrame,
-  spec: PivotSpec,
+  spec: ViewSpec,
+  norm: NormalizedView,
   rowKeys: CellValue[][],
   colKeys: CellValue[][],
   g: Grouping,
   emptyDisplay: string,
 ): ViewResult {
-  const fieldValues = spec.values.map(
-    (m) => requireColumn(frame, m.field).values,
+  const { pivotRows, pivotColumns, measures } = norm;
+  const fieldValues = measures.map(
+    (m) => requireColumn(frame, measureSource(m)).values,
   );
 
   const colKeyStrs = colKeys.map(keyOf);
-  const colMember = spec.columns.map((f) =>
-    memberFormat(frame, f, spec.locale),
+  const colMember = pivotColumns.map((a) =>
+    memberFormat(frame, a.field, spec.locale),
   );
   const leaves: ResolvedLeaf[] = colKeys.map((colKey, i) => {
     const colStrs = colKey.map((v, l) => colMember[l]!(v));
@@ -754,7 +808,7 @@ function pivotMeasuresOnRows(
   const rows: ResultRow[] = [];
   for (const rowKey of rowKeys) {
     const byCol = g.groups.get(keyOf(rowKey));
-    spec.values.forEach((measure, mi) => {
+    measures.forEach((measure, mi) => {
       const cells: Cell[] = colKeys.map((_colKey, ci) => {
         const idxs = byCol?.get(colKeyStrs[ci]!);
         const vals = idxs ? idxs.map((r) => fieldValues[mi]![r] ?? null) : [];
@@ -766,12 +820,9 @@ function pivotMeasuresOnRows(
     });
   }
 
-  const rowLevels = [
-    ...spec.rows.map((f) => fieldLabel(frame, f, spec.labels)),
-    'Measure',
-  ];
+  const rowLevels = [...pivotRows.map((a) => axisLabel(frame, a)), 'Measure'];
   const rowMemberFormats = [
-    ...spec.rows.map((f) => memberFormat(frame, f, spec.locale)),
+    ...pivotRows.map((a) => memberFormat(frame, a.field, spec.locale)),
     // the measure level is already a label
     (v: CellValue) => String(v ?? ''),
   ];
@@ -791,23 +842,185 @@ function pivotMeasuresOnRows(
 // ---------------------------------------------------------------------------
 
 /**
- * Prepare the frame the spec describes: layer the view's metadata over whatever
- * the data supplied, then add its derived columns so `rows`/`columns` can name
- * them. Done here rather than in the component so `computeView` is usable
- * standalone.
+ * The metadata the spec supplies: `spec.meta` with any per-axis-field `meta`
+ * layered on top. An axis entry is the closer of the two to the field it
+ * describes, so it wins.
  */
-function prepare(frame: DataFrame, spec: ViewSpec): DataFrame {
+function specMeta(
+  spec: ViewSpec,
+  norm: NormalizedView,
+): Record<string, ColumnMetaInput> | undefined {
+  const axes = [...norm.pivotRows, ...norm.pivotColumns].filter((a) => a.meta);
+  if (axes.length === 0) return spec.meta;
+  const out = { ...spec.meta };
+  for (const axis of axes) {
+    out[axis.field] = { ...out[axis.field], ...axis.meta };
+  }
+  return out;
+}
+
+/**
+ * Prepare the frame the spec describes: layer the view's metadata over whatever
+ * the data supplied, then add its derived columns so the axes can name them.
+ * Done here rather than in the component so `computeView` is usable standalone.
+ */
+function prepare(
+  frame: DataFrame,
+  spec: ViewSpec,
+  norm: NormalizedView,
+): DataFrame {
   return deriveColumns(
-    withMeta(frame, spec.meta),
+    withMeta(frame, specMeta(spec, norm)),
     spec.derive,
     spec.locale,
     spec.timeZone,
   );
 }
 
+// ---------------------------------------------------------------------------
+// Auto-scaling
+// ---------------------------------------------------------------------------
+
+/** Every value a column shows, body and summary alike. */
+function leafValues(result: ViewResult, indices: number[]): CellValue[] {
+  const out: CellValue[] = [];
+  const take = (cell: Cell | undefined) => {
+    // Nulls and text carry no magnitude; dropping them here saves the
+    // representative pass a second copy of a potentially long column.
+    if (cell?.value != null) out.push(cell.value as CellValue);
+  };
+  for (const i of indices) {
+    for (const row of result.rows) take(row.cells[i]);
+    take(result.summary?.[i]);
+  }
+  return out;
+}
+
+/** Multiply the value a formatter sees, leaving `Cell.value` alone. */
+function scaleFormat(base: FormatFn, factor: number): FormatFn {
+  return (ctx) => {
+    const n = asNumber(ctx.value as CellValue);
+    return n === null ? base(ctx) : base({ ...ctx, value: n * factor });
+  };
+}
+
+/**
+ * A per-cell scale: the step is chosen from the value itself, so the label
+ * cannot live on the column and rides the number instead. Still composed
+ * through `unitLabels`, so short forms and the tight/prefix rules are the ones
+ * every other unit uses.
+ */
+function perValueFormat(
+  leaf: ResolvedLeaf,
+  meta: ColumnMeta,
+  ladder: string,
+  spec: ViewSpec,
+  emptyDisplay: string,
+): FormatFn {
+  // Everything that does not vary by cell, resolved once. This runs per cell
+  // *and* 200 times per column while widths are measured, so re-deriving the
+  // ladder and the column's magnitude here would be the whole cost.
+  const stored = storedMagnitude(meta)!;
+  const { steps } = getLadder(ladder);
+  const rungs = new Map<ScaleStep, { fn: FormatFn; label: string }>();
+
+  const rungFor = (step: ScaleStep) => {
+    let rung = rungs.get(step);
+    if (!rung) {
+      const stepMeta = metaForStep(meta, step);
+      const label = unitLabels(stepMeta, spec.locale);
+      rung = {
+        fn: resolveFormat(
+          scaledColumnFormat(leaf.column.def ?? {}, stepMeta, spec.locale),
+          emptyDisplay,
+        ),
+        label: label.full ? `${label.tight ? '' : ' '}${label.full}` : '',
+      };
+      rungs.set(step, rung);
+    }
+    return rung;
+  };
+
+  return (ctx) => {
+    const n = asNumber(ctx.value as CellValue);
+    if (n === null) return leaf.format(ctx);
+    const base = Math.abs(n) * stored;
+    let step = steps[0]!;
+    for (const rung of steps) if (base >= rung.magnitude) step = rung;
+
+    const { fn, label } = rungFor(step);
+    const text = fn({ ...ctx, value: (n * stored) / step.magnitude });
+    return text ? text + label : text;
+  };
+}
+
+/**
+ * Choose a display scale for every column that asked for one.
+ *
+ * Runs here rather than at leaf construction because a scale is chosen from the
+ * data, and leaves are built before a single cell exists. Leaves are grouped by
+ * `scalePool ?? id`, so a lone column is simply a pool of one and there is no
+ * second code path for the two cases.
+ */
+function applyAutoScale(result: ViewResult, spec: ViewSpec): ViewResult {
+  const emptyDisplay = spec.emptyDisplay ?? '';
+  const pools = new Map<string, number[]>();
+  result.leaves.forEach((leaf, i) => {
+    const def = leaf.column.def;
+    if (!def || !autoScaleOf(def)) return;
+    const key = ('scalePool' in def ? def.scalePool : undefined) ?? def.id;
+    const at = pools.get(key);
+    if (at) at.push(i);
+    else pools.set(key, [i]);
+  });
+  if (pools.size === 0) return result;
+
+  const leaves = [...result.leaves];
+  for (const indices of pools.values()) {
+    const first = leaves[indices[0]!]!;
+    const def = first.column.def!;
+    const meta = first.column.meta;
+    const auto = autoScaleOf(def)!;
+    if (!meta) continue;
+    const ladder = auto.ladder ?? defaultLadder(meta);
+    if (!hasLadder(ladder) || storedMagnitude(meta) === undefined) continue;
+
+    if (auto.per === 'value') {
+      for (const i of indices) {
+        const leaf = leaves[i]!;
+        leaves[i] = {
+          ...leaf,
+          format: perValueFormat(leaf, meta, ladder, spec, emptyDisplay),
+        };
+      }
+      continue;
+    }
+
+    const chosen = chooseStep(leafValues(result, indices), meta, ladder);
+    if (!chosen) continue;
+    const stepMeta = metaForStep(meta, chosen.step);
+    const format = resolveFormat(
+      scaledColumnFormat(def, stepMeta, spec.locale),
+      emptyDisplay,
+    );
+    for (const i of indices) {
+      const leaf = leaves[i]!;
+      leaves[i] = {
+        ...leaf,
+        column: { ...leaf.column, meta: stepMeta },
+        format: scaleFormat(format, chosen.factor),
+        displayFactor: chosen.factor,
+      };
+    }
+  }
+  return { ...result, leaves };
+}
+
 export function computeView(frame: DataFrame, spec: ViewSpec): ViewResult {
-  const prepared = prepare(frame, spec);
-  return isFlat(spec)
+  const norm = normalizeView(spec);
+  const prepared = prepare(frame, spec, norm);
+  const result = isFlat(spec)
     ? computeFlat(prepared, spec)
-    : computePivot(prepared, spec);
+    : computePivot(prepared, spec, norm);
+  return applyAutoScale(result, spec);
 }

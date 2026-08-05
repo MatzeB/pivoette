@@ -4,7 +4,67 @@ import { withMeta } from '../data/frame';
 import { unitLabels } from '../data/meta';
 import { computeView } from './engine';
 import type { ViewResult } from './result';
-import type { PivotSpec, TableSpec } from './spec';
+import { isFlat, normalizeView } from './spec';
+import type { ViewSpec } from './spec';
+
+describe('flat and pivot are the same spec', () => {
+  const frame = fromRows([
+    { r: 'A', v: 1 },
+    { r: 'A', v: 3 },
+    { r: 'B', v: 5 },
+  ]);
+
+  it('reads flat as "no grouping and no aggregation"', () => {
+    expect(isFlat({ columns: [{ id: 'r' }, { id: 'v' }] })).toBe(true);
+    // An axis is enough on its own, even an empty one — it was declared.
+    expect(isFlat({ pivotRows: [], columns: [{ id: 'r' }] })).toBe(false);
+    expect(
+      isFlat({
+        pivotRows: [{ field: 'r' }],
+        columns: [{ id: 'v', agg: 'sum' }],
+      }),
+    ).toBe(false);
+    // No axes, but an aggregation: a single grand-total row is still a pivot.
+    expect(isFlat({ columns: [{ id: 'v', agg: 'sum' }] })).toBe(false);
+  });
+
+  it('aggregates to one row when a spec has no axes at all', () => {
+    const res = computeView(frame, { columns: [{ id: 'v', agg: 'sum' }] });
+    expect(res.mode).toBe('pivot');
+    expect(res.rows).toHaveLength(1);
+    expect(res.rows[0]!.cells[0]!.value).toBe(9);
+  });
+
+  it('projects one row per source row when nothing aggregates', () => {
+    const res = computeView(frame, { columns: [{ id: 'r' }, { id: 'v' }] });
+    expect(res.mode).toBe('flat');
+    expect(res.rows).toHaveLength(3);
+    expect(res.rowLevels).toEqual([]);
+  });
+
+  it('splits the one columns list by what each entry declares', () => {
+    const norm = normalizeView({
+      pivotRows: [{ field: 'r' }],
+      columns: [
+        { id: 'sum', source: 'v', agg: 'sum' },
+        { id: 'twice', compute: 'sum * 2' },
+        { id: 'mean', source: 'v', agg: 'mean' },
+      ],
+    });
+    // Order within each kind is spec order, which is what the engine relies on.
+    expect(norm.measures.map((m) => m.id)).toEqual(['sum', 'mean']);
+    expect(norm.derived.map((d) => d.id)).toEqual(['twice']);
+    expect(norm.pivotColumns).toEqual([]);
+  });
+
+  it('defaults a measure source to its id', () => {
+    const res = computeView(frame, {
+      pivotRows: [{ field: 'r' }],
+      columns: [{ id: 'v', agg: 'sum' }],
+    });
+    expect(res.rows.map((row) => row.cells[0]!.value)).toEqual([4, 5]);
+  });
+});
 
 /** Find a leaf index whose colPath equals the given path. */
 function leafAt(result: ViewResult, path: string[]): number {
@@ -29,12 +89,12 @@ describe('computePivot — multi-level columns & measures', () => {
     { r: 'A', c: 'y', v: 10 },
     { r: 'B', c: 'x', v: 5 },
   ]);
-  const spec: PivotSpec = {
-    rows: ['r'],
-    columns: ['c'],
-    values: [
-      { id: 'sum', field: 'v', agg: 'sum', label: 'sum' },
-      { id: 'mean', field: 'v', agg: 'mean', label: 'mean' },
+  const spec: ViewSpec = {
+    pivotRows: [{ field: 'r' }],
+    pivotColumns: [{ field: 'c' }],
+    columns: [
+      { id: 'sum', source: 'v', agg: 'sum', label: 'sum' },
+      { id: 'mean', source: 'v', agg: 'mean', label: 'mean' },
     ],
   };
 
@@ -52,7 +112,7 @@ describe('computePivot — multi-level columns & measures', () => {
   it('places measures on rows when configured', () => {
     const res = computeView(frame, {
       ...spec,
-      valuePlacement: { axis: 'rows' },
+      columnAxis: 'pivotRows',
     });
     expect(res.rowLevels).toEqual(['r', 'Measure']);
     // leaves are just the column keys now
@@ -71,9 +131,9 @@ describe('summary footer is computed from source', () => {
       { r: 'B', c: 'x', v: 9 },
     ]);
     const res = computeView(frame, {
-      rows: ['r'],
-      columns: ['c'],
-      values: [{ id: 'mean', field: 'v', agg: 'mean', label: 'mean' }],
+      pivotRows: [{ field: 'r' }],
+      pivotColumns: [{ field: 'c' }],
+      columns: [{ id: 'mean', source: 'v', agg: 'mean', label: 'mean' }],
       showSummary: true,
     });
     // group means: A/x = 2, B/x = 9 -> naive average 5.5
@@ -90,8 +150,7 @@ describe('flat mode — computed columns & composite sort', () => {
     { img: 'i2', desc: 'Alpha', price: 8, base: 10 },
     { img: 'i3', desc: 'Bravo', price: 15, base: 10 },
   ]);
-  const spec: TableSpec = {
-    mode: 'flat',
+  const spec: ViewSpec = {
     columns: [
       {
         id: 'asset',
@@ -124,23 +183,27 @@ describe('per-group derived columns (before/after Δ%)', () => {
     { app: 'P1', platform: 'AMD', revision: 'before', t: 200 },
     { app: 'P1', platform: 'AMD', revision: 'after', t: 220 },
   ]);
-  const spec: PivotSpec = {
-    rows: ['app'],
-    columns: ['platform', 'revision'],
-    values: [{ id: 'mean', field: 't', agg: 'mean', label: 'mean' }],
-    computed: [
+  const spec: ViewSpec = {
+    pivotRows: [{ field: 'app' }],
+    pivotColumns: [
+      { field: 'platform' },
       {
-        id: 'delta',
-        label: 'Δ%',
-        repeatPer: ['platform'],
-        inputs: {
-          before: { colPath: ['before'], value: 'mean' },
-          after: { colPath: ['after'], value: 'mean' },
-        },
-        compute: 'before ? (after - before) / before : null',
-        place: { after: 'after' },
+        field: 'revision',
+        computed: [
+          {
+            id: 'delta',
+            label: 'Δ%',
+            inputs: {
+              before: { member: 'before' },
+              after: { member: 'after' },
+            },
+            compute: 'before ? (after - before) / before : null',
+            place: { after: 'after' },
+          },
+        ],
       },
     ],
+    columns: [{ id: 'mean', source: 't', agg: 'mean', label: 'mean' }],
   };
 
   it('inserts a Δ% per platform referencing that platform’s own cells', () => {
@@ -160,6 +223,63 @@ describe('per-group derived columns (before/after Δ%)', () => {
     );
     expect(row.cells[leafAt(res, ['AMD', 'Δ%'])]!.value).toBeCloseTo(0.1, 10);
   });
+
+  it('survives moving the outer level to the row axis', () => {
+    // The whole reason the member lives on the axis: how often it repeats is
+    // read off the levels outside it, so dropping one leaves a single Δ% per
+    // row instead of a dangling reference. Nothing about `delta` changes.
+    const res = computeView(frame, {
+      ...spec,
+      pivotRows: [{ field: 'app' }, { field: 'platform' }],
+      pivotColumns: [spec.pivotColumns![1]!],
+    });
+    expect(res.leaves.map((l) => l.colPath.join('/'))).toEqual([
+      'before',
+      'after',
+      'Δ%',
+    ]);
+    // Intel: 100 -> 80, AMD: 200 -> 220.
+    expect(res.rows[0]!.cells[leafAt(res, ['Δ%'])]!.value).toBeCloseTo(
+      -0.2,
+      10,
+    );
+    expect(res.rows[1]!.cells[leafAt(res, ['Δ%'])]!.value).toBeCloseTo(0.1, 10);
+  });
+
+  it('yields one Δ% per measure, from the one expression', () => {
+    // `inputs` name no `column`, so each Δ% reads the measure it sits under —
+    // the member spans the measures sublevel as a real member does.
+    const res = computeView(frame, {
+      ...spec,
+      columns: [
+        { id: 'mean', source: 't', agg: 'mean', label: 'mean' },
+        { id: 'max', source: 't', agg: 'max', label: 'max' },
+      ],
+    });
+    expect(res.leaves.map((l) => l.colPath.join('/'))).toEqual([
+      'Intel/before/mean',
+      'Intel/before/max',
+      'Intel/after/mean',
+      'Intel/after/max',
+      'Intel/Δ%/mean',
+      'Intel/Δ%/max',
+      'AMD/before/mean',
+      'AMD/before/max',
+      'AMD/after/mean',
+      'AMD/after/max',
+      'AMD/Δ%/mean',
+      'AMD/Δ%/max',
+    ]);
+    const row = res.rows[0]!;
+    expect(row.cells[leafAt(res, ['Intel', 'Δ%', 'mean'])]!.value).toBeCloseTo(
+      -0.2,
+      10,
+    );
+    expect(row.cells[leafAt(res, ['AMD', 'Δ%', 'max'])]!.value).toBeCloseTo(
+      0.1,
+      10,
+    );
+  });
 });
 
 describe('row/column sorting', () => {
@@ -169,10 +289,10 @@ describe('row/column sorting', () => {
     { r: 'B', c: 'x', v: 3 },
     { r: 'A', c: 'y', v: 4 },
   ]);
-  const base: PivotSpec = {
-    rows: ['r'],
-    columns: ['c'],
-    values: [{ id: 'sum', field: 'v', agg: 'sum', label: 'sum' }],
+  const base: ViewSpec = {
+    pivotRows: [{ field: 'r' }],
+    pivotColumns: [{ field: 'c' }],
+    columns: [{ id: 'sum', source: 'v', agg: 'sum', label: 'sum' }],
   };
 
   it('defaults to first-seen order', () => {
@@ -181,11 +301,11 @@ describe('row/column sorting', () => {
     expect(res.leaves.map((l) => l.colPath[0])).toEqual(['y', 'x']);
   });
 
-  it('applies rowSort and columnSort', () => {
+  it('applies a sort on either axis', () => {
     const res = computeView(frame, {
       ...base,
-      rowSort: [{ field: 'r', direction: 'asc' }],
-      columnSort: [{ field: 'c', direction: 'asc' }],
+      pivotRows: [{ field: 'r', sort: 'asc' }],
+      pivotColumns: [{ field: 'c', sort: 'asc' }],
     });
     expect(res.rows.map((r) => r.path[0])).toEqual(['A', 'B']);
     expect(res.leaves.map((l) => l.colPath[0])).toEqual(['x', 'y']);
@@ -194,7 +314,7 @@ describe('row/column sorting', () => {
   it('honors descending direction', () => {
     const res = computeView(frame, {
       ...base,
-      rowSort: [{ field: 'r', direction: 'desc' }],
+      pivotRows: [{ field: 'r', sort: 'desc' }],
     });
     expect(res.rows.map((r) => r.path[0])).toEqual(['B', 'A']);
   });
@@ -208,12 +328,11 @@ describe('custom aggregation expression', () => {
       { r: 'A', v: 3 },
     ]);
     const res = computeView(frame, {
-      rows: ['r'],
-      columns: [],
-      values: [
+      pivotRows: [{ field: 'r' }],
+      columns: [
         {
           id: 'range',
-          field: 'v',
+          source: 'v',
           agg: 'custom', // ignored when expression is present
           label: 'range',
           expression: 'Math.max(...values) - Math.min(...values)',
@@ -232,9 +351,9 @@ describe('includeMeasure header toggle', () => {
 
   it('single measure omits the measure level (depth 1)', () => {
     const res = computeView(frame, {
-      rows: ['r'],
-      columns: ['c'],
-      values: [{ id: 'sum', field: 'v', agg: 'sum', label: 'sum' }],
+      pivotRows: [{ field: 'r' }],
+      pivotColumns: [{ field: 'c' }],
+      columns: [{ id: 'sum', source: 'v', agg: 'sum', label: 'sum' }],
     });
     expect(res.columnHeaderDepth).toBe(1);
     expect(res.leaves.every((l) => l.colPath.length === 1)).toBe(true);
@@ -242,11 +361,11 @@ describe('includeMeasure header toggle', () => {
 
   it('multiple measures add the measure level (depth 2)', () => {
     const res = computeView(frame, {
-      rows: ['r'],
-      columns: ['c'],
-      values: [
-        { id: 'sum', field: 'v', agg: 'sum', label: 'sum' },
-        { id: 'max', field: 'v', agg: 'max', label: 'max' },
+      pivotRows: [{ field: 'r' }],
+      pivotColumns: [{ field: 'c' }],
+      columns: [
+        { id: 'sum', source: 'v', agg: 'sum', label: 'sum' },
+        { id: 'max', source: 'v', agg: 'max', label: 'max' },
       ],
     });
     expect(res.columnHeaderDepth).toBe(2);
@@ -258,19 +377,16 @@ describe('derived column placement', () => {
   it('appends a global derived column at the end (place: append)', () => {
     const frame = fromRows([{ t: 'x', a: 2, b: 3 }]);
     const res = computeView(frame, {
-      rows: ['t'],
-      columns: [],
-      values: [
-        { id: 'a', field: 'a', agg: 'sum', label: 'A' },
-        { id: 'b', field: 'b', agg: 'sum', label: 'B' },
-      ],
-      computed: [
+      pivotRows: [{ field: 't' }],
+      columns: [
+        { id: 'a', source: 'a', agg: 'sum', label: 'A' },
+        { id: 'b', source: 'b', agg: 'sum', label: 'B' },
         {
           id: 'total',
           label: 'Sum',
           inputs: {
-            a: { colPath: [], value: 'a' },
-            b: { colPath: [], value: 'b' },
+            a: { colPath: [], column: 'a' },
+            b: { colPath: [], column: 'b' },
           },
           compute: 'a + b',
           place: 'append',
@@ -281,7 +397,7 @@ describe('derived column placement', () => {
     expect(res.rows[0]!.cells[leafAt(res, ['Sum'])]!.value).toBe(5);
   });
 
-  it('repeatPer without place appends within each group', () => {
+  it('a computed member without place appends within each group', () => {
     const frame = fromRows([
       { app: 'P1', platform: 'Intel', revision: 'before', t: 100 },
       { app: 'P1', platform: 'Intel', revision: 'after', t: 50 },
@@ -289,22 +405,26 @@ describe('derived column placement', () => {
       { app: 'P1', platform: 'AMD', revision: 'after', t: 100 },
     ]);
     const res = computeView(frame, {
-      rows: ['app'],
-      columns: ['platform', 'revision'],
-      values: [{ id: 'mean', field: 't', agg: 'mean', label: 'mean' }],
-      computed: [
+      pivotRows: [{ field: 'app' }],
+      pivotColumns: [
+        { field: 'platform' },
         {
-          id: 'delta',
-          label: 'Δ%',
-          repeatPer: ['platform'],
-          inputs: {
-            before: { colPath: ['before'], value: 'mean' },
-            after: { colPath: ['after'], value: 'mean' },
-          },
-          compute: 'before ? (after - before) / before : null',
-          // no `place` — falls back to appending after the group's last leaf
+          field: 'revision',
+          computed: [
+            {
+              id: 'delta',
+              label: 'Δ%',
+              inputs: {
+                before: { member: 'before' },
+                after: { member: 'after' },
+              },
+              compute: 'before ? (after - before) / before : null',
+              // no `place` — falls back to appending after the group's last leaf
+            },
+          ],
         },
       ],
+      columns: [{ id: 'mean', source: 't', agg: 'mean', label: 'mean' }],
     });
     expect(res.leaves.map((l) => l.colPath.join('/'))).toEqual([
       'Intel/before',
@@ -338,7 +458,6 @@ describe('column metadata wiring', () => {
   it('exposes source metadata on flat leaves, incl. composite sources', () => {
     const frame = fromRows(rows, meta);
     const res = computeView(frame, {
-      mode: 'flat',
       columns: [
         {
           id: 'asset',
@@ -347,7 +466,7 @@ describe('column metadata wiring', () => {
         { id: 'latency', source: 'latency' },
         { id: 'double', compute: 'latency * 2' },
       ],
-    } satisfies TableSpec);
+    } satisfies ViewSpec);
 
     const [asset, latency, double] = res.leaves;
     expect(latency!.column.meta!.displayName).toBe('Latency');
@@ -360,29 +479,58 @@ describe('column metadata wiring', () => {
     expect(double!.column.meta).toBeUndefined();
   });
 
-  it('falls back to displayName for flat headers, letting labels win', () => {
+  it('falls back to displayName for flat headers, letting `label` win', () => {
     const frame = fromRows(rows, meta);
     const res = computeView(frame, {
-      mode: 'flat',
-      labels: { latency: 'Explicit' },
       columns: [
         { id: 'host', source: 'host' },
-        { id: 'latency', source: 'latency' },
+        { id: 'latency', source: 'latency', label: 'Explicit' },
       ],
-    } satisfies TableSpec);
+    } satisfies ViewSpec);
     expect(res.leaves.map((l) => l.column.label)).toEqual(['Host', 'Explicit']);
   });
 
   it('exposes the aggregated field metadata on pivot measure leaves', () => {
     const frame = fromRows(rows, meta);
     const res = computeView(frame, {
-      rows: ['host'],
-      columns: [],
-      values: [{ id: 'mean', field: 'latency', agg: 'mean', label: 'mean' }],
-    } satisfies PivotSpec);
+      pivotRows: [{ field: 'host' }],
+      columns: [{ id: 'mean', source: 'latency', agg: 'mean', label: 'mean' }],
+    } satisfies ViewSpec);
     expect(res.leaves[0]!.column.meta!.dataName).toBe('latency');
     // Row-level headers pick up displayName too.
     expect(res.rowLevels).toEqual(['Host']);
+  });
+
+  it('lets an axis entry label and re-describe its level', () => {
+    const frame = fromRows(rows, meta);
+    const res = computeView(frame, {
+      // `label` beats the field's displayName; `meta` layers over the frame's.
+      pivotRows: [
+        { field: 'host', label: 'Machine', meta: { unit: ['byte'] } },
+      ],
+      columns: [{ id: 'mean', source: 'latency', agg: 'mean', label: 'mean' }],
+    } satisfies ViewSpec);
+    expect(res.rowLevels).toEqual(['Machine']);
+    expect(frame.columnByName.get('host')!.meta.unit).toBeUndefined();
+    expect(res.frame.columnByName.get('host')!.meta.unit).toEqual(['byte']);
+  });
+
+  it('lets a measure carry its own metadata', () => {
+    const frame = fromRows(rows, meta);
+    const res = computeView(frame, {
+      pivotRows: [{ field: 'host' }],
+      columns: [
+        {
+          id: 'mean',
+          source: 'latency',
+          agg: 'mean',
+          meta: { unit: ['second'], scale: ['milli'] },
+        },
+      ],
+    } satisfies ViewSpec);
+    // The source field's metadata, with the column's own layered over it.
+    expect(res.leaves[0]!.column.meta!.dataName).toBe('latency');
+    expect(res.leaves[0]!.column.meta!.unit).toEqual(['second']);
   });
 });
 
@@ -393,13 +541,12 @@ describe('view metadata and defaults', () => {
   ];
 
   /** Plain rows + view-declared metadata, as a caller would wire it up. */
-  function build(spec: TableSpec) {
+  function build(spec: ViewSpec) {
     return computeView(withMeta(fromRows(rows), spec.meta), spec);
   }
 
   it('defaults `source` to the column id for a plain projection', () => {
     const res = build({
-      mode: 'flat',
       columns: [{ id: 'symbol' }, { id: 'price' }],
     });
     expect(res.rows[0]!.cells.map((c) => c.value)).toEqual(['AAA', 12.5]);
@@ -407,7 +554,6 @@ describe('view metadata and defaults', () => {
 
   it('does not default `source` for computed or composite columns', () => {
     const res = build({
-      mode: 'flat',
       columns: [
         { id: 'price', compute: 'basePrice * 2' },
         { id: 'sym', composite: { fields: ['symbol'], sortKey: 'symbol' } },
@@ -420,7 +566,6 @@ describe('view metadata and defaults', () => {
 
   it('layers view metadata over the frame and deduces the format', () => {
     const res = build({
-      mode: 'flat',
       meta: {
         price: { displayName: 'Price', kind: ['price'], unit: ['dollar'] },
       },
@@ -435,7 +580,6 @@ describe('view metadata and defaults', () => {
 
   it('lets a computed column declare its own metadata', () => {
     const res = build({
-      mode: 'flat',
       columns: [
         {
           id: 'delta',
@@ -451,7 +595,6 @@ describe('view metadata and defaults', () => {
 
   it('keeps an explicit format over the deduced one', () => {
     const res = build({
-      mode: 'flat',
       meta: { price: { kind: ['price'], unit: ['dollar'] } },
       columns: [
         { id: 'price', format: { fnName: 'number', options: { decimals: 0 } } },
@@ -466,7 +609,7 @@ describe('inheritUnitFormat', () => {
   const meta = { ratio: { kind: ['percentage'], scale: ['percent'] } };
 
   function leafFormat(def: Parameters<typeof computeView>[1]) {
-    const spec = def as TableSpec;
+    const spec = def as ViewSpec;
     const res = computeView(withMeta(fromRows(rows), spec.meta), spec);
     return res.leaves[0]!.format({ value: 5.25 } as never);
   }
@@ -474,7 +617,6 @@ describe('inheritUnitFormat', () => {
   it('inherits the deduced decimals by default', () => {
     expect(
       leafFormat({
-        mode: 'flat',
         meta,
         columns: [
           {
@@ -492,7 +634,6 @@ describe('inheritUnitFormat', () => {
   it('uses the format verbatim when inheritUnitFormat is false', () => {
     expect(
       leafFormat({
-        mode: 'flat',
         meta,
         columns: [
           {
@@ -511,7 +652,6 @@ describe('inheritUnitFormat', () => {
   it('opts out of deduction with no format at all', () => {
     expect(
       leafFormat({
-        mode: 'flat',
         meta,
         columns: [{ id: 'ratio', inheritUnitFormat: false }],
       }),
@@ -528,13 +668,12 @@ describe('factor', () => {
 
   it('scales a pivot measure and its summary alike', () => {
     const res = computeView(fromRows(rows), {
-      rows: ['g'],
-      columns: [],
+      pivotRows: [{ field: 'g' }],
       showSummary: true,
-      values: [
-        { id: 'm', field: 'rate', agg: 'mean', label: 'mean', factor: 100 },
+      columns: [
+        { id: 'm', source: 'rate', agg: 'mean', label: 'mean', factor: 100 },
       ],
-    } satisfies PivotSpec);
+    } satisfies ViewSpec);
     const [a, b] = res.rows.map((r) => r.cells[0]!.value as number);
     expect(a).toBeCloseTo(15, 10); // float: ((0.1+0.2)/2)*100
     expect(b).toBeCloseTo(60, 10);
@@ -545,32 +684,29 @@ describe('factor', () => {
 
   it('scales a flat column before formatting and styling', () => {
     const res = computeView(fromRows(rows), {
-      mode: 'flat',
       columns: [{ id: 'rate', factor: 100 }],
-    } satisfies TableSpec);
+    } satisfies ViewSpec);
     expect(res.rows.map((r) => r.cells[0]!.value)).toEqual([10, 20, 60]);
   });
 
   it('leaves nulls and non-numbers alone', () => {
     const res = computeView(fromRows([{ a: null, b: 'x' }]), {
-      mode: 'flat',
       columns: [
         { id: 'a', factor: 100 },
         { id: 'b', factor: 100 },
       ],
-    } satisfies TableSpec);
+    } satisfies ViewSpec);
     expect(res.rows[0]!.cells.map((c) => c.value)).toEqual([null, 'x']);
   });
 
   it('reaches formats that could not honour an option', () => {
     const res = computeView(fromRows(rows), {
-      mode: 'flat',
       columns: [
         // An inline fn has no `options` at all — a format-level factor could
         // never have applied here.
         { id: 'rate', factor: 100, format: { fn: (ctx) => `<${ctx.value}>` } },
       ],
-    } satisfies TableSpec);
+    } satisfies ViewSpec);
     const leaf = res.leaves[0]!;
     expect(leaf.format({ value: res.rows[0]!.cells[0]!.value } as never)).toBe(
       '<10>',
@@ -581,18 +717,18 @@ describe('factor', () => {
 describe('factor and compute inputs', () => {
   it('a derived column sees a referenced measure in display units', () => {
     const res = computeView(fromRows([{ g: 'A', c: 'x', v: 0.5 }]), {
-      rows: ['g'],
-      columns: ['c'],
-      values: [{ id: 'm', field: 'v', agg: 'sum', label: 'm', factor: 100 }],
-      computed: [
+      pivotRows: [{ field: 'g' }],
+      pivotColumns: [{ field: 'c' }],
+      columns: [
+        { id: 'm', source: 'v', agg: 'sum', label: 'm', factor: 100 },
         {
           id: 'd',
           label: 'D',
-          inputs: { m: { colPath: ['x'], value: 'm' } },
+          inputs: { m: { colPath: ['x'], column: 'm' } },
           compute: 'm',
         },
       ],
-    } satisfies PivotSpec);
+    } satisfies ViewSpec);
     const cells = res.rows[0]!.cells;
     expect(cells[0]!.value).toBe(50);
     // Not 0.5: the measure was factored when its own cell was built.
@@ -601,9 +737,8 @@ describe('factor and compute inputs', () => {
 
   it("a column's own factor applies after its compute runs", () => {
     const res = computeView(fromRows([{ a: 2 }]), {
-      mode: 'flat',
       columns: [{ id: 'd', compute: 'a * 3', factor: 10 }],
-    } satisfies TableSpec);
+    } satisfies ViewSpec);
     expect(res.rows[0]!.cells[0]!.value).toBe(60);
   });
 });
@@ -617,10 +752,9 @@ describe('multi-level index nesting', () => {
     { team: 'B', project: 'p4', n: 8 },
     { team: 'A', project: 'p1', n: 16 },
   ];
-  const spec: PivotSpec = {
-    rows: ['team', 'project'],
-    columns: [],
-    values: [{ id: 's', field: 'n', agg: 'sum', label: 'n' }],
+  const spec: ViewSpec = {
+    pivotRows: [{ field: 'team' }, { field: 'project' }],
+    columns: [{ id: 's', source: 'n', agg: 'sum', label: 'n' }],
   };
 
   /** Merged index cells assume keys sharing a prefix are adjacent. */
@@ -653,7 +787,7 @@ describe('multi-level index nesting', () => {
   it('still nests when only an inner level is sorted', () => {
     const res = computeView(fromRows(scrambled), {
       ...spec,
-      rowSort: [{ field: 'project', direction: 'desc' }],
+      pivotRows: [{ field: 'team' }, { field: 'project', sort: 'desc' }],
     });
     const paths = res.rows.map((r) => r.path);
     // The outer level is untouched but must still block together.
@@ -669,8 +803,207 @@ describe('multi-level index nesting', () => {
   it('honors an explicit outer sort', () => {
     const res = computeView(fromRows(scrambled), {
       ...spec,
-      rowSort: [{ field: 'team', direction: 'desc' }],
+      pivotRows: [{ field: 'team', sort: 'desc' }, { field: 'project' }],
     });
     expect(res.rows.map((r) => r.path[0])).toEqual(['B', 'B', 'A', 'A']);
+  });
+});
+
+describe('auto-scaled columns', () => {
+  const rows = [
+    { app: 'A', t: 4_000 },
+    { app: 'A', t: 4_680 },
+    { app: 'B', t: 5_000 },
+  ];
+  /** Nanoseconds, declared by the view the way a CSV-fed spec must. */
+  const nanos = {
+    t: { kind: ['duration'], unit: ['second'], scale: ['nano'] },
+  };
+
+  /** The text a leaf renders for a row. */
+  function text(res: ViewResult, li: number, row = res.rows[0]!): string {
+    const leaf = res.leaves[li]!;
+    return leaf.format({
+      value: row.cells[li]!.value,
+      inputs: row.cells[li]!.inputs ?? {},
+      rowPath: row.path,
+      colPath: leaf.colPath,
+      column: leaf.column,
+      frame: res.frame,
+    });
+  }
+
+  function build(columns: ViewSpec['columns']) {
+    return computeView(fromRows(rows), {
+      meta: nanos,
+      pivotRows: [{ field: 'app' }],
+      columns,
+    });
+  }
+
+  it('shows nanoseconds as microseconds, and says so in the metadata', () => {
+    const res = build([
+      { id: 'mean', source: 't', agg: 'mean', autoScale: true },
+    ]);
+    expect(text(res, 0)).toBe('4.34');
+    expect(res.leaves[0]!.column.meta!.scale).toEqual(['micro']);
+    expect(res.leaves[0]!.displayFactor).toBeCloseTo(1e-3, 12);
+  });
+
+  it('leaves Cell.value in stored units', () => {
+    // The property the whole design rests on: sorting, styles and any
+    // expression over the value keep meaning nanoseconds.
+    const res = build([
+      { id: 'mean', source: 't', agg: 'mean', autoScale: true },
+    ]);
+    expect(res.rows[0]!.cells[0]!.value).toBeCloseTo(4340, 10);
+    const plain = build([{ id: 'mean', source: 't', agg: 'mean' }]);
+    expect(res.rows.map((r) => r.cells[0]!.value)).toEqual(
+      plain.rows.map((r) => r.cells[0]!.value),
+    );
+  });
+
+  it('scales the summary row with the body', () => {
+    const res = computeView(fromRows(rows), {
+      meta: nanos,
+      pivotRows: [{ field: 'app' }],
+      columns: [{ id: 'mean', source: 't', agg: 'mean', autoScale: true }],
+      showSummary: true,
+    });
+    const leaf = res.leaves[0]!;
+    const cell = res.summary![0]!;
+    const shown = leaf.format({
+      value: cell.value,
+      inputs: {},
+      rowPath: [],
+      colPath: leaf.colPath,
+      column: leaf.column,
+      frame: res.frame,
+    });
+    // Mean of 4000/4680/5000 = 4560 ns, in the column's chosen µs.
+    expect(shown).toBe('4.56');
+  });
+
+  it('is off unless the column asks', () => {
+    const res = build([{ id: 'mean', source: 't', agg: 'mean' }]);
+    expect(res.leaves[0]!.displayFactor).toBeUndefined();
+    expect(res.leaves[0]!.column.meta!.scale).toEqual(['nano']);
+  });
+
+  it('declines a column whose unit has no magnitude', () => {
+    const res = computeView(fromRows(rows), {
+      meta: { t: { unit: ['token', '1/second'] } },
+      pivotRows: [{ field: 'app' }],
+      columns: [{ id: 'mean', source: 't', agg: 'mean', autoScale: true }],
+    });
+    expect(res.leaves[0]!.displayFactor).toBeUndefined();
+  });
+
+  it('honours an explicit precision instead of overriding it', () => {
+    const res = build([
+      {
+        id: 'mean',
+        source: 't',
+        agg: 'mean',
+        autoScale: true,
+        format: { options: { decimals: 1 } },
+      },
+    ]);
+    expect(text(res, 0)).toBe('4.3');
+  });
+});
+
+describe('scale pools', () => {
+  // `small` and `big` are three orders of magnitude apart, so left alone they
+  // land on different rungs.
+  const rows = [{ g: 'x', small: 900, big: 900_000 }];
+  const nanos = {
+    small: { kind: ['duration'], unit: ['second'], scale: ['nano'] },
+    big: { kind: ['duration'], unit: ['second'], scale: ['nano'] },
+  };
+
+  function build(pool?: string) {
+    return computeView(fromRows(rows), {
+      meta: nanos,
+      pivotRows: [{ field: 'g' }],
+      columns: [
+        { id: 'small', agg: 'sum', autoScale: true, scalePool: pool },
+        { id: 'big', agg: 'sum', autoScale: true, scalePool: pool },
+      ],
+    });
+  }
+
+  it('lets unpooled columns choose independently', () => {
+    const res = build();
+    expect(res.leaves.map((l) => l.column.meta!.scale?.[0])).toEqual([
+      'nano',
+      'micro',
+    ]);
+  });
+
+  it('makes pooled columns agree on one scale', () => {
+    const res = build('times');
+    const scales = res.leaves.map((l) => l.column.meta!.scale?.[0]);
+    expect(scales[0]).toBe(scales[1]);
+    expect(res.leaves[0]!.displayFactor).toBe(res.leaves[1]!.displayFactor);
+  });
+
+  it('holds one scale across a pivot’s column groups', () => {
+    // The same measure repeated per column group must not split: a row is only
+    // comparable across the page if every group reads in the same unit.
+    const res = computeView(
+      fromRows([
+        { g: 'x', size: 'tiny', t: 100 },
+        { g: 'x', size: 'huge', t: 90_000 },
+      ]),
+      {
+        meta: { t: { kind: ['duration'], unit: ['second'], scale: ['nano'] } },
+        pivotRows: [{ field: 'g' }],
+        pivotColumns: [{ field: 'size' }],
+        columns: [{ id: 't', agg: 'mean', autoScale: true }],
+      },
+    );
+    expect(res.leaves).toHaveLength(2);
+    expect(res.leaves[0]!.displayFactor).toBe(res.leaves[1]!.displayFactor);
+  });
+});
+
+describe('per-value scale (what Format.Duration used to do)', () => {
+  /** One row per value, so each cell picks its own rung. */
+  function render(value: number): string {
+    const res = computeView(fromRows([{ g: 'x', t: value }]), {
+      meta: { t: { kind: ['duration'], unit: ['second'], scale: ['nano'] } },
+      pivotRows: [{ field: 'g' }],
+      columns: [{ id: 't', agg: 'sum', autoScale: { per: 'value' } }],
+    });
+    const leaf = res.leaves[0]!;
+    return leaf.format({
+      value: res.rows[0]!.cells[0]!.value,
+      inputs: {},
+      rowPath: [],
+      colPath: leaf.colPath,
+      column: leaf.column,
+      frame: res.frame,
+    });
+  }
+
+  it('reproduces the cases the removed formatter was pinned to', () => {
+    expect(render(999)).toBe('999 ns');
+    expect(render(1_000)).toBe('1.00 µs');
+    expect(render(1_500_000)).toBe('1.50 ms');
+    expect(render(2_000_000_000)).toBe('2.00 s');
+    // The one difference: minute is `min`, not the old `m`, which collided
+    // with metre.
+    expect(render(90_000_000_000)).toBe('1.50 min');
+    expect(render(3_600_000_000_000)).toBe('1.00 h');
+  });
+
+  it('carries no column-wide factor, since each cell chose its own', () => {
+    const res = computeView(fromRows([{ g: 'x', t: 5 }]), {
+      meta: { t: { kind: ['duration'], unit: ['second'], scale: ['nano'] } },
+      pivotRows: [{ field: 'g' }],
+      columns: [{ id: 't', agg: 'sum', autoScale: { per: 'value' } }],
+    });
+    expect(res.leaves[0]!.displayFactor).toBeUndefined();
   });
 });

@@ -10,11 +10,13 @@
 import { fromRows } from './data/import';
 import { parseCsv } from './data/csv';
 import type { CsvOptions } from './data/csv';
+import { normalizeMeta, storedMagnitude } from './data/meta';
 import type { ColumnMetaInput } from './data/meta';
 import type { DataFrame } from './data/types';
+import { hasLadder, ladderIds } from './format/ladders';
 import { aggregationIds } from './pivot/aggregations';
-import { isFlat } from './pivot/spec';
-import type { ViewSpec } from './pivot/spec';
+import { autoScaleOf, isFlat } from './pivot/spec';
+import type { AutoScaleSpec, ColumnDef, ViewSpec } from './pivot/spec';
 import type { DataTableDisplay } from './components/DataTable';
 
 /** Exactly one of `rows`, `csv`, or `url`. */
@@ -125,7 +127,8 @@ export function validateBundle(
       (k) => (data as Record<string, unknown>)[k] !== undefined,
     );
     if (given.length === 0) add('`data` needs one of `rows`, `csv`, or `url`');
-    if (given.length > 1) add(`\`data\` has more than one source: ${given.join(', ')}`);
+    if (given.length > 1)
+      add(`\`data\` has more than one source: ${given.join(', ')}`);
   }
 
   if (!b.view || typeof b.view !== 'object') {
@@ -139,57 +142,210 @@ export function validateBundle(
   /** Field names must exist, once derived columns are taken into account. */
   const checkField = (field: string, where: string) => {
     if (fields && !fields.includes(field)) {
-      add(`${where}: no column named "${field}". Available: ${fields.join(', ')}`);
+      add(
+        `${where}: no column named "${field}". Available: ${fields.join(', ')}`,
+      );
     }
   };
 
-  if (isFlat(view)) {
-    if (!Array.isArray(view.columns) || view.columns.length === 0) {
-      add('a flat view needs a non-empty `columns`');
-    } else {
-      view.columns.forEach((def, i) => {
-        if (!def.id) add(`view.columns[${i}]: \`id\` is required`);
-        // `source` defaults to `id`; a computed column names no field.
-        if (!def.compute && !def.composite) checkField(def.source ?? def.id, `view.columns[${i}]`);
-      });
-    }
-    return { ok: problems.length === 0, problems };
-  }
-
-  for (const axis of ['rows', 'columns'] as const) {
-    if (!Array.isArray(view[axis])) {
-      add(`view.${axis} must be an array (use [] for none)`);
+  // The axes first: `isFlat` reads them, so a malformed one has to be caught
+  // before anything branches on what kind of view this is.
+  for (const axis of ['pivotRows', 'pivotColumns'] as const) {
+    const entries = view[axis];
+    if (entries === undefined) continue;
+    if (!Array.isArray(entries)) {
+      add(`view.${axis} must be an array (omit it, or use [], for none)`);
       continue;
     }
-    view[axis].forEach((field, i) => checkField(field, `view.${axis}[${i}]`));
-  }
-
-  if (!Array.isArray(view.values) || view.values.length === 0) {
-    add('view.values needs at least one measure');
-  } else {
-    const aggs = aggregationIds();
-    const ids = new Set<string>();
-    view.values.forEach((value, i) => {
-      const at = `view.values[${i}]`;
-      if (!value.id) add(`${at}: \`id\` is required`);
-      else if (ids.has(value.id)) add(`${at}: duplicate id "${value.id}"`);
-      else ids.add(value.id);
-
-      if (!value.field) add(`${at}: \`field\` is required`);
-      else {
-        checkField(value.field, at);
-        const column = frame?.columnByName.get(value.field);
-        // A non-numeric column can still be counted, just not summed.
-        const counts = value.agg === 'count' || value.agg === 'countDistinct';
-        if (column && !counts && column.type !== 'int' && column.type !== 'float') {
-          add(`${at}: "${value.field}" is ${column.type}; ${value.agg} needs a number column`);
-        }
-      }
-      if (!value.agg) add(`${at}: \`agg\` is required`);
-      else if (!value.expression && !aggs.includes(value.agg)) {
-        add(`${at}: unknown agg "${value.agg}". Available: ${aggs.join(', ')}`);
+    entries.forEach((entry, i) => {
+      const at = `view.${axis}[${i}]`;
+      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+        add(`${at}: must be an object with a \`field\`, not ${typeof entry}`);
+      } else if (!entry.field) {
+        add(`${at}: \`field\` is required`);
+      } else {
+        checkField(entry.field, at);
       }
     });
+  }
+
+  if (!Array.isArray(view.columns) || view.columns.length === 0) {
+    add('a view needs a non-empty `columns`');
+    return { ok: false, problems };
+  }
+
+  const flat = isFlat(view);
+  const aggs = aggregationIds();
+  const ids = new Set<string>();
+  /** pool name -> the first column in it, for the agreement checks. */
+  const pools = new Map<string, { auto: AutoScaleSpec; at: string }>();
+
+  /**
+   * A column that asks to be scaled needs a scale that can be measured. An
+   * unregistered scale is fine as a *label* — it just cannot be a starting
+   * point, so saying `autoScale` over one is a mistake worth naming rather
+   * than a silent no-op.
+   */
+  const checkAutoScale = (
+    def: ColumnDef,
+    source: string | undefined,
+    at: string,
+  ) => {
+    const auto = autoScaleOf(def);
+    if (!auto) {
+      if (def.scalePool) add(`${at}: \`scalePool\` needs \`autoScale\``);
+      return;
+    }
+
+    if (auto.ladder !== undefined && !hasLadder(auto.ladder)) {
+      add(
+        `${at}: unknown scale ladder "${auto.ladder}". Available: ${ladderIds().join(', ')}`,
+      );
+    }
+    if (auto.per === 'value' && def.scalePool) {
+      add(
+        `${at}: \`scalePool\` and \`per: 'value'\` conflict; a pool exists to pick one scale`,
+      );
+    }
+
+    // Metadata from the view wins over the frame's, matching what the engine
+    // layers on in `prepare`.
+    const declared = source ? view.meta?.[source] : undefined;
+    const fromFrame = source
+      ? frame?.columnByName.get(source)?.meta
+      : undefined;
+    const meta =
+      declared || fromFrame
+        ? normalizeMeta(
+            fromFrame ?? { dataName: source!, type: 'float', category: 'data' },
+            { ...fromFrame, ...def.meta, ...declared },
+          )
+        : undefined;
+    if ((declared || fromFrame) && storedMagnitude(meta) === undefined) {
+      add(
+        `${at}: \`autoScale\` needs a measurable \`unit\`/\`scale\`; ` +
+          `"${source}" has none, or a compound one that cannot scale`,
+      );
+    }
+
+    if (!def.scalePool) return;
+    const first = pools.get(def.scalePool);
+    if (!first) {
+      pools.set(def.scalePool, { auto, at });
+      return;
+    }
+    if (first.auto.ladder !== auto.ladder) {
+      add(
+        `${at}: pool "${def.scalePool}" disagrees with ${first.at} about the ladder`,
+      );
+    }
+    if ((first.auto.per ?? 'column') !== (auto.per ?? 'column')) {
+      add(
+        `${at}: pool "${def.scalePool}" disagrees with ${first.at} about \`per\``,
+      );
+    }
+  };
+
+  view.columns.forEach((def, i) => {
+    const at = `view.columns[${i}]`;
+    if (!def.id) add(`${at}: \`id\` is required`);
+    else if (ids.has(def.id)) add(`${at}: duplicate id "${def.id}"`);
+    else ids.add(def.id);
+
+    // `source` defaults to `id`; a computed or composite column names no field
+    // of its own unless it says so.
+    const source =
+      def.compute || def.composite ? def.source : (def.source ?? def.id);
+    if (source) checkField(source, at);
+
+    if (def.agg !== undefined) {
+      if (!def.agg) add(`${at}: \`agg\` is empty; omit it for a plain column`);
+      else if (!def.expression && !aggs.includes(def.agg)) {
+        add(`${at}: unknown agg "${def.agg}". Available: ${aggs.join(', ')}`);
+      }
+      const column = source ? frame?.columnByName.get(source) : undefined;
+      // A non-numeric column can still be counted, just not summed.
+      const counts = def.agg === 'count' || def.agg === 'countDistinct';
+      if (
+        column &&
+        !counts &&
+        column.type !== 'int' &&
+        column.type !== 'float'
+      ) {
+        add(
+          `${at}: "${source}" is ${column.type}; ${def.agg} needs a number column`,
+        );
+      }
+    }
+
+    checkAutoScale(def, source, at);
+
+    // Coherence. A pivot groups its source rows away, so every column has to
+    // say how it survives that; a flat view has no groups to aggregate over.
+    if (flat) {
+      if (def.place) add(`${at}: \`place\` needs a pivot view`);
+    } else if (def.agg === undefined && !def.compute) {
+      add(
+        `${at}: "${def.id}" neither aggregates nor computes; a pivot column ` +
+          'needs `agg` (or `compute`, for a derived column)',
+      );
+    }
+  });
+
+  // Computed axis members. The engine reads them off the innermost column
+  // level — that is what tells it how often each one repeats — so the places it
+  // would not look for them are worth saying out loud rather than dropping.
+  const columnLevels = view.pivotColumns ?? [];
+  (view.pivotRows ?? []).forEach((entry, i) => {
+    if (entry?.computed) {
+      add(
+        `view.pivotRows[${i}]: \`computed\` is supported on \`pivotColumns\`; ` +
+          'a computed member of a row level would have to synthesize rows',
+      );
+    }
+  });
+  columnLevels.forEach((entry, i) => {
+    const members = entry?.computed;
+    if (!members) return;
+    const at = `view.pivotColumns[${i}]`;
+    if (i !== columnLevels.length - 1) {
+      add(
+        `${at}: only the innermost column level may carry \`computed\`; ` +
+          `"${entry.field}" has ${columnLevels.length - 1 - i} level(s) inside it`,
+      );
+    }
+    if (view.columnAxis === 'pivotRows') {
+      add(`${at}: \`computed\` needs the columns level on \`pivotColumns\``);
+    }
+    if (!Array.isArray(members)) {
+      add(`${at}: \`computed\` must be an array`);
+      return;
+    }
+    const memberIds = new Set<string>();
+    members.forEach((member, j) => {
+      const mAt = `${at}.computed[${j}]`;
+      if (!member?.id) add(`${mAt}: \`id\` is required`);
+      else if (memberIds.has(member.id)) {
+        add(`${mAt}: duplicate id "${member.id}"`);
+      } else memberIds.add(member.id);
+      if (!member?.compute) {
+        add(`${mAt}: \`compute\` is required; a computed member has no source`);
+      }
+      for (const [alias, ref] of Object.entries(member?.inputs ?? {})) {
+        if (!ref?.member) {
+          add(`${mAt}: inputs.${alias} needs a \`member\` of this level`);
+        }
+      }
+    });
+  });
+
+  if (flat) {
+    if (view.showSummary) add('view.showSummary needs a pivot view');
+    if (view.columnAxis) add('view.columnAxis needs a pivot view');
+  } else if (view.sort) {
+    add(
+      'view.sort is flat-only; a pivot sorts per level, via `pivotRows[].sort`',
+    );
   }
 
   return { ok: problems.length === 0, problems };

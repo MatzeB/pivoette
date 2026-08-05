@@ -67,23 +67,25 @@ export type {
 } from './pivot/result';
 
 // Config language
-export { isFlat } from './pivot/spec';
+export { autoScaleOf, axisFields, isFlat, normalizeView } from './pivot/spec';
 export type {
+  AutoScaleSpec,
+  AxisField,
   CellRef,
   ColumnDef,
+  ComputedMember,
   DerivedField,
+  MemberRef,
   FormatOptionsSpec,
   CompositeSpec,
   Direction,
   FormatSpec,
+  MeasureColumn,
   NamedSpec,
-  PivotSpec,
+  NormalizedView,
   RenderSpec,
   SortSpec,
   StyleSpec,
-  TableSpec,
-  ValuePlacement,
-  ValueSpec,
   ViewSpec,
 } from './pivot/spec';
 
@@ -95,18 +97,17 @@ export type { BundleData, ColumnSummary, PivoetteBundle } from './bundle';
 export { ViewEditor } from './editor/ViewEditor';
 export type { ViewEditorProps } from './editor/ViewEditor';
 export {
+  addColumn,
   addField,
   addFooterRow,
-  addValue,
+  moveColumn,
   moveField,
   moveFooterRow,
-  moveValue,
-  removeComputed,
+  removeColumn,
   removeField,
   removeFooterRow,
-  removeValue,
+  setColumnAgg,
   setShowSummary,
-  setValueAgg,
 } from './editor/ops';
 export type { FieldRef, FieldZone } from './editor/ops';
 
@@ -121,6 +122,14 @@ export { deduceFormat } from './format/deduce';
 export { registerFormat, resolveFormat } from './format/format';
 export { registerStyle, resolveStyle } from './format/style';
 export { registerRender, resolveRender } from './format/render';
+export {
+  chooseStep,
+  getLadder,
+  hasLadder,
+  ladderIds,
+  registerLadder,
+} from './format/ladders';
+export type { Ladder, ScaleStep } from './format/ladders';
 export { Format, Render, Style } from './format/builtins';
 export { compileExpression, evalExpression } from './format/expression';
 export type {

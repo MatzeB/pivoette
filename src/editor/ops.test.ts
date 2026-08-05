@@ -1,37 +1,38 @@
 import { describe, expect, it } from 'vitest';
 import {
+  addColumn,
   addField,
   addFooterRow,
-  addValue,
+  moveColumn,
   moveField,
   moveFooterRow,
-  moveValue,
+  removeColumn,
   removeField,
   removeFooterRow,
-  removeValue,
-  setValueAgg,
+  setColumnAgg,
 } from './ops';
-import type { PivotSpec, TableSpec, ViewSpec } from '../pivot/spec';
+import type { ViewSpec } from '../pivot/spec';
 
-const base: PivotSpec = {
-  rows: ['team', 'author'],
-  columns: ['weekday'],
-  values: [
-    { id: 'added', field: 'linesAdded', agg: 'sum', label: '+' },
-    { id: 'removed', field: 'linesRemoved', agg: 'sum', label: '−' },
+const base: ViewSpec = {
+  pivotRows: [{ field: 'team' }, { field: 'author' }],
+  pivotColumns: [{ field: 'weekday' }],
+  columns: [
+    { id: 'added', source: 'linesAdded', agg: 'sum', label: '+' },
+    { id: 'removed', source: 'linesRemoved', agg: 'sum', label: '−' },
   ],
 };
 
-/** Narrow back to a pivot for assertions. */
-const p = (spec: ViewSpec) => spec as PivotSpec;
+/** The field names on an axis, which is what most assertions are about. */
+const fields = (spec: ViewSpec, zone: 'pivotRows' | 'pivotColumns') =>
+  (spec[zone] ?? []).map((a) => a.field);
+const ids = (spec: ViewSpec) => spec.columns.map((c) => c.id);
 
 describe('grouping fields', () => {
   it('appends to the named axis', () => {
-    expect(p(addField(base, 'columns', 'month')).columns).toEqual([
-      'weekday',
-      'month',
-    ]);
-    expect(p(addField(base, 'rows', 'month')).rows).toEqual([
+    expect(
+      fields(addField(base, 'pivotColumns', 'month'), 'pivotColumns'),
+    ).toEqual(['weekday', 'month']);
+    expect(fields(addField(base, 'pivotRows', 'month'), 'pivotRows')).toEqual([
       'team',
       'author',
       'month',
@@ -39,115 +40,129 @@ describe('grouping fields', () => {
   });
 
   it('ignores a field already placed on either axis', () => {
-    expect(addField(base, 'columns', 'author')).toBe(base);
-    expect(addField(base, 'rows', 'weekday')).toBe(base);
+    expect(addField(base, 'pivotColumns', 'author')).toBe(base);
+    expect(addField(base, 'pivotRows', 'weekday')).toBe(base);
   });
 
   it('removes by position', () => {
-    expect(p(removeField(base, 'rows', 0)).rows).toEqual(['author']);
-    expect(removeField(base, 'rows', 5)).toBe(base);
-  });
-
-  it('prunes a sort entry whose field left the axis', () => {
-    const sorted: PivotSpec = {
-      ...base,
-      rowSort: [{ field: 'team' }, { field: 'author' }],
-    };
-    expect(p(removeField(sorted, 'rows', 0)).rowSort).toEqual([
-      { field: 'author' },
+    expect(fields(removeField(base, 'pivotRows', 0), 'pivotRows')).toEqual([
+      'author',
     ]);
+    expect(removeField(base, 'pivotRows', 5)).toBe(base);
   });
 
   it('reorders within an axis', () => {
     const moved = moveField(
       base,
-      { zone: 'rows', index: 1 },
-      { zone: 'rows', index: 0 },
+      { zone: 'pivotRows', index: 1 },
+      { zone: 'pivotRows', index: 0 },
     );
-    expect(p(moved).rows).toEqual(['author', 'team']);
+    expect(fields(moved, 'pivotRows')).toEqual(['author', 'team']);
   });
 
   it('clamps a drop past the end', () => {
     const moved = moveField(
       base,
-      { zone: 'rows', index: 0 },
-      { zone: 'rows', index: 9 },
+      { zone: 'pivotRows', index: 0 },
+      { zone: 'pivotRows', index: 9 },
     );
-    expect(p(moved).rows).toEqual(['author', 'team']);
+    expect(fields(moved, 'pivotRows')).toEqual(['author', 'team']);
   });
 
   it('pivots a field from one axis to the other', () => {
-    const moved = p(
-      moveField(
-        base,
-        { zone: 'rows', index: 1 },
-        { zone: 'columns', index: 0 },
-      ),
+    const moved = moveField(
+      base,
+      { zone: 'pivotRows', index: 1 },
+      { zone: 'pivotColumns', index: 0 },
     );
-    expect(moved.rows).toEqual(['team']);
-    expect(moved.columns).toEqual(['author', 'weekday']);
+    expect(fields(moved, 'pivotRows')).toEqual(['team']);
+    expect(fields(moved, 'pivotColumns')).toEqual(['author', 'weekday']);
   });
 
-  it('prunes the source axis sort when a field pivots away', () => {
-    const sorted: PivotSpec = { ...base, rowSort: [{ field: 'author' }] };
-    const moved = p(
-      moveField(
-        sorted,
-        { zone: 'rows', index: 1 },
-        { zone: 'columns', index: 0 },
-      ),
+  it("carries the level's label and sort across a pivot", () => {
+    const sorted: ViewSpec = {
+      ...base,
+      pivotRows: [
+        { field: 'team' },
+        { field: 'author', sort: 'desc', label: 'Who' },
+      ],
+    };
+    const moved = moveField(
+      sorted,
+      { zone: 'pivotRows', index: 1 },
+      { zone: 'pivotColumns', index: 0 },
     );
-    expect(moved.rowSort).toEqual([]);
+    // The whole entry moves, so nothing has to be pruned or reattached.
+    expect(moved.pivotColumns?.[0]).toEqual({
+      field: 'author',
+      sort: 'desc',
+      label: 'Who',
+    });
+    expect(moved.pivotRows).toEqual([{ field: 'team' }]);
+  });
+
+  it('handles an axis the spec never declared', () => {
+    const rowsOnly: ViewSpec = {
+      pivotRows: [{ field: 'team' }],
+      columns: [{ id: 'n', source: 'v', agg: 'sum' }],
+    };
+    expect(
+      fields(addField(rowsOnly, 'pivotColumns', 'weekday'), 'pivotColumns'),
+    ).toEqual(['weekday']);
+    expect(removeField(rowsOnly, 'pivotColumns', 0)).toBe(rowsOnly);
   });
 
   it('is a no-op for an empty position', () => {
     expect(
       moveField(
         base,
-        { zone: 'columns', index: 4 },
-        { zone: 'rows', index: 0 },
+        { zone: 'pivotColumns', index: 4 },
+        { zone: 'pivotRows', index: 0 },
       ),
     ).toBe(base);
   });
 });
 
-describe('measures', () => {
+describe('columns', () => {
   it('derives an id from the aggregation and field', () => {
-    const next = p(addValue(base, 'linesAdded', 'mean'));
-    expect(next.values.at(-1)).toMatchObject({
+    const next = addColumn(base, 'linesAdded', 'mean');
+    expect(next.columns.at(-1)).toMatchObject({
       id: 'mean_linesAdded',
-      field: 'linesAdded',
+      source: 'linesAdded',
       agg: 'mean',
     });
   });
 
   it('keeps the derived id unique', () => {
-    const once = addValue(base, 'linesAdded', 'mean');
-    const twice = p(addValue(once, 'linesAdded', 'mean'));
-    expect(twice.values.map((v) => v.id)).toContain('mean_linesAdded');
-    expect(twice.values.map((v) => v.id)).toContain('mean_linesAdded_2');
+    const once = addColumn(base, 'linesAdded', 'mean');
+    const twice = addColumn(once, 'linesAdded', 'mean');
+    expect(ids(twice)).toContain('mean_linesAdded');
+    expect(ids(twice)).toContain('mean_linesAdded_2');
   });
 
-  it('removes by position but never empties the list', () => {
-    expect(p(removeValue(base, 0)).values.map((v) => v.id)).toEqual([
-      'removed',
-    ]);
-    const one = p(removeValue(base, 0));
+  it('removes by position but never drops the last measure', () => {
+    expect(ids(removeColumn(base, 0))).toEqual(['removed']);
+    const one = removeColumn(base, 0);
     // Nothing left to aggregate, so the last one stays.
-    expect(removeValue(one, 0)).toBe(one);
+    expect(removeColumn(one, 0)).toBe(one);
+  });
+
+  it('removes a derived column even when one measure remains', () => {
+    const withDerived: ViewSpec = {
+      ...base,
+      columns: [base.columns[0]!, { id: 'net', compute: 'added - removed' }],
+    };
+    expect(ids(removeColumn(withDerived, 1))).toEqual(['added']);
   });
 
   it('changes an aggregation without touching the rest', () => {
-    const next = p(setValueAgg(base, 0, 'mean'));
-    expect(next.values[0]).toEqual({ ...base.values[0], agg: 'mean' });
-    expect(next.values[1]).toBe(base.values[1]);
+    const next = setColumnAgg(base, 0, 'mean');
+    expect(next.columns[0]).toEqual({ ...base.columns[0], agg: 'mean' });
+    expect(next.columns[1]).toBe(base.columns[1]);
   });
 
   it('reorders', () => {
-    expect(p(moveValue(base, 1, 0)).values.map((v) => v.id)).toEqual([
-      'removed',
-      'added',
-    ]);
+    expect(ids(moveColumn(base, 1, 0))).toEqual(['removed', 'added']);
   });
 });
 
@@ -165,17 +180,18 @@ describe('footer rows', () => {
 });
 
 describe('flat specs', () => {
-  const flat: TableSpec = { mode: 'flat', columns: [{ id: 'a' }] };
+  const flat: ViewSpec = { columns: [{ id: 'a' }] };
 
   it('are left alone by the pivot-only operations', () => {
-    expect(addField(flat, 'rows', 'x')).toBe(flat);
-    expect(removeField(flat, 'rows', 0)).toBe(flat);
-    expect(addValue(flat, 'x', 'sum')).toBe(flat);
+    expect(addField(flat, 'pivotRows', 'x')).toBe(flat);
+    expect(removeField(flat, 'pivotRows', 0)).toBe(flat);
+    expect(addColumn(flat, 'x', 'sum')).toBe(flat);
+    expect(removeColumn(flat, 0)).toBe(flat);
     expect(
       moveField(
         flat,
-        { zone: 'rows', index: 0 },
-        { zone: 'columns', index: 0 },
+        { zone: 'pivotRows', index: 0 },
+        { zone: 'pivotColumns', index: 0 },
       ),
     ).toBe(flat);
   });
@@ -184,46 +200,45 @@ describe('flat specs', () => {
 describe('serializability', () => {
   it('survives every operation', () => {
     let spec: ViewSpec = base;
-    spec = addField(spec, 'columns', 'month');
+    spec = addField(spec, 'pivotColumns', 'month');
     spec = moveField(
       spec,
-      { zone: 'rows', index: 0 },
-      { zone: 'columns', index: 0 },
+      { zone: 'pivotRows', index: 0 },
+      { zone: 'pivotColumns', index: 0 },
     );
-    spec = addValue(spec, 'linesAdded', 'mean');
-    spec = setValueAgg(spec, 0, 'max');
-    spec = removeValue(spec, 1);
+    spec = addColumn(spec, 'linesAdded', 'mean');
+    spec = setColumnAgg(spec, 0, 'max');
+    spec = removeColumn(spec, 1);
     // The property the editor exists to preserve.
     expect(JSON.parse(JSON.stringify(spec))).toEqual(spec);
   });
 
   it('never mutates the input', () => {
-    const before = JSON.parse(JSON.stringify(base)) as PivotSpec;
-    addField(base, 'rows', 'month');
-    moveField(base, { zone: 'rows', index: 0 }, { zone: 'columns', index: 0 });
-    removeValue(base, 0);
+    const before = JSON.parse(JSON.stringify(base)) as ViewSpec;
+    addField(base, 'pivotRows', 'month');
+    moveField(
+      base,
+      { zone: 'pivotRows', index: 0 },
+      { zone: 'pivotColumns', index: 0 },
+    );
+    removeColumn(base, 0);
     expect(base).toEqual(before);
   });
 });
 
 describe('inserting a field at a position', () => {
+  const at = (i?: number) =>
+    fields(addField(base, 'pivotRows', 'month', i), 'pivotRows');
+
   it('places it where asked', () => {
-    expect(p(addField(base, 'rows', 'month', 0)).rows).toEqual([
-      'month',
-      'team',
-      'author',
-    ]);
-    expect(p(addField(base, 'rows', 'month', 1)).rows).toEqual([
-      'team',
-      'month',
-      'author',
-    ]);
+    expect(at(0)).toEqual(['month', 'team', 'author']);
+    expect(at(1)).toEqual(['team', 'month', 'author']);
   });
 
   it('appends without a position, and clamps a silly one', () => {
-    expect(p(addField(base, 'rows', 'month')).rows.at(-1)).toBe('month');
-    expect(p(addField(base, 'rows', 'month', 99)).rows.at(-1)).toBe('month');
-    expect(p(addField(base, 'rows', 'month', -3)).rows[0]).toBe('month');
+    expect(at().at(-1)).toBe('month');
+    expect(at(99).at(-1)).toBe('month');
+    expect(at(-3)[0]).toBe('month');
   });
 });
 

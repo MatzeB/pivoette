@@ -28,6 +28,15 @@ export interface ResolvedLeaf {
   format: FormatFn;
   style: StyleFn;
   render?: CellRender;
+  /**
+   * Set when the column chose its own scale: multiply a `Cell.value` by this to
+   * get the number shown. `format` already applies it — this is here so a host
+   * can report the scale, not so it has to do the arithmetic. The matching
+   * label lives in `column.meta`, like every other unit.
+   *
+   * Absent for a per-value scale, where each cell picks its own.
+   */
+  displayFactor?: number;
 }
 
 /**

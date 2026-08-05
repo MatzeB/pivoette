@@ -3,7 +3,7 @@ import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { DataTable } from './DataTable';
 import type { DataTableDisplay } from './DataTable';
-import type { PivotSpec, TableSpec, ViewSpec } from '../pivot/spec';
+import type { ViewSpec } from '../pivot/spec';
 
 // react-dom needs this flag; @tanstack/react-virtual needs ResizeObserver.
 (
@@ -40,24 +40,27 @@ describe('<DataTable> smoke', () => {
       { app: 'P1', platform: 'AMD', revision: 'before', t: 200 },
       { app: 'P1', platform: 'AMD', revision: 'after', t: 220 },
     ];
-    const view: PivotSpec = {
-      rows: ['app'],
-      columns: ['platform', 'revision'],
-      labels: { app: 'Application' },
-      values: [{ id: 'mean', field: 't', agg: 'mean', label: 'mean' }],
-      computed: [
+    const view: ViewSpec = {
+      pivotRows: [{ field: 'app', label: 'Application' }],
+      pivotColumns: [
+        { field: 'platform' },
         {
-          id: 'delta',
-          label: 'Δ%',
-          repeatPer: ['platform'],
-          inputs: {
-            before: { colPath: ['before'], value: 'mean' },
-            after: { colPath: ['after'], value: 'mean' },
-          },
-          compute: 'before ? (after - before) / before : null',
-          place: { after: 'after' },
+          field: 'revision',
+          computed: [
+            {
+              id: 'delta',
+              label: 'Δ%',
+              inputs: {
+                before: { member: 'before' },
+                after: { member: 'after' },
+              },
+              compute: 'before ? (after - before) / before : null',
+              place: { after: 'after' },
+            },
+          ],
         },
       ],
+      columns: [{ id: 'mean', source: 't', agg: 'mean', label: 'mean' }],
     };
     const el = await render(<DataTable data={data} view={view} />);
     const headerText = el.querySelector('thead')!.textContent ?? '';
@@ -74,12 +77,12 @@ describe('<DataTable> smoke', () => {
       { b: 'k1', size: 'big', arch: 'AArch64', t: 100 },
       { b: 'k2', size: 'tiny', arch: 'x86', t: 5 },
     ];
-    const view: PivotSpec = {
-      rows: ['b'],
-      columns: ['size', 'arch'],
-      values: [
-        { id: 'mean', field: 't', agg: 'mean', label: 'mean' },
-        { id: 'max', field: 't', agg: 'max', label: 'max' },
+    const view: ViewSpec = {
+      pivotRows: [{ field: 'b' }],
+      pivotColumns: [{ field: 'size' }, { field: 'arch' }],
+      columns: [
+        { id: 'mean', source: 't', agg: 'mean', label: 'mean' },
+        { id: 'max', source: 't', agg: 'max', label: 'max' },
       ],
     };
     const el = await render(
@@ -104,8 +107,7 @@ describe('<DataTable> smoke', () => {
 
   it('renders a flat table with a summary-free header', async () => {
     const data = [{ name: 'a', v: 1 }];
-    const view: TableSpec = {
-      mode: 'flat',
+    const view: ViewSpec = {
       columns: [
         { id: 'name', label: 'Name', source: 'name' },
         { id: 'v', label: 'Value', source: 'v' },
@@ -128,8 +130,7 @@ describe('<DataTable> unit decoration', () => {
     },
     cpu: { displayName: 'CPU', scale: 'percent' },
   };
-  const view: TableSpec = {
-    mode: 'flat',
+  const view: ViewSpec = {
     columns: [
       { id: 'host', source: 'host' },
       {
@@ -230,8 +231,7 @@ describe('<DataTable> unit decoration', () => {
 
 describe('<DataTable> currency prefix', () => {
   const rows = [{ sym: 'A', price: 12.5, delta: -3.25, gain: 4 }];
-  const view: TableSpec = {
-    mode: 'flat',
+  const view: ViewSpec = {
     meta: {
       price: { displayName: 'Price', kind: ['price'], unit: ['dollar'] },
     },
@@ -292,15 +292,110 @@ describe('<DataTable> currency prefix', () => {
   });
 });
 
+describe('<DataTable> auto-scaled units move with the toggle', () => {
+  // The defect this exists to fix: a duration used to print its own `µs`
+  // inside the formatted string, so the placement toggle could not see it.
+  const rows = [
+    { app: 'A', t: 4_000 },
+    { app: 'B', t: 4_680 },
+  ];
+  const view: ViewSpec = {
+    meta: { t: { kind: ['duration'], unit: ['second'], scale: ['nano'] } },
+    pivotRows: [{ field: 'app' }],
+    columns: [
+      { id: 'mean', source: 't', agg: 'mean', label: 'mean', autoScale: true },
+    ],
+  };
+
+  async function renderWith(display: DataTableDisplay) {
+    const el = await render(
+      <DataTable
+        data={rows}
+        view={view}
+        display={{ footer: [{ label: 'sum', agg: 'mean' }], ...display }}
+      />,
+    );
+    return {
+      head: el.querySelector('thead')!.textContent ?? '',
+      values: el.querySelector('tfoot')!.textContent ?? '',
+    };
+  }
+
+  it('puts the chosen scale on the value', async () => {
+    const { head, values } = await renderWith({
+      unitPlacement: 'value',
+      scalePlacement: 'value',
+    });
+    expect(values).toContain('4.34 µs');
+    expect(head).not.toContain('µs');
+  });
+
+  it('hoists it into the header instead', async () => {
+    const { head, values } = await renderWith({
+      unitPlacement: 'header',
+      scalePlacement: 'header',
+    });
+    expect(head).toContain('mean (µs)');
+    expect(values).toContain('4.34');
+    expect(values).not.toContain('µs');
+  });
+
+  it('splits the scale from the unit, like any other simple unit', async () => {
+    const { head, values } = await renderWith({
+      unitPlacement: 'header',
+      scalePlacement: 'value',
+    });
+    expect(head).toContain('mean (s)');
+    expect(values).toContain('4.34 µ');
+  });
+
+  it('still scales the number when the label is turned off', async () => {
+    const { head, values } = await renderWith({
+      unitPlacement: 'off',
+      scalePlacement: 'off',
+    });
+    expect(values).toContain('4.34');
+    expect(head).not.toContain('µ');
+  });
+
+  it('leaves a per-value column to write its own label', async () => {
+    // Each cell chose its own rung, so there is no single label to hoist.
+    const el = await render(
+      <DataTable
+        data={rows}
+        view={{
+          ...view,
+          columns: [
+            {
+              id: 'mean',
+              source: 't',
+              agg: 'mean',
+              label: 'mean',
+              autoScale: { per: 'value' },
+            },
+          ],
+        }}
+        display={{
+          footer: [{ label: 'sum', agg: 'mean' }],
+          unitPlacement: 'header',
+          scalePlacement: 'header',
+        }}
+      />,
+    );
+    expect(el.querySelector('thead')!.textContent).not.toContain('µs');
+    expect(el.querySelector('tfoot')!.textContent).toContain('4.34 µs');
+  });
+});
+
 describe('<DataTable> editing', () => {
   const data = [
     { author: 'a', weekday: 1, n: 5 },
     { author: 'b', weekday: 2, n: 7 },
   ];
-  const view: PivotSpec = {
-    rows: ['author'],
-    columns: ['weekday'],
-    values: [{ id: 's', field: 'n', agg: 'sum', label: 'n' }],
+  const view: ViewSpec = {
+    pivotRows: [{ field: 'author' }],
+    pivotColumns: [{ field: 'weekday' }],
+    columns: [{ id: 's', source: 'n', agg: 'sum', label: 'n' }],
   };
 
   async function cellCounts(el: HTMLElement) {
@@ -413,7 +508,7 @@ describe('<DataTable> editing', () => {
     // Committing a choice goes through `addField`, which never mutates. The
     // choices themselves render in body rows, which the virtualizer does not
     // render under jsdom, so what is exercised here is revealing and opening.
-    const before = JSON.parse(JSON.stringify(view)) as PivotSpec;
+    const before = JSON.parse(JSON.stringify(view)) as ViewSpec;
     const el = await render(
       <DataTable data={data} view={view} editing onViewChange={() => {}} />,
     );
@@ -431,10 +526,9 @@ describe('<DataTable> editing', () => {
 
 describe('<DataTable> field removal', () => {
   const data = [{ team: 'A', project: 'p', n: 1 }];
-  const view: PivotSpec = {
-    rows: ['team', 'project'],
-    columns: [],
-    values: [{ id: 's', field: 'n', agg: 'sum', label: 'n' }],
+  const view: ViewSpec = {
+    pivotRows: [{ field: 'team' }, { field: 'project' }],
+    columns: [{ id: 's', source: 'n', agg: 'sum', label: 'n' }],
   };
 
   it('shows a remove control per row field only when editable', async () => {
@@ -454,20 +548,20 @@ describe('<DataTable> field removal', () => {
   });
 
   it('removes the field it names, without sorting', async () => {
-    let next: PivotSpec | undefined;
+    let next: ViewSpec | undefined;
     const el = await render(
       <DataTable
         data={data}
         view={view}
         editing
-        onViewChange={(v) => (next = v as PivotSpec)}
+        onViewChange={(v) => (next = v as ViewSpec)}
       />,
     );
     const remove = el.querySelector<HTMLButtonElement>(
       'button[aria-label="Remove the team row field"]',
     )!;
     await act(async () => remove.click());
-    expect(next!.rows).toEqual(['project']);
+    expect(next!.pivotRows?.map((a) => a.field)).toEqual(['project']);
     // The click must not also reach the header's sort handler.
     expect(el.querySelector('thead')!.textContent).not.toContain('▼');
     expect(el.querySelector('thead')!.textContent).not.toContain('▲');
@@ -479,18 +573,18 @@ describe('<DataTable> remove controls', () => {
     { team: 'A', wd: 1, n: 2 },
     { team: 'B', wd: 2, n: 3 },
   ];
-  const view: PivotSpec = {
-    rows: ['team'],
-    columns: ['wd'],
+  const view: ViewSpec = {
+    pivotRows: [{ field: 'team' }],
+    pivotColumns: [{ field: 'wd' }],
     showSummary: true,
-    values: [
-      { id: 'a', field: 'n', agg: 'sum', label: 'sum' },
-      { id: 'b', field: 'n', agg: 'mean', label: 'avg' },
+    columns: [
+      { id: 'a', source: 'n', agg: 'sum', label: 'sum' },
+      { id: 'b', source: 'n', agg: 'mean', label: 'avg' },
     ],
   };
 
   async function mount(
-    spec: PivotSpec,
+    spec: ViewSpec,
     onView: (v: ViewSpec) => void = () => {},
     onDisplay: (d: DataTableDisplay) => void = () => {},
   ) {
@@ -528,16 +622,16 @@ describe('<DataTable> remove controls', () => {
 
   it('omits the measure control while only one measure remains', async () => {
     // Removing it would be a no-op, and a dead control is worse than none.
-    const el = await mount({ ...view, values: [view.values[0]!] });
+    const el = await mount({ ...view, columns: [view.columns[0]!] });
     expect(labels(el).some((l) => l?.includes('measure'))).toBe(false);
   });
 
   it('removes the measure, a footer row, and the grand total', async () => {
-    let v: PivotSpec | undefined;
+    let v: ViewSpec | undefined;
     let d: DataTableDisplay | undefined;
     const el = await mount(
       view,
-      (x) => (v = x as PivotSpec),
+      (x) => (v = x as ViewSpec),
       (x) => (d = x),
     );
     const click = async (label: string) => {
@@ -548,7 +642,7 @@ describe('<DataTable> remove controls', () => {
     };
 
     await click('Remove the avg measure');
-    expect(v!.values.map((x) => x.id)).toEqual(['a']);
+    expect(v!.columns.map((x) => x.id)).toEqual(['a']);
 
     await click('Remove the med row');
     expect(d!.footer).toEqual([]);
@@ -564,12 +658,12 @@ describe('<DataTable> linked measure controls', () => {
     { b: 'k1', size: 'tiny', n: 1 },
     { b: 'k1', size: 'big', n: 2 },
   ];
-  const view: PivotSpec = {
-    rows: ['b'],
-    columns: ['size'],
-    values: [
-      { id: 'mean', field: 'n', agg: 'mean', label: 'mean' },
-      { id: 'max', field: 'n', agg: 'max', label: 'max' },
+  const view: ViewSpec = {
+    pivotRows: [{ field: 'b' }],
+    pivotColumns: [{ field: 'size' }],
+    columns: [
+      { id: 'mean', source: 'n', agg: 'mean', label: 'mean' },
+      { id: 'max', source: 'n', agg: 'max', label: 'max' },
     ],
   };
 
@@ -605,13 +699,13 @@ describe('<DataTable> remove tint', () => {
     { t: 'A', s: 'x', n: 1 },
     { t: 'B', s: 'y', n: 2 },
   ];
-  const view: PivotSpec = {
-    rows: ['t'],
-    columns: ['s'],
+  const view: ViewSpec = {
+    pivotRows: [{ field: 't' }],
+    pivotColumns: [{ field: 's' }],
     showSummary: true,
-    values: [
-      { id: 'a', field: 'n', agg: 'sum', label: 'sum' },
-      { id: 'b', field: 'n', agg: 'max', label: 'max' },
+    columns: [
+      { id: 'a', source: 'n', agg: 'sum', label: 'sum' },
+      { id: 'b', source: 'n', agg: 'max', label: 'max' },
     ],
   };
 
@@ -679,11 +773,11 @@ describe('<DataTable> footer row tint', () => {
     { t: 'A', s: 'x', n: 1 },
     { t: 'B', s: 'y', n: 2 },
   ];
-  const view: PivotSpec = {
-    rows: ['t'],
-    columns: ['s'],
+  const view: ViewSpec = {
+    pivotRows: [{ field: 't' }],
+    pivotColumns: [{ field: 's' }],
     showSummary: true,
-    values: [{ id: 'a', field: 'n', agg: 'sum', label: 'sum' }],
+    columns: [{ id: 'a', source: 'n', agg: 'sum', label: 'sum' }],
   };
 
   /** Tint map per footer row, including the aria-hidden rule row. */
@@ -728,13 +822,13 @@ describe('<DataTable> measure drag', () => {
     { t: 'A', s: 'x', n: 1 },
     { t: 'B', s: 'y', n: 2 },
   ];
-  const view: PivotSpec = {
-    rows: ['t'],
-    columns: ['s'],
-    values: [
-      { id: 'a', field: 'n', agg: 'sum', label: 'sum' },
-      { id: 'b', field: 'n', agg: 'max', label: 'max' },
-      { id: 'c', field: 'n', agg: 'min', label: 'min' },
+  const view: ViewSpec = {
+    pivotRows: [{ field: 't' }],
+    pivotColumns: [{ field: 's' }],
+    columns: [
+      { id: 'a', source: 'n', agg: 'sum', label: 'sum' },
+      { id: 'b', source: 'n', agg: 'max', label: 'max' },
+      { id: 'c', source: 'n', agg: 'min', label: 'min' },
     ],
   };
 
@@ -762,8 +856,8 @@ describe('<DataTable> measure drag', () => {
   }
 
   it('reorders measures regardless of which column group was grabbed', async () => {
-    let next: PivotSpec | undefined;
-    const handles = await mount((v) => (next = v as PivotSpec));
+    let next: ViewSpec | undefined;
+    const handles = await mount((v) => (next = v as ViewSpec));
     // The cell's text now includes its remove control, so match the prefix.
     const named = (n: string) =>
       handles.filter((h) => h.textContent?.startsWith(n));
@@ -772,13 +866,13 @@ describe('<DataTable> measure drag', () => {
 
     // `min` from the second group, dropped on `sum` in the first.
     await act(async () => drag(named('min')[1]!, named('sum')[0]!));
-    expect(next!.values.map((v) => v.id)).toEqual(['c', 'a', 'b']);
+    expect(next!.columns.map((c) => c.id)).toEqual(['c', 'a', 'b']);
   });
 
   it('ignores a measure dropped on an axis field', async () => {
     // A measure is not a grouping field; the drop means nothing.
-    let next: PivotSpec | undefined;
-    const handles = await mount((v) => (next = v as PivotSpec));
+    let next: ViewSpec | undefined;
+    const handles = await mount((v) => (next = v as ViewSpec));
     const measure = handles.find((h) => h.textContent?.startsWith('max'))!;
     const rowField = handles.find((h) => h.textContent?.startsWith('t'))!;
     await act(async () => drag(measure, rowField));
@@ -791,10 +885,10 @@ describe('<DataTable> column-field controls', () => {
     { t: 'A', size: 'tiny', arch: 'x86', n: 1 },
     { t: 'B', size: 'big', arch: 'arm', n: 2 },
   ];
-  const view: PivotSpec = {
-    rows: ['t'],
-    columns: ['size', 'arch'],
-    values: [{ id: 'a', field: 'n', agg: 'sum', label: 'sum' }],
+  const view: ViewSpec = {
+    pivotRows: [{ field: 't' }],
+    pivotColumns: [{ field: 'size' }, { field: 'arch' }],
+    columns: [{ id: 'a', source: 'n', agg: 'sum', label: 'sum' }],
   };
 
   async function mount(onChange: (v: ViewSpec) => void = () => {}) {
@@ -851,10 +945,10 @@ describe('<DataTable> column-field controls', () => {
   });
 
   it('removes the field it names', async () => {
-    let next: PivotSpec | undefined;
-    const { controls } = await mount((v) => (next = v as PivotSpec));
+    let next: ViewSpec | undefined;
+    const { controls } = await mount((v) => (next = v as ViewSpec));
     await act(async () => controls[0]!.click());
-    expect(next!.columns).toEqual(['arch']);
+    expect(next!.pivotColumns?.map((a) => a.field)).toEqual(['arch']);
   });
 });
 
@@ -863,10 +957,10 @@ describe('<DataTable> column level drag', () => {
     { t: 'A', size: 'tiny', arch: 'x86', n: 1 },
     { t: 'B', size: 'big', arch: 'arm', n: 2 },
   ];
-  const view: PivotSpec = {
-    rows: ['t'],
-    columns: ['size', 'arch'],
-    values: [{ id: 'a', field: 'n', agg: 'sum', label: 'sum' }],
+  const view: ViewSpec = {
+    pivotRows: [{ field: 't' }],
+    pivotColumns: [{ field: 'size' }, { field: 'arch' }],
+    columns: [{ id: 'a', source: 'n', agg: 'sum', label: 'sum' }],
   };
 
   function drag(from: HTMLElement, to: HTMLElement) {
@@ -897,23 +991,23 @@ describe('<DataTable> column level drag', () => {
   }
 
   it('reorders the axis when a level is dropped on another', async () => {
-    let next: PivotSpec | undefined;
-    const handles = await mount((v) => (next = v as PivotSpec));
+    let next: ViewSpec | undefined;
+    const handles = await mount((v) => (next = v as ViewSpec));
     // Any member of a level is a handle for it, as with measures.
     await act(async () => drag(handles(1)[0]!, handles(0)[1]!));
-    expect(next!.columns).toEqual(['arch', 'size']);
+    expect(next!.pivotColumns?.map((a) => a.field)).toEqual(['arch', 'size']);
   });
 
   it('accepts a drop anywhere in the cell, not just on the label', async () => {
     // The label is a fraction of the cell's box; requiring the pointer to be
     // exactly on the text is what made this silently do nothing in a browser.
-    let next: PivotSpec | undefined;
+    let next: ViewSpec | undefined;
     const el = await render(
       <DataTable
         data={data}
         view={view}
         editing
-        onViewChange={(v) => (next = v as PivotSpec)}
+        onViewChange={(v) => (next = v as ViewSpec)}
       />,
     );
     const rows = [...el.querySelectorAll('thead tr')];
@@ -921,27 +1015,28 @@ describe('<DataTable> column level drag', () => {
     // Drop on the <th> itself, with no label under the pointer.
     const targetCell = [...rows[0]!.querySelectorAll<HTMLElement>('th')][1]!;
     await act(async () => drag(source, targetCell));
-    expect(next!.columns).toEqual(['arch', 'size']);
+    expect(next!.pivotColumns?.map((a) => a.field)).toEqual(['arch', 'size']);
   });
 
   it('pivots a column field dropped on a row field', async () => {
-    let next: PivotSpec | undefined;
-    const handles = await mount((v) => (next = v as PivotSpec));
+    let next: ViewSpec | undefined;
+    const handles = await mount((v) => (next = v as ViewSpec));
     // handles(0)[0] is the row field's own header.
     await act(async () => drag(handles(1)[0]!, handles(0)[0]!));
-    expect(next!.rows).toEqual(['arch', 't']);
-    expect(next!.columns).toEqual(['size']);
+    expect(next!.pivotRows?.map((a) => a.field)).toEqual(['arch', 't']);
+    expect(next!.pivotColumns?.map((a) => a.field)).toEqual(['size']);
   });
 });
 
 describe('<DataTable> computed columns and footer order', () => {
   const data = [{ a: 'x', n: 2 }];
-  const view: PivotSpec = {
-    rows: ['a'],
-    columns: [],
+  const view: ViewSpec = {
+    pivotRows: [{ field: 'a' }],
     showSummary: true,
-    values: [{ id: 'm', field: 'n', agg: 'sum', label: 'm' }],
-    computed: [{ id: 'twice', label: 'Twice', compute: 'm * 2' }],
+    columns: [
+      { id: 'm', source: 'n', agg: 'sum', label: 'm' },
+      { id: 'twice', label: 'Twice', compute: 'm * 2' },
+    ],
   };
   const display: DataTableDisplay = {
     footer: [
@@ -977,15 +1072,16 @@ describe('<DataTable> computed columns and footer order', () => {
   it('offers a remove control on a derived column', async () => {
     // Derived columns are their own list, so a measure's control cannot
     // reach them.
-    let next: PivotSpec | undefined;
-    const el = await mount((v) => (next = v as PivotSpec));
+    let next: ViewSpec | undefined;
+    const el = await mount((v) => (next = v as ViewSpec));
     const x = el.querySelector<HTMLButtonElement>(
       'button[aria-label="Remove the Twice column"]',
     )!;
     expect(x).toBeTruthy();
     await act(async () => x.click());
-    expect(next!.computed).toEqual([]);
-    expect(next!.values).toHaveLength(1);
+    // The derived column goes; the lone measure stays, since dropping it
+    // would leave nothing to aggregate.
+    expect(next!.columns.map((c) => c.id)).toEqual(['m']);
   });
 
   it('makes only the listed footer rows draggable', async () => {
@@ -1046,12 +1142,11 @@ describe('<DataTable> computed columns and footer order', () => {
 
 describe('<DataTable> column drag image', () => {
   const data = [{ t: 'A', n: 1 }];
-  const view: PivotSpec = {
-    rows: ['t'],
-    columns: [],
-    values: [
-      { id: 'a', field: 'n', agg: 'sum', label: 'sum' },
-      { id: 'b', field: 'n', agg: 'max', label: 'max' },
+  const view: ViewSpec = {
+    pivotRows: [{ field: 't' }],
+    columns: [
+      { id: 'a', source: 'n', agg: 'sum', label: 'sum' },
+      { id: 'b', source: 'n', agg: 'max', label: 'max' },
     ],
   };
 
@@ -1085,7 +1180,7 @@ describe('<DataTable> column drag image', () => {
     // cells cannot be checked here — the virtualizer renders no rows under
     // jsdom — which is how a missing marker on them once went unnoticed.
     const table = el.querySelector('table')!;
-    const leaves = view.values.length;
+    const leaves = view.columns.length;
     expect(table.querySelectorAll('thead [data-leaf]')).toHaveLength(leaves);
     expect(table.querySelectorAll('tfoot [data-leaf]')).toHaveLength(leaves);
     expect(table.querySelectorAll('[data-leaf]')).toHaveLength(leaves * 2);
@@ -1103,12 +1198,11 @@ describe('<DataTable> column drag image', () => {
 });
 
 describe('<DataTable> column ghost viewport', () => {
-  const view: PivotSpec = {
-    rows: ['a'],
-    columns: [],
-    values: [
-      { id: 'm', field: 'n', agg: 'sum', label: 'sum' },
-      { id: 'x', field: 'n', agg: 'max', label: 'max' },
+  const view: ViewSpec = {
+    pivotRows: [{ field: 'a' }],
+    columns: [
+      { id: 'm', source: 'n', agg: 'sum', label: 'sum' },
+      { id: 'x', source: 'n', agg: 'max', label: 'max' },
     ],
   };
 
