@@ -1007,3 +1007,101 @@ describe('per-value scale (what Format.Duration used to do)', () => {
     expect(res.leaves[0]!.displayFactor).toBeUndefined();
   });
 });
+
+describe('a scalePool spanning unlike stored magnitudes', () => {
+  const frame = withMeta(
+    fromRows([
+      { r: 'A', ns: 5_000_000, ms: 5 },
+      { r: 'A', ns: 8_000_000, ms: 8 },
+    ]),
+    {
+      ns: { kind: ['duration'], unit: ['second'], scale: ['nano'] },
+      ms: { kind: ['duration'], unit: ['second'], scale: ['milli'] },
+    },
+  );
+  const spec: ViewSpec = {
+    pivotRows: [{ field: 'r' }],
+    columns: [
+      { id: 'ns', agg: 'mean', autoScale: true, scalePool: 'p' },
+      { id: 'ms', agg: 'mean', autoScale: true, scalePool: 'p' },
+    ],
+  };
+
+  it('converts each column from where it is actually stored', () => {
+    // Both hold the same duration. A pool agrees on the *displayed* scale, so
+    // each column has its own distance to travel to reach it — sharing one
+    // factor left them a million apart under a single label.
+    const res = computeView(frame, spec);
+    const shown = (i: number) =>
+      res.leaves[i]!.format({
+        value: res.rows[0]!.cells[i]!.value,
+        inputs: {},
+        rowPath: [],
+        colPath: [],
+        column: res.leaves[i]!.column,
+        frame,
+      });
+    expect(shown(0)).toBe(shown(1));
+    expect(unitLabels(res.leaves[0]!.column.meta).full).toBe('ms');
+    expect(unitLabels(res.leaves[1]!.column.meta).full).toBe('ms');
+  });
+});
+
+describe('a computed member under a formatted level', () => {
+  it('takes the level’s own member format, as the measures do', () => {
+    const frame = withMeta(
+      fromRows([
+        { app: 'P1', dow: 0, revision: 'before', t: 100 },
+        { app: 'P1', dow: 0, revision: 'after', t: 80 },
+      ]),
+      { dow: { kind: ['weekday'] } },
+    );
+    const res = computeView(frame, {
+      pivotRows: [{ field: 'app' }],
+      pivotColumns: [
+        { field: 'dow' },
+        {
+          field: 'revision',
+          computed: [
+            {
+              id: 'delta',
+              label: 'Δ',
+              inputs: {
+                before: { member: 'before' },
+                after: { member: 'after' },
+              },
+              compute: 'before ? (after - before) / before : null',
+            },
+          ],
+        },
+      ],
+      columns: [{ id: 'mean', source: 't', agg: 'mean', label: 'mean' }],
+    });
+    // A raw String(0) here would hang the Δ under a second "0" group beside
+    // the formatted "Sun" one, splitting the header in two.
+    expect(res.leaves.map((l) => l.colPath.join('/'))).toEqual([
+      'Sun/before',
+      'Sun/after',
+      'Sun/Δ',
+    ]);
+    expect(res.columnHeader.map((h) => h.label)).toEqual(['Sun']);
+  });
+
+  it('renders nothing rather than throwing when no column aggregates', () => {
+    // The validator rejects this, but an unvalidated spec reaching the engine
+    // should not take the page down with it.
+    const frame = fromRows([{ app: 'P1', revision: 'before', t: 100 }]);
+    expect(() =>
+      computeView(frame, {
+        pivotRows: [{ field: 'app' }],
+        pivotColumns: [
+          {
+            field: 'revision',
+            computed: [{ id: 'd', compute: '1', inputs: {} }],
+          },
+        ],
+        columns: [{ id: 'x', compute: '1' }],
+      }),
+    ).not.toThrow();
+  });
+});

@@ -1261,3 +1261,46 @@ describe('<DataTable> column ghost viewport', () => {
     expect(ghost.textContent).toContain('sum');
   });
 });
+
+describe('<DataTable> editing controls vs the unit suffix', () => {
+  const data = [
+    { team: 'A', ms: 10 },
+    { team: 'B', ms: 20 },
+  ];
+  const view: ViewSpec = {
+    meta: { ms: { kind: ['duration'], unit: ['second'], scale: ['milli'] } },
+    pivotRows: [{ field: 'team' }],
+    columns: [
+      { id: 'ms', agg: 'mean', label: 'mean' },
+      { id: 'ms2', source: 'ms', agg: 'max', label: 'max' },
+    ],
+  };
+
+  async function controls(unitPlacement: 'off' | 'header') {
+    const el = await render(
+      <DataTable
+        data={data}
+        view={view}
+        editing
+        onViewChange={() => {}}
+        display={{ unitPlacement }}
+      />,
+    );
+    return [...el.querySelectorAll('button')]
+      .map((b) => b.title)
+      .filter(Boolean);
+  }
+
+  it('keeps them when the header carries a unit label', async () => {
+    // The header cell reads "mean (ms)" once units are placed there, so
+    // matching it back to the spec has to use the pre-suffix text. Comparing
+    // the rendered label silently dropped every measure's control.
+    expect(await controls('off')).toEqual(await controls('header'));
+    expect(await controls('header')).toEqual(
+      expect.arrayContaining([
+        'Remove the mean measure',
+        'Remove the max measure',
+      ]),
+    );
+  });
+});

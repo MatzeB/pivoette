@@ -31,7 +31,14 @@ export interface ScaleStep {
   magnitude: number;
   /** Scale name for the label, e.g. `'micro'`. Absent means unscaled. */
   scale?: string;
-  /** Unit name, when the step changes the unit itself (`minute`, `hour`). */
+  /**
+   * Unit name for the label. Since `magnitude` is measured in the *base* unit,
+   * a rung that omits this is asserting that the column's declared unit already
+   * is the base one — true for SI prefixes over tokens or metres, false for a
+   * column declared in minutes. A ladder whose column may be declared in a
+   * multiple of its base (see `unitFactor`) has to name the unit on every rung;
+   * `chooseStep` declines rather than mislabel when one does not.
+   */
   unit?: string;
 }
 
@@ -95,13 +102,17 @@ registerLadder('si', {
  * Time. Sub-second rungs are SI prefixes, but minutes and hours are not — 60×
  * and 3600× are no prefix at all, which is exactly why a ladder is data rather
  * than a formula over `SCALE_FACTOR`.
+ *
+ * Every rung names its unit, including the second ones: a duration column may
+ * be *declared* in minutes, and then "no unit on the rung" would label a value
+ * already converted to seconds with the column's `min`.
  */
 registerLadder('duration', {
   steps: [
-    siStep('nano'),
-    siStep('micro'),
-    siStep('milli'),
-    { magnitude: 1 },
+    { ...siStep('nano'), unit: 'second' },
+    { ...siStep('micro'), unit: 'second' },
+    { ...siStep('milli'), unit: 'second' },
+    { magnitude: 1, unit: 'second' },
     { magnitude: unitFactor('minute')!, unit: 'minute' },
     { magnitude: unitFactor('hour')!, unit: 'hour' },
     { magnitude: unitFactor('day')!, unit: 'day' },
@@ -183,16 +194,48 @@ export function chooseStep(
   if (stored === undefined) return undefined;
   const rep = representative(values);
   if (rep === undefined) return undefined;
+  const step = stepAt(rep * stored, ladderId); // the representative, in base units
+  if (!step || !stepLabels(meta, step)) return undefined;
+  return { step, factor: stored / step.magnitude };
+}
 
+/**
+ * The rung a base-unit magnitude falls on: the largest step it still exceeds,
+ * falling off either end onto the outermost rung rather than inventing one.
+ *
+ * Separate from `chooseStep` because a `scalePool` spans columns with different
+ * stored magnitudes — the pool has to convert each column's values itself
+ * before there is a single number to choose from.
+ */
+export function stepAt(
+  baseMagnitude: number,
+  ladderId: string,
+): ScaleStep | undefined {
   const { steps } = getLadder(ladderId);
   if (steps.length === 0) return undefined;
-
-  const base = rep * stored; // the representative value, in base units
   let chosen = steps[0]!;
   for (const step of steps) {
-    if (base >= step.magnitude) chosen = step;
+    if (baseMagnitude >= step.magnitude) chosen = step;
   }
-  return { step: chosen, factor: stored / chosen.magnitude };
+  return chosen;
+}
+
+/**
+ * Whether a step can label this column without lying.
+ *
+ * A column declared in a multiple of its base unit (minutes, hours) is
+ * converted to base units by the step's factor, so a rung that names no unit
+ * would leave the declared one on a converted number — `0.5` minutes shown as
+ * "30.0 min" rather than "30.0 s". Nothing here can invent the base unit's
+ * name, so such a column keeps its own scale instead of being relabelled.
+ */
+export function stepLabels(
+  meta: ColumnMeta | undefined,
+  step: ScaleStep,
+): boolean {
+  if (step.unit !== undefined) return true;
+  const unit = meta?.unit?.length === 1 ? meta.unit[0] : undefined;
+  return !unit || unitFactor(unit) === undefined;
 }
 
 /**

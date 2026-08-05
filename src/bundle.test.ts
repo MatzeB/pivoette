@@ -330,3 +330,81 @@ describe('autoScale validation', () => {
     expect(problems.some((p) => p.includes('needs `autoScale`'))).toBe(true);
   });
 });
+
+describe('malformed input becomes a problem, not an exception', () => {
+  it('reports a bad columns entry instead of throwing', () => {
+    // Turning bad input into a readable list is the whole point of this
+    // function, so it must not be the thing that throws.
+    const bad = { columns: [null] } as unknown as ViewSpec;
+    expect(() =>
+      validateBundle({ data: { rows }, view: bad }, frame),
+    ).not.toThrow();
+    expect(
+      validateBundle({ data: { rows }, view: bad }, frame).problems,
+    ).toEqual(['view.columns[0]: must be an object with an `id`, not object']);
+  });
+});
+
+describe('metadata layering matches the engine', () => {
+  it('lets a column override an unmeasurable view-level unit', () => {
+    // The engine applies view.meta first, then the column's own on top. With
+    // the order reversed this column was rejected for the unit it replaced.
+    const { problems } = validateBundle(
+      {
+        data: { rows },
+        view: {
+          meta: { revenue: { unit: ['token', '1/second'] } },
+          pivotRows: [{ field: 'region' }],
+          columns: [
+            {
+              id: 'rev',
+              source: 'revenue',
+              agg: 'sum',
+              autoScale: true,
+              meta: { unit: ['second'], scale: ['nano'] },
+            },
+          ],
+        },
+      },
+      frame,
+    );
+    expect(problems).toEqual([]);
+  });
+
+  it('still rejects an unmeasurable unit the column does not replace', () => {
+    const { problems } = validateBundle(
+      {
+        data: { rows },
+        view: {
+          meta: { revenue: { unit: ['token', '1/second'] } },
+          pivotRows: [{ field: 'region' }],
+          columns: [
+            { id: 'rev', source: 'revenue', agg: 'sum', autoScale: true },
+          ],
+        },
+      },
+      frame,
+    );
+    expect(problems.some((p) => p.includes('needs a measurable'))).toBe(true);
+  });
+
+  it('rejects autoScale with the measures on the row axis', () => {
+    const { problems } = validateBundle(
+      {
+        data: { rows },
+        view: {
+          pivotRows: [{ field: 'region' }],
+          pivotColumns: [{ field: 'quarter' }],
+          columnAxis: 'pivotRows',
+          columns: [
+            { id: 'rev', source: 'revenue', agg: 'sum', autoScale: true },
+          ],
+        },
+      },
+      frame,
+    );
+    expect(
+      problems.some((p) => p.includes('`autoScale` needs the columns level')),
+    ).toBe(true);
+  });
+});
