@@ -188,7 +188,15 @@ function makeCtx(
 // --- header rows with leaf ranges ------------------------------------------
 
 interface HCell {
+  /** What is rendered — the unit suffix is appended to this. */
   label: string;
+  /**
+   * The same text as the spec wrote it, before any unit suffix. Matching a
+   * header back to the column it came from has to use this one: the displayed
+   * label carries `(ms)` as soon as units are placed in the header, and a
+   * comparison against the spec would then never match.
+   */
+  specLabel: string;
   colSpan: number;
   rowSpan: number;
   leafStart: number;
@@ -206,6 +214,7 @@ function headerRowsRanged(
       const start = cursor;
       rows[level]!.push({
         label: n.label,
+        specLabel: n.label,
         colSpan: n.span,
         // A leaf reaches the bottom of the header; a group is one row tall.
         rowSpan: n.leaf ? depth - level : 1,
@@ -755,7 +764,7 @@ export function DataTable({
     if (!editable || !spec || hc.leafStart !== hc.leafEnd) return undefined;
     const own = leaves[hc.leafStart]?.column.def;
     if (!own) return undefined;
-    if (hc.label !== (own.label ?? own.id)) return undefined;
+    if (hc.specLabel !== (own.label ?? own.id)) return undefined;
     // A computed axis member is not in `view.columns`, so it finds no index —
     // removing it means editing the level it belongs to, not this list.
     const index = spec.columns.findIndex((c) => c.id === own.id);
@@ -986,7 +995,7 @@ export function DataTable({
                       {sortArrow(active)}
                       {removable && (
                         <RemoveField
-                          title={`Remove the ${hc.label} ${removable.noun}`}
+                          title={`Remove the ${hc.specLabel} ${removable.noun}`}
                           linked={
                             removeHover?.kind === 'column' &&
                             removeHover.index === removable.index

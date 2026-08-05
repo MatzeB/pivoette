@@ -143,9 +143,14 @@ export interface ColumnDef {
 }
 
 /**
- * One of a level's own members, by the text it is displayed as — `'before'` of
- * a `revision` level. No path: a `ComputedMember` already knows which level it
- * is on, which is the whole reason it lives on the axis.
+ * One of a level's own members — `'before'` of a `revision` level. No path: a
+ * `ComputedMember` already knows which level it is on, which is the whole
+ * reason it lives on the axis.
+ *
+ * The member is named by its value *in the data*, not by the text the header
+ * shows. The two differ wherever a level formats its members — a weekday level
+ * groups on `0` and displays `Mon` — and only the stored value is stable:
+ * display text moves with the locale, which a spec should survive.
  */
 export interface MemberRef {
   member: string;
@@ -174,7 +179,8 @@ export interface ComputedMember {
   compute: string;
   /** alias -> a sibling member of this level. */
   inputs?: Record<string, MemberRef>;
-  /** Where among this level's members it lands; defaults to last. */
+  /** Where among this level's members it lands; defaults to last. Names the
+   * member by its stored value, as `MemberRef.member` does. */
   place?: 'append' | { after: string };
   /** Multiply before formatting — see `ColumnDef.factor`. */
   factor?: number;

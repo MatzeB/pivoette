@@ -10,7 +10,7 @@
 import { fromRows } from './data/import';
 import { parseCsv } from './data/csv';
 import type { CsvOptions } from './data/csv';
-import { normalizeMeta, storedMagnitude } from './data/meta';
+import { mergeMeta, normalizeMeta, storedMagnitude } from './data/meta';
 import type { ColumnMetaInput } from './data/meta';
 import type { DataFrame } from './data/types';
 import { hasLadder, ladderIds } from './format/ladders';
@@ -173,6 +173,17 @@ export function validateBundle(
     add('a view needs a non-empty `columns`');
     return { ok: false, problems };
   }
+  // Every check below — `isFlat` included — reads keys off each entry, so a
+  // malformed one has to be reported here rather than thrown from the middle of
+  // the validator. Turning bad input into a problem list is the whole job.
+  const before = problems.length;
+  view.columns.forEach((def, i) => {
+    if (!def || typeof def !== 'object' || Array.isArray(def)) {
+      const got = Array.isArray(def) ? 'an array' : typeof def;
+      add(`view.columns[${i}]: must be an object with an \`id\`, not ${got}`);
+    }
+  });
+  if (problems.length > before) return { ok: false, problems };
 
   const flat = isFlat(view);
   const aggs = aggregationIds();
@@ -208,20 +219,30 @@ export function validateBundle(
       );
     }
 
-    // Metadata from the view wins over the frame's, matching what the engine
-    // layers on in `prepare`.
+    // Same layering the engine does: the frame's metadata, then `view.meta`
+    // (applied by `withMeta` in `prepare`), then the column's own `meta` on top
+    // (by `columnMeta`). Getting that order backwards rejected a column that
+    // overrides an unmeasurable view-level unit with a measurable one.
     const declared = source ? view.meta?.[source] : undefined;
     const fromFrame = source
       ? frame?.columnByName.get(source)?.meta
       : undefined;
-    const meta =
+    const fallback = {
+      dataName: source ?? def.id,
+      type: 'float' as const,
+      category: 'data' as const,
+    };
+    const viewLevel =
       declared || fromFrame
-        ? normalizeMeta(
-            fromFrame ?? { dataName: source!, type: 'float', category: 'data' },
-            { ...fromFrame, ...def.meta, ...declared },
-          )
+        ? normalizeMeta(fromFrame ?? fallback, { ...fromFrame, ...declared })
         : undefined;
-    if ((declared || fromFrame) && storedMagnitude(meta) === undefined) {
+    const meta = def.meta
+      ? normalizeMeta(
+          viewLevel ?? fallback,
+          mergeMeta(viewLevel, def.meta) ?? def.meta,
+        )
+      : viewLevel;
+    if (meta && storedMagnitude(meta) === undefined) {
       add(
         `${at}: \`autoScale\` needs a measurable \`unit\`/\`scale\`; ` +
           `"${source}" has none, or a compound one that cannot scale`,
@@ -317,6 +338,7 @@ export function validateBundle(
     if (view.columnAxis === 'pivotRows') {
       add(`${at}: \`computed\` needs the columns level on \`pivotColumns\``);
     }
+
     if (!Array.isArray(members)) {
       add(`${at}: \`computed\` must be an array`);
       return;
@@ -338,6 +360,21 @@ export function validateBundle(
       }
     });
   });
+
+  // Measures on the row axis put cells from *different* measures down one
+  // rendered column, so there is no single column for a scale to belong to.
+  // Better to say so than to accept the spec and quietly not scale.
+  if (view.columnAxis === 'pivotRows') {
+    view.columns.forEach((def, i) => {
+      if (autoScaleOf(def)) {
+        add(
+          `view.columns[${i}]: \`autoScale\` needs the columns level on ` +
+            '`pivotColumns`; with measures on the row axis one rendered ' +
+            'column holds several measures',
+        );
+      }
+    });
+  }
 
   if (flat) {
     if (view.showSummary) add('view.showSummary needs a pivot view');

@@ -190,3 +190,28 @@ describe('the registry', () => {
     expect(() => getLadder('nope')).toThrow(/Unknown scale ladder "nope"/);
   });
 });
+
+describe('a unit that is a multiple of its base', () => {
+  const minutes = meta({ kind: ['duration'], unit: ['minute'] });
+
+  it('relabels a converted value with the unit it was converted to', () => {
+    // `storedMagnitude` folds the 60 in, so the ladder works in seconds. The
+    // label has to follow: 0.5 minutes is 30 s, never "30 min".
+    expect(shown([0.5], minutes)).toEqual({ label: 's', at: [30] });
+    // Far enough down and it is still seconds, scaled.
+    expect(shown([0.0005], minutes)).toEqual({ label: 'ms', at: [30] });
+  });
+
+  it('stays on its own rungs when it climbs back to minutes', () => {
+    expect(shown([5], minutes)).toEqual({ label: 'min', at: [5] });
+  });
+
+  it('declines a ladder whose rungs cannot name the base unit', () => {
+    // `si` is SI prefixes over whatever the column says it holds, which is
+    // exactly the assumption a minutes column breaks. Better unscaled than
+    // relabelled wrongly.
+    expect(chooseStep([0.5], minutes, 'si')).toBeUndefined();
+    // A column already in its base unit is unaffected.
+    expect(chooseStep([0.5], meta({ unit: ['second'] }), 'si')).toBeDefined();
+  });
+});

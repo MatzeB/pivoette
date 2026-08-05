@@ -16,11 +16,13 @@ import { deriveColumns } from '../data/derive';
 import type { Align, FormatFn, ResolvedColumn } from '../format/context';
 import { columnFormat, scaledColumnFormat } from '../format/deduce';
 import {
-  chooseStep,
   defaultLadder,
   getLadder,
   hasLadder,
   metaForStep,
+  representative,
+  stepAt,
+  stepLabels,
 } from '../format/ladders';
 import type { ScaleStep } from '../format/ladders';
 import { Format, Render } from '../format/builtins';
@@ -539,7 +541,12 @@ function computePivot(
   // — rather than declared, which is what keeps it correct when a level is
   // moved to the other axis or dropped.
   const innermost = pivotColumns[pivotColumns.length - 1];
-  for (const member of innermost?.computed ?? []) {
+  // A computed member's value comes from cells that a measure produced, so
+  // there has to be one. `validateBundle` says so too, but a spec reaching the
+  // engine unvalidated should not take the page down.
+  const firstMeasure = measures[0];
+  for (const member of firstMeasure ? (innermost?.computed ?? []) : []) {
+    const fallbackMeasure = firstMeasure!;
     const outerLevels = pivotColumns.length - 1;
     for (const prefix of distinctPrefixes(colKeys, outerLevels)) {
       // One per measure, as a real member of this level would be: the member
@@ -553,7 +560,7 @@ function computePivot(
             // is what makes one expression yield a Δ for each of them.
             lookupKey: baseLookupKey(
               [...prefix, ref.member],
-              ref.column ?? measure?.id ?? measures[0]!.id,
+              ref.column ?? measure?.id ?? fallbackMeasure.id,
             ),
           }),
         );
@@ -563,8 +570,11 @@ function computePivot(
           kind: 'derived' as const,
           def: member,
           prefix,
+          // Through the level's own member format, exactly as the base leaves
+          // above: a raw `String(v)` would put the member under a second,
+          // unformatted copy of its group — `0` beside `Sun`.
           colPath: [
-            ...prefix.map((v) => String(v)),
+            ...prefix.map((v, i) => colMember[i]!(v)),
             label,
             ...(measure ? [measure.label ?? measure.id] : []),
           ],
@@ -882,14 +892,28 @@ function prepare(
 // ---------------------------------------------------------------------------
 
 /** Every value a column shows, body and summary alike. */
-function leafValues(result: ViewResult, indices: number[]): CellValue[] {
+/**
+ * Every pooled leaf's values, converted to the pool's common base unit.
+ *
+ * Converting here rather than after the fact is what makes a pool of unlike
+ * columns comparable: a column of nanoseconds and one of milliseconds hold the
+ * same duration as numbers a million apart, and a representative taken over the
+ * raw mixture would describe neither.
+ */
+function leafValues(
+  result: ViewResult,
+  indices: number[],
+  leaves: ResolvedLeaf[],
+): CellValue[] {
   const out: CellValue[] = [];
-  const take = (cell: Cell | undefined) => {
-    // Nulls and text carry no magnitude; dropping them here saves the
-    // representative pass a second copy of a potentially long column.
-    if (cell?.value != null) out.push(cell.value as CellValue);
-  };
   for (const i of indices) {
+    const stored = storedMagnitude(leaves[i]!.column.meta) ?? 1;
+    const take = (cell: Cell | undefined) => {
+      // Nulls and text carry no magnitude; dropping them here saves the
+      // representative pass a second copy of a potentially long column.
+      const n = cell?.value == null ? null : asNumber(cell.value as CellValue);
+      if (n !== null) out.push(n * stored);
+    };
     for (const row of result.rows) take(row.cells[i]);
     take(result.summary?.[i]);
   }
@@ -922,19 +946,27 @@ function perValueFormat(
   // ladder and the column's magnitude here would be the whole cost.
   const stored = storedMagnitude(meta)!;
   const { steps } = getLadder(ladder);
-  const rungs = new Map<ScaleStep, { fn: FormatFn; label: string }>();
+  const rungs = new Map<
+    ScaleStep,
+    { fn: FormatFn; attach: (text: string) => string }
+  >();
 
   const rungFor = (step: ScaleStep) => {
     let rung = rungs.get(step);
     if (!rung) {
       const stepMeta = metaForStep(meta, step);
-      const label = unitLabels(stepMeta, spec.locale);
+      const labels = unitLabels(stepMeta, spec.locale);
+      const fn = resolveFormat(
+        scaledColumnFormat(leaf.column.def ?? {}, stepMeta, spec.locale),
+        emptyDisplay,
+      );
+      // Same attachment rules as the per-column path (`wrapFormat`): a leading
+      // label sits inside the sign, a tight one hugs the digits.
       rung = {
-        fn: resolveFormat(
-          scaledColumnFormat(leaf.column.def ?? {}, stepMeta, spec.locale),
-          emptyDisplay,
-        ),
-        label: label.full ? `${label.tight ? '' : ' '}${label.full}` : '',
+        fn,
+        attach: labels.full
+          ? wrapLabel(labels.full, labels.prefix, labels.tight)
+          : (text: string) => text,
       };
       rungs.set(step, rung);
     }
@@ -948,9 +980,27 @@ function perValueFormat(
     let step = steps[0]!;
     for (const rung of steps) if (base >= rung.magnitude) step = rung;
 
-    const { fn, label } = rungFor(step);
-    const text = fn({ ...ctx, value: (n * stored) / step.magnitude });
-    return text ? text + label : text;
+    const { fn, attach } = rungFor(step);
+    return attach(fn({ ...ctx, value: (n * stored) / step.magnitude }));
+  };
+}
+
+/**
+ * Attach a unit label to already-formatted text. The per-column path does this
+ * by wrapping the formatter (`wrapFormat` in `DataTable`); a per-value scale
+ * has a different label per cell, so it wraps the text instead.
+ */
+function wrapLabel(
+  label: string,
+  prefix: boolean,
+  tight: boolean,
+): (text: string) => string {
+  const gap = tight ? '' : ' ';
+  if (!prefix) return (text) => (text ? text + gap + label : text);
+  return (text) => {
+    if (!text) return text;
+    const sign = text[0] === '-' || text[0] === '+' ? text[0] : '';
+    return sign + label + gap + text.slice(sign.length);
   };
 }
 
@@ -986,6 +1036,9 @@ function applyAutoScale(result: ViewResult, spec: ViewSpec): ViewResult {
     if (!hasLadder(ladder) || storedMagnitude(meta) === undefined) continue;
 
     if (auto.per === 'value') {
+      // Every rung is reachable here, since the step is chosen per cell — so
+      // one that could not label this column honestly disqualifies the lot.
+      if (!getLadder(ladder).steps.every((s) => stepLabels(meta, s))) continue;
       for (const i of indices) {
         const leaf = leaves[i]!;
         leaves[i] = {
@@ -996,20 +1049,30 @@ function applyAutoScale(result: ViewResult, spec: ViewSpec): ViewResult {
       continue;
     }
 
-    const chosen = chooseStep(leafValues(result, indices), meta, ladder);
-    if (!chosen) continue;
-    const stepMeta = metaForStep(meta, chosen.step);
+    // Values arrive in base units, so the rung is chosen once for the pool and
+    // each column converts to it from wherever it happens to be stored.
+    const rep = representative(leafValues(result, indices, leaves));
+    const step = rep === undefined ? undefined : stepAt(rep, ladder);
+    if (!step || !stepLabels(meta, step)) continue;
+    const stepMeta = metaForStep(meta, step);
     const format = resolveFormat(
       scaledColumnFormat(def, stepMeta, spec.locale),
       emptyDisplay,
     );
     for (const i of indices) {
       const leaf = leaves[i]!;
+      // The pool agrees on the *displayed* scale, not on the stored one: a
+      // pool may hold a column of nanoseconds beside one of milliseconds, and
+      // each has its own distance to travel to reach the chosen rung. Sharing
+      // the first leaf's factor would leave them a million apart under one
+      // label.
+      const stored = storedMagnitude(leaf.column.meta) ?? 1;
+      const factor = stored / step.magnitude;
       leaves[i] = {
         ...leaf,
         column: { ...leaf.column, meta: stepMeta },
-        format: scaleFormat(format, chosen.factor),
-        displayFactor: chosen.factor,
+        format: scaleFormat(format, factor),
+        displayFactor: factor,
       };
     }
   }
