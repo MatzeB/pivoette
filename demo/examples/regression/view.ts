@@ -1,5 +1,5 @@
 import { Style } from '../../../src';
-import type { ViewSpec } from '../../../src';
+import type { DataTableDisplay, ViewSpec } from '../../../src';
 
 // light-dark() adapts to the table's color-scheme automatically.
 const green = 'light-dark(#137333, #30d158)';
@@ -60,3 +60,10 @@ export const view: ViewSpec = {
     },
   ],
 };
+
+/**
+ * How the result is presented, once the engine has produced it. Separate from
+ * the view because `computeView` never sees it: everything here is applied to
+ * the rows that already exist, so changing it repaints without re-pivoting.
+ */
+export const display: DataTableDisplay = { groupSpacing: 8 };

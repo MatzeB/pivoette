@@ -1,5 +1,5 @@
 import { Format } from '../../../src';
-import type { ViewSpec } from '../../../src';
+import type { DataTableDisplay, ViewSpec } from '../../../src';
 
 /**
  * Flat detail table driven by column metadata. No `label` is set on any column
@@ -34,4 +34,15 @@ export const view: ViewSpec = {
     },
   ],
   sort: [{ field: 'host', direction: 'asc' }],
+};
+
+/**
+ * How the result is presented, once the engine has produced it. Separate from
+ * the view because `computeView` never sees it: everything here is applied to
+ * the rows that already exist, so changing it repaints without re-pivoting.
+ */
+export const display: DataTableDisplay = {
+  indexColumns: 2,
+  zebra: true,
+  footer: [{ label: 'median', agg: 'median' }],
 };

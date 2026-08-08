@@ -1,4 +1,4 @@
-import type { ViewSpec } from '../../../src';
+import type { DataTableDisplay, ViewSpec } from '../../../src';
 
 /** Aggregated pivot: 3-level columns, four measures, duration formatting. */
 export const view: ViewSpec = {
@@ -53,5 +53,22 @@ export const view: ViewSpec = {
       // it stays on the number while `ns²` follows the placement toggle.
       format: { options: { decimals: 0, prefix: '± ' } },
     },
+  ],
+};
+
+/**
+ * How the result is presented, once the engine has produced it. Separate from
+ * the view because `computeView` never sees it: everything here is applied to
+ * the rows that already exist, so changing it repaints without re-pivoting.
+ */
+export const display: DataTableDisplay = {
+  frameless: true,
+  hideRules: true,
+  zebra: true,
+  groupSpacing: 14,
+  footer: [
+    { label: 'avg', agg: 'mean' },
+    { label: 'median', agg: 'median' },
+    { label: 'sum', agg: 'sum' },
   ],
 };
