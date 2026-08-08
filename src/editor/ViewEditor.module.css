@@ -45,6 +45,9 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  /* A strip under the last entry that belongs to the section rather than to
+     any row, so there is somewhere to drop when you mean "at the end". */
+  padding-bottom: 10px;
 }
 
 .row {
@@ -109,9 +112,20 @@
   background: var(--pv-hover);
 }
 
-/* Where the dragged entry would land. */
+/* Where the dragged entry would land: a rule above the entry it lands before. */
 .over {
   box-shadow: inset 0 2px 0 -1px light-dark(#3b82f6, #60a5fa);
+}
+
+/*
+ * The same, for a drop past the last entry. Drawn around the whole list rather
+ * than as a rule, because there is no following entry to sit above — and with
+ * `outline` rather than a border or shadow, so nothing shifts as it appears.
+ */
+.overSection {
+  outline: 1px solid light-dark(#3b82f6, #60a5fa);
+  outline-offset: 4px;
+  border-radius: 6px;
 }
 
 .empty,

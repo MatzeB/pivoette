@@ -79,17 +79,32 @@ function Row({
 function Section({
   title,
   empty,
+  drop,
+  over,
   children,
 }: {
   title: string;
   empty: boolean;
-  children: React.ReactNode;
+  /**
+   * Drop handlers for the list as a whole, landing past its last entry. The
+   * rows only accept a drop *at* their own index, which leaves the end of a
+   * list unreachable — and an empty list, having no rows at all, unreachable
+   * entirely. This is the target for both.
+   */
+  drop?: React.HTMLAttributes<HTMLElement>;
+  over?: boolean;
+  children?: React.ReactNode;
 }) {
   return (
-    <section className={styles.section}>
+    <section
+      className={`${styles.section} ${over ? styles.overSection : ''}`}
+      {...drop}
+    >
       <h4 className={styles.heading}>{title}</h4>
       {empty ? (
-        <p className={styles.empty}>none — use the + in the table</p>
+        <p className={styles.empty}>
+          {drop ? 'none — drop one here, or use the + in the table' : 'none'}
+        </p>
       ) : (
         <ul className={styles.list}>{children}</ul>
       )}
@@ -143,6 +158,27 @@ export function ViewEditor({
     }
   }
 
+  /** Accepting a drop at `ref`. Shared by the rows and their section. */
+  function dropProps(ref: DragRef) {
+    return {
+      onDragOver: (e: React.DragEvent) => {
+        if (!dragged.current) return;
+        e.preventDefault();
+        // A row sits inside its section, which also accepts drops. Without
+        // this the section would answer for every row and the only reachable
+        // position would be the end of the list.
+        e.stopPropagation();
+        setOver(ref);
+      },
+      onDragLeave: () => setOver(null),
+      onDrop: (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        drop(ref);
+      },
+    };
+  }
+
   /** Handlers for one draggable entry. */
   function dragProps(ref: DragRef) {
     return {
@@ -153,16 +189,7 @@ export function ViewEditor({
         // Firefox will not start a drag without data on the transfer.
         e.dataTransfer.setData('text/plain', `${ref.zone}:${ref.index}`);
       },
-      onDragOver: (e: React.DragEvent) => {
-        if (!dragged.current) return;
-        e.preventDefault();
-        setOver(ref);
-      },
-      onDragLeave: () => setOver(null),
-      onDrop: (e: React.DragEvent) => {
-        e.preventDefault();
-        drop(ref);
-      },
+      ...dropProps(ref),
       onDragEnd: () => {
         dragged.current = null;
         setOver(null);
@@ -173,10 +200,20 @@ export function ViewEditor({
   const isOver = (ref: DragRef) =>
     over?.zone === ref.zone && over.index === ref.index;
 
+  /** The whole list as a target: one past the end, so a drop appends. */
+  const appendTo = (zone: DragRef['zone'], count: number) => ({
+    drop: dropProps({ zone, index: count } as DragRef),
+    over: isOver({ zone, index: count } as DragRef),
+  });
+
   const zone = (title: string, key: FieldZone) => {
     const fields = view[key] ?? [];
     return (
-      <Section title={title} empty={fields.length === 0}>
+      <Section
+        title={title}
+        empty={fields.length === 0}
+        {...appendTo(key, fields.length)}
+      >
         {fields.map((axisField, i) => (
           <Row
             key={axisField.field}
@@ -200,7 +237,11 @@ export function ViewEditor({
       {zone('Pivot rows', 'pivotRows')}
       {zone('Pivot columns', 'pivotColumns')}
 
-      <Section title="Columns" empty={view.columns.length === 0}>
+      <Section
+        title="Columns"
+        empty={view.columns.length === 0}
+        {...appendTo('columns', view.columns.length)}
+      >
         {view.columns.map((column, i) => (
           <Row
             key={column.id}
@@ -237,7 +278,11 @@ export function ViewEditor({
       </Section>
 
       {onDisplayChange && display && (
-        <Section title="Totals" empty={footer.length === 0}>
+        <Section
+          title="Totals"
+          empty={footer.length === 0}
+          {...appendTo('footer', footer.length)}
+        >
           {footer.map((f, i) => (
             <Row
               key={`${f.agg}${i}`}

@@ -126,3 +126,84 @@ describe('<ViewEditor> reordering', () => {
     expect(view).toEqual(before);
   });
 });
+
+describe('<ViewEditor> reaching every position in a list', () => {
+  /** Mount an arbitrary spec, returning the panel root. */
+  async function mountSpec(spec: ViewSpec, onChange: (n: ViewSpec) => void) {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    await act(async () => {
+      createRoot(container!).render(
+        <ViewEditor view={spec} onViewChange={onChange} />,
+      );
+    });
+    return container;
+  }
+
+  /** The <section> whose heading reads `title`. */
+  function section(title: string): HTMLElement {
+    const h = [...container!.querySelectorAll('h4')].find(
+      (n) => n.textContent === title,
+    )!;
+    return h.parentElement as HTMLElement;
+  }
+
+  it('appends when the drop lands past the last entry', async () => {
+    // A one-entry list offers a single row, and dropping *on* a row inserts
+    // before it — so the end of the list was unreachable. ex3 is exactly this
+    // shape: one pivot row, and no way to drop a pivot column after it.
+    const spec: ViewSpec = {
+      pivotRows: [{ field: 'app' }],
+      pivotColumns: [{ field: 'platform' }, { field: 'revision' }],
+      columns: [{ id: 'm', source: 't', agg: 'mean' }],
+    };
+    let next: ViewSpec | undefined;
+    await mountSpec(spec, (v) => (next = v));
+    const platform = [...container!.querySelectorAll('li')].find((l) =>
+      l.textContent?.includes('platform'),
+    )!;
+    await drag(platform, section('Pivot rows'));
+    expect(next!.pivotRows!.map((a) => a.field)).toEqual(['app', 'platform']);
+    expect(next!.pivotColumns!.map((a) => a.field)).toEqual(['revision']);
+  });
+
+  it('still inserts at the front when the drop lands on the first row', async () => {
+    const spec: ViewSpec = {
+      pivotRows: [{ field: 'app' }],
+      pivotColumns: [{ field: 'platform' }, { field: 'revision' }],
+      columns: [{ id: 'm', source: 't', agg: 'mean' }],
+    };
+    let next: ViewSpec | undefined;
+    await mountSpec(spec, (v) => (next = v));
+    const items = [...container!.querySelectorAll('li')] as HTMLElement[];
+    const platform = items.find((l) => l.textContent?.includes('platform'))!;
+    const app = items.find((l) => l.textContent?.includes('app'))!;
+    await drag(platform, app);
+    expect(next!.pivotRows!.map((a) => a.field)).toEqual(['platform', 'app']);
+  });
+
+  it('accepts a drop into a list that has no entries at all', async () => {
+    // ex4 declares no `pivotColumns`, so that section renders a placeholder
+    // and had no drop target of any kind — nothing could be pivoted across.
+    const spec: ViewSpec = {
+      pivotRows: [{ field: 'team' }, { field: 'project' }],
+      columns: [{ id: 'm', source: 't', agg: 'sum' }],
+    };
+    let next: ViewSpec | undefined;
+    await mountSpec(spec, (v) => (next = v));
+    const team = [...container!.querySelectorAll('li')].find((l) =>
+      l.textContent?.includes('team'),
+    )!;
+    await drag(team, section('Pivot columns'));
+    expect(next!.pivotColumns!.map((a) => a.field)).toEqual(['team']);
+    expect(next!.pivotRows!.map((a) => a.field)).toEqual(['project']);
+  });
+
+  it('lets a row reach the end of its own list', async () => {
+    let next: ViewSpec | undefined;
+    const items = await mount((v) => (next = v as ViewSpec));
+    // items: team, project | weekday | A, B
+    await drag(items[0]!, section('Pivot rows'));
+    expect(next!.pivotRows!.map((a) => a.field)).toEqual(['project', 'team']);
+  });
+});
