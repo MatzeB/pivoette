@@ -17,18 +17,36 @@ import type {
   ViewSpec,
 } from '../src';
 
-import { view as tickerView } from './examples/ticker/view';
+import {
+  view as tickerView,
+  display as tickerDisplay,
+} from './examples/ticker/view';
 import tickerData from './examples/ticker/data.json';
-import { view as benchmarkView } from './examples/benchmark/view';
+import {
+  view as benchmarkView,
+  display as benchmarkDisplay,
+} from './examples/benchmark/view';
 import benchmarkData from './examples/benchmark/data.json';
-import { view as regressionView } from './examples/regression/view';
+import {
+  view as regressionView,
+  display as regressionDisplay,
+} from './examples/regression/view';
 // CSV rather than JSON, to exercise the csv importer end to end.
 import regressionCsv from './examples/regression/data.csv?raw';
-import { view as tokensView } from './examples/tokens/view';
+import {
+  view as tokensView,
+  display as tokensDisplay,
+} from './examples/tokens/view';
 import tokensData from './examples/tokens/data.json';
-import { view as metricsView } from './examples/metrics/view';
+import {
+  view as metricsView,
+  display as metricsDisplay,
+} from './examples/metrics/view';
 import metricsData from './examples/metrics/data.json';
-import { view as commitsView } from './examples/commits/view';
+import {
+  view as commitsView,
+  display as commitsDisplay,
+} from './examples/commits/view';
 import commitsData from './examples/commits/data.json';
 
 import tickerSrc from './examples/ticker/view?raw';
@@ -47,7 +65,8 @@ interface Example {
   view: ViewSpec;
   /** Rows, or the `{meta, rows}` wire form carrying column metadata. */
   data: Row[] | DatasetJson;
-  /** The example's own `view.ts`, shown verbatim in the panels below. */
+  /** The example's own `view.ts` — view spec *and* display — shown verbatim
+   * in the panels below. */
   source: string;
   display?: DataTableDisplay;
 }
@@ -61,7 +80,7 @@ const EXAMPLES: Example[] = [
     view: tickerView,
     source: tickerSrc,
     data: tickerData as Row[],
-    display: { indexColumns: 1 },
+    display: tickerDisplay,
   },
   {
     id: 'benchmark',
@@ -71,17 +90,7 @@ const EXAMPLES: Example[] = [
     view: benchmarkView,
     source: benchmarkSrc,
     data: benchmarkData as Row[],
-    display: {
-      frameless: true,
-      hideRules: true,
-      zebra: true,
-      groupSpacing: 14,
-      footer: [
-        { label: 'avg', agg: 'mean' },
-        { label: 'median', agg: 'median' },
-        { label: 'sum', agg: 'sum' },
-      ],
-    },
+    display: benchmarkDisplay,
   },
   {
     id: 'regression',
@@ -91,7 +100,7 @@ const EXAMPLES: Example[] = [
     view: regressionView,
     source: regressionSrc,
     data: parseCsv(regressionCsv),
-    display: { groupSpacing: 8 },
+    display: regressionDisplay,
   },
   {
     id: 'tokens',
@@ -101,7 +110,7 @@ const EXAMPLES: Example[] = [
     view: tokensView,
     source: tokensSrc,
     data: tokensData as Row[],
-    display: { rowGroupSpacing: 10 },
+    display: tokensDisplay,
   },
   {
     id: 'metrics',
@@ -111,11 +120,7 @@ const EXAMPLES: Example[] = [
     view: metricsView,
     source: metricsSrc,
     data: metricsData as DatasetJson,
-    display: {
-      indexColumns: 2,
-      zebra: true,
-      footer: [{ label: 'median', agg: 'median' }],
-    },
+    display: metricsDisplay,
   },
   {
     id: 'commits',
@@ -125,7 +130,7 @@ const EXAMPLES: Example[] = [
     view: commitsView,
     source: commitsSrc,
     data: commitsData as DatasetJson,
-    display: { groupSpacing: 10 },
+    display: commitsDisplay,
   },
 ];
 
@@ -710,7 +715,7 @@ export function App() {
         </span>
       </div>
 
-      <Panel title="View spec — the config that produces the table above">
+      <Panel title="Example config — the view spec and display that produce the table above">
         {() => <Source text={example.source} />}
       </Panel>
 

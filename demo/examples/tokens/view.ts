@@ -1,5 +1,5 @@
 import { Format } from '../../../src';
-import type { ViewSpec } from '../../../src';
+import type { DataTableDisplay, ViewSpec } from '../../../src';
 
 /** Multi-level rows (team > project > model), compact tokens, summary footer. */
 export const view: ViewSpec = {
@@ -60,3 +60,10 @@ export const view: ViewSpec = {
   ],
   showSummary: true,
 };
+
+/**
+ * How the result is presented, once the engine has produced it. Separate from
+ * the view because `computeView` never sees it: everything here is applied to
+ * the rows that already exist, so changing it repaints without re-pivoting.
+ */
+export const display: DataTableDisplay = { rowGroupSpacing: 10 };
