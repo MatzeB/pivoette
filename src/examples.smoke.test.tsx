@@ -12,7 +12,7 @@ import { fromRows } from './data/import';
 import { parseCsv } from './data/csv';
 import { validateBundle } from './bundle';
 import { autoScaleOf } from './pivot/spec';
-import type { DataFrame } from './data/types';
+import type { DataFrame, DatasetJson } from './data/types';
 import type { ViewSpec } from './pivot/spec';
 
 // react-dom needs this flag; @tanstack/react-virtual needs ResizeObserver.
@@ -36,6 +36,10 @@ import { view as metrics } from '../demo/examples/metrics/view';
 import metricsData from '../demo/examples/metrics/data.json';
 import { view as commits } from '../demo/examples/commits/view';
 import commitsData from '../demo/examples/commits/data.json';
+import { Chart as NetworthChart } from '../demo/examples/networth/view';
+import networthData from '../demo/examples/networth/data.json';
+import { buildGraphData } from './graph/series';
+import { unitLabels } from './data/meta';
 
 // Read rather than `?raw`-imported: the build's tsconfig has no Vite types.
 // Vitest runs from the project root, next to vite.config.ts.
@@ -87,6 +91,72 @@ describe.each(examples)('example: %s', (_name, view, frame, leafCount) => {
     expect(table.querySelectorAll('thead th').length).toBeGreaterThan(0);
     // The header text a reader would see, with nothing missing.
     expect(table.querySelector('thead')!.textContent).toBeTruthy();
+    await act(async () => root.unmount());
+    host.remove();
+  });
+});
+
+/**
+ * The chart example cannot be a row in the array above: those tuples carry a
+ * `ViewSpec` and every assertion runs through `computeView` and its leaves,
+ * none of which a chart has. Forcing it in would mean nullable slots and
+ * skipped assertions, so it gets its own block instead.
+ */
+describe('example: networth (chart)', () => {
+  const frame = frameOf(networthData as Dataset);
+  const fields = { x: 'month', y: 'balance', series: 'account' } as const;
+
+  it('builds one series per account over the shared months', () => {
+    const graph = buildGraphData(frame, { ...fields, agg: 'sum' });
+    expect(graph.xKind).toBe('time');
+    expect(graph.series.map((s) => s.key)).toEqual([
+      'Brokerage',
+      'Checking',
+      'Mortgage',
+      'Retirement',
+    ]);
+    expect(graph.xs).toHaveLength(120);
+    for (const s of graph.series) expect(s.points).toHaveLength(120);
+  });
+
+  it('leaves the brokerage line broken until the account opens', () => {
+    const graph = buildGraphData(frame, { ...fields, agg: 'sum' });
+    const brokerage = graph.series.find((s) => s.key === 'Brokerage')!;
+    const holes = brokerage.points.filter((p) => p.y === null);
+    expect(holes).toHaveLength(30);
+    // A single leading run of holes, not scattered ones.
+    expect(brokerage.points.slice(0, 30).every((p) => p.y === null)).toBe(true);
+    expect(brokerage.points.slice(30).every((p) => p.y !== null)).toBe(true);
+  });
+
+  it('puts the whole value axis on one $k rung', () => {
+    const graph = buildGraphData(frame, { ...fields, agg: 'sum' });
+    expect(graph.yMeta.scale).toEqual(['kilo']);
+    expect(unitLabels(graph.yMeta).full).toBe('$k');
+    expect(graph.yFactor).toBe(0.001);
+    // And it straddles zero, because the mortgage is negative.
+    expect(graph.yExtent[0]).toBeLessThan(0);
+    expect(graph.yExtent[1]).toBeGreaterThan(0);
+  });
+
+  it('renders both charts to real DOM', async () => {
+    const host = document.createElement('div');
+    document.body.append(host);
+    const root = createRoot(host);
+    await act(async () => {
+      root.render(
+        <NetworthChart
+          // The local `Dataset` above is the loose shape this file uses to
+          // read every example's JSON; the component wants the real one.
+          data={networthData as unknown as DatasetJson}
+          locale="en-US"
+          timeZone="UTC"
+        />,
+      );
+    });
+    // Both boxes render, though only the sized one draws: jsdom reports zero
+    // width, so the responsive charts fall back to their placeholder.
+    expect(host.querySelectorAll('div[class]').length).toBeGreaterThan(0);
     await act(async () => root.unmount());
     host.remove();
   });

@@ -1,0 +1,2731 @@
+{
+"meta": {
+"month": {
+"displayName": "Month",
+"encoding": "rfc3339"
+},
+"account": {
+"displayName": "Account"
+},
+"balance": {
+"displayName": "Net worth",
+"kind": [
+"price"
+],
+"unit": [
+"dollar"
+]
+},
+"contribution": {
+"displayName": "Contribution",
+"kind": [
+"price"
+],
+"unit": [
+"dollar"
+]
+}
+},
+"rows": [
+{
+"month": "2016-01-01T00:00:00Z",
+"account": "Checking",
+"balance": 6212.99,
+"contribution": 43.38
+},
+{
+"month": "2016-02-01T00:00:00Z",
+"account": "Checking",
+"balance": 6618.55,
+"contribution": 56.08
+},
+{
+"month": "2016-03-01T00:00:00Z",
+"account": "Checking",
+"balance": 5990.27,
+"contribution": 51.39
+},
+{
+"month": "2016-04-01T00:00:00Z",
+"account": "Checking",
+"balance": 5734.19,
+"contribution": 58.51
+},
+{
+"month": "2016-05-01T00:00:00Z",
+"account": "Checking",
+"balance": 6336.86,
+"contribution": 75.2
+},
+{
+"month": "2016-06-01T00:00:00Z",
+"account": "Checking",
+"balance": 6809.47,
+"contribution": 76.25
+},
+{
+"month": "2016-07-01T00:00:00Z",
+"account": "Checking",
+"balance": 7511.08,
+"contribution": 60.98
+},
+{
+"month": "2016-08-01T00:00:00Z",
+"account": "Checking",
+"balance": 7626.67,
+"contribution": 44.81
+},
+{
+"month": "2016-09-01T00:00:00Z",
+"account": "Checking",
+"balance": 6532.33,
+"contribution": 58.06
+},
+{
+"month": "2016-10-01T00:00:00Z",
+"account": "Checking",
+"balance": 6710.52,
+"contribution": 64.0
+},
+{
+"month": "2016-11-01T00:00:00Z",
+"account": "Checking",
+"balance": 7331.94,
+"contribution": 40.42
+},
+{
+"month": "2016-12-01T00:00:00Z",
+"account": "Checking",
+"balance": 7010.57,
+"contribution": 42.51
+},
+{
+"month": "2017-01-01T00:00:00Z",
+"account": "Checking",
+"balance": 8197.03,
+"contribution": 57.4
+},
+{
+"month": "2017-02-01T00:00:00Z",
+"account": "Checking",
+"balance": 8570.79,
+"contribution": 45.64
+},
+{
+"month": "2017-03-01T00:00:00Z",
+"account": "Checking",
+"balance": 7668.86,
+"contribution": 50.36
+},
+{
+"month": "2017-04-01T00:00:00Z",
+"account": "Checking",
+"balance": 7767.38,
+"contribution": 65.84
+},
+{
+"month": "2017-05-01T00:00:00Z",
+"account": "Checking",
+"balance": 6558.54,
+"contribution": 63.87
+},
+{
+"month": "2017-06-01T00:00:00Z",
+"account": "Checking",
+"balance": 5888.43,
+"contribution": 51.19
+},
+{
+"month": "2017-07-01T00:00:00Z",
+"account": "Checking",
+"balance": 5635.82,
+"contribution": 52.58
+},
+{
+"month": "2017-08-01T00:00:00Z",
+"account": "Checking",
+"balance": 6033.25,
+"contribution": 71.95
+},
+{
+"month": "2017-09-01T00:00:00Z",
+"account": "Checking",
+"balance": 6272.04,
+"contribution": 50.94
+},
+{
+"month": "2017-10-01T00:00:00Z",
+"account": "Checking",
+"balance": 6530.35,
+"contribution": 64.5
+},
+{
+"month": "2017-11-01T00:00:00Z",
+"account": "Checking",
+"balance": 7133.58,
+"contribution": 62.92
+},
+{
+"month": "2017-12-01T00:00:00Z",
+"account": "Checking",
+"balance": 5495.76,
+"contribution": 47.72
+},
+{
+"month": "2018-01-01T00:00:00Z",
+"account": "Checking",
+"balance": 4897.0,
+"contribution": 72.59
+},
+{
+"month": "2018-02-01T00:00:00Z",
+"account": "Checking",
+"balance": 4503.99,
+"contribution": 72.42
+},
+{
+"month": "2018-03-01T00:00:00Z",
+"account": "Checking",
+"balance": 4467.2,
+"contribution": 41.35
+},
+{
+"month": "2018-04-01T00:00:00Z",
+"account": "Checking",
+"balance": 4196.63,
+"contribution": 67.13
+},
+{
+"month": "2018-05-01T00:00:00Z",
+"account": "Checking",
+"balance": 4239.34,
+"contribution": 37.02
+},
+{
+"month": "2018-06-01T00:00:00Z",
+"account": "Checking",
+"balance": 4301.08,
+"contribution": 50.26
+},
+{
+"month": "2018-07-01T00:00:00Z",
+"account": "Checking",
+"balance": 2124.25,
+"contribution": 50.53
+},
+{
+"month": "2018-08-01T00:00:00Z",
+"account": "Checking",
+"balance": 88.28,
+"contribution": 40.1
+},
+{
+"month": "2018-09-01T00:00:00Z",
+"account": "Checking",
+"balance": 1106.52,
+"contribution": 95.36
+},
+{
+"month": "2018-10-01T00:00:00Z",
+"account": "Checking",
+"balance": 1821.0,
+"contribution": 65.36
+},
+{
+"month": "2018-11-01T00:00:00Z",
+"account": "Checking",
+"balance": 3320.35,
+"contribution": 64.0
+},
+{
+"month": "2018-12-01T00:00:00Z",
+"account": "Checking",
+"balance": 2310.0,
+"contribution": 22.64
+},
+{
+"month": "2019-01-01T00:00:00Z",
+"account": "Checking",
+"balance": 3024.85,
+"contribution": 25.59
+},
+{
+"month": "2019-02-01T00:00:00Z",
+"account": "Checking",
+"balance": 444.43,
+"contribution": 49.26
+},
+{
+"month": "2019-03-01T00:00:00Z",
+"account": "Checking",
+"balance": 515.08,
+"contribution": 46.17
+},
+{
+"month": "2019-04-01T00:00:00Z",
+"account": "Checking",
+"balance": 1507.09,
+"contribution": 57.66
+},
+{
+"month": "2019-05-01T00:00:00Z",
+"account": "Checking",
+"balance": 1809.62,
+"contribution": 65.59
+},
+{
+"month": "2019-06-01T00:00:00Z",
+"account": "Checking",
+"balance": 1452.3,
+"contribution": 62.11
+},
+{
+"month": "2019-07-01T00:00:00Z",
+"account": "Checking",
+"balance": 3736.2,
+"contribution": 45.1
+},
+{
+"month": "2019-08-01T00:00:00Z",
+"account": "Checking",
+"balance": 4129.0,
+"contribution": 66.85
+},
+{
+"month": "2019-09-01T00:00:00Z",
+"account": "Checking",
+"balance": 3922.49,
+"contribution": 58.34
+},
+{
+"month": "2019-10-01T00:00:00Z",
+"account": "Checking",
+"balance": 2691.87,
+"contribution": 52.56
+},
+{
+"month": "2019-11-01T00:00:00Z",
+"account": "Checking",
+"balance": 3043.23,
+"contribution": 75.7
+},
+{
+"month": "2019-12-01T00:00:00Z",
+"account": "Checking",
+"balance": 4211.04,
+"contribution": 50.51
+},
+{
+"month": "2020-01-01T00:00:00Z",
+"account": "Checking",
+"balance": 3536.73,
+"contribution": 86.44
+},
+{
+"month": "2020-02-01T00:00:00Z",
+"account": "Checking",
+"balance": 4641.88,
+"contribution": 30.66
+},
+{
+"month": "2020-03-01T00:00:00Z",
+"account": "Checking",
+"balance": 4627.4,
+"contribution": 45.69
+},
+{
+"month": "2020-04-01T00:00:00Z",
+"account": "Checking",
+"balance": 4345.43,
+"contribution": 33.56
+},
+{
+"month": "2020-05-01T00:00:00Z",
+"account": "Checking",
+"balance": 4197.03,
+"contribution": 51.49
+},
+{
+"month": "2020-06-01T00:00:00Z",
+"account": "Checking",
+"balance": 4173.47,
+"contribution": 74.78
+},
+{
+"month": "2020-07-01T00:00:00Z",
+"account": "Checking",
+"balance": 4519.16,
+"contribution": 41.03
+},
+{
+"month": "2020-08-01T00:00:00Z",
+"account": "Checking",
+"balance": 3057.2,
+"contribution": 51.33
+},
+{
+"month": "2020-09-01T00:00:00Z",
+"account": "Checking",
+"balance": 4133.36,
+"contribution": 73.35
+},
+{
+"month": "2020-10-01T00:00:00Z",
+"account": "Checking",
+"balance": 3598.79,
+"contribution": 76.68
+},
+{
+"month": "2020-11-01T00:00:00Z",
+"account": "Checking",
+"balance": 3930.8,
+"contribution": 50.26
+},
+{
+"month": "2020-12-01T00:00:00Z",
+"account": "Checking",
+"balance": 4213.0,
+"contribution": 58.18
+},
+{
+"month": "2021-01-01T00:00:00Z",
+"account": "Checking",
+"balance": 3061.49,
+"contribution": 52.88
+},
+{
+"month": "2021-02-01T00:00:00Z",
+"account": "Checking",
+"balance": 3016.72,
+"contribution": 79.16
+},
+{
+"month": "2021-03-01T00:00:00Z",
+"account": "Checking",
+"balance": 1861.38,
+"contribution": 63.0
+},
+{
+"month": "2021-04-01T00:00:00Z",
+"account": "Checking",
+"balance": 1628.49,
+"contribution": 58.69
+},
+{
+"month": "2021-05-01T00:00:00Z",
+"account": "Checking",
+"balance": 258.37,
+"contribution": 78.36
+},
+{
+"month": "2021-06-01T00:00:00Z",
+"account": "Checking",
+"balance": 1144.29,
+"contribution": 83.46
+},
+{
+"month": "2021-07-01T00:00:00Z",
+"account": "Checking",
+"balance": 1280.48,
+"contribution": 81.72
+},
+{
+"month": "2021-08-01T00:00:00Z",
+"account": "Checking",
+"balance": 1486.47,
+"contribution": 74.51
+},
+{
+"month": "2021-09-01T00:00:00Z",
+"account": "Checking",
+"balance": 920.61,
+"contribution": 62.9
+},
+{
+"month": "2021-10-01T00:00:00Z",
+"account": "Checking",
+"balance": 384.29,
+"contribution": 43.69
+},
+{
+"month": "2021-11-01T00:00:00Z",
+"account": "Checking",
+"balance": -221.26,
+"contribution": 42.68
+},
+{
+"month": "2021-12-01T00:00:00Z",
+"account": "Checking",
+"balance": -1404.89,
+"contribution": 53.7
+},
+{
+"month": "2022-01-01T00:00:00Z",
+"account": "Checking",
+"balance": -2083.68,
+"contribution": 90.67
+},
+{
+"month": "2022-02-01T00:00:00Z",
+"account": "Checking",
+"balance": -569.77,
+"contribution": 75.85
+},
+{
+"month": "2022-03-01T00:00:00Z",
+"account": "Checking",
+"balance": 108.36,
+"contribution": 46.68
+},
+{
+"month": "2022-04-01T00:00:00Z",
+"account": "Checking",
+"balance": 374.35,
+"contribution": 37.88
+},
+{
+"month": "2022-05-01T00:00:00Z",
+"account": "Checking",
+"balance": -124.43,
+"contribution": 52.36
+},
+{
+"month": "2022-06-01T00:00:00Z",
+"account": "Checking",
+"balance": -334.96,
+"contribution": 72.6
+},
+{
+"month": "2022-07-01T00:00:00Z",
+"account": "Checking",
+"balance": -876.99,
+"contribution": 95.99
+},
+{
+"month": "2022-08-01T00:00:00Z",
+"account": "Checking",
+"balance": -1122.61,
+"contribution": 72.48
+},
+{
+"month": "2022-09-01T00:00:00Z",
+"account": "Checking",
+"balance": -2294.12,
+"contribution": 73.37
+},
+{
+"month": "2022-10-01T00:00:00Z",
+"account": "Checking",
+"balance": -3113.09,
+"contribution": 62.65
+},
+{
+"month": "2022-11-01T00:00:00Z",
+"account": "Checking",
+"balance": -2797.34,
+"contribution": 72.1
+},
+{
+"month": "2022-12-01T00:00:00Z",
+"account": "Checking",
+"balance": -1902.96,
+"contribution": 65.57
+},
+{
+"month": "2023-01-01T00:00:00Z",
+"account": "Checking",
+"balance": -1684.32,
+"contribution": 89.22
+},
+{
+"month": "2023-02-01T00:00:00Z",
+"account": "Checking",
+"balance": -1744.71,
+"contribution": 59.89
+},
+{
+"month": "2023-03-01T00:00:00Z",
+"account": "Checking",
+"balance": -1820.23,
+"contribution": 61.77
+},
+{
+"month": "2023-04-01T00:00:00Z",
+"account": "Checking",
+"balance": -2355.62,
+"contribution": 53.47
+},
+{
+"month": "2023-05-01T00:00:00Z",
+"account": "Checking",
+"balance": -1585.11,
+"contribution": 50.97
+},
+{
+"month": "2023-06-01T00:00:00Z",
+"account": "Checking",
+"balance": -881.4,
+"contribution": 50.88
+},
+{
+"month": "2023-07-01T00:00:00Z",
+"account": "Checking",
+"balance": 652.19,
+"contribution": 57.68
+},
+{
+"month": "2023-08-01T00:00:00Z",
+"account": "Checking",
+"balance": 2449.07,
+"contribution": 67.21
+},
+{
+"month": "2023-09-01T00:00:00Z",
+"account": "Checking",
+"balance": 2487.37,
+"contribution": 74.04
+},
+{
+"month": "2023-10-01T00:00:00Z",
+"account": "Checking",
+"balance": 3650.33,
+"contribution": 82.77
+},
+{
+"month": "2023-11-01T00:00:00Z",
+"account": "Checking",
+"balance": 4965.67,
+"contribution": 73.21
+},
+{
+"month": "2023-12-01T00:00:00Z",
+"account": "Checking",
+"balance": 3909.8,
+"contribution": 73.79
+},
+{
+"month": "2024-01-01T00:00:00Z",
+"account": "Checking",
+"balance": 3781.97,
+"contribution": 65.84
+},
+{
+"month": "2024-02-01T00:00:00Z",
+"account": "Checking",
+"balance": 4833.0,
+"contribution": 48.88
+},
+{
+"month": "2024-03-01T00:00:00Z",
+"account": "Checking",
+"balance": 5898.35,
+"contribution": 95.9
+},
+{
+"month": "2024-04-01T00:00:00Z",
+"account": "Checking",
+"balance": 6220.16,
+"contribution": 54.99
+},
+{
+"month": "2024-05-01T00:00:00Z",
+"account": "Checking",
+"balance": 7250.21,
+"contribution": 62.47
+},
+{
+"month": "2024-06-01T00:00:00Z",
+"account": "Checking",
+"balance": 7962.76,
+"contribution": 78.67
+},
+{
+"month": "2024-07-01T00:00:00Z",
+"account": "Checking",
+"balance": 6332.62,
+"contribution": 64.58
+},
+{
+"month": "2024-08-01T00:00:00Z",
+"account": "Checking",
+"balance": 4681.12,
+"contribution": 49.07
+},
+{
+"month": "2024-09-01T00:00:00Z",
+"account": "Checking",
+"balance": 4958.69,
+"contribution": 41.64
+},
+{
+"month": "2024-10-01T00:00:00Z",
+"account": "Checking",
+"balance": 4039.07,
+"contribution": 52.75
+},
+{
+"month": "2024-11-01T00:00:00Z",
+"account": "Checking",
+"balance": 4071.38,
+"contribution": 64.93
+},
+{
+"month": "2024-12-01T00:00:00Z",
+"account": "Checking",
+"balance": 4244.23,
+"contribution": 52.02
+},
+{
+"month": "2025-01-01T00:00:00Z",
+"account": "Checking",
+"balance": 3364.29,
+"contribution": 65.83
+},
+{
+"month": "2025-02-01T00:00:00Z",
+"account": "Checking",
+"balance": 2413.78,
+"contribution": 47.35
+},
+{
+"month": "2025-03-01T00:00:00Z",
+"account": "Checking",
+"balance": 2927.82,
+"contribution": 47.57
+},
+{
+"month": "2025-04-01T00:00:00Z",
+"account": "Checking",
+"balance": 2035.29,
+"contribution": 76.61
+},
+{
+"month": "2025-05-01T00:00:00Z",
+"account": "Checking",
+"balance": 1971.04,
+"contribution": 25.84
+},
+{
+"month": "2025-06-01T00:00:00Z",
+"account": "Checking",
+"balance": 1314.77,
+"contribution": 88.96
+},
+{
+"month": "2025-07-01T00:00:00Z",
+"account": "Checking",
+"balance": 3962.36,
+"contribution": 55.04
+},
+{
+"month": "2025-08-01T00:00:00Z",
+"account": "Checking",
+"balance": 4726.34,
+"contribution": 70.64
+},
+{
+"month": "2025-09-01T00:00:00Z",
+"account": "Checking",
+"balance": 5187.71,
+"contribution": 32.03
+},
+{
+"month": "2025-10-01T00:00:00Z",
+"account": "Checking",
+"balance": 6313.15,
+"contribution": 63.7
+},
+{
+"month": "2025-11-01T00:00:00Z",
+"account": "Checking",
+"balance": 6357.63,
+"contribution": 35.05
+},
+{
+"month": "2025-12-01T00:00:00Z",
+"account": "Checking",
+"balance": 6076.01,
+"contribution": 57.74
+},
+{
+"month": "2016-01-01T00:00:00Z",
+"account": "Retirement",
+"balance": 18697.32,
+"contribution": 1519.59
+},
+{
+"month": "2016-02-01T00:00:00Z",
+"account": "Retirement",
+"balance": 19197.14,
+"contribution": 1800.64
+},
+{
+"month": "2016-03-01T00:00:00Z",
+"account": "Retirement",
+"balance": 22479.55,
+"contribution": 1016.28
+},
+{
+"month": "2016-04-01T00:00:00Z",
+"account": "Retirement",
+"balance": 22688.3,
+"contribution": 1589.58
+},
+{
+"month": "2016-05-01T00:00:00Z",
+"account": "Retirement",
+"balance": 23155.63,
+"contribution": 1945.52
+},
+{
+"month": "2016-06-01T00:00:00Z",
+"account": "Retirement",
+"balance": 23769.24,
+"contribution": 1525.11
+},
+{
+"month": "2016-07-01T00:00:00Z",
+"account": "Retirement",
+"balance": 27467.83,
+"contribution": 1022.78
+},
+{
+"month": "2016-08-01T00:00:00Z",
+"account": "Retirement",
+"balance": 32911.42,
+"contribution": 1358.91
+},
+{
+"month": "2016-09-01T00:00:00Z",
+"account": "Retirement",
+"balance": 33280.26,
+"contribution": 1182.52
+},
+{
+"month": "2016-10-01T00:00:00Z",
+"account": "Retirement",
+"balance": 31108.51,
+"contribution": 938.94
+},
+{
+"month": "2016-11-01T00:00:00Z",
+"account": "Retirement",
+"balance": 37262.01,
+"contribution": 1387.47
+},
+{
+"month": "2016-12-01T00:00:00Z",
+"account": "Retirement",
+"balance": 38743.76,
+"contribution": 1505.36
+},
+{
+"month": "2017-01-01T00:00:00Z",
+"account": "Retirement",
+"balance": 42412.4,
+"contribution": 1145.21
+},
+{
+"month": "2017-02-01T00:00:00Z",
+"account": "Retirement",
+"balance": 43956.25,
+"contribution": 1533.7
+},
+{
+"month": "2017-03-01T00:00:00Z",
+"account": "Retirement",
+"balance": 48592.42,
+"contribution": 1526.77
+},
+{
+"month": "2017-04-01T00:00:00Z",
+"account": "Retirement",
+"balance": 54804.42,
+"contribution": 1355.85
+},
+{
+"month": "2017-05-01T00:00:00Z",
+"account": "Retirement",
+"balance": 55681.68,
+"contribution": 929.3
+},
+{
+"month": "2017-06-01T00:00:00Z",
+"account": "Retirement",
+"balance": 57181.45,
+"contribution": 1668.06
+},
+{
+"month": "2017-07-01T00:00:00Z",
+"account": "Retirement",
+"balance": 58005.82,
+"contribution": 1371.22
+},
+{
+"month": "2017-08-01T00:00:00Z",
+"account": "Retirement",
+"balance": 56774.03,
+"contribution": 1220.97
+},
+{
+"month": "2017-09-01T00:00:00Z",
+"account": "Retirement",
+"balance": 56775.05,
+"contribution": 1401.35
+},
+{
+"month": "2017-10-01T00:00:00Z",
+"account": "Retirement",
+"balance": 60588.11,
+"contribution": 1619.14
+},
+{
+"month": "2017-11-01T00:00:00Z",
+"account": "Retirement",
+"balance": 63853.71,
+"contribution": 1861.39
+},
+{
+"month": "2017-12-01T00:00:00Z",
+"account": "Retirement",
+"balance": 63400.44,
+"contribution": 1919.81
+},
+{
+"month": "2018-01-01T00:00:00Z",
+"account": "Retirement",
+"balance": 64166.44,
+"contribution": 954.95
+},
+{
+"month": "2018-02-01T00:00:00Z",
+"account": "Retirement",
+"balance": 63148.58,
+"contribution": 1402.62
+},
+{
+"month": "2018-03-01T00:00:00Z",
+"account": "Retirement",
+"balance": 59635.42,
+"contribution": 2270.28
+},
+{
+"month": "2018-04-01T00:00:00Z",
+"account": "Retirement",
+"balance": 59948.3,
+"contribution": 1744.5
+},
+{
+"month": "2018-05-01T00:00:00Z",
+"account": "Retirement",
+"balance": 57224.93,
+"contribution": 1469.22
+},
+{
+"month": "2018-06-01T00:00:00Z",
+"account": "Retirement",
+"balance": 58322.32,
+"contribution": 1156.64
+},
+{
+"month": "2018-07-01T00:00:00Z",
+"account": "Retirement",
+"balance": 59436.0,
+"contribution": 1432.21
+},
+{
+"month": "2018-08-01T00:00:00Z",
+"account": "Retirement",
+"balance": 60915.49,
+"contribution": 994.27
+},
+{
+"month": "2018-09-01T00:00:00Z",
+"account": "Retirement",
+"balance": 62844.25,
+"contribution": 1328.42
+},
+{
+"month": "2018-10-01T00:00:00Z",
+"account": "Retirement",
+"balance": 61302.01,
+"contribution": 634.1
+},
+{
+"month": "2018-11-01T00:00:00Z",
+"account": "Retirement",
+"balance": 61593.74,
+"contribution": 1296.49
+},
+{
+"month": "2018-12-01T00:00:00Z",
+"account": "Retirement",
+"balance": 68690.77,
+"contribution": 993.26
+},
+{
+"month": "2019-01-01T00:00:00Z",
+"account": "Retirement",
+"balance": 73625.1,
+"contribution": 1885.67
+},
+{
+"month": "2019-02-01T00:00:00Z",
+"account": "Retirement",
+"balance": 75909.71,
+"contribution": 1521.36
+},
+{
+"month": "2019-03-01T00:00:00Z",
+"account": "Retirement",
+"balance": 78571.97,
+"contribution": 895.01
+},
+{
+"month": "2019-04-01T00:00:00Z",
+"account": "Retirement",
+"balance": 83761.53,
+"contribution": 1313.79
+},
+{
+"month": "2019-05-01T00:00:00Z",
+"account": "Retirement",
+"balance": 83485.58,
+"contribution": 1428.79
+},
+{
+"month": "2019-06-01T00:00:00Z",
+"account": "Retirement",
+"balance": 78119.53,
+"contribution": 949.13
+},
+{
+"month": "2019-07-01T00:00:00Z",
+"account": "Retirement",
+"balance": 76958.25,
+"contribution": 860.54
+},
+{
+"month": "2019-08-01T00:00:00Z",
+"account": "Retirement",
+"balance": 80485.42,
+"contribution": 2008.84
+},
+{
+"month": "2019-09-01T00:00:00Z",
+"account": "Retirement",
+"balance": 82610.96,
+"contribution": 1311.93
+},
+{
+"month": "2019-10-01T00:00:00Z",
+"account": "Retirement",
+"balance": 85605.35,
+"contribution": 1245.98
+},
+{
+"month": "2019-11-01T00:00:00Z",
+"account": "Retirement",
+"balance": 88137.73,
+"contribution": 1576.14
+},
+{
+"month": "2019-12-01T00:00:00Z",
+"account": "Retirement",
+"balance": 89746.14,
+"contribution": 1278.63
+},
+{
+"month": "2020-01-01T00:00:00Z",
+"account": "Retirement",
+"balance": 92119.67,
+"contribution": 1449.5
+},
+{
+"month": "2020-02-01T00:00:00Z",
+"account": "Retirement",
+"balance": 96037.52,
+"contribution": 880.55
+},
+{
+"month": "2020-03-01T00:00:00Z",
+"account": "Retirement",
+"balance": 95223.85,
+"contribution": 1250.81
+},
+{
+"month": "2020-04-01T00:00:00Z",
+"account": "Retirement",
+"balance": 98498.51,
+"contribution": 957.64
+},
+{
+"month": "2020-05-01T00:00:00Z",
+"account": "Retirement",
+"balance": 103547.21,
+"contribution": 1947.04
+},
+{
+"month": "2020-06-01T00:00:00Z",
+"account": "Retirement",
+"balance": 103413.91,
+"contribution": 1831.3
+},
+{
+"month": "2020-07-01T00:00:00Z",
+"account": "Retirement",
+"balance": 99626.92,
+"contribution": 1388.74
+},
+{
+"month": "2020-08-01T00:00:00Z",
+"account": "Retirement",
+"balance": 96934.02,
+"contribution": 1814.07
+},
+{
+"month": "2020-09-01T00:00:00Z",
+"account": "Retirement",
+"balance": 100478.87,
+"contribution": 1608.37
+},
+{
+"month": "2020-10-01T00:00:00Z",
+"account": "Retirement",
+"balance": 100148.35,
+"contribution": 1012.05
+},
+{
+"month": "2020-11-01T00:00:00Z",
+"account": "Retirement",
+"balance": 102258.14,
+"contribution": 1234.87
+},
+{
+"month": "2020-12-01T00:00:00Z",
+"account": "Retirement",
+"balance": 104893.92,
+"contribution": 841.11
+},
+{
+"month": "2021-01-01T00:00:00Z",
+"account": "Retirement",
+"balance": 106738.12,
+"contribution": 1605.61
+},
+{
+"month": "2021-02-01T00:00:00Z",
+"account": "Retirement",
+"balance": 101435.37,
+"contribution": 956.25
+},
+{
+"month": "2021-03-01T00:00:00Z",
+"account": "Retirement",
+"balance": 100092.02,
+"contribution": 1198.93
+},
+{
+"month": "2021-04-01T00:00:00Z",
+"account": "Retirement",
+"balance": 96010.81,
+"contribution": 1421.53
+},
+{
+"month": "2021-05-01T00:00:00Z",
+"account": "Retirement",
+"balance": 93405.68,
+"contribution": 1387.23
+},
+{
+"month": "2021-06-01T00:00:00Z",
+"account": "Retirement",
+"balance": 88933.87,
+"contribution": 984.95
+},
+{
+"month": "2021-07-01T00:00:00Z",
+"account": "Retirement",
+"balance": 91021.62,
+"contribution": 791.47
+},
+{
+"month": "2021-08-01T00:00:00Z",
+"account": "Retirement",
+"balance": 91217.08,
+"contribution": 1938.28
+},
+{
+"month": "2021-09-01T00:00:00Z",
+"account": "Retirement",
+"balance": 93642.57,
+"contribution": 932.86
+},
+{
+"month": "2021-10-01T00:00:00Z",
+"account": "Retirement",
+"balance": 99809.19,
+"contribution": 1209.9
+},
+{
+"month": "2021-11-01T00:00:00Z",
+"account": "Retirement",
+"balance": 102700.38,
+"contribution": 1760.38
+},
+{
+"month": "2021-12-01T00:00:00Z",
+"account": "Retirement",
+"balance": 102437.65,
+"contribution": 1641.45
+},
+{
+"month": "2022-01-01T00:00:00Z",
+"account": "Retirement",
+"balance": 95944.71,
+"contribution": 1444.78
+},
+{
+"month": "2022-02-01T00:00:00Z",
+"account": "Retirement",
+"balance": 97176.68,
+"contribution": 1285.45
+},
+{
+"month": "2022-03-01T00:00:00Z",
+"account": "Retirement",
+"balance": 98452.16,
+"contribution": 1798.23
+},
+{
+"month": "2022-04-01T00:00:00Z",
+"account": "Retirement",
+"balance": 102007.02,
+"contribution": 1184.36
+},
+{
+"month": "2022-05-01T00:00:00Z",
+"account": "Retirement",
+"balance": 105317.52,
+"contribution": 1836.15
+},
+{
+"month": "2022-06-01T00:00:00Z",
+"account": "Retirement",
+"balance": 107020.25,
+"contribution": 1551.35
+},
+{
+"month": "2022-07-01T00:00:00Z",
+"account": "Retirement",
+"balance": 102197.97,
+"contribution": 839.14
+},
+{
+"month": "2022-08-01T00:00:00Z",
+"account": "Retirement",
+"balance": 104850.14,
+"contribution": 866.04
+},
+{
+"month": "2022-09-01T00:00:00Z",
+"account": "Retirement",
+"balance": 108849.54,
+"contribution": 1831.16
+},
+{
+"month": "2022-10-01T00:00:00Z",
+"account": "Retirement",
+"balance": 108169.86,
+"contribution": 986.34
+},
+{
+"month": "2022-11-01T00:00:00Z",
+"account": "Retirement",
+"balance": 109618.17,
+"contribution": 1489.43
+},
+{
+"month": "2022-12-01T00:00:00Z",
+"account": "Retirement",
+"balance": 113772.04,
+"contribution": 1325.04
+},
+{
+"month": "2023-01-01T00:00:00Z",
+"account": "Retirement",
+"balance": 115912.36,
+"contribution": 1046.1
+},
+{
+"month": "2023-02-01T00:00:00Z",
+"account": "Retirement",
+"balance": 118702.52,
+"contribution": 1126.43
+},
+{
+"month": "2023-03-01T00:00:00Z",
+"account": "Retirement",
+"balance": 123342.43,
+"contribution": 1660.29
+},
+{
+"month": "2023-04-01T00:00:00Z",
+"account": "Retirement",
+"balance": 121067.95,
+"contribution": 1530.51
+},
+{
+"month": "2023-05-01T00:00:00Z",
+"account": "Retirement",
+"balance": 120133.75,
+"contribution": 1755.4
+},
+{
+"month": "2023-06-01T00:00:00Z",
+"account": "Retirement",
+"balance": 119271.22,
+"contribution": 1862.92
+},
+{
+"month": "2023-07-01T00:00:00Z",
+"account": "Retirement",
+"balance": 123767.16,
+"contribution": 2113.55
+},
+{
+"month": "2023-08-01T00:00:00Z",
+"account": "Retirement",
+"balance": 126221.2,
+"contribution": 1422.81
+},
+{
+"month": "2023-09-01T00:00:00Z",
+"account": "Retirement",
+"balance": 130844.71,
+"contribution": 961.34
+},
+{
+"month": "2023-10-01T00:00:00Z",
+"account": "Retirement",
+"balance": 132051.4,
+"contribution": 1289.36
+},
+{
+"month": "2023-11-01T00:00:00Z",
+"account": "Retirement",
+"balance": 133058.62,
+"contribution": 830.58
+},
+{
+"month": "2023-12-01T00:00:00Z",
+"account": "Retirement",
+"balance": 129699.3,
+"contribution": 784.74
+},
+{
+"month": "2024-01-01T00:00:00Z",
+"account": "Retirement",
+"balance": 134368.91,
+"contribution": 1281.93
+},
+{
+"month": "2024-02-01T00:00:00Z",
+"account": "Retirement",
+"balance": 136706.89,
+"contribution": 1358.33
+},
+{
+"month": "2024-03-01T00:00:00Z",
+"account": "Retirement",
+"balance": 136669.72,
+"contribution": 1875.01
+},
+{
+"month": "2024-04-01T00:00:00Z",
+"account": "Retirement",
+"balance": 131111.13,
+"contribution": 1322.78
+},
+{
+"month": "2024-05-01T00:00:00Z",
+"account": "Retirement",
+"balance": 129436.31,
+"contribution": 1069.1
+},
+{
+"month": "2024-06-01T00:00:00Z",
+"account": "Retirement",
+"balance": 125526.37,
+"contribution": 846.18
+},
+{
+"month": "2024-07-01T00:00:00Z",
+"account": "Retirement",
+"balance": 122645.19,
+"contribution": 1798.18
+},
+{
+"month": "2024-08-01T00:00:00Z",
+"account": "Retirement",
+"balance": 121057.9,
+"contribution": 1233.49
+},
+{
+"month": "2024-09-01T00:00:00Z",
+"account": "Retirement",
+"balance": 120802.3,
+"contribution": 1627.49
+},
+{
+"month": "2024-10-01T00:00:00Z",
+"account": "Retirement",
+"balance": 123711.86,
+"contribution": 1472.46
+},
+{
+"month": "2024-11-01T00:00:00Z",
+"account": "Retirement",
+"balance": 123987.45,
+"contribution": 1591.84
+},
+{
+"month": "2024-12-01T00:00:00Z",
+"account": "Retirement",
+"balance": 122256.7,
+"contribution": 1480.71
+},
+{
+"month": "2025-01-01T00:00:00Z",
+"account": "Retirement",
+"balance": 127070.69,
+"contribution": 1166.95
+},
+{
+"month": "2025-02-01T00:00:00Z",
+"account": "Retirement",
+"balance": 125384.22,
+"contribution": 845.23
+},
+{
+"month": "2025-03-01T00:00:00Z",
+"account": "Retirement",
+"balance": 126185.46,
+"contribution": 1628.08
+},
+{
+"month": "2025-04-01T00:00:00Z",
+"account": "Retirement",
+"balance": 125882.21,
+"contribution": 1284.37
+},
+{
+"month": "2025-05-01T00:00:00Z",
+"account": "Retirement",
+"balance": 129889.92,
+"contribution": 1414.23
+},
+{
+"month": "2025-06-01T00:00:00Z",
+"account": "Retirement",
+"balance": 132798.98,
+"contribution": 1271.4
+},
+{
+"month": "2025-07-01T00:00:00Z",
+"account": "Retirement",
+"balance": 137421.7,
+"contribution": 1732.78
+},
+{
+"month": "2025-08-01T00:00:00Z",
+"account": "Retirement",
+"balance": 138453.32,
+"contribution": 1188.96
+},
+{
+"month": "2025-09-01T00:00:00Z",
+"account": "Retirement",
+"balance": 146592.98,
+"contribution": 1017.22
+},
+{
+"month": "2025-10-01T00:00:00Z",
+"account": "Retirement",
+"balance": 145776.23,
+"contribution": 505.53
+},
+{
+"month": "2025-11-01T00:00:00Z",
+"account": "Retirement",
+"balance": 149353.87,
+"contribution": 1428.32
+},
+{
+"month": "2025-12-01T00:00:00Z",
+"account": "Retirement",
+"balance": 151031.71,
+"contribution": 854.45
+},
+{
+"month": "2018-07-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 23806.73,
+"contribution": 1624.9
+},
+{
+"month": "2018-08-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 13926.89,
+"contribution": 1912.03
+},
+{
+"month": "2018-09-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 15324.43,
+"contribution": 1961.9
+},
+{
+"month": "2018-10-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 10954.32,
+"contribution": 2422.42
+},
+{
+"month": "2018-11-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 12500.77,
+"contribution": 1847.41
+},
+{
+"month": "2018-12-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 16898.39,
+"contribution": 2198.28
+},
+{
+"month": "2019-01-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 24243.87,
+"contribution": 2473.82
+},
+{
+"month": "2019-02-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 30707.74,
+"contribution": 1732.54
+},
+{
+"month": "2019-03-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 41926.52,
+"contribution": 2564.04
+},
+{
+"month": "2019-04-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 39746.7,
+"contribution": 2693.08
+},
+{
+"month": "2019-05-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 42705.47,
+"contribution": 1520.85
+},
+{
+"month": "2019-06-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 45084.6,
+"contribution": 1374.13
+},
+{
+"month": "2019-07-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 56497.4,
+"contribution": 1385.87
+},
+{
+"month": "2019-08-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 70730.69,
+"contribution": 1594.22
+},
+{
+"month": "2019-09-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 73320.6,
+"contribution": 2709.54
+},
+{
+"month": "2019-10-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 79716.28,
+"contribution": 1188.96
+},
+{
+"month": "2019-11-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 82618.01,
+"contribution": 1097.29
+},
+{
+"month": "2019-12-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 91568.9,
+"contribution": 1515.38
+},
+{
+"month": "2020-01-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 94840.72,
+"contribution": 1978.61
+},
+{
+"month": "2020-02-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 87477.97,
+"contribution": 2219.4
+},
+{
+"month": "2020-03-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 104375.26,
+"contribution": 1572.77
+},
+{
+"month": "2020-04-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 103543.18,
+"contribution": 2241.14
+},
+{
+"month": "2020-05-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 115706.86,
+"contribution": 1593.94
+},
+{
+"month": "2020-06-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 120016.45,
+"contribution": 2235.84
+},
+{
+"month": "2020-07-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 130284.39,
+"contribution": 1622.65
+},
+{
+"month": "2020-08-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 150625.56,
+"contribution": 3110.64
+},
+{
+"month": "2020-09-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 142172.27,
+"contribution": 1638.71
+},
+{
+"month": "2020-10-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 146076.4,
+"contribution": 1721.43
+},
+{
+"month": "2020-11-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 142982.25,
+"contribution": 2054.75
+},
+{
+"month": "2020-12-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 137946.87,
+"contribution": 1736.08
+},
+{
+"month": "2021-01-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 139544.28,
+"contribution": 1847.72
+},
+{
+"month": "2021-02-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 141916.8,
+"contribution": 2599.29
+},
+{
+"month": "2021-03-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 149608.31,
+"contribution": 2105.3
+},
+{
+"month": "2021-04-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 164014.6,
+"contribution": 1854.83
+},
+{
+"month": "2021-05-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 169655.76,
+"contribution": 2996.95
+},
+{
+"month": "2021-06-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 170030.47,
+"contribution": 2483.86
+},
+{
+"month": "2021-07-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 165443.07,
+"contribution": 1766.66
+},
+{
+"month": "2021-08-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 165913.1,
+"contribution": 2311.81
+},
+{
+"month": "2021-09-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 167714.0,
+"contribution": 2407.58
+},
+{
+"month": "2021-10-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 169383.82,
+"contribution": 2019.16
+},
+{
+"month": "2021-11-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 164411.97,
+"contribution": 2009.48
+},
+{
+"month": "2021-12-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 164647.28,
+"contribution": 2059.9
+},
+{
+"month": "2022-01-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 156860.07,
+"contribution": 2720.84
+},
+{
+"month": "2022-02-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 165557.44,
+"contribution": 2187.58
+},
+{
+"month": "2022-03-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 163086.03,
+"contribution": 2636.55
+},
+{
+"month": "2022-04-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 162897.6,
+"contribution": 1945.03
+},
+{
+"month": "2022-05-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 169221.53,
+"contribution": 1789.14
+},
+{
+"month": "2022-06-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 172567.57,
+"contribution": 1822.3
+},
+{
+"month": "2022-07-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 179861.13,
+"contribution": 2291.52
+},
+{
+"month": "2022-08-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 188336.54,
+"contribution": 2299.27
+},
+{
+"month": "2022-09-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 194298.6,
+"contribution": 2271.67
+},
+{
+"month": "2022-10-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 204000.7,
+"contribution": 1583.68
+},
+{
+"month": "2022-11-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 199506.33,
+"contribution": 2113.6
+},
+{
+"month": "2022-12-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 204964.63,
+"contribution": 1950.55
+},
+{
+"month": "2023-01-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 220327.06,
+"contribution": 2318.63
+},
+{
+"month": "2023-02-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 233945.42,
+"contribution": 2127.48
+},
+{
+"month": "2023-03-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 228292.97,
+"contribution": 1377.93
+},
+{
+"month": "2023-04-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 240451.92,
+"contribution": 2102.23
+},
+{
+"month": "2023-05-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 241010.03,
+"contribution": 2738.27
+},
+{
+"month": "2023-06-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 257416.1,
+"contribution": 2281.11
+},
+{
+"month": "2023-07-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 270340.34,
+"contribution": 1923.21
+},
+{
+"month": "2023-08-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 266637.82,
+"contribution": 1238.13
+},
+{
+"month": "2023-09-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 277408.83,
+"contribution": 1292.51
+},
+{
+"month": "2023-10-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 276849.0,
+"contribution": 2118.01
+},
+{
+"month": "2023-11-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 283038.82,
+"contribution": 1127.66
+},
+{
+"month": "2023-12-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 282832.55,
+"contribution": 1665.15
+},
+{
+"month": "2024-01-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 294521.02,
+"contribution": 1985.11
+},
+{
+"month": "2024-02-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 290425.49,
+"contribution": 2952.09
+},
+{
+"month": "2024-03-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 291889.51,
+"contribution": 2484.49
+},
+{
+"month": "2024-04-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 294213.66,
+"contribution": 2000.78
+},
+{
+"month": "2024-05-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 299319.62,
+"contribution": 1714.71
+},
+{
+"month": "2024-06-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 288713.63,
+"contribution": 1748.2
+},
+{
+"month": "2024-07-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 292615.59,
+"contribution": 1887.42
+},
+{
+"month": "2024-08-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 299604.04,
+"contribution": 2446.79
+},
+{
+"month": "2024-09-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 300359.51,
+"contribution": 2644.28
+},
+{
+"month": "2024-10-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 302405.26,
+"contribution": 2245.6
+},
+{
+"month": "2024-11-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 299845.85,
+"contribution": 2029.56
+},
+{
+"month": "2024-12-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 298940.16,
+"contribution": 2617.59
+},
+{
+"month": "2025-01-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 310297.57,
+"contribution": 2633.86
+},
+{
+"month": "2025-02-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 312302.33,
+"contribution": 2022.23
+},
+{
+"month": "2025-03-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 314737.58,
+"contribution": 1794.06
+},
+{
+"month": "2025-04-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 315598.33,
+"contribution": 1915.8
+},
+{
+"month": "2025-05-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 316728.03,
+"contribution": 881.61
+},
+{
+"month": "2025-06-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 318529.01,
+"contribution": 2414.84
+},
+{
+"month": "2025-07-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 313018.16,
+"contribution": 2977.02
+},
+{
+"month": "2025-08-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 316762.22,
+"contribution": 1798.96
+},
+{
+"month": "2025-09-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 330113.29,
+"contribution": 1602.22
+},
+{
+"month": "2025-10-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 353204.44,
+"contribution": 1725.21
+},
+{
+"month": "2025-11-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 363800.0,
+"contribution": 2810.39
+},
+{
+"month": "2025-12-01T00:00:00Z",
+"account": "Brokerage",
+"balance": 372921.87,
+"contribution": 2152.47
+},
+{
+"month": "2016-01-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -284850.0,
+"contribution": 1102.42
+},
+{
+"month": "2016-02-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -283700.0,
+"contribution": 1415.2
+},
+{
+"month": "2016-03-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -282550.0,
+"contribution": 1312.09
+},
+{
+"month": "2016-04-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -281400.0,
+"contribution": 971.01
+},
+{
+"month": "2016-05-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -280250.0,
+"contribution": 967.7
+},
+{
+"month": "2016-06-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -279100.0,
+"contribution": 689.41
+},
+{
+"month": "2016-07-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -277950.0,
+"contribution": 860.86
+},
+{
+"month": "2016-08-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -276800.0,
+"contribution": 1120.54
+},
+{
+"month": "2016-09-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -275650.0,
+"contribution": 1256.52
+},
+{
+"month": "2016-10-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -274500.0,
+"contribution": 960.66
+},
+{
+"month": "2016-11-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -273350.0,
+"contribution": 1559.17
+},
+{
+"month": "2016-12-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -272200.0,
+"contribution": 573.64
+},
+{
+"month": "2017-01-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -271050.0,
+"contribution": 917.01
+},
+{
+"month": "2017-02-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -269900.0,
+"contribution": 1112.85
+},
+{
+"month": "2017-03-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -268750.0,
+"contribution": 1019.02
+},
+{
+"month": "2017-04-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -267600.0,
+"contribution": 880.88
+},
+{
+"month": "2017-05-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -266450.0,
+"contribution": 1314.68
+},
+{
+"month": "2017-06-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -265300.0,
+"contribution": 1257.89
+},
+{
+"month": "2017-07-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -264150.0,
+"contribution": 878.07
+},
+{
+"month": "2017-08-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -263000.0,
+"contribution": 1512.11
+},
+{
+"month": "2017-09-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -261850.0,
+"contribution": 1481.21
+},
+{
+"month": "2017-10-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -260700.0,
+"contribution": 1359.72
+},
+{
+"month": "2017-11-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -259550.0,
+"contribution": 947.29
+},
+{
+"month": "2017-12-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -258400.0,
+"contribution": 1472.97
+},
+{
+"month": "2018-01-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -257250.0,
+"contribution": 1091.39
+},
+{
+"month": "2018-02-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -256100.0,
+"contribution": 1365.1
+},
+{
+"month": "2018-03-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -254950.0,
+"contribution": 1455.17
+},
+{
+"month": "2018-04-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -253800.0,
+"contribution": 985.62
+},
+{
+"month": "2018-05-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -252650.0,
+"contribution": 850.08
+},
+{
+"month": "2018-06-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -251500.0,
+"contribution": 1001.51
+},
+{
+"month": "2018-07-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -250350.0,
+"contribution": 1041.0
+},
+{
+"month": "2018-08-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -249200.0,
+"contribution": 955.73
+},
+{
+"month": "2018-09-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -248050.0,
+"contribution": 771.89
+},
+{
+"month": "2018-10-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -246900.0,
+"contribution": 1613.53
+},
+{
+"month": "2018-11-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -245750.0,
+"contribution": 1193.2
+},
+{
+"month": "2018-12-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -244600.0,
+"contribution": 1457.48
+},
+{
+"month": "2019-01-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -243450.0,
+"contribution": 1405.85
+},
+{
+"month": "2019-02-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -242300.0,
+"contribution": 1277.22
+},
+{
+"month": "2019-03-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -241150.0,
+"contribution": 1109.05
+},
+{
+"month": "2019-04-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -240000.0,
+"contribution": 1600.24
+},
+{
+"month": "2019-05-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -238850.0,
+"contribution": 867.26
+},
+{
+"month": "2019-06-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -237700.0,
+"contribution": 946.97
+},
+{
+"month": "2019-07-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -236550.0,
+"contribution": 905.17
+},
+{
+"month": "2019-08-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -235400.0,
+"contribution": 1452.26
+},
+{
+"month": "2019-09-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -234250.0,
+"contribution": 709.43
+},
+{
+"month": "2019-10-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -233100.0,
+"contribution": 1393.67
+},
+{
+"month": "2019-11-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -231950.0,
+"contribution": 1339.74
+},
+{
+"month": "2019-12-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -230800.0,
+"contribution": 1468.65
+},
+{
+"month": "2020-01-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -229650.0,
+"contribution": 1358.63
+},
+{
+"month": "2020-02-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -228500.0,
+"contribution": 1202.83
+},
+{
+"month": "2020-03-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -227350.0,
+"contribution": 1067.84
+},
+{
+"month": "2020-04-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -226200.0,
+"contribution": 861.77
+},
+{
+"month": "2020-05-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -225050.0,
+"contribution": 629.53
+},
+{
+"month": "2020-06-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -223900.0,
+"contribution": 1091.89
+},
+{
+"month": "2020-07-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -222750.0,
+"contribution": 1359.15
+},
+{
+"month": "2020-08-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -221600.0,
+"contribution": 1205.54
+},
+{
+"month": "2020-09-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -220450.0,
+"contribution": 1002.17
+},
+{
+"month": "2020-10-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -219300.0,
+"contribution": 939.95
+},
+{
+"month": "2020-11-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -218150.0,
+"contribution": 1289.5
+},
+{
+"month": "2020-12-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -217000.0,
+"contribution": 1708.37
+},
+{
+"month": "2021-01-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -215850.0,
+"contribution": 1179.46
+},
+{
+"month": "2021-02-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -214700.0,
+"contribution": 835.48
+},
+{
+"month": "2021-03-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -213550.0,
+"contribution": 1725.77
+},
+{
+"month": "2021-04-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -212400.0,
+"contribution": 1293.15
+},
+{
+"month": "2021-05-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -211250.0,
+"contribution": 862.21
+},
+{
+"month": "2021-06-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -210100.0,
+"contribution": 1578.44
+},
+{
+"month": "2021-07-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -208950.0,
+"contribution": 689.63
+},
+{
+"month": "2021-08-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -207800.0,
+"contribution": 1581.68
+},
+{
+"month": "2021-09-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -206650.0,
+"contribution": 693.15
+},
+{
+"month": "2021-10-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -205500.0,
+"contribution": 1096.36
+},
+{
+"month": "2021-11-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -204350.0,
+"contribution": 956.33
+},
+{
+"month": "2021-12-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -203200.0,
+"contribution": 1060.11
+},
+{
+"month": "2022-01-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -202050.0,
+"contribution": 978.32
+},
+{
+"month": "2022-02-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -200900.0,
+"contribution": 1146.61
+},
+{
+"month": "2022-03-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -199750.0,
+"contribution": 620.41
+},
+{
+"month": "2022-04-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -198600.0,
+"contribution": 1423.79
+},
+{
+"month": "2022-05-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -197450.0,
+"contribution": 1427.28
+},
+{
+"month": "2022-06-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -196300.0,
+"contribution": 1319.02
+},
+{
+"month": "2022-07-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -195150.0,
+"contribution": 1141.24
+},
+{
+"month": "2022-08-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -194000.0,
+"contribution": 871.09
+},
+{
+"month": "2022-09-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -192850.0,
+"contribution": 1100.86
+},
+{
+"month": "2022-10-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -191700.0,
+"contribution": 838.82
+},
+{
+"month": "2022-11-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -190550.0,
+"contribution": 861.81
+},
+{
+"month": "2022-12-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -189400.0,
+"contribution": 1325.6
+},
+{
+"month": "2023-01-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -188250.0,
+"contribution": 871.73
+},
+{
+"month": "2023-02-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -187100.0,
+"contribution": 1235.87
+},
+{
+"month": "2023-03-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -185950.0,
+"contribution": 1180.09
+},
+{
+"month": "2023-04-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -184800.0,
+"contribution": 1366.63
+},
+{
+"month": "2023-05-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -183650.0,
+"contribution": 1202.1
+},
+{
+"month": "2023-06-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -182500.0,
+"contribution": 1461.22
+},
+{
+"month": "2023-07-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -181350.0,
+"contribution": 1366.38
+},
+{
+"month": "2023-08-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -180200.0,
+"contribution": 1175.75
+},
+{
+"month": "2023-09-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -179050.0,
+"contribution": 1167.72
+},
+{
+"month": "2023-10-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -177900.0,
+"contribution": 1345.79
+},
+{
+"month": "2023-11-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -176750.0,
+"contribution": 948.03
+},
+{
+"month": "2023-12-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -175600.0,
+"contribution": 1076.19
+},
+{
+"month": "2024-01-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -174450.0,
+"contribution": 658.39
+},
+{
+"month": "2024-02-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -173300.0,
+"contribution": 1195.74
+},
+{
+"month": "2024-03-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -172150.0,
+"contribution": 872.98
+},
+{
+"month": "2024-04-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -171000.0,
+"contribution": 1085.21
+},
+{
+"month": "2024-05-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -169850.0,
+"contribution": 997.83
+},
+{
+"month": "2024-06-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -168700.0,
+"contribution": 1435.72
+},
+{
+"month": "2024-07-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -167550.0,
+"contribution": 1079.45
+},
+{
+"month": "2024-08-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -166400.0,
+"contribution": 1611.01
+},
+{
+"month": "2024-09-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -165250.0,
+"contribution": 1343.07
+},
+{
+"month": "2024-10-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -164100.0,
+"contribution": 1176.97
+},
+{
+"month": "2024-11-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -162950.0,
+"contribution": 1232.83
+},
+{
+"month": "2024-12-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -161800.0,
+"contribution": 1201.01
+},
+{
+"month": "2025-01-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -160650.0,
+"contribution": 1186.41
+},
+{
+"month": "2025-02-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -159500.0,
+"contribution": 1353.22
+},
+{
+"month": "2025-03-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -158350.0,
+"contribution": 1083.89
+},
+{
+"month": "2025-04-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -157200.0,
+"contribution": 1373.05
+},
+{
+"month": "2025-05-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -156050.0,
+"contribution": 1112.56
+},
+{
+"month": "2025-06-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -154900.0,
+"contribution": 828.94
+},
+{
+"month": "2025-07-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -153750.0,
+"contribution": 1507.38
+},
+{
+"month": "2025-08-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -152600.0,
+"contribution": 1379.6
+},
+{
+"month": "2025-09-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -151450.0,
+"contribution": 1175.19
+},
+{
+"month": "2025-10-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -150300.0,
+"contribution": 1968.83
+},
+{
+"month": "2025-11-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -149150.0,
+"contribution": 894.06
+},
+{
+"month": "2025-12-01T00:00:00Z",
+"account": "Mortgage",
+"balance": -148000.0,
+"contribution": 1144.65
+}
+]
+}

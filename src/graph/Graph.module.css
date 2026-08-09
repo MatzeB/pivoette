@@ -1,0 +1,183 @@
+/**
+ * Chart chrome. Everything here is either a palette token or a pointer rule —
+ * geometry belongs in the components, where the scales are.
+ *
+ * The root stacks two layers: an `<svg>` carrying the marks, and an absolutely
+ * positioned HTML layer above it carrying the legend and the scrubber readout.
+ * Text is HTML rather than SVG on purpose. Sizing a readout's background around
+ * SVG text needs `getBBox`, which jsdom does not implement, so a `foreignObject`
+ * would put the readout beyond the reach of this repo's test harness — and SVG
+ * text lands on subpixel offsets that blur.
+ */
+.root {
+  composes: palette from '../theme.module.css';
+
+  position: relative;
+  color: var(--pv-text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+}
+
+.svg {
+  display: block;
+  /* Marks never take the pointer: the scrubber's hit rect covers the plot and
+   * must win wherever <Scrubber/> happens to sit among the children. */
+  pointer-events: none;
+}
+
+/* The one element that does listen. `fill: none` would not be hit-testable. */
+.hit {
+  fill: transparent;
+  pointer-events: all;
+  /* Not `none`: that would swallow page scrolling over the chart on a phone.
+   * A vertical swipe scrolls; a horizontal drag scrubs. */
+  touch-action: pan-y;
+  outline: none;
+}
+
+.hit:focus-visible {
+  outline: 2px solid var(--pv-hi);
+  outline-offset: -2px;
+}
+
+/* --- axes ----------------------------------------------------------------- */
+
+.grid {
+  stroke: var(--pv-border);
+  stroke-width: 1;
+  /* Solid, never dashed: a dashed gridline competes with the data for
+   * attention, which is exactly backwards. */
+  fill: none;
+}
+
+.axisLine {
+  stroke: var(--pv-border);
+  stroke-width: 1;
+}
+
+.tickText {
+  fill: var(--pv-muted);
+  font-size: 11px;
+  /* Ticks are a column of numbers that should line up. */
+  font-variant-numeric: tabular-nums;
+}
+
+.axisTitle {
+  fill: var(--pv-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* --- marks ---------------------------------------------------------------- */
+
+.line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.area {
+  stroke: none;
+}
+
+/* A dot carries a ring in the surface colour so it stays legible where it
+ * crosses its own line or another series'. Never a border in the mark colour —
+ * that adds ink that is not data. */
+.dot {
+  stroke: var(--pv-bg);
+  stroke-width: 2;
+}
+
+.bar {
+  stroke: none;
+}
+
+.pointLabel {
+  fill: var(--pv-text);
+  font-size: 11px;
+}
+
+/* --- overlay -------------------------------------------------------------- */
+
+/*
+ * Covers the plot only, not the legend below it — its height is set inline to
+ * match the `<svg>`, because the root grows past that to fit whatever the
+ * `below` layer holds.
+ */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Or it would eat the very moves that position the readout. */
+  pointer-events: none;
+}
+
+.rule {
+  stroke: var(--pv-border);
+  stroke-width: 1;
+}
+
+.readout {
+  position: absolute;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--pv-border);
+  border-radius: 6px;
+  background: var(--pv-bg);
+  color: var(--pv-text);
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px light-dark(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.5));
+}
+
+.readoutHead {
+  color: var(--pv-muted);
+  padding-bottom: 2px;
+}
+
+.readoutRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.readoutValue {
+  margin-left: auto;
+  padding-left: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- legend --------------------------------------------------------------- */
+
+/*
+ * Always present for two or more series, and the reason is measurable: three
+ * of the light-mode series colours sit below 3:1 against the surface, so a
+ * reader matching a faint line to a colour name is being asked to do something
+ * the contrast does not support. The swatch beside the name is the answer.
+ */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  padding: 6px 2px 0;
+  font-size: 11px;
+  color: var(--pv-muted);
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* A short line-key rather than a square: it reads as "this is the line". */
+.swatch {
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+  flex: none;
+}
