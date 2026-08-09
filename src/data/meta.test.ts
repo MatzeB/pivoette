@@ -225,6 +225,43 @@ describe('currency units', () => {
   it('does not prefix a non-currency kind', () => {
     expect(unitLabels(meta({ unit: 'second' })).prefix).toBe(false);
   });
+
+  it('reads placement from the locale, not from the currency alone', () => {
+    const usd = meta({ kind: 'price', unit: 'dollar' });
+    expect(unitLabels(usd, 'en-US').prefix).toBe(true);
+    // German trails the symbol, whichever currency it is.
+    expect(unitLabels(usd, 'de-DE').prefix).toBe(false);
+    const eur = meta({ kind: 'price', unit: 'euro' });
+    expect(unitLabels(eur, 'en-US').prefix).toBe(true);
+    expect(unitLabels(eur, 'fr-FR').prefix).toBe(false);
+  });
+
+  it('asks Intl for a symbol the shortname table does not carry', () => {
+    // `UNIT_SHORT` lists only the currencies written the same way everywhere.
+    // The rest used to fall through to their long name — `franc1234.50`.
+    expect(
+      unitLabels(meta({ kind: 'price', unit: 'franc' }), 'de-CH').full,
+    ).toBe('CHF');
+    expect(
+      unitLabels(meta({ kind: 'price', unit: 'rupee' }), 'en-IN').full,
+    ).toBe('₹');
+    expect(
+      unitLabels(meta({ kind: 'price', unit: 'real' }), 'pt-BR').full,
+    ).toBe('R$');
+  });
+
+  it('lets an explicit shortname win over the locale’s symbol', () => {
+    const m = meta({ kind: 'price', unit: 'dollar', unitShort: 'USD' });
+    expect(unitLabels(m, 'en-US').full).toBe('USD');
+  });
+
+  it('orders a scaled currency so the header matches the values', () => {
+    // `$300k`, so `($k)` — see `attachUnit`.
+    const m = meta({ kind: 'price', unit: 'dollar', scale: 'kilo' });
+    expect(unitLabels(m, 'en-US').full).toBe('$k');
+    // Trailing locales re-merge the two halves into one token, like `km`.
+    expect(unitLabels(m, 'de-DE').full).toBe('k$');
+  });
 });
 
 describe('mergeMeta', () => {
