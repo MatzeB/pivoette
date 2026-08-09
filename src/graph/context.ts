@@ -53,6 +53,8 @@ export interface GraphGeometry {
   colorOf: (index: number) => string;
   /** Where the unit is stated. Every mark that could state it reads this. */
   unitPlacement: GraphUnitPlacement;
+  /** Ticks each axis aims for, so an axis and the margin estimate agree. */
+  ticks: number;
   locale: string | undefined;
   timeZone: string | undefined;
 }

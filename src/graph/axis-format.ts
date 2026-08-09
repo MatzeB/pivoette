@@ -30,6 +30,12 @@ import { resolveTimeZone } from '../data/temporal';
 import type { TimeUnit } from './time';
 
 /**
+ * Formats that answer with a name rather than a number, so a tick step has no
+ * opinion about them: an axis over `month` wants `Mar`, not two decimals.
+ */
+const NAMING_FORMATS = new Set<string>([Format.Weekday, Format.Month]);
+
+/**
  * Attach a unit to a formatted number, where the metadata says it goes.
  *
  * Thin, deliberately. The placement rules are the table's — `DataTable` has
@@ -62,12 +68,16 @@ export function tickSpec(
   decimals: number,
   locale: string | undefined,
 ): FormatSpec {
-  const deduced = rescaled ? undefined : deduceFormat(meta, locale);
+  const deduced = deduceFormat(meta, locale);
+  // A format that turns a number into a *name* is not about precision at all,
+  // and the step has nothing to say about it: an axis over `month` still wants
+  // `Mar`, not `3`. Everything else defers to the step.
   if (
+    !rescaled &&
     deduced &&
     typeof deduced === 'object' &&
     'fnName' in deduced &&
-    deduced.options?.decimals !== undefined
+    NAMING_FORMATS.has(deduced.fnName)
   ) {
     return { ...deduced, options: { ...deduced.options, locale } };
   }
@@ -131,6 +141,55 @@ const ROLLOVER: Partial<Record<TimeUnit, Intl.DateTimeFormatOptions>> = {
   week: { month: 'short', day: 'numeric', year: 'numeric' },
   month: { year: 'numeric' },
 };
+
+/**
+ * Parts a scrubber readout needs to name one point, at the axis's resolution.
+ *
+ * Distinct from a tick's: a tick is one of a labelled row and can lean on its
+ * neighbours, while a readout stands alone and has to say which instant it is.
+ * On an hourly axis every point shares a date, so the heading needs the hour.
+ */
+const READOUT_DATE: Record<TimeUnit, Intl.DateTimeFormatOptions> = {
+  millisecond: {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    fractionalSecondDigits: 3,
+  },
+  second: {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+  },
+  minute: {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  },
+  hour: { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
+  day: { year: 'numeric', month: 'short', day: 'numeric' },
+  week: { year: 'numeric', month: 'short', day: 'numeric' },
+  month: { year: 'numeric', month: 'short' },
+  year: { year: 'numeric' },
+};
+
+/** A one-line name for an instant, at the axis's own resolution. */
+export function timeReadoutFormat(
+  unit: TimeUnit,
+  locale: string | undefined,
+  timeZone: string | undefined,
+): (ms: number) => string {
+  const fmt = new Intl.DateTimeFormat(locale, {
+    ...READOUT_DATE[unit],
+    timeZone: resolveTimeZone(timeZone),
+  });
+  return (ms) => fmt.format(new Date(ms));
+}
 
 export interface TimeTickFormat {
   /** The label for a tick at `ms`. */

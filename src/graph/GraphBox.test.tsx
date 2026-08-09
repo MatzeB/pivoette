@@ -329,6 +329,111 @@ describe('ordering', () => {
   });
 });
 
+describe('regressions the review turned up', () => {
+  it('reserves left margin for the text the axis really draws', async () => {
+    // Grouped, un-rescaled thousands: measuring `1000` instead of `1,000`
+    // used to put the ticks over the rotated title and past x=0.
+    const rows: Row[] = [
+      { g: 1, v: 120 },
+      { g: 2, v: 880 },
+    ];
+    const host = await render(
+      <GraphBox
+        data={{ meta: { v: { kind: 'price', unit: 'dollar' } }, rows }}
+        x="g"
+        y="v"
+        width={600}
+        height={300}
+        locale="en-US"
+      >
+        <Axis side="left" />
+      </GraphBox>,
+    );
+    const ticks = [...host.querySelectorAll('text')].filter((t) =>
+      /^[\d,]+$/.test(t.textContent!),
+    );
+    expect(ticks.length).toBeGreaterThan(1);
+    // Anchored `end`, so x is the right edge of the text; it has to clear the
+    // rotated title sitting at x=11 by at least the text's own width.
+    const widest = Math.max(...ticks.map((t) => t.textContent!.length));
+    const anchor = Number(ticks[0]!.getAttribute('x'));
+    expect(anchor - widest * 6.6).toBeGreaterThan(11);
+  });
+
+  it('lets the box ask for more ticks than the default', async () => {
+    const five = await render(chart([<Axis key="y" side="left" />]));
+    const count = (h: HTMLElement) =>
+      [...h.querySelectorAll('text')].filter((t) =>
+        /^[\d,.-]+$/.test(t.textContent!),
+      ).length;
+    const withFive = count(five);
+    await act(async () => root!.unmount());
+    const many = await render(
+      chart([<Axis key="y" side="left" />], { ticks: 12 }),
+    );
+    expect(count(many)).toBeGreaterThan(withFive);
+  });
+
+  it('does not wrap a ninth series onto the first one’s colour', async () => {
+    const rows: Row[] = [];
+    for (let s = 0; s < 9; s++) {
+      for (const m of [1, 2]) rows.push({ m, who: `s${s}`, v: s + 1 });
+    }
+    const host = await render(
+      <GraphBox data={rows} x="m" y="v" series="who" width={600} height={300}>
+        <LineSeries />
+      </GraphBox>,
+    );
+    const strokes = [...host.querySelectorAll('g[data-series] path')].map(
+      (p) => (p as SVGPathElement).style.stroke,
+    );
+    expect(strokes).toHaveLength(9);
+    expect(new Set(strokes.slice(0, 8)).size).toBe(8);
+    // The ninth is out of palette, and says so rather than impersonating one.
+    expect(strokes[8]).toBe('var(--pv-muted)');
+    expect(strokes[8]).not.toBe(strokes[0]);
+  });
+
+  it('reaches the first point with one arrow press', async () => {
+    const host = await render(
+      chart([<LineSeries key="l" />, <Scrubber key="s" />], {
+        locale: 'en-US',
+        timeZone: 'UTC',
+      }),
+    );
+    const hit = host.querySelector('rect')!;
+    await act(async () => {
+      hit.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+      );
+    });
+    // January, the first month — not February, which stepping from 0 gave.
+    expect(host.querySelector('[class*="readout"]')!.textContent).toContain(
+      'Jan',
+    );
+  });
+
+  it('announces the readout to a screen reader', async () => {
+    const host = await render(
+      chart([<LineSeries key="l" />, <Scrubber key="s" />], {
+        locale: 'en-US',
+        timeZone: 'UTC',
+      }),
+    );
+    const hit = host.querySelector('rect')!;
+    await act(async () => {
+      hit.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+      );
+    });
+    const readout = host.querySelector('[class*="readout"]')!;
+    expect(readout.getAttribute('aria-live')).toBe('polite');
+    // No `role="slider"`, which would promise an `aria-valuenow` the hit rect
+    // deliberately cannot report without subscribing to every pointer move.
+    expect(hit.getAttribute('role')).toBeNull();
+  });
+});
+
 describe('legend', () => {
   it('lists every series beneath the plot', async () => {
     const host = await render(

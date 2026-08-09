@@ -16,7 +16,7 @@ import { createPortal } from 'react-dom';
 import { unitLabels } from '../data/meta';
 import { useGraph, useLayers, usePointer, useSetPointer } from './context';
 import { tickFormatter, tickSpec, withUnit } from './axis-format';
-import { timeTickFormat } from './axis-format';
+import { timeReadoutFormat } from './axis-format';
 import { nearestIndex } from './series';
 import type { Series } from './series';
 import styles from './Graph.module.css';
@@ -126,12 +126,15 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
       data.frame,
       tickSpec(data.yMeta, data.yFactor !== 1, 2, locale),
     );
+    // At the axis's own resolution: hardcoding a day made every point of an
+    // intraday chart read the same heading, which is the one thing a readout
+    // exists to tell apart.
     const time =
       data.xKind === 'time'
-        ? timeTickFormat('day', locale, timeZone)
+        ? timeReadoutFormat(x.ticks().interval?.unit ?? 'day', locale, timeZone)
         : undefined;
     return { labels, number, time };
-  }, [data, locale, timeZone]);
+  }, [data, x, locale, timeZone]);
 
   const hit = useMemo<ScrubHit | null>(() => {
     if (!hover) return null;
@@ -139,7 +142,7 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
     const raw = data.series[0]?.points[hover.index]?.raw;
     const xLabel =
       data.xKind === 'time'
-        ? formatters.time!.rollover(value)
+        ? formatters.time!(value)
         : data.xKind === 'band'
           ? (data.categories[hover.index] ?? '')
           : String(raw ?? value);
@@ -176,6 +179,10 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
   return createPortal(
     <div
       className={styles.readout}
+      // A live region, so arrow-key movement is spoken. This is the component
+      // that actually knows the value, and it already re-renders per move.
+      role="status"
+      aria-live="polite"
       style={{
         // Always `left` plus a translate, never `right`. The overlay spans the
         // whole box, so a `right` measured from the plot's edge is short by the
@@ -240,8 +247,14 @@ function ScrubHitArea() {
 
   const stepBy = (delta: number) => {
     setHover((prev) => {
-      const from = prev ? prev.index : 0;
-      const index = Math.min(Math.max(from + delta, 0), data.xs.length - 1);
+      // From nothing, the first press lands on the end it is stepping *from*,
+      // so Right reaches the first point rather than skipping it.
+      const next = prev
+        ? prev.index + delta
+        : delta > 0
+          ? 0
+          : data.xs.length - 1;
+      const index = Math.min(Math.max(next, 0), data.xs.length - 1);
       return { index, px: x.at(data.xs[index] ?? 0) };
     });
   };
@@ -271,10 +284,11 @@ function ScrubHitArea() {
       // Reachable, and readable, without a pointer at all — which also gives
       // the tests a path that needs no synthetic pointer events.
       tabIndex={0}
-      role="slider"
-      aria-label="Scrub the chart"
-      aria-valuemin={0}
-      aria-valuemax={Math.max(data.xs.length - 1, 0)}
+      // Not `role="slider"`: that promises `aria-valuenow`, and reading the
+      // hover here would subscribe the hit rect to every pointer move — the
+      // one thing this component is arranged to avoid. The readout carries the
+      // value instead, as a live region, which is what actually gets spoken.
+      aria-label="Scrub the chart with the arrow keys"
       onPointerMove={(e) => locate(e.clientX)}
       onPointerDown={onDown}
       onPointerUp={onUp}

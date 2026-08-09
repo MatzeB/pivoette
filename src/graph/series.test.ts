@@ -318,6 +318,25 @@ describe('ordering', () => {
   });
 });
 
+describe('categories', () => {
+  it('are empty for an axis that has none', () => {
+    // Typed `string[]`; it used to hold one `undefined` per point, so a host
+    // testing `categories.length` to detect a band axis got the wrong answer.
+    const data = buildGraphData(
+      frameOf([
+        { m: 1, v: 1 },
+        { m: 2, v: 2 },
+      ]),
+      {
+        x: 'm',
+        y: 'v',
+      },
+    );
+    expect(data.xKind).toBe('linear');
+    expect(data.categories).toEqual([]);
+  });
+});
+
 describe('nearestIndex', () => {
   const xs = [0, 10, 20, 30];
 
