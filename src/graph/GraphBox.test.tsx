@@ -280,6 +280,55 @@ describe('per-point children', () => {
   });
 });
 
+describe('ordering', () => {
+  // Name order and value order disagree here, which is the only way to see
+  // that the box passes `order` down at all.
+  const RANKED: Row[] = [
+    { m: 1, who: 'aaa', v: 10 },
+    { m: 2, who: 'aaa', v: 10 },
+    { m: 1, who: 'zzz', v: 900 },
+    { m: 2, who: 'zzz', v: 900 },
+  ];
+
+  /** Series in drawn order, with the palette slot each one ended up wearing. */
+  const drawn = (host: HTMLElement) =>
+    [...host.querySelectorAll('g[data-series]')].map((g) => [
+      g.getAttribute('data-series'),
+      (g.querySelector('path') as SVGPathElement).style.stroke,
+    ]);
+
+  const ranked = (props: object) =>
+    render(
+      <GraphBox
+        data={RANKED}
+        x="m"
+        y="v"
+        series="who"
+        width={600}
+        height={300}
+        {...props}
+      >
+        <LineSeries />
+      </GraphBox>,
+    );
+
+  it('draws in name order by default', async () => {
+    expect(drawn(await ranked({}))).toEqual([
+      ['aaa', 'var(--pv-series-0)'],
+      ['zzz', 'var(--pv-series-1)'],
+    ]);
+  });
+
+  it('draws the largest first when the box asks, without moving a colour', async () => {
+    expect(drawn(await ranked({ order: 'value' }))).toEqual([
+      // Re-ordered — and each still wearing the slot it had under name order,
+      // so a second chart sorted differently still agrees about the colours.
+      ['zzz', 'var(--pv-series-1)'],
+      ['aaa', 'var(--pv-series-0)'],
+    ]);
+  });
+});
+
 describe('legend', () => {
   it('lists every series beneath the plot', async () => {
     const host = await render(

@@ -35,6 +35,18 @@ export interface GraphFields {
   series?: string;
   /** Reduces the rows falling in each (x, series) group. Default `'sum'`. */
   agg?: string;
+  /**
+   * How the categorical dimension is ordered — the series, and a band x axis.
+   * Default `'name'`.
+   *
+   * `'value'` puts the largest first, by each entry's total. Signed, not by
+   * magnitude: on a net-worth chart that reads assets down to debts, which is
+   * the order a reader expects, rather than filing a large debt next to a
+   * large holding.
+   *
+   * Ordering never moves a colour — see `Series.slot`.
+   */
+  order?: 'name' | 'value';
 }
 
 export type XKind = 'time' | 'linear' | 'band';
@@ -55,8 +67,18 @@ export interface Series {
   label: string;
   /** This series' own metadata, at the axis's chosen ladder step. */
   meta: ColumnMeta;
-  /** Palette slot, assigned in series order. */
+  /** Where it sits in the drawn order — what `order` decides. */
   index: number;
+  /**
+   * Palette slot. Assigned from the *name* order, never from `index`.
+   *
+   * Colour identifies the entity, so it cannot depend on how this particular
+   * chart happens to be sorted: two charts of the same accounts, one ranked by
+   * balance and one by contribution, must still agree about which one is blue.
+   * That is also what makes a filter safe — dropping a series never repaints
+   * the survivors.
+   */
+  slot: number;
   /** One entry per x in the shared domain, ascending. */
   points: GraphPoint[];
 }
@@ -68,6 +90,12 @@ export interface GraphData {
   xs: number[];
   /** Band labels, index-aligned with `xs`. Empty unless `xKind` is `'band'`. */
   categories: string[];
+  /**
+   * Palette slot per band category, index-aligned with `categories`. The same
+   * name-order rule as `Series.slot`, and for the same reason: a bar keeps its
+   * colour when the axis is re-sorted.
+   */
+  categorySlots: number[];
   xMeta: ColumnMeta;
   /** Metadata for the shared value axis, at the chosen ladder step. */
   yMeta: ColumnMeta;
@@ -280,33 +308,84 @@ export function buildGraphData(
   const yFactor = picked?.factor ?? 1;
   const yMeta = picked ? metaForStep(first, picked.step) : first;
 
+  // --- ordering -------------------------------------------------------------
+
+  /**
+   * One entry of a categorical dimension, on its way through the sort.
+   *
+   * The palette slot travels *in* the record rather than being looked up
+   * afterwards, so re-ordering carries the colour along the way reordering
+   * rows carries their columns. There is no permutation to re-apply, and so no
+   * way for the order and the colours to come apart.
+   */
+  interface Entry {
+    /** Position before sorting, which is name order — hence the palette slot. */
+    slot: number;
+    /** What the sort ranks on. */
+    total: number;
+  }
+
+  const byValue = (fields.order ?? 'name') === 'value';
+
+  const totalOf = (values: (CellValue | null)[]) =>
+    values.reduce<number>((acc, v) => acc + (asNumber(v) ?? 0), 0);
+
+  /** Largest first, ties keeping the name order they arrived in. */
+  const arrange = (entries: Entry[]): Entry[] =>
+    byValue
+      ? [...entries].sort((a, b) => b.total - a.total || a.slot - b.slot)
+      : entries;
+
+  const seriesEntries = arrange(
+    keys.map((_k, slot) => ({ slot, total: totalOf(reduced[slot]!) })),
+  );
+  const bandEntries = arrange(
+    xs.map((_x, slot) => ({
+      slot,
+      // A continuous axis is never re-ordered — its positions are numbers, not
+      // categories — so only a band needs a real total here.
+      total: xKind === 'band' ? totalOf(reduced.map((s) => s[slot]!)) : 0,
+    })),
+  );
+
   // --- assemble -------------------------------------------------------------
 
   let min = Infinity;
   let max = -Infinity;
-  const series: Series[] = keys.map((k, s) => ({
-    key: k.key,
-    label: k.label,
-    // Each series keeps its own display name for the legend while sharing the
-    // axis's unit — safe because `uniform` established they agree.
-    meta: picked ? metaForStep(k.meta, picked.step) : k.meta,
-    index: s,
-    points: xs.map((x, slot) => {
-      const stored = asNumber(reduced[s]![slot]);
-      const y = stored === null ? null : stored * yFactor;
-      if (y !== null) {
-        if (y < min) min = y;
-        if (y > max) max = y;
-      }
-      return { x, y, raw: rawAt[slot]! };
-    }),
-  }));
+  const series: Series[] = seriesEntries.map((entry, index) => {
+    const k = keys[entry.slot]!;
+    return {
+      key: k.key,
+      label: k.label,
+      // Each series keeps its own display name for the legend while sharing
+      // the axis's unit — safe because `uniform` established they agree.
+      meta: picked ? metaForStep(k.meta, picked.step) : k.meta,
+      index,
+      slot: entry.slot,
+      points: bandEntries.map((at, position) => {
+        const stored = asNumber(reduced[entry.slot]![at.slot]);
+        const y = stored === null ? null : stored * yFactor;
+        if (y !== null) {
+          if (y < min) min = y;
+          if (y > max) max = y;
+        }
+        // A band's x *is* its drawn position, so it renumbers with the sort; a
+        // continuous axis plots the number itself and keeps it.
+        return {
+          x: xKind === 'band' ? position : xs[at.slot]!,
+          y,
+          raw: rawAt[at.slot]!,
+        };
+      }),
+    };
+  });
 
   return {
     series,
     xKind,
-    xs,
-    categories,
+    xs: bandEntries.map((e, i) => (xKind === 'band' ? i : xs[e.slot]!)),
+    categories: bandEntries.map((e) => categories[e.slot]!),
+    categorySlots: bandEntries.map((e) => e.slot),
     xMeta: xColumn.meta,
     yMeta,
     yFactor,

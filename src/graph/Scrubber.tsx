@@ -103,7 +103,7 @@ function ScrubDots() {
             cx={px}
             cy={y.at(point.y)}
             r={4}
-            style={{ fill: colorOf(series.index) }}
+            style={{ fill: colorOf(series.slot) }}
           />
         );
       })}
@@ -151,7 +151,7 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
         const y = series.points[hover.index]?.y ?? null;
         return {
           series,
-          color: graph.colorOf(series.index),
+          color: graph.colorOf(series.slot),
           y,
           // Bare unless the chart nominated values to carry the unit: with the
           // default placement the axis title beside the readout already says it.
