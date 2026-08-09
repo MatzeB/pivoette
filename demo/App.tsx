@@ -13,6 +13,7 @@ import type {
   UnitLabels,
   DataTableDisplay,
   DatasetJson,
+  GraphUnitPlacement,
   UnitPlacement,
   ViewSpec,
 } from '../src';
@@ -48,6 +49,9 @@ import {
   display as commitsDisplay,
 } from './examples/commits/view';
 import commitsData from './examples/commits/data.json';
+import { Chart as networthChart } from './examples/networth/view';
+import networthData from './examples/networth/data.json';
+import type { ChartExample } from './examples/chart';
 
 import tickerSrc from './examples/ticker/view?raw';
 import benchmarkSrc from './examples/benchmark/view?raw';
@@ -55,24 +59,36 @@ import regressionSrc from './examples/regression/view?raw';
 import tokensSrc from './examples/tokens/view?raw';
 import metricsSrc from './examples/metrics/view?raw';
 import commitsSrc from './examples/commits/view?raw';
+import networthSrc from './examples/networth/view?raw';
 
 type Row = Record<string, unknown>;
 
-interface Example {
+interface Common {
   id: string;
   title: string;
   blurb: string;
-  view: ViewSpec;
   /** Rows, or the `{meta, rows}` wire form carrying column metadata. */
   data: Row[] | DatasetJson;
-  /** The example's own `view.ts` — view spec *and* display — shown verbatim
-   * in the panels below. */
+  /** The example's own `view` file, shown verbatim in the panels below. */
   source: string;
-  display?: DataTableDisplay;
 }
+
+/**
+ * A table is fully described by configuration, so a table example ships a
+ * `ViewSpec` and the harness renders it. A chart is a composition — which
+ * marks, in what order — so a chart example ships the component itself, and
+ * the source panel below shows the same file that produced what is on screen.
+ */
+type Example =
+  | (Common & { kind: 'table'; view: ViewSpec; display?: DataTableDisplay })
+  | (Common & { kind: 'chart'; Chart: ChartExample });
+
+/** Stands in for a chart example's absent spec, with a stable identity. */
+const NO_VIEW: ViewSpec = { columns: [] };
 
 const EXAMPLES: Example[] = [
   {
+    kind: 'table',
     id: 'ticker',
     title: '1 · Stock ticker (flat)',
     blurb:
@@ -83,6 +99,7 @@ const EXAMPLES: Example[] = [
     display: tickerDisplay,
   },
   {
+    kind: 'table',
     id: 'benchmark',
     title: '2 · Kernel benchmark (pivot)',
     blurb:
@@ -93,6 +110,7 @@ const EXAMPLES: Example[] = [
     display: benchmarkDisplay,
   },
   {
+    kind: 'table',
     id: 'regression',
     title: '3 · Before/after regression',
     blurb:
@@ -103,6 +121,7 @@ const EXAMPLES: Example[] = [
     display: regressionDisplay,
   },
   {
+    kind: 'table',
     id: 'tokens',
     title: '4 · AI token spend (multi-level rows)',
     blurb:
@@ -113,6 +132,7 @@ const EXAMPLES: Example[] = [
     display: tokensDisplay,
   },
   {
+    kind: 'table',
     id: 'metrics',
     title: '5 · Fleet metrics (column metadata)',
     blurb:
@@ -123,6 +143,7 @@ const EXAMPLES: Example[] = [
     display: metricsDisplay,
   },
   {
+    kind: 'table',
     id: 'commits',
     title: '6 · Commits by weekday (dates)',
     blurb:
@@ -131,6 +152,16 @@ const EXAMPLES: Example[] = [
     source: commitsSrc,
     data: commitsData as DatasetJson,
     display: commitsDisplay,
+  },
+  {
+    kind: 'chart',
+    id: 'networth',
+    title: '7 · Net worth over time (chart)',
+    blurb:
+      'The same data layer, drawn instead of tabulated. `GraphBox` takes four field names and works out the scales; the axes, lines, per-point labels, scrubber, and legend are nested children reading them from context. Nothing in the config says “thousands”: the ladder sees six-figure dollars and puts the whole axis on the $k rung, and the axis title composes its label from that — once, since `unitPlacement` is one setting for the chart rather than a decision each mark makes. The brokerage line breaks for its first 30 months because those rows are genuinely absent, and the time zone select moves the tick boundaries.',
+    Chart: networthChart,
+    source: networthSrc,
+    data: networthData as DatasetJson,
   },
 ];
 
@@ -182,6 +213,16 @@ const PLACEMENT_OPTIONS: { id: UnitPlacement; label: string }[] = [
   { id: 'off', label: 'off' },
   { id: 'value', label: 'value' },
   { id: 'header', label: 'header' },
+];
+
+/**
+ * The chart's equivalent. `axis` stands where `header` stands for a table —
+ * the place a chart can state a unit once for a whole column of numbers.
+ */
+const GRAPH_PLACEMENT_OPTIONS: { id: GraphUnitPlacement; label: string }[] = [
+  { id: 'off', label: 'off' },
+  { id: 'value', label: 'value' },
+  { id: 'axis', label: 'axis' },
 ];
 
 /** Locale override. '' means "let the runtime decide". */
@@ -340,11 +381,19 @@ export function App() {
   // glance; a per-cell one keeps every value in its own natural unit but must
   // carry the label, so `4.34 µs` and `521 ns` sit side by side.
   const [scalePer, setScalePer] = useState<'column' | 'value'>('column');
+  // Separate from the table's: a chart's third option is `axis`, not `header`,
+  // and sharing one state would leave the select showing a mode the other
+  // renderer has no meaning for.
+  const [graphPlacement, setGraphPlacement] =
+    useState<GraphUnitPlacement>('axis');
   const [locale, setLocale] = useState('');
   const [timeZone, setTimeZone] = useState('');
 
   const example = EXAMPLES.find((e) => e.id === selected)!;
   const isRegression = example.id === 'regression';
+  // A chart has no spec to edit and no cells to place a unit in, so the
+  // table's chrome is gated on this rather than duplicated in a second page.
+  const isChart = example.kind === 'chart';
 
   // Editing makes the spec state rather than a constant. Seeded from the
   // example and reset whenever it changes, so switching examples starts clean.
@@ -389,7 +438,9 @@ export function App() {
   // the engine is not re-run on unrelated renders.
   // The re-render React schedules above is what actually clears these; reading
   // through `staleEdit` keeps the discarded pass coherent too.
-  const baseView = (staleEdit ? null : edited) ?? example.view;
+  const baseView =
+    (staleEdit ? null : edited) ??
+    (example.kind === 'table' ? example.view : NO_VIEW);
   const view = useMemo(() => {
     const scaled =
       scalePer === 'column'
@@ -417,10 +468,14 @@ export function App() {
     };
   }, [baseView, locale, timeZone, scalePer]);
 
-  const display = (staleEdit ? null : editedDisplay) ?? example.display ?? {};
+  const display =
+    (staleEdit ? null : editedDisplay) ??
+    (example.kind === 'table' ? example.display : undefined) ??
+    {};
 
-  // Only a view that derives something can be affected by the zone.
-  const usesTime = view.derive !== undefined;
+  // Only a view that derives something can be affected by the zone — but a
+  // time axis always is, since the zone decides where a day boundary falls.
+  const usesTime = isChart || view.derive !== undefined;
 
   useEffect(() => {
     if (stress && isRegression && !stressData) {
@@ -582,7 +637,21 @@ export function App() {
         </label>
       )}
 
-      {hasUnits && (
+      {/* The chart's own placement control. One setting for the whole chart,
+          so the axis title, the tick labels, the end labels, and the scrubber
+          readout move together rather than each stating the unit. */}
+      {isChart && (
+        <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+          <Select
+            label="units"
+            value={graphPlacement}
+            options={GRAPH_PLACEMENT_OPTIONS}
+            onChange={setGraphPlacement}
+          />
+        </div>
+      )}
+
+      {!isChart && hasUnits && (
         <div
           style={{
             display: 'flex',
@@ -625,21 +694,31 @@ export function App() {
         </div>
       )}
 
-      <DataTable
-        key={example.id + (stress ? '-stress' : '')}
-        data={data}
-        view={view}
-        height={560}
-        theme={theme}
-        display={{ ...display, unitPlacement, scalePlacement }}
-        editing={editing}
-        onViewChange={setEdited}
-        onDisplayChange={setEditedDisplay}
-      />
+      {example.kind === 'chart' ? (
+        <example.Chart
+          data={data}
+          theme={theme}
+          locale={locale || undefined}
+          timeZone={timeZone || undefined}
+          unitPlacement={graphPlacement}
+        />
+      ) : (
+        <DataTable
+          key={example.id + (stress ? '-stress' : '')}
+          data={data}
+          view={view}
+          height={560}
+          theme={theme}
+          display={{ ...display, unitPlacement, scalePlacement }}
+          editing={editing}
+          onViewChange={setEdited}
+          onDisplayChange={setEditedDisplay}
+        />
+      )}
 
       {/* Below the table rather than beside it: the panel used to take its
           width out of the table, which is the one thing being edited. */}
-      {editing && (
+      {editing && !isChart && (
         <div style={{ marginTop: 10 }}>
           {/* No `frame`: the panel shows the spec, so raw field names are the
               right identifiers here — they are what the config says. */}
@@ -661,21 +740,23 @@ export function App() {
           marginTop: 10,
         }}
       >
-        <button
-          onClick={() => setEditing((v) => !v)}
-          style={{
-            padding: '4px 10px',
-            borderRadius: 6,
-            border: '1px solid var(--btn-border)',
-            cursor: 'pointer',
-            background: editing ? 'var(--btn-active-bg)' : 'var(--btn-bg)',
-            color: editing ? 'var(--btn-active-fg)' : 'var(--btn-fg)',
-            fontSize: 12,
-          }}
-        >
-          {editing ? 'Done editing' : 'Edit'}
-        </button>
-        {editing && (
+        {!isChart && (
+          <button
+            onClick={() => setEditing((v) => !v)}
+            style={{
+              padding: '4px 10px',
+              borderRadius: 6,
+              border: '1px solid var(--btn-border)',
+              cursor: 'pointer',
+              background: editing ? 'var(--btn-active-bg)' : 'var(--btn-bg)',
+              color: editing ? 'var(--btn-active-fg)' : 'var(--btn-fg)',
+              fontSize: 12,
+            }}
+          >
+            {editing ? 'Done editing' : 'Edit'}
+          </button>
+        )}
+        {editing && !isChart && (
           <button
             disabled={!edited && !editedDisplay}
             onClick={() => {
@@ -697,25 +778,36 @@ export function App() {
           </button>
         )}
         <span style={{ color: 'var(--page-muted)', fontSize: 12 }}>
-          {rowCount.toLocaleString()} source rows · press{' '}
-          <kbd
-            style={{
-              padding: '1px 5px',
-              borderRadius: 4,
-              border: '1px solid var(--btn-border)',
-              background: 'var(--btn-bg)',
-              color: 'var(--btn-fg)',
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-              fontSize: 11,
-            }}
-          >
-            e
-          </kbd>{' '}
-          to {editing ? 'stop editing' : 'edit'}
+          {rowCount.toLocaleString()} source rows
+          {!isChart && (
+            <>
+              {' · press '}
+              <kbd
+                style={{
+                  padding: '1px 5px',
+                  borderRadius: 4,
+                  border: '1px solid var(--btn-border)',
+                  background: 'var(--btn-bg)',
+                  color: 'var(--btn-fg)',
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                  fontSize: 11,
+                }}
+              >
+                e
+              </kbd>{' '}
+              to {editing ? 'stop editing' : 'edit'}
+            </>
+          )}
         </span>
       </div>
 
-      <Panel title="Example config — the view spec and display that produce the table above">
+      <Panel
+        title={
+          isChart
+            ? 'Example source — the component that produces the charts above'
+            : 'Example config — the view spec and display that produce the table above'
+        }
+      >
         {() => <Source text={example.source} />}
       </Panel>
 

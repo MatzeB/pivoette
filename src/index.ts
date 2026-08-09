@@ -8,6 +8,84 @@ export type {
   UnitPlacement,
 } from './components/DataTable';
 
+// Charts — composed rather than configured: `GraphBox` resolves the scales and
+// every mark nested inside reads them from context.
+export { GraphBox, SERIES_SLOTS } from './graph/GraphBox';
+export type { GraphBoxProps, GraphMargin } from './graph/GraphBox';
+export { Axis } from './graph/Axis';
+export type { AxisProps } from './graph/Axis';
+export { LineSeries, DEFAULT_MAX_MARKERS } from './graph/LineSeries';
+export type { LineSeriesProps, DatumChildren } from './graph/LineSeries';
+export { BarSeries, MAX_BAR_WIDTH } from './graph/BarSeries';
+export type { BarSeriesProps } from './graph/BarSeries';
+export { Dot, PointLabel } from './graph/marks';
+export type { DotProps, PointLabelProps } from './graph/marks';
+export { Legend } from './graph/Legend';
+export type { LegendProps } from './graph/Legend';
+export { Scrubber } from './graph/Scrubber';
+export type { ScrubberProps, ScrubEntry, ScrubHit } from './graph/Scrubber';
+export {
+  useDatum,
+  useGraph,
+  useLayers,
+  usePointer,
+  useSeries,
+  useSetPointer,
+} from './graph/context';
+export type {
+  GraphDatum,
+  GraphGeometry,
+  GraphLayers,
+  GraphPointer,
+  GraphSeriesCtx,
+  GraphUnitPlacement,
+  SetHover,
+} from './graph/context';
+export { buildGraphData, nearestIndex } from './graph/series';
+export type {
+  GraphData,
+  GraphFields,
+  GraphPoint,
+  Series,
+  XKind,
+} from './graph/series';
+export {
+  bandScale,
+  continuousScale,
+  linearScale,
+  niceDomain,
+  tickDecimals,
+  tickStep,
+  DEFAULT_TICKS,
+} from './graph/scale';
+export type {
+  BandScale,
+  ContinuousScale,
+  Scale,
+  ScaleKind,
+  ScaleTick,
+  TickSet,
+} from './graph/scale';
+export {
+  addTime,
+  chooseInterval,
+  floorTime,
+  niceTimeDomain,
+  timeScale,
+  timeTicks,
+} from './graph/time';
+export type { TimeInterval, TimeUnit } from './graph/time';
+export { areaPath, barPath, linePath, runs } from './graph/shape';
+export type { PlotPoint } from './graph/shape';
+export {
+  axisTitle,
+  tickFormatter,
+  tickSpec,
+  timeTickFormat,
+  withUnit,
+} from './graph/axis-format';
+export type { TimeTickFormat } from './graph/axis-format';
+
 // Data model
 export { datasetMeta, fromDataset, fromRows } from './data/import';
 export { fromCsv, parseCsv, parseCsvRows } from './data/csv';
@@ -127,6 +205,7 @@ export { registerStyle, resolveStyle } from './format/style';
 export { registerRender, resolveRender } from './format/render';
 export {
   chooseStep,
+  defaultLadder,
   getLadder,
   hasLadder,
   ladderIds,
