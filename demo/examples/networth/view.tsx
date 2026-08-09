@@ -66,9 +66,15 @@ export function Chart({
         <Legend />
       </GraphBox>
 
-      {/* A second chart over the same data, to show that the x axis follows
-          the field rather than the mark: `account` is categorical, so the
-          scale becomes a band and the bars share it. */}
+      {/* The same data asked a different question: not what each account is
+          worth now, but what went into it. `agg="sum"` over every month makes
+          each bar the decade's total, which is the only reading of a monthly
+          inflow that means anything on its own — and it is why these numbers
+          do not match the line ends above. Brokerage took 183k and is worth
+          373k; Retirement took 162k and is worth 151k.
+
+          It also shows that the x axis follows the field rather than the mark:
+          `account` is categorical, so the scale becomes a band. */}
       <GraphBox
         data={data}
         x="account"

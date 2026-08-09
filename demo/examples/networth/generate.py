@@ -12,6 +12,9 @@ The shape is chosen to exercise the chart rather than to look tidy:
     the line has a real gap rather than a run of zeroes.
   * Balances run from a few thousand to the high hundreds of thousands, which
     puts the shared scale ladder on the k$ rung.
+  * `contribution` is the money moved into the account that month — for the
+    mortgage, the principal repaid. Summed over the decade it is what each
+    account cost, which is the only reading the demo puts on screen.
 """
 import json
 import math
@@ -35,8 +38,10 @@ META = {
         "kind": ["price"],
         "unit": ["dollar"],
     },
+    # Named for what a *sum* of it means, since that is the only way a chart
+    # ever shows it: one month's inflow on its own says nothing.
     "contribution": {
-        "displayName": "Contribution",
+        "displayName": "Paid in",
         "kind": ["price"],
         "unit": ["dollar"],
     },
