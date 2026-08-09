@@ -31,12 +31,25 @@ import type {
 import { bandScale, linearScale } from './scale';
 import type { Scale } from './scale';
 import { timeScale } from './time';
+import { tickFormatter, tickSpec } from './axis-format';
 import { buildGraphData } from './series';
 import type { GraphData, GraphFields } from './series';
 import styles from './Graph.module.css';
 
-/** How many slots `theme.module.css` defines. A ninth series has no colour. */
+/** How many categorical slots `theme.module.css` defines. */
 export const SERIES_SLOTS = 8;
+
+/**
+ * What a series past the last slot gets.
+ *
+ * Not slot 0 again. The palette's whole premise is that a colour identifies one
+ * entity, and wrapping quietly hands the ninth series the first one's hue — two
+ * identical swatches in the legend, which is the failure the fixed ordering
+ * exists to prevent. Muted grey reads as "beyond the palette", which is the
+ * truth: a chart with nine series needs "other", small multiples, or fewer
+ * series, and none of those is a decision this function can make.
+ */
+const OVERFLOW_COLOR = 'var(--pv-muted)';
 
 export interface GraphMargin {
   top: number;
@@ -203,11 +216,18 @@ export function GraphBox({
     // The left margin depends on the tick labels, which depend on the value
     // scale, which depends on the left margin only through the *range* — so a
     // throwaway scale over the final domain gives the labels without a loop.
+    //
+    // Through `tickFormatter`, not `toFixed`: the axis draws grouped, localised
+    // text, so measuring the bare number reserves room for `1000` and then
+    // paints `1,000.00` over the axis title.
     const probe = linearScale({ domain: [lo, hi], range: [0, 1], ticks });
     const probeTicks = probe.ticks(ticks);
-    const sample = probeTicks.ticks.map((t) =>
-      t.value.toFixed(probeTicks.decimals),
+    const probeLabels = tickFormatter(
+      graph.yMeta,
+      graph.frame,
+      tickSpec(graph.yMeta, graph.yFactor !== 1, probeTicks.decimals, locale),
     );
+    const sample = probeTicks.ticks.map((t) => probeLabels(t.value));
     const auto: GraphMargin = {
       ...DEFAULT_MARGIN,
       left: Math.max(
@@ -265,8 +285,10 @@ export function GraphBox({
       y: yScale,
       plot,
       data: graph,
-      colorOf: (index) => `var(--pv-series-${index % SERIES_SLOTS})`,
+      colorOf: (index) =>
+        index < SERIES_SLOTS ? `var(--pv-series-${index})` : OVERFLOW_COLOR,
       unitPlacement,
+      ticks,
       locale,
       timeZone: tz,
     };

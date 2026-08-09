@@ -59,13 +59,16 @@ export function Axis({ side, grid = false, label, ticks: count }: AxisProps) {
   // `unitPlacement` comes from the box, not from here: two axes and several
   // marks are describing one value scale, and they have to agree about which
   // of them says what it is measured in.
-  const { x, y, plot, data, locale, timeZone, unitPlacement } = useGraph();
+  const { x, y, plot, data, locale, timeZone, unitPlacement, ticks } =
+    useGraph();
   const vertical = side === 'left';
   const scale = vertical ? y : x;
   const meta = vertical ? data.yMeta : data.xMeta;
   const showTitle = label ?? vertical;
 
-  const set = useMemo(() => scale.ticks(count), [scale, count]);
+  // Falls back to the box's own target rather than the scale's default, so
+  // `<GraphBox ticks={12}>` reaches the axis that draws them.
+  const set = useMemo(() => scale.ticks(count ?? ticks), [scale, count, ticks]);
 
   const labels = useMemo(() => unitLabels(meta, locale), [meta, locale]);
 

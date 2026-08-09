@@ -384,7 +384,8 @@ export function buildGraphData(
     series,
     xKind,
     xs: bandEntries.map((e, i) => (xKind === 'band' ? i : xs[e.slot]!)),
-    categories: bandEntries.map((e) => categories[e.slot]!),
+    categories:
+      xKind === 'band' ? bandEntries.map((e) => categories[e.slot]!) : [],
     categorySlots: bandEntries.map((e) => e.slot),
     xMeta: xColumn.meta,
     yMeta,

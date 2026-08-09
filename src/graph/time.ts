@@ -174,6 +174,9 @@ export function addTime(
   }
 }
 
+/** Nominal length of a year, for ranking rungs. Generated ticks are exact. */
+const YEAR_MS = 365.2425 * DAY;
+
 /**
  * The rungs a time axis may tick on. Deliberately not every multiple: 7 minutes
  * or 4 hours divide the clock unevenly, and a gridline the reader cannot name
@@ -206,15 +209,13 @@ const LADDER: TimeInterval[] = [
     approxMs: every * DAY,
   })),
   { unit: 'week', every: 1, approxMs: 7 * DAY },
-  ...[1, 3].map((every) => ({
+  ...[1, 3, 6].map((every) => ({
     unit: 'month' as const,
     every,
     approxMs: every * 30.44 * DAY,
   })),
+  { unit: 'year', every: 1, approxMs: YEAR_MS },
 ];
-
-/** Nominal length of a year, for ranking the top rung only. */
-const YEAR_MS = 365.2425 * DAY;
 
 /**
  * The rung whose spacing is geometrically nearest the target.
@@ -233,6 +234,10 @@ export function chooseInterval(
 ): TimeInterval {
   const target = Math.abs(span) / Math.max(count, 1);
   if (!Number.isFinite(target) || target <= 0) return LADDER[0]!;
+  // Above a single year the ladder runs out and the step becomes numeric. The
+  // rungs below have to reach that far unbroken, or a four-year span drops to
+  // quarters — sixteen `Mon YYYY` labels on a 600px axis, which nothing
+  // downstream thins.
   if (target >= YEAR_MS) {
     // In years, not in milliseconds: the 1/2/5 landing points have to be whole
     // years, and `tickStep` over millis would answer 6.34 of them.

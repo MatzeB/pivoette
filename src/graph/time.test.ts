@@ -29,7 +29,10 @@ describe('chooseInterval', () => {
     expect(pick(3 * HOUR)).toBe('30 minute');
     expect(pick(3 * DAY)).toBe('12 hour');
     expect(pick(90 * DAY)).toBe('1 month');
-    expect(pick(3 * 365 * DAY)).toBe('3 month');
+    expect(pick(3 * 365 * DAY)).toBe('6 month');
+    // The rungs reach a whole year, so nothing between a quarter and the
+    // numeric year steps falls back to quarters.
+    expect(pick(4 * 365 * DAY)).toBe('1 year');
   });
 
   it('steps years on the 1/2/5 rule once the ladder runs out', () => {
@@ -194,6 +197,23 @@ describe('timeTicks', () => {
         'UTC',
       ).ticks,
     ).toEqual([]);
+  });
+});
+
+describe('the ladder has no gaps a reader would see', () => {
+  const DAY = 86400000;
+  const lo = Date.parse('2016-01-01T00:00:00Z');
+
+  it('never explodes into an unreadable row of labels', () => {
+    // The month rungs used to stop at a quarter while the year branch only
+    // engaged at a full year, so a four-year span drew sixteen `Mon YYYY`
+    // labels — nothing downstream thins them.
+    for (const years of [0.5, 1, 1.5, 2, 3, 4, 4.9, 5, 10, 30]) {
+      const span = years * 365.25 * DAY;
+      const { ticks } = timeTicks(lo, lo + span, 5, 'UTC');
+      expect(ticks.length, `${years}y`).toBeGreaterThan(2);
+      expect(ticks.length, `${years}y`).toBeLessThanOrEqual(8);
+    }
   });
 });
 

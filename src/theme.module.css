@@ -44,6 +44,9 @@
    * Three light-mode slots (aqua, yellow, magenta) fall below 3:1 against
    * white. That is why a chart always carries a legend: identity can never
    * rest on hue alone.
+   *
+   * Past the eighth slot `GraphBox` falls back to muted grey rather than
+   * wrapping — see `OVERFLOW_COLOR`.
    */
   --pv-series-0: light-dark(#2a78d6, #3987e5);
   --pv-series-1: light-dark(#eb6834, #d95926);

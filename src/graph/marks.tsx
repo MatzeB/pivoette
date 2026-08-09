@@ -8,6 +8,7 @@
 import { useDatum, useGraph, useSeries } from './context';
 import { tickFormatter, tickSpec, withUnit } from './axis-format';
 import { unitLabels } from '../data/meta';
+import type { Series } from './series';
 import styles from './Graph.module.css';
 
 export interface DotProps {
@@ -60,27 +61,41 @@ export interface PointLabelProps {
   format?: (value: number | null) => string;
 }
 
-/** Whether this datum is one `at` selects, within its own series. */
-function chosen(
+/**
+ * The one index `at` selects within a series, or -1 for `'all'`.
+ *
+ * Cached against the series object, because `PointLabel` is mounted once per
+ * point and the answer is a property of the series: rescanning per datum made
+ * `<PointLabel at="last">` over a 500-point series quadratic, and it re-ran on
+ * every resize and theme flip. The cache is a `WeakMap`, and `buildGraphData`
+ * mints new series objects whenever the data changes, so it cannot go stale.
+ */
+const pickedCache = new WeakMap<Series, Map<string, number>>();
+
+function pickedIndex(
+  series: Series,
   at: NonNullable<PointLabelProps['at']>,
-  index: number,
-  values: (number | null)[],
-): boolean {
-  if (at === 'all') return true;
-  const real = values
-    .map((v, i) => ({ v, i }))
-    .filter((e): e is { v: number; i: number } => e.v !== null);
-  if (real.length === 0) return false;
-  switch (at) {
-    case 'first':
-      return index === real[0]!.i;
-    case 'last':
-      return index === real[real.length - 1]!.i;
-    case 'min':
-      return index === real.reduce((m, e) => (e.v < m.v ? e : m)).i;
-    case 'max':
-      return index === real.reduce((m, e) => (e.v > m.v ? e : m)).i;
-  }
+): number {
+  if (at === 'all') return -1;
+  let perAt = pickedCache.get(series);
+  if (!perAt) pickedCache.set(series, (perAt = new Map()));
+  const hit = perAt.get(at);
+  if (hit !== undefined) return hit;
+
+  let best = -1;
+  series.points.forEach((p, i) => {
+    if (p.y === null) return;
+    if (best === -1) {
+      best = i;
+      return;
+    }
+    const other = series.points[best]!.y!;
+    if (at === 'last') best = i;
+    else if (at === 'min' && p.y < other) best = i;
+    else if (at === 'max' && p.y > other) best = i;
+  });
+  perAt.set(at, best);
+  return best;
 }
 
 /**
@@ -109,14 +124,9 @@ export function PointLabel({
   const { series } = useSeries();
   const { data, locale, plot, unitPlacement, y } = useGraph();
 
-  if (
-    !chosen(
-      at,
-      index,
-      series.points.map((p) => p.y),
-    )
-  )
-    return null;
+  const picked = pickedIndex(series, at);
+  if (picked !== -1 && picked !== index) return null;
+  if (at === 'all' && point.y === null) return null;
 
   const number =
     point.y === null

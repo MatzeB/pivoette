@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   DataTable,
   ViewEditor,
@@ -416,6 +416,11 @@ export function App() {
 
   // `e` toggles editing, except while a form control has focus — the locale
   // and placement selects would otherwise swallow or fight for the key.
+  // Read through a ref: the listener is installed once, and re-binding it on
+  // every example switch would be a lot of churn for one comparison.
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'e' || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -423,6 +428,14 @@ export function App() {
       if (
         el?.isContentEditable ||
         (el && /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName))
+      ) {
+        return;
+      }
+      // A chart has no spec to edit, and every consumer of `editing` is gated
+      // on that — so flipping it here would do nothing now and surprise the
+      // reader on the next table example they open.
+      if (
+        EXAMPLES.find((x) => x.id === selectedRef.current)?.kind !== 'table'
       ) {
         return;
       }
