@@ -7,6 +7,7 @@ import {
   resolveTimeZone,
   temporalHelpers,
   timeParts,
+  zoneOffset,
 } from './temporal';
 import { normalizeMeta } from './meta';
 import { unitLabels } from './meta';
@@ -75,6 +76,60 @@ describe('zones', () => {
       day: 15,
       isoWeekday: 7,
     });
+  });
+});
+
+describe('zoneOffset', () => {
+  const MIN = 60_000;
+  const HOUR = 60 * MIN;
+  const at = (iso: string, tz: string) => zoneOffset(Date.parse(iso), tz);
+
+  it('is zero for UTC', () => {
+    expect(at('2026-03-14T23:00:00Z', 'UTC')).toBe(0);
+  });
+
+  it('follows daylight saving', () => {
+    expect(at('2026-01-15T12:00:00Z', 'Europe/Berlin')).toBe(HOUR);
+    expect(at('2026-07-15T12:00:00Z', 'Europe/Berlin')).toBe(2 * HOUR);
+  });
+
+  it('handles zones that are not on the hour', () => {
+    // The reason `TimeParts` carries minutes: rounding to whole hours would
+    // put every Indian tick 30 minutes out.
+    expect(at('2026-03-14T23:00:00Z', 'Asia/Kolkata')).toBe(
+      5 * HOUR + 30 * MIN,
+    );
+    expect(at('2026-03-14T23:00:00Z', 'Asia/Kathmandu')).toBe(
+      5 * HOUR + 45 * MIN,
+    );
+  });
+
+  it('handles a half-hour daylight-saving shift', () => {
+    // Lord Howe moves by 30 minutes, not an hour — the case that a
+    // whole-hour offset gets wrong even in a zone that starts on the half.
+    expect(at('2026-07-15T00:00:00Z', 'Australia/Lord_Howe')).toBe(
+      10 * HOUR + 30 * MIN,
+    );
+    expect(at('2026-01-15T00:00:00Z', 'Australia/Lord_Howe')).toBe(11 * HOUR);
+  });
+
+  it('ignores the instant’s own sub-second remainder', () => {
+    const ms = Date.parse('2026-07-15T12:00:00Z') + 837;
+    expect(zoneOffset(ms, 'Europe/Berlin')).toBe(2 * HOUR);
+  });
+
+  it('inverts timeParts: parts read as UTC, minus the offset', () => {
+    const ms = Date.parse('2026-07-15T12:34:56Z');
+    const p = timeParts(ms, 'Asia/Kolkata');
+    const wall = Date.UTC(
+      p.year,
+      p.month - 1,
+      p.day,
+      p.hour,
+      p.minute,
+      p.second,
+    );
+    expect(wall - zoneOffset(ms, 'Asia/Kolkata')).toBe(ms);
   });
 });
 

@@ -33,6 +33,7 @@ export {
   resolveTimeZone,
   temporalHelpers,
   timeParts,
+  zoneOffset,
 } from './data/temporal';
 export type { TimeParts } from './data/temporal';
 export { currencyFacts } from './data/currency';
