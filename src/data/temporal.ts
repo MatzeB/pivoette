@@ -92,6 +92,10 @@ export interface TimeParts {
   day: number;
   /** 0..23 */
   hour: number;
+  /** 0..59 */
+  minute: number;
+  /** 0..59 */
+  second: number;
   /** 1 = Monday … 7 = Sunday. */
   isoWeekday: number;
 }
@@ -112,6 +116,8 @@ function partsFormat(timeZone: string | undefined): Intl.DateTimeFormat {
       month: 'numeric',
       day: 'numeric',
       hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
       weekday: 'short',
       hourCycle: 'h23',
     });
@@ -135,8 +141,30 @@ export function timeParts(ms: number, timeZone?: string): TimeParts {
     month: Number(get('month')),
     day: Number(get('day')),
     hour: Number(get('hour')),
+    minute: Number(get('minute')),
+    second: Number(get('second')),
     isoWeekday: ISO_DAYS.indexOf(weekday) + 1,
   };
+}
+
+/**
+ * Milliseconds the zone is ahead of UTC at this instant.
+ *
+ * The inverse of `timeParts`, and the reason it needs minutes: an axis that
+ * places a tick at "local midnight" has wall-clock parts and needs the instant,
+ * which is the parts read as UTC minus the offset. Rounding the offset to whole
+ * hours would work everywhere except the zones that are not on the hour —
+ * India is +05:30, and Lord Howe shifts by *half* an hour for daylight saving.
+ *
+ * Sub-second precision is not recoverable from the parts, so the instant's own
+ * millisecond remainder is subtracted out before differencing; the result is a
+ * whole number of seconds, which every real zone offset is.
+ */
+export function zoneOffset(ms: number, timeZone?: string): number {
+  const p = timeParts(ms, timeZone);
+  const wall = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+  const whole = ms - (((ms % 1000) + 1000) % 1000);
+  return wall - whole;
 }
 
 /** ISO-8601 week number (1..53) of an instant, in a time zone. */
