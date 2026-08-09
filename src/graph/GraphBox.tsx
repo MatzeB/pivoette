@@ -133,6 +133,7 @@ export function GraphBox({
   y,
   series,
   agg,
+  order,
   height,
   width,
   margin,
@@ -158,9 +159,9 @@ export function GraphBox({
   // object identity, so the label cache would churn on every mouse move.
   const yKey = Array.isArray(y) ? y.join('\u0000') : y;
   const graph: GraphData = useMemo(
-    () => buildGraphData(frame, { x, y, series, agg }, { ladder }),
+    () => buildGraphData(frame, { x, y, series, agg, order }, { ladder }),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- yKey stands in for y
-    [frame, x, yKey, series, agg, ladder],
+    [frame, x, yKey, series, agg, order, ladder],
   );
 
   // --- size -----------------------------------------------------------------

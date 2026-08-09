@@ -230,6 +230,94 @@ describe('the shared ladder step', () => {
   });
 });
 
+describe('ordering', () => {
+  const rows: Row[] = [
+    { g: 'alpha', v: 10 },
+    { g: 'beta', v: 90 },
+    { g: 'gamma', v: 50 },
+  ];
+  const series: Row[] = [
+    { m: 1, who: 'alpha', v: 10 },
+    { m: 1, who: 'beta', v: 90 },
+    { m: 1, who: 'gamma', v: 50 },
+  ];
+
+  it('orders by name unless asked otherwise', () => {
+    const data = buildGraphData(frameOf(rows), { x: 'g', y: 'v' });
+    expect(data.categories).toEqual(['alpha', 'beta', 'gamma']);
+  });
+
+  it('puts the largest first when asked', () => {
+    const data = buildGraphData(frameOf(rows), {
+      x: 'g',
+      y: 'v',
+      order: 'value',
+    });
+    expect(data.categories).toEqual(['beta', 'gamma', 'alpha']);
+    expect(data.series[0]!.points.map((p) => p.y)).toEqual([90, 50, 10]);
+    // Band positions are drawn positions, so they renumber with the order.
+    expect(data.xs).toEqual([0, 1, 2]);
+  });
+
+  it('ranks series the same way', () => {
+    const data = buildGraphData(frameOf(series), {
+      x: 'm',
+      y: 'v',
+      series: 'who',
+      order: 'value',
+    });
+    expect(data.series.map((s) => s.key)).toEqual(['beta', 'gamma', 'alpha']);
+    expect(data.series.map((s) => s.index)).toEqual([0, 1, 2]);
+  });
+
+  it('sorts signed, so a debt files below a small holding', () => {
+    const debt: Row[] = [
+      { g: 'small', v: 5 },
+      { g: 'debt', v: -900 },
+      { g: 'big', v: 100 },
+    ];
+    const data = buildGraphData(frameOf(debt), {
+      x: 'g',
+      y: 'v',
+      order: 'value',
+    });
+    expect(data.categories).toEqual(['big', 'small', 'debt']);
+  });
+
+  it('never lets the order move a colour', () => {
+    // The point of separating `slot` from `index`: two charts of the same
+    // entities, sorted differently, still agree about which one is blue.
+    const named = buildGraphData(frameOf(series), {
+      x: 'm',
+      y: 'v',
+      series: 'who',
+    });
+    const ranked = buildGraphData(frameOf(series), {
+      x: 'm',
+      y: 'v',
+      series: 'who',
+      order: 'value',
+    });
+    const slots = (d: typeof named) =>
+      Object.fromEntries(d.series.map((s) => [s.key, s.slot]));
+    expect(slots(ranked)).toEqual(slots(named));
+    expect(slots(named)).toEqual({ alpha: 0, beta: 1, gamma: 2 });
+  });
+
+  it('keeps a band category’s slot through a re-sort', () => {
+    const plain = buildGraphData(frameOf(rows), { x: 'g', y: 'v' });
+    const ranked = buildGraphData(frameOf(rows), {
+      x: 'g',
+      y: 'v',
+      order: 'value',
+    });
+    const byName = (d: typeof plain) =>
+      Object.fromEntries(d.categories.map((c, i) => [c, d.categorySlots[i]]));
+    expect(byName(ranked)).toEqual(byName(plain));
+    expect(byName(plain)).toEqual({ alpha: 0, beta: 1, gamma: 2 });
+  });
+});
+
 describe('nearestIndex', () => {
   const xs = [0, 10, 20, 30];
 

@@ -36,7 +36,7 @@ export function Legend({ always = false }: LegendProps) {
         <span key={series.key} className={styles.legendItem}>
           <span
             className={styles.swatch}
-            style={{ background: colorOf(series.index) }}
+            style={{ background: colorOf(series.slot) }}
           />
           {series.label}
         </span>

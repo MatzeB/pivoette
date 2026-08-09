@@ -103,8 +103,12 @@ export function BarSeries({
               if (point.y === null) return null;
               const centre = x.at(point.x) + offset;
               const top = y.at(point.y);
+              // Both are canonical slots, not drawn positions: re-sorting
+              // the axis must not repaint anything.
               const color = colorOf(
-                colorBy === 'category' ? index : series.index,
+                colorBy === 'category'
+                  ? (data.categorySlots[index] ?? index)
+                  : series.slot,
               );
               const datum: GraphDatum = { point, index, cx: centre, cy: top };
               return (

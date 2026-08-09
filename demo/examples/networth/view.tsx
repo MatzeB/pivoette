@@ -40,6 +40,9 @@ export function Chart({
         y="balance"
         series="account"
         agg="sum"
+        // Largest holding first, down to the largest debt. The legend follows,
+        // so it reads as a ranking rather than an alphabet.
+        order="value"
         height={340}
         theme={theme}
         locale={locale}
@@ -71,6 +74,10 @@ export function Chart({
         x="account"
         y="contribution"
         agg="sum"
+        // Ranked by its own measure, which puts the bars in a different order
+        // than the chart above — and changes no colours, because a slot comes
+        // from the account's name, never from where it happens to be sorted.
+        order="value"
         height={200}
         theme={theme}
         locale={locale}

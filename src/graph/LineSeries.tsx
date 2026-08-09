@@ -105,7 +105,7 @@ export function LineSeries({
   return (
     <>
       {geometry.map(({ series, points }) => {
-        const color = colorOf(series.index);
+        const color = colorOf(series.slot);
         return (
           <SeriesContext.Provider key={series.key} value={{ series, color }}>
             <g data-series={series.key}>
