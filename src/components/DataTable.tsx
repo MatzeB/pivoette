@@ -5,6 +5,8 @@ import type { CellCtx, FormatFn } from '../format/context';
 import type { CellValue, DataFrame, DatasetJson } from '../data/types';
 import type { ColumnMeta } from '../data/meta';
 import { unitLabels } from '../data/meta';
+import { affixOf, attachUnit } from '../format/label';
+import type { UnitAffix } from '../format/label';
 import { fromDataset } from '../data/import';
 import { computeView } from '../pivot/engine';
 import { getAggregation } from '../pivot/aggregations';
@@ -274,49 +276,42 @@ function unitAffixes(
   unitPlacement: UnitPlacement,
   scalePlacement: UnitPlacement,
   locale?: string,
-): { value: string; header: string; prefix: boolean; tight: boolean } {
+): { value: UnitAffix; header: string; any: boolean } {
   const labels = unitLabels(meta, locale);
-  const out = {
-    value: '',
-    header: '',
-    prefix: labels.prefix,
-    tight: labels.tight,
-  };
-  if (!labels.full) return out;
+  const base = affixOf(labels);
+  const value: UnitAffix = { ...base, scale: '', unit: '' };
+  let header = '';
+  if (!labels.full) return { value, header, any: false };
+
   if (!labels.simple) {
-    if (unitPlacement !== 'off') out[unitPlacement] += labels.full;
-    return out;
+    // No separable halves; the whole label goes to one slot or nowhere.
+    if (unitPlacement === 'value') value.unit = labels.full;
+    else if (unitPlacement === 'header') header = labels.full;
+    return { value, header, any: !!value.unit };
   }
-  if (scalePlacement !== 'off') out[scalePlacement] += labels.scalePart;
-  if (unitPlacement !== 'off') out[unitPlacement] += labels.unitPart;
-  return out;
+  if (scalePlacement === 'value') value.scale = base.scale;
+  else if (scalePlacement === 'header') header += base.scale;
+  if (unitPlacement === 'value') value.unit = base.unit;
+  else if (unitPlacement === 'header') header += base.unit;
+  // The header spells the two halves in reading order, which for a leading
+  // symbol is unit-then-scale — `($k)`, matching the `$300k` beneath it.
+  if (
+    base.prefix &&
+    scalePlacement === 'header' &&
+    unitPlacement === 'header'
+  ) {
+    header = base.unit + base.scale;
+  }
+  return { value, header, any: !!(value.scale || value.unit) };
 }
 
 /**
  * Build a column's formatter, specialized once for its unit label rather than
- * re-deciding per cell. A leading label sits inside any sign (`-$12.50`); a
- * `tight` one hugs the digits (`$12.50`, `45.6%`) and the rest stand off with a
- * space (`15467 MB`). Both facts come from the metadata — see `unitLabels`.
+ * re-deciding per cell. Where the label goes is `attachUnit`'s business, which
+ * the engine and the charts share so the same value cannot read three ways.
  */
-function wrapFormat(
-  base: FormatFn,
-  label: string,
-  prefix: boolean,
-  tight: boolean,
-): FormatFn {
-  const gap = tight ? '' : ' ';
-  if (!prefix) {
-    return (ctx) => {
-      const text = base(ctx);
-      return text ? text + gap + label : text;
-    };
-  }
-  return (ctx) => {
-    const text = base(ctx);
-    if (!text) return text;
-    const sign = text[0] === '-' || text[0] === '+' ? text[0] : '';
-    return sign + label + gap + text.slice(sign.length);
-  };
+function wrapFormat(base: FormatFn, affix: UnitAffix): FormatFn {
+  return (ctx) => attachUnit(base(ctx), affix);
 }
 
 function isFrame(
@@ -383,11 +378,8 @@ export function DataTable({
       headerSuffix[i] = affix.header ? ` (${affix.header})` : '';
       // Tier-3 cells own their whole rendering; metadata is on `CellCtx` if
       // they want it.
-      if (!affix.value || leaf.render) return leaf;
-      return {
-        ...leaf,
-        format: wrapFormat(leaf.format, affix.value, affix.prefix, affix.tight),
-      };
+      if (!affix.any || leaf.render) return leaf;
+      return { ...leaf, format: wrapFormat(leaf.format, affix.value) };
     });
     return { leaves, headerSuffix };
   }, [result.leaves, unitPlacement, scalePlacement, view.locale]);

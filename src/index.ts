@@ -121,6 +121,8 @@ export {
 export type { Aggregation, Reducer } from './pivot/aggregations';
 export { deduceFormat } from './format/deduce';
 export { registerFormat, resolveFormat } from './format/format';
+export { affixOf, attachUnit } from './format/label';
+export type { UnitAffix } from './format/label';
 export { registerStyle, resolveStyle } from './format/style';
 export { registerRender, resolveRender } from './format/render';
 export {

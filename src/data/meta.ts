@@ -468,15 +468,39 @@ export function unitLabels(
   const factors = factorsOf(meta.unitShort, meta.scaleShort);
   const only = factors.length === 1 ? factors[0]! : undefined;
   const simple = !!only && !only.inverted && only.exponent === 1;
-  const full = compose(factors);
   // A currency's placement comes from the locale; otherwise the symbol itself
   // decides. Compound units always trail with a space.
-  const prefix = simple && (columnCurrency(meta, locale)?.prefix ?? false);
+  const currency = simple ? columnCurrency(meta, locale) : undefined;
+  const prefix = currency?.prefix ?? false;
+
+  // `UNIT_SHORT` carries symbols for the handful of currencies that are always
+  // written the same way, and `shortOf` leaves the rest as their long name —
+  // `franc1234.50`. But the symbol is a *locale* fact, which is why it cannot
+  // live in that table at all (`$` in en-US, `US$` in en-CA), and `Intl` has
+  // already told us this one. Only fills the gap: an explicit `unitShort`, or
+  // one the table answered, still wins.
+  const declared = simple ? (meta.unit?.[0] ?? null) : null;
+  const unitPart = simple
+    ? currency && only.unit === declared
+      ? currency.symbol
+      : only.unit
+    : '';
+  const scalePart = simple ? only.scale : '';
+
+  // A leading symbol keeps the scale on the far side of the digits — `$300k`,
+  // not `k$300` — so the composed label has to agree: `$k`, so that a header
+  // reading `Net worth ($k)` describes the values under it.
+  const full = !simple
+    ? compose(factors)
+    : prefix
+      ? unitPart + scalePart
+      : scalePart + unitPart;
+
   const labels: UnitLabels = {
     full,
     simple,
-    scalePart: simple ? only.scale : '',
-    unitPart: simple ? only.unit : '',
+    scalePart,
+    unitPart,
     prefix,
     tight: prefix || (simple && SYMBOL_TIGHT.has(full)),
   };

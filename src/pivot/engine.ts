@@ -27,6 +27,8 @@ import {
 import type { ScaleStep } from '../format/ladders';
 import { Format, Render } from '../format/builtins';
 import { resolveFormat } from '../format/format';
+import { affixOf, attachUnit } from '../format/label';
+import type { UnitAffix } from '../format/label';
 import { resolveStyle } from '../format/style';
 import { resolveRender } from '../format/render';
 import { compileExpression, evalExpression } from '../format/expression';
@@ -965,7 +967,7 @@ function perValueFormat(
       rung = {
         fn,
         attach: labels.full
-          ? wrapLabel(labels.full, labels.prefix, labels.tight)
+          ? wrapLabel(affixOf(labels))
           : (text: string) => text,
       };
       rungs.set(step, rung);
@@ -988,20 +990,11 @@ function perValueFormat(
 /**
  * Attach a unit label to already-formatted text. The per-column path does this
  * by wrapping the formatter (`wrapFormat` in `DataTable`); a per-value scale
- * has a different label per cell, so it wraps the text instead.
+ * has a different label per cell, so it wraps the text instead. Both defer to
+ * `attachUnit` for where the label goes.
  */
-function wrapLabel(
-  label: string,
-  prefix: boolean,
-  tight: boolean,
-): (text: string) => string {
-  const gap = tight ? '' : ' ';
-  if (!prefix) return (text) => (text ? text + gap + label : text);
-  return (text) => {
-    if (!text) return text;
-    const sign = text[0] === '-' || text[0] === '+' ? text[0] : '';
-    return sign + label + gap + text.slice(sign.length);
-  };
+function wrapLabel(affix: UnitAffix): (text: string) => string {
+  return (text) => attachUnit(text, affix);
 }
 
 /**
