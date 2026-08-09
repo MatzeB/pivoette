@@ -73,6 +73,12 @@ export function Chart({
           do not match the line ends above. Brokerage took 183k and is worth
           373k; Retirement took 162k and is worth 151k.
 
+          The mortgage is positive here and negative above, which is not an
+          inconsistency: a balance of -148k is what is owed, while paying the
+          principal down is money going in — the same 139k that lifted that
+          balance from -286k. Two charts, two measures, and only one of them is
+          a liability.
+
           It also shows that the x axis follows the field rather than the mark:
           `account` is categorical, so the scale becomes a band. */}
       <GraphBox

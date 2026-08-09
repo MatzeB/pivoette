@@ -77,13 +77,18 @@ def main() -> None:
             # The mortgage is paid down towards zero and stops there.
             if name == "Mortgage":
                 balance = min(balance, 0.0)
+            # Signed, and positive for every account including the mortgage:
+            # money paid in raises that account's balance, and the mortgage's
+            # rises from -286k towards zero as the principal is repaid. Taking
+            # an absolute value here would not *establish* that — it would hide
+            # a withdrawal by reporting it as a deposit.
             contribution = drift + random.gauss(0, drift * 0.25)
             rows.append(
                 {
                     "month": month_iso(i),
                     "account": name,
                     "balance": round(balance, 2),
-                    "contribution": round(abs(contribution), 2),
+                    "contribution": round(contribution, 2),
                 }
             )
 
