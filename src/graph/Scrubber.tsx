@@ -13,10 +13,9 @@
 import { useMemo, useRef } from 'react';
 import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { unitLabels } from '../data/meta';
 import { useGraph, useLayers, usePointer, useSetPointer } from './context';
-import { tickFormatter, tickSpec, withUnit } from './axis-format';
 import { timeReadoutFormat } from './axis-format';
+import { chooseInterval } from './time';
 import { nearestIndex } from './series';
 import type { Series } from './series';
 import styles from './Graph.module.css';
@@ -112,29 +111,39 @@ function ScrubDots() {
 }
 
 function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
-  const graph = useGraph();
   const { overlay } = useLayers();
   const hover = useHovered();
-  const { x, plot, data, locale, timeZone, unitPlacement } = graph;
+  const {
+    x,
+    plot,
+    data,
+    locale,
+    timeZone,
+    colorOf,
+    formatValue,
+    valueDecimals,
+  } = useGraph();
 
   // Built once and reused, because each of these constructs an `Intl`
   // formatter — far too expensive to do on every pointer move.
-  const formatters = useMemo(() => {
-    const labels = unitLabels(data.yMeta, locale);
-    const number = tickFormatter(
-      data.yMeta,
-      data.frame,
-      tickSpec(data.yMeta, data.yFactor !== 1, 2, locale),
-    );
-    // At the axis's own resolution: hardcoding a day made every point of an
-    // intraday chart read the same heading, which is the one thing a readout
-    // exists to tell apart.
-    const time =
-      data.xKind === 'time'
-        ? timeReadoutFormat(x.ticks().interval?.unit ?? 'day', locale, timeZone)
-        : undefined;
-    return { labels, number, time };
-  }, [data, x, locale, timeZone]);
+  /**
+   * At the resolution of the *points*, not of the ticks.
+   *
+   * Hardcoding a day made every point of an intraday chart read the same
+   * heading, which is the one thing a readout exists to tell apart. But the
+   * axis's tick interval is the wrong correction: a decade of monthly balances
+   * ticks every two years, and "2023" does not identify a point either. How
+   * close the points sit is what decides how precisely one has to be named.
+   */
+  const timeText = useMemo(() => {
+    if (data.xKind !== 'time') return undefined;
+    let gap = Infinity;
+    for (let i = 1; i < data.xs.length; i++) {
+      gap = Math.min(gap, data.xs[i]! - data.xs[i - 1]!);
+    }
+    const unit = Number.isFinite(gap) ? chooseInterval(gap, 1).unit : 'day';
+    return timeReadoutFormat(unit, locale, timeZone);
+  }, [data.xKind, data.xs, locale, timeZone]);
 
   const hit = useMemo<ScrubHit | null>(() => {
     if (!hover) return null;
@@ -142,7 +151,7 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
     const raw = data.series[0]?.points[hover.index]?.raw;
     const xLabel =
       data.xKind === 'time'
-        ? formatters.time!(value)
+        ? timeText!(value)
         : data.xKind === 'band'
           ? (data.categories[hover.index] ?? '')
           : String(raw ?? value);
@@ -154,20 +163,17 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
         const y = series.points[hover.index]?.y ?? null;
         return {
           series,
-          color: graph.colorOf(series.slot),
+          color: colorOf(series.slot),
           y,
-          // Bare unless the chart nominated values to carry the unit: with the
-          // default placement the axis title beside the readout already says it.
-          label:
-            y === null
-              ? ''
-              : unitPlacement === 'value'
-                ? withUnit(formatters.number(y), formatters.labels)
-                : formatters.number(y),
+          // The box's formatter, so a value reads the same here as it does on
+          // the axis — including whether it carries the unit at all.
+          // One digit past the axis step — the same rule a `<PointLabel>`
+          // follows, so the two never name one point differently.
+          label: y === null ? '' : formatValue(y, valueDecimals + 1),
         };
       }),
     };
-  }, [hover, data, formatters, graph, unitPlacement]);
+  }, [hover, data, timeText, colorOf, formatValue, valueDecimals]);
 
   if (!overlay || !hit) return null;
 

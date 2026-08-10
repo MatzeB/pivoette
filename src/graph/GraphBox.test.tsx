@@ -608,6 +608,58 @@ describe('scrubber', () => {
     expect(host.querySelectorAll('circle')).toHaveLength(2);
   });
 
+  it('names the hovered point at the resolution the points sit at', async () => {
+    // Monthly points on an axis that ticks yearly: the heading has to say
+    // which month, not which tick period it fell in.
+    const host = await render(
+      chart([<LineSeries key="l" />, <Scrubber key="s" />], {
+        locale: 'en-US',
+        timeZone: 'UTC',
+      }),
+    );
+    const hit = host.querySelector('rect')!;
+    await act(async () => {
+      hit.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+      );
+    });
+    const head = host.querySelector('[class*="readoutHead"]')!;
+    expect(head.textContent).toBe('Jan 2026');
+  });
+
+  it('names a value the same way wherever it appears', async () => {
+    // One rule, one digit past the axis step — so a point does not read
+    // `$160k` on the axis, `$163.1k` as a label and `$163.09k` under the
+    // pointer, which is what three separate pipelines produced.
+    const host = await render(
+      chart(
+        [
+          <Axis key="y" side="left" />,
+          <LineSeries key="l">
+            <PointLabel at="last" />
+          </LineSeries>,
+          <Scrubber key="s" />,
+        ],
+        { locale: 'en-US', timeZone: 'UTC' },
+      ),
+    );
+    const hit = host.querySelector('rect')!;
+    await act(async () => {
+      for (let i = 0; i < 3; i++) {
+        hit.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+        );
+      }
+    });
+    const labels = [...host.querySelectorAll('svg text')]
+      .map((t) => t.textContent!)
+      .filter((t) => t.startsWith('4'));
+    const readout = host.querySelector('[class*="readout"]')!.textContent!;
+    // Brokerage's last point, as an end label and under the pointer.
+    expect(labels).toContain('460.0');
+    expect(readout).toContain('460.0');
+  });
+
   it('is reachable without a pointer at all', async () => {
     const host = await render(withScrubber());
     const hit = host.querySelector('rect')!;

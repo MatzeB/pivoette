@@ -15,7 +15,13 @@
  */
 import { timeParts, zoneOffset } from '../data/temporal';
 import type { TimeParts } from '../data/temporal';
-import { continuousScale, tickStep, DEFAULT_TICKS } from './scale';
+import {
+  continuousScale,
+  spread,
+  tickStep,
+  DEFAULT_TICKS,
+  MAX_TICKS,
+} from './scale';
 import type { ContinuousScale } from './scale';
 
 export type TimeUnit =
@@ -259,9 +265,6 @@ export function chooseInterval(
   return best;
 }
 
-/** Same ceiling, same reason, as the linear generator's. */
-const MAX_TICKS = 500;
-
 /**
  * Ticks on calendar boundaries between two instants.
  *
@@ -297,16 +300,17 @@ export function timeTicks(
  * Round a time domain out to the interval's own boundaries, so the axis begins
  * and ends on a gridline the reader can name.
  */
+/** A single instant is not a span; give it an hour to sit in. */
+const PAD_INSTANT = (v: number): [number, number] => [v - HOUR, v + HOUR];
+
 export function niceTimeDomain(
   domain: readonly [number, number],
   count = DEFAULT_TICKS,
   timeZone?: string,
   weekStart = 1,
 ): [number, number] {
-  let [lo, hi] = domain;
-  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return [0, 1];
-  if (lo > hi) [lo, hi] = [hi, lo];
-  if (lo === hi) return [lo - HOUR, hi + HOUR];
+  const [lo, hi] = spread(domain, PAD_INSTANT);
+  if (lo === hi) return [lo, hi];
   const interval = chooseInterval(hi - lo, count);
   const start = floorToInterval(lo, interval, timeZone, weekStart);
   let end = floorToInterval(hi, interval, timeZone, weekStart);
@@ -329,7 +333,7 @@ export function timeScale(opts: {
   const weekStart = opts.weekStart ?? 1;
   const domain =
     opts.nice === false
-      ? spreadTime(opts.domain)
+      ? spread(opts.domain, PAD_INSTANT)
       : niceTimeDomain(opts.domain, count, opts.timeZone, weekStart);
   return continuousScale('time', domain, opts.range, (lo, hi, n) => {
     const { ticks, interval } = timeTicks(lo, hi, n, opts.timeZone, weekStart);
@@ -339,13 +343,4 @@ export function timeScale(opts: {
       interval,
     };
   });
-}
-
-/** The un-niced fallback: usable, without pretending to a calendar boundary. */
-function spreadTime(domain: readonly [number, number]): [number, number] {
-  let [lo, hi] = domain;
-  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return [0, 1];
-  if (lo > hi) [lo, hi] = [hi, lo];
-  if (lo === hi) return [lo - HOUR, hi + HOUR];
-  return [lo, hi];
 }

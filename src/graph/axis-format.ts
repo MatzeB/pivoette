@@ -75,7 +75,6 @@ export function tickSpec(
   if (
     !rescaled &&
     deduced &&
-    typeof deduced === 'object' &&
     'fnName' in deduced &&
     NAMING_FORMATS.has(deduced.fnName)
   ) {
@@ -178,16 +177,40 @@ const READOUT_DATE: Record<TimeUnit, Intl.DateTimeFormatOptions> = {
   year: { year: 'numeric' },
 };
 
+/**
+ * `Intl.DateTimeFormat` is expensive to construct and these depend on nothing
+ * but their three arguments — yet the memos holding them are keyed on the tick
+ * set, which changes on every width change. Without a cache, dragging a
+ * responsive chart builds three of them per animation frame forever. Same
+ * shape as `format.ts`'s `nameCache` and `temporal.ts`'s `partsCache`.
+ */
+const dateCache = new Map<string, Intl.DateTimeFormat>();
+
+function dateFormat(
+  key: string,
+  options: Intl.DateTimeFormatOptions,
+  locale: string | undefined,
+  timeZone: string | undefined,
+): Intl.DateTimeFormat {
+  const id = `${key}|${locale ?? ''}|${timeZone ?? ''}`;
+  let fmt = dateCache.get(id);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat(locale, {
+      ...options,
+      timeZone: resolveTimeZone(timeZone),
+    });
+    dateCache.set(id, fmt);
+  }
+  return fmt;
+}
+
 /** A one-line name for an instant, at the axis's own resolution. */
 export function timeReadoutFormat(
   unit: TimeUnit,
   locale: string | undefined,
   timeZone: string | undefined,
 ): (ms: number) => string {
-  const fmt = new Intl.DateTimeFormat(locale, {
-    ...READOUT_DATE[unit],
-    timeZone: resolveTimeZone(timeZone),
-  });
+  const fmt = dateFormat(`r:${unit}`, READOUT_DATE[unit], locale, timeZone);
   return (ms) => fmt.format(new Date(ms));
 }
 
@@ -211,15 +234,13 @@ export function timeTickFormat(
   locale: string | undefined,
   timeZone: string | undefined,
 ): TimeTickFormat {
-  const tz = resolveTimeZone(timeZone);
-  const main = new Intl.DateTimeFormat(locale, {
-    ...TICK_DATE[unit],
-    timeZone: tz,
-  });
-  const coarse = new Intl.DateTimeFormat(locale, {
-    ...(ROLLOVER[unit] ?? TICK_DATE[unit]),
-    timeZone: tz,
-  });
+  const main = dateFormat(`t:${unit}`, TICK_DATE[unit], locale, timeZone);
+  const coarse = dateFormat(
+    `c:${unit}`,
+    ROLLOVER[unit] ?? TICK_DATE[unit],
+    locale,
+    timeZone,
+  );
   return {
     label: (ms) => main.format(new Date(ms)),
     rollover: (ms) => coarse.format(new Date(ms)),

@@ -28,10 +28,10 @@ import type {
   GraphPointer,
   GraphUnitPlacement,
 } from './context';
-import { bandScale, linearScale } from './scale';
+import { bandScale, linearScale, DEFAULT_TICKS } from './scale';
 import type { Scale } from './scale';
 import { timeScale } from './time';
-import { tickFormatter, tickSpec } from './axis-format';
+import { tickFormatter, tickSpec, withUnit } from './axis-format';
 import { buildGraphData } from './series';
 import type { GraphData, GraphFields } from './series';
 import styles from './Graph.module.css';
@@ -151,7 +151,7 @@ export function GraphBox({
   width,
   margin,
   ladder,
-  ticks = 5,
+  ticks = DEFAULT_TICKS,
   includeZero = false,
   bandPadding,
   unitPlacement = 'axis',
@@ -217,23 +217,26 @@ export function GraphBox({
     // scale, which depends on the left margin only through the *range* — so a
     // throwaway scale over the final domain gives the labels without a loop.
     //
-    // Through `tickFormatter`, not `toFixed`: the axis draws grouped, localised
-    // text, so measuring the bare number reserves room for `1000` and then
-    // paints `1,000.00` over the axis title.
+    // Through the *same* formatter the axis paints with, so the two cannot
+    // disagree: measuring the bare number reserved room for `1000` and then
+    // painted `1,000.00` over the title, and skipping `unitPlacement` reserved
+    // room for `160` and painted `$160k`.
+    const rescaled = graph.yFactor !== 1;
+    const labels = unitLabels(graph.yMeta, locale);
     const probe = linearScale({ domain: [lo, hi], range: [0, 1], ticks });
     const probeTicks = probe.ticks(ticks);
-    const probeLabels = tickFormatter(
-      graph.yMeta,
-      graph.frame,
-      tickSpec(graph.yMeta, graph.yFactor !== 1, probeTicks.decimals, locale),
-    );
-    const sample = probeTicks.ticks.map((t) => probeLabels(t.value));
+    const formatValue = (value: number, decimals = probeTicks.decimals) => {
+      const text = tickFormatter(
+        graph.yMeta,
+        graph.frame,
+        tickSpec(graph.yMeta, rescaled, decimals, locale),
+      )(value);
+      return unitPlacement === 'value' ? withUnit(text, labels) : text;
+    };
+    const sample = probeTicks.ticks.map((t) => formatValue(t.value));
     const auto: GraphMargin = {
       ...DEFAULT_MARGIN,
-      left: Math.max(
-        DEFAULT_MARGIN.left,
-        estimateLeft(sample, !!unitLabels(graph.yMeta, locale).full),
-      ),
+      left: Math.max(DEFAULT_MARGIN.left, estimateLeft(sample, !!labels.full)),
     };
     const m: GraphMargin = { ...auto, ...margin };
 
@@ -245,10 +248,14 @@ export function GraphBox({
     };
 
     const xRange: [number, number] = [plot.left, plot.left + plot.width];
+    const xDomain: [number, number] = [
+      graph.xs[0] ?? 0,
+      graph.xs[graph.xs.length - 1] ?? 1,
+    ];
     let xScale: Scale;
     if (graph.xKind === 'time') {
       xScale = timeScale({
-        domain: [graph.xs[0] ?? 0, graph.xs[graph.xs.length - 1] ?? 1],
+        domain: xDomain,
         range: xRange,
         timeZone: tz,
         weekStart,
@@ -266,7 +273,7 @@ export function GraphBox({
       });
     } else {
       xScale = linearScale({
-        domain: [graph.xs[0] ?? 0, graph.xs[graph.xs.length - 1] ?? 1],
+        domain: xDomain,
         range: xRange,
         nice: false,
         ticks,
@@ -289,14 +296,31 @@ export function GraphBox({
         index < SERIES_SLOTS ? `var(--pv-series-${index})` : OVERFLOW_COLOR,
       unitPlacement,
       ticks,
+      // Clamped into the plot: a zero that is off-screen still has to give the
+      // marks a row to grow from, and all of them must pick the same one.
+      baseline: Math.min(
+        Math.max(yScale.at(0), plot.top),
+        plot.top + plot.height,
+      ),
+      formatValue,
+      valueDecimals: probeTicks.decimals,
+      xTicks: xScale.ticks(ticks),
       locale,
       timeZone: tz,
     };
+    // Four primitives, not the object: `Axis` tells hosts to pass
+    // `margin={{ bottom: 46 }}` inline, and an inline literal in this list
+    // would rebuild the geometry — and re-render every mark — on each render
+    // of the parent. Same trap `yKey` defuses above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the four below stand in for `margin`
   }, [
     graph,
     outerWidth,
     height,
-    margin,
+    margin?.top,
+    margin?.right,
+    margin?.bottom,
+    margin?.left,
     ticks,
     includeZero,
     bandPadding,

@@ -15,7 +15,7 @@ export type { GraphBoxProps, GraphMargin } from './graph/GraphBox';
 export { Axis } from './graph/Axis';
 export type { AxisProps } from './graph/Axis';
 export { LineSeries, DEFAULT_MAX_MARKERS } from './graph/LineSeries';
-export type { LineSeriesProps, DatumChildren } from './graph/LineSeries';
+export type { LineSeriesProps } from './graph/LineSeries';
 export { BarSeries, MAX_BAR_WIDTH } from './graph/BarSeries';
 export type { BarSeriesProps } from './graph/BarSeries';
 export { Dot, PointLabel } from './graph/marks';
@@ -24,6 +24,7 @@ export { Legend } from './graph/Legend';
 export type { LegendProps } from './graph/Legend';
 export { Scrubber } from './graph/Scrubber';
 export type { ScrubberProps, ScrubEntry, ScrubHit } from './graph/Scrubber';
+export { renderDatum } from './graph/context';
 export {
   useDatum,
   useGraph,
@@ -33,6 +34,7 @@ export {
   useSetPointer,
 } from './graph/context';
 export type {
+  DatumChildren,
   GraphDatum,
   GraphGeometry,
   GraphLayers,
@@ -41,7 +43,7 @@ export type {
   GraphUnitPlacement,
   SetHover,
 } from './graph/context';
-export { buildGraphData, nearestIndex } from './graph/series';
+export { buildGraphData, nearestIndex, selectSeries } from './graph/series';
 export type {
   GraphData,
   GraphFields,
@@ -49,15 +51,11 @@ export type {
   Series,
   XKind,
 } from './graph/series';
-export {
-  bandScale,
-  continuousScale,
-  linearScale,
-  niceDomain,
-  tickDecimals,
-  tickStep,
-  DEFAULT_TICKS,
-} from './graph/scale';
+// Scale factories, for a host building geometry without `GraphBox`. The
+// numeric helpers behind them (`spread`, `niceDomain`, `tickDecimals`,
+// `MAX_TICKS`) and `continuousScale` — whose fourth parameter is the private
+// tick-generator contract between `scale` and `time` — stay internal.
+export { bandScale, linearScale, tickStep, DEFAULT_TICKS } from './graph/scale';
 export type {
   BandScale,
   ContinuousScale,
@@ -66,23 +64,21 @@ export type {
   ScaleTick,
   TickSet,
 } from './graph/scale';
-export {
-  addTime,
-  chooseInterval,
-  floorTime,
-  niceTimeDomain,
-  timeScale,
-  timeTicks,
-} from './graph/time';
+// The calendar primitives a host would need to write its own time axis.
+// `niceTimeDomain` and `timeTicks` are what `timeScale` is *made of*, so they
+// stay internal rather than becoming a second way to ask the same question.
+export { addTime, chooseInterval, floorTime, timeScale } from './graph/time';
 export type { TimeInterval, TimeUnit } from './graph/time';
 export { areaPath, barPath, linePath, runs } from './graph/shape';
 export type { PlotPoint } from './graph/shape';
+// `withUnit` is not here: it is `attachUnit(body, affixOf(labels))`, and two
+// public names for one operation is how callers end up disagreeing.
 export {
   axisTitle,
   tickFormatter,
   tickSpec,
+  timeReadoutFormat,
   timeTickFormat,
-  withUnit,
 } from './graph/axis-format';
 export type { TimeTickFormat } from './graph/axis-format';
 

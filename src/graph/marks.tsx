@@ -6,8 +6,6 @@
  * are — so a host writing its own can copy one and change the shape.
  */
 import { useDatum, useGraph, useSeries } from './context';
-import { tickFormatter, tickSpec, withUnit } from './axis-format';
-import { unitLabels } from '../data/meta';
 import type { Series } from './series';
 import styles from './Graph.module.css';
 
@@ -122,27 +120,18 @@ export function PointLabel({
 }: PointLabelProps) {
   const { point, index, cx, cy } = useDatum();
   const { series } = useSeries();
-  const { data, locale, plot, unitPlacement, y } = useGraph();
+  const { plot, baseline, formatValue, valueDecimals } = useGraph();
 
   const picked = pickedIndex(series, at);
   if (picked !== -1 && picked !== index) return null;
   if (at === 'all' && point.y === null) return null;
 
-  const number =
-    point.y === null
-      ? ''
-      : tickFormatter(
-          series.meta,
-          data.frame,
-          tickSpec(series.meta, data.yFactor !== 1, 1, locale),
-        )(point.y);
-  // Silent about the unit unless the chart has nominated values to carry it —
-  // by default the axis title already said `$k` once.
+  // The box's own formatter: it already knows the precision and where the unit
+  // goes, and composing one here built an `Intl.NumberFormat` per labelled
+  // point on every resize — and disagreed with the axis about decimals.
   const text =
     format?.(point.y) ??
-    (unitPlacement === 'value'
-      ? withUnit(number, unitLabels(series.meta, locale))
-      : number);
+    (point.y === null ? '' : formatValue(point.y, valueDecimals + 1));
 
   if (!text) return null;
 
@@ -158,7 +147,7 @@ export function PointLabel({
 
   // A mark that grew downwards from the baseline carries its label below, so
   // the number always sits past the data end rather than on top of the fill.
-  const below = side === 'outside' && cy > y.at(0);
+  const below = side === 'outside' && cy > baseline;
 
   return (
     <text

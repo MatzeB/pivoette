@@ -418,8 +418,8 @@ export function App() {
   // and placement selects would otherwise swallow or fight for the key.
   // Read through a ref: the listener is installed once, and re-binding it on
   // every example switch would be a lot of churn for one comparison.
-  const selectedRef = useRef(selected);
-  selectedRef.current = selected;
+  const isChartRef = useRef(isChart);
+  isChartRef.current = isChart;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -434,11 +434,7 @@ export function App() {
       // A chart has no spec to edit, and every consumer of `editing` is gated
       // on that — so flipping it here would do nothing now and surprise the
       // reader on the next table example they open.
-      if (
-        EXAMPLES.find((x) => x.id === selectedRef.current)?.kind !== 'table'
-      ) {
-        return;
-      }
+      if (isChartRef.current) return;
       e.preventDefault();
       setEditing((v) => !v);
     };

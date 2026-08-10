@@ -16,16 +16,12 @@
  * so it is supported *as well*, funnelling into the same loop.
  */
 import { useMemo } from 'react';
-import type { ReactNode } from 'react';
-import { DatumContext, SeriesContext, useGraph } from './context';
-import type { GraphDatum } from './context';
+import { DatumContext, SeriesContext, renderDatum, useGraph } from './context';
+import type { DatumChildren, GraphDatum } from './context';
 import { areaPath, linePath } from './shape';
 import type { PlotPoint } from './shape';
-import type { Series } from './series';
+import { selectSeries } from './series';
 import styles from './Graph.module.css';
-
-export type DatumChildren =
-  ReactNode | ((datum: GraphDatum, index: number) => ReactNode);
 
 /**
  * Above this many points, the built-in `markers` stop being drawn.
@@ -60,16 +56,6 @@ export interface LineSeriesProps {
   children?: DatumChildren;
 }
 
-/** Resolve the `only` filter to the series it names. */
-function selected(all: Series[], only: LineSeriesProps['only']): Series[] {
-  if (only === undefined) return all;
-  if (typeof only === 'number') {
-    const one = all[only];
-    return one ? [one] : [];
-  }
-  return all.filter((s) => s.key === only);
-}
-
 export function LineSeries({
   only,
   area = false,
@@ -77,14 +63,13 @@ export function LineSeries({
   maxMarkers = DEFAULT_MAX_MARKERS,
   children,
 }: LineSeriesProps) {
-  const { x, y, plot, data, colorOf } = useGraph();
-  const list = selected(data.series, only);
-
-  // The wash sits on the baseline the axis actually shows, so a series that
-  // crosses zero fills towards zero rather than towards the bottom edge.
-  const baseline = Math.min(
-    Math.max(y.at(0), plot.top),
-    plot.top + plot.height,
+  const { x, y, data, colorOf, baseline } = useGraph();
+  // Memoised because it feeds the geometry memo below: `only` returns a fresh
+  // array each render, which would miss the memo in exactly the case it exists
+  // for.
+  const list = useMemo(
+    () => selectSeries(data.series, only),
+    [data.series, only],
   );
 
   const geometry = useMemo(
@@ -147,9 +132,7 @@ export function LineSeries({
                           style={{ fill: color }}
                         />
                       )}
-                      {typeof children === 'function'
-                        ? children(datum, index)
-                        : children}
+                      {renderDatum(children, datum, index)}
                     </DatumContext.Provider>
                   );
                 })}

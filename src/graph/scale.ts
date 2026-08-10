@@ -131,16 +131,17 @@ export function tickDecimals(step: number): number {
  * three of these: a single repeated value, a reversed pair, and — for a column
  * that is entirely null — nothing finite at all.
  */
-function spread(domain: readonly [number, number]): [number, number] {
+export function spread(
+  domain: readonly [number, number],
+  /** What a single repeated value widens to. Defaults to half its magnitude. */
+  padFlat: (value: number) => [number, number] = (v) =>
+    v === 0 ? [-1, 1] : [v - Math.abs(v) / 2, v + Math.abs(v) / 2],
+): [number, number] {
   let [lo, hi] = domain;
   if (!Number.isFinite(lo) || !Number.isFinite(hi)) return [0, 1];
   if (lo > hi) [lo, hi] = [hi, lo];
-  if (lo === hi) {
-    // A flat series still deserves an axis; centre it in one.
-    if (lo === 0) return [-1, 1];
-    const pad = Math.abs(lo) / 2;
-    return [lo - pad, hi + pad];
-  }
+  // A flat series still deserves an axis; centre it in one.
+  if (lo === hi) return padFlat(lo);
   return [lo, hi];
 }
 
@@ -161,8 +162,11 @@ export function niceDomain(
  * A hard ceiling on generated ticks. Not defensiveness for its own sake: a NaN
  * that survives into a domain makes the loop's exit condition never true, and
  * an infinite loop inside a test run hangs the suite rather than failing it.
+ *
+ * Shared with the calendar generator in `./time`, which walks the same kind of
+ * loop under the same hazard.
  */
-const MAX_TICKS = 200;
+export const MAX_TICKS = 200;
 
 /** Every multiple of `step` inside `[lo, hi]`, inclusive. */
 function linearTicks(lo: number, hi: number, step: number): number[] {
