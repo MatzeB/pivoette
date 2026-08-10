@@ -8,7 +8,7 @@
  * is shallow and known, and prop lists say more than a hidden channel would.
  * A chart tree is neither — its depth and contents are the host's to choose.
  *
- * There are four rather than one, and the split is about *when each changes*:
+ * There are five, and the split is about *when each changes*:
  *
  * - `GraphContext` changes when the data or the size does. Nearly everything
  *   reads it.
@@ -16,6 +16,7 @@
  *   three pieces read it, so a sweep repaints three leaves instead of the chart.
  * - `PointerSetContext` never changes — it holds a `useState` setter, so the hit
  *   rect can *write* the hover without subscribing to it.
+ * - `LayersContext` changes once, when the two portal targets mount.
  * - `SeriesContext` / `DatumContext` are mounted by a series mark around its
  *   per-point children.
  *
@@ -27,8 +28,8 @@
  * undo the whole arrangement.
  */
 import { createContext, useContext } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
-import type { Scale } from './scale';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import type { Scale, TickSet } from './scale';
 import type { GraphData, GraphPoint, Series } from './series';
 
 /**
@@ -55,6 +56,42 @@ export interface GraphGeometry {
   unitPlacement: GraphUnitPlacement;
   /** Ticks each axis aims for, so an axis and the margin estimate agree. */
   ticks: number;
+  /**
+   * Pixel row the value axis calls zero, clamped into the plot.
+   *
+   * One definition for the three marks that need it: a bar grows from it, an
+   * area fills to it, and an outside `<PointLabel>` picks its side against it.
+   * Computing it separately is how a bar ends up growing from the clamped zero
+   * while its label picks a side from the unclamped one, and lands inside the
+   * fill.
+   */
+  baseline: number;
+  /**
+   * A value in display units, as the chart writes it — precision and unit
+   * placement already applied.
+   *
+   * Built once here rather than per mark. Three marks used to compose this
+   * pipeline themselves and disagreed about precision, so one point read
+   * `$160k` on the axis, `$163.1k` as an end label, and `$163.09k` under the
+   * pointer; and `PointLabel` rebuilt an `Intl.NumberFormat` per point.
+   */
+  formatValue: (value: number, decimals?: number) => string;
+  /**
+   * Fraction digits the value axis's own tick step needs, and the base every
+   * other mark measures from.
+   *
+   * A tick and a point label are not asking the same question: a tick rounds
+   * to the step it sits on, while a label or a readout names one point and
+   * wants a digit past it. Deriving the second from the first keeps them one
+   * rule apart instead of three unrelated constants.
+   */
+  valueDecimals: number;
+  /**
+   * The x axis's ticks, generated once. `Axis` paints them and `Scrubber` reads
+   * the calendar interval off them — regenerating cost a `formatToParts` per
+   * tick to answer one enum.
+   */
+  xTicks: TickSet;
   locale: string | undefined;
   timeZone: string | undefined;
 }
@@ -93,6 +130,22 @@ export interface GraphLayers {
   overlay: HTMLDivElement | null;
   /** In normal flow beneath the plot, for the legend. */
   below: HTMLDivElement | null;
+}
+
+/**
+ * What a series component accepts as children: elements replicated once per
+ * point, or a function called with each point.
+ */
+export type DatumChildren =
+  ReactNode | ((datum: GraphDatum, index: number) => ReactNode);
+
+/** Render a series' children for one point, whichever shape they came in. */
+export function renderDatum(
+  children: DatumChildren,
+  datum: GraphDatum,
+  index: number,
+): ReactNode {
+  return typeof children === 'function' ? children(datum, index) : children;
 }
 
 export const GraphContext = createContext<GraphGeometry | null>(null);

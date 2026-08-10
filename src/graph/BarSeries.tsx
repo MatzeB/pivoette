@@ -11,10 +11,10 @@
  * a decision worth making with a real use in front of it.
  */
 import { useMemo } from 'react';
-import { DatumContext, SeriesContext, useGraph } from './context';
-import type { GraphDatum } from './context';
+import { DatumContext, SeriesContext, renderDatum, useGraph } from './context';
+import type { DatumChildren, GraphDatum } from './context';
 import { barPath } from './shape';
-import type { DatumChildren } from './LineSeries';
+import { selectSeries } from './series';
 import styles from './Graph.module.css';
 
 /**
@@ -62,17 +62,10 @@ export function BarSeries({
   colorBy = 'series',
   children,
 }: BarSeriesProps) {
-  const { x, y, plot, data, colorOf } = useGraph();
+  const { x, y, plot, data, colorOf, baseline } = useGraph();
 
   const all = data.series;
-  const list = useMemo(() => {
-    if (only === undefined) return all;
-    if (typeof only === 'number') {
-      const one = all[only];
-      return one ? [one] : [];
-    }
-    return all.filter((s) => s.key === only);
-  }, [all, only]);
+  const list = useMemo(() => selectSeries(all, only), [all, only]);
 
   // Every series takes a share of the slot, whether or not it was filtered
   // out — so hiding one widens nothing and the bars stay where they were.
@@ -83,20 +76,12 @@ export function BarSeries({
   const share = slot / Math.max(all.length, 1);
   const width = Math.max(1, Math.min(maxWidth, share - GAP));
 
-  // The bars grow from the axis's own zero when it is on screen, and from the
-  // nearer edge when it is not — a bar starting off-canvas has no length the
-  // reader can measure.
-  const baseline = Math.min(
-    Math.max(y.at(0), plot.top),
-    plot.top + plot.height,
-  );
-
   return (
     <>
       {list.map((series) => {
-        // Position within the group by the series' place in the full list.
-        const rank = all.indexOf(series);
-        const offset = (rank - (all.length - 1) / 2) * share;
+        // Position within the group by the series' place in the full list,
+        // which is exactly what `index` records — no scan needed.
+        const offset = (series.index - (all.length - 1) / 2) * share;
         return (
           <g key={series.key} data-series={series.key}>
             {series.points.map((point, index) => {
@@ -131,9 +116,7 @@ export function BarSeries({
                       )}
                       style={{ fill: color }}
                     />
-                    {typeof children === 'function'
-                      ? children(datum, index)
-                      : children}
+                    {renderDatum(children, datum, index)}
                   </DatumContext.Provider>
                 </SeriesContext.Provider>
               );

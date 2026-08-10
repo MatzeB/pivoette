@@ -27,8 +27,7 @@ import {
 import type { ScaleStep } from '../format/ladders';
 import { Format, Render } from '../format/builtins';
 import { resolveFormat } from '../format/format';
-import { affixOf, attachUnit } from '../format/label';
-import type { UnitAffix } from '../format/label';
+import { affixOf, attacherFor } from '../format/label';
 import { resolveStyle } from '../format/style';
 import { resolveRender } from '../format/render';
 import { compileExpression, evalExpression } from '../format/expression';
@@ -962,14 +961,10 @@ function perValueFormat(
         scaledColumnFormat(leaf.column.def ?? {}, stepMeta, spec.locale),
         emptyDisplay,
       );
-      // Same attachment rules as the per-column path (`wrapFormat`): a leading
-      // label sits inside the sign, a tight one hugs the digits.
-      rung = {
-        fn,
-        attach: labels.full
-          ? wrapLabel(affixOf(labels))
-          : (text: string) => text,
-      };
+      // Specialised per rung, the way the per-column path specialises per
+      // column: `attacherFor` returns the identity for a rung with no label,
+      // so there is nothing to guard here.
+      rung = { fn, attach: attacherFor(affixOf(labels)) };
       rungs.set(step, rung);
     }
     return rung;
@@ -985,16 +980,6 @@ function perValueFormat(
     const { fn, attach } = rungFor(step);
     return attach(fn({ ...ctx, value: (n * stored) / step.magnitude }));
   };
-}
-
-/**
- * Attach a unit label to already-formatted text. The per-column path does this
- * by wrapping the formatter (`wrapFormat` in `DataTable`); a per-value scale
- * has a different label per cell, so it wraps the text instead. Both defer to
- * `attachUnit` for where the label goes.
- */
-function wrapLabel(affix: UnitAffix): (text: string) => string {
-  return (text) => attachUnit(text, affix);
 }
 
 /**

@@ -145,6 +145,23 @@ export function nearestIndex(xs: readonly number[], target: number): number {
   return target - xs[lo - 1]! <= xs[lo]! - target ? lo - 1 : lo;
 }
 
+/**
+ * The series a mark's `only` prop selects: all of them, one by position, or one
+ * by key. Shared so the two series components cannot drift — and so a caller
+ * can memoise it, which matters because the result feeds a geometry memo.
+ */
+export function selectSeries(
+  all: Series[],
+  only: string | number | undefined,
+): Series[] {
+  if (only === undefined) return all;
+  if (typeof only === 'number') {
+    const one = all[only];
+    return one ? [one] : [];
+  }
+  return all.filter((s) => s.key === only);
+}
+
 export function buildGraphData(
   frame: DataFrame,
   fields: GraphFields,
@@ -173,11 +190,12 @@ export function buildGraphData(
 
   // --- positions along x ----------------------------------------------------
 
-  const xRaw: CellValue[] = [];
+  // The column's own array: nothing below mutates it, so copying it per row
+  // only doubled the memory for the width of the frame.
+  const xRaw: readonly CellValue[] = xColumn.values;
   const xAt: (number | null)[] = [];
   for (let r = 0; r < frame.length; r++) {
-    const value = xColumn.values[r]!;
-    xRaw.push(value);
+    const value = xRaw[r]!;
     if (xKind === 'time') xAt.push(decodeTime(value, xColumn.meta));
     else if (xKind === 'linear') xAt.push(asNumber(value));
     else xAt.push(value === null || value === undefined ? null : 0);
@@ -188,16 +206,23 @@ export function buildGraphData(
   /** Position in `xs` for each source row; -1 for a row with no position. */
   const slotOf = new Array<number>(frame.length).fill(-1);
 
+  /** `String(x)` per row, kept from the first pass rather than recomputed. */
+  const xKeys: (string | null)[] = [];
+
   if (xKind === 'band') {
-    const seen = new Map<string, CellValue>();
+    const seen = new Set<string>();
     for (let r = 0; r < frame.length; r++) {
-      if (xAt[r] === null) continue;
+      if (xAt[r] === null) {
+        xKeys.push(null);
+        continue;
+      }
       const key = String(xRaw[r]);
-      if (!seen.has(key)) seen.set(key, xRaw[r]!);
+      xKeys.push(key);
+      seen.add(key);
     }
     // Sorted, not first-seen: these rows are aggregated, so row order is an
     // artefact of the source rather than anything the reader should see.
-    const keys = [...seen.keys()].sort((a, b) => compareValues(a, b));
+    const keys = [...seen].sort((a, b) => compareValues(a, b));
     const slot = new Map<string, number>();
     keys.forEach((key, i) => {
       categories.push(key);
@@ -205,8 +230,8 @@ export function buildGraphData(
       slot.set(key, i);
     });
     for (let r = 0; r < frame.length; r++) {
-      if (xAt[r] === null) continue;
-      slotOf[r] = slot.get(String(xRaw[r]))!;
+      const key = xKeys[r];
+      if (key !== null && key !== undefined) slotOf[r] = slot.get(key)!;
     }
   } else {
     const distinct = new Set<number>();
@@ -249,36 +274,44 @@ export function buildGraphData(
     return keys.length - 1;
   };
 
+  // Resolved once: the ladder pool below needs the same metadata, and looking
+  // each field up twice is a map lookup per column for nothing.
+  const yColumns = yFields.map((field) => requireColumn(frame, field));
+
   if (splitBySeries) {
-    const yColumn = requireColumn(frame, yFields[0]!);
+    const yColumn = yColumns[0]!;
     // Distinct series values, in the order a reader would expect them.
-    const members = new Map<string, CellValue>();
+    // Stringified once per row, not once per row twice.
+    const memberKeys: (string | null)[] = [];
+    const members = new Set<string>();
     for (let r = 0; r < frame.length; r++) {
-      if (slotOf[r]! < 0) continue;
-      const v = seriesColumn!.values[r]!;
-      const key = String(v);
-      if (!members.has(key)) members.set(key, v);
+      if (slotOf[r]! < 0) {
+        memberKeys.push(null);
+        continue;
+      }
+      const key = String(seriesColumn!.values[r]!);
+      memberKeys.push(key);
+      members.add(key);
     }
-    for (const key of [...members.keys()].sort((a, b) => compareValues(a, b))) {
+    for (const key of [...members].sort((a, b) => compareValues(a, b))) {
       openSeries(key, key, yColumn.meta);
     }
     for (let r = 0; r < frame.length; r++) {
       const slot = slotOf[r]!;
-      if (slot < 0) continue;
-      const s = indexOfKey.get(String(seriesColumn!.values[r]!))!;
-      buckets[s]![slot]!.push(yColumn.values[r]!);
+      const key = memberKeys[r];
+      if (slot < 0 || key === null || key === undefined) continue;
+      buckets[indexOfKey.get(key)!]![slot]!.push(yColumn.values[r]!);
     }
   } else {
-    const columns = yFields.map((field) => requireColumn(frame, field));
-    columns.forEach((column, i) => {
+    yColumns.forEach((column, i) => {
       openSeries(yFields[i]!, column.meta.displayName, column.meta);
     });
     for (let r = 0; r < frame.length; r++) {
       const slot = slotOf[r]!;
       if (slot < 0) continue;
-      columns.forEach((column, s) => {
-        buckets[s]![slot]!.push(column.values[r]!);
-      });
+      for (let s = 0; s < yColumns.length; s++) {
+        buckets[s]![slot]!.push(yColumns[s]!.values[r]!);
+      }
     }
   }
 
@@ -289,7 +322,7 @@ export function buildGraphData(
 
   // --- one ladder step for the whole value axis -----------------------------
 
-  const yMetas = yFields.map((f) => requireColumn(frame, f).meta);
+  const yMetas = yColumns.map((c) => c.meta);
   const first = yMetas[0]!;
   // They share an axis, so they share a unit — or none of them is rescaled.
   // Splitting the rung per series would put two different meanings of "1" on
@@ -297,14 +330,16 @@ export function buildGraphData(
   const uniform = yMetas.every(
     (m) => unitLabels(m).full === unitLabels(first).full,
   );
-  const pooled: CellValue[] = [];
-  for (const slots of reduced)
-    for (const v of slots) if (v !== null) pooled.push(v);
   // Chosen from the aggregated values, not the raw column: a sum over a
-  // thousand rows sits decades away from any single one of them.
-  const picked = uniform
-    ? chooseStep(pooled, first, opts?.ladder ?? defaultLadder(first))
-    : undefined;
+  // thousand rows sits decades away from any single one of them. Only
+  // collected when a rung can actually be taken — it is a full copy of them.
+  let picked: ReturnType<typeof chooseStep>;
+  if (uniform) {
+    const pooled: CellValue[] = [];
+    for (const slots of reduced)
+      for (const v of slots) if (v !== null) pooled.push(v);
+    picked = chooseStep(pooled, first, opts?.ladder ?? defaultLadder(first));
+  }
   const yFactor = picked?.factor ?? 1;
   const yMeta = picked ? metaForStep(first, picked.step) : first;
 
@@ -339,14 +374,19 @@ export function buildGraphData(
   const seriesEntries = arrange(
     keys.map((_k, slot) => ({ slot, total: totalOf(reduced[slot]!) })),
   );
-  const bandEntries = arrange(
-    xs.map((_x, slot) => ({
-      slot,
-      // A continuous axis is never re-ordered — its positions are numbers, not
-      // categories — so only a band needs a real total here.
-      total: xKind === 'band' ? totalOf(reduced.map((s) => s[slot]!)) : 0,
-    })),
-  );
+  // A continuous axis is never re-ordered — its positions are numbers, not
+  // categories — so it skips the entries, the totals, and the sort entirely
+  // rather than paying them to produce the identity permutation.
+  const bandEntries =
+    xKind === 'band'
+      ? arrange(
+          xs.map((_x, slot) => {
+            let total = 0;
+            for (const slots of reduced) total += asNumber(slots[slot]!) ?? 0;
+            return { slot, total };
+          }),
+        )
+      : xs.map((_x, slot) => ({ slot, total: 0 }));
 
   // --- assemble -------------------------------------------------------------
 

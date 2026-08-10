@@ -56,10 +56,32 @@ export function affixOf(labels: UnitLabels): UnitAffix {
  * become a lone unit.
  */
 export function attachUnit(text: string, affix: UnitAffix): string {
+  return attacherFor(affix)(text);
+}
+
+/**
+ * The same rule, specialised once for an affix that will not change.
+ *
+ * Every caller has a natural "once" moment — a column, a ladder rung, an axis —
+ * and then runs the result over every cell, tick, or label. Deciding the branch
+ * and building the gap there rather than per value matters more than it looks:
+ * the table's formatters run once per rendered cell *and* around two hundred
+ * times per column while measuring its width.
+ */
+export function attacherFor(affix: UnitAffix): (text: string) => string {
   const { scale, unit, prefix, tight } = affix;
-  if (!text || (!scale && !unit)) return text;
+  if (!scale && !unit) return (text) => text;
   const gap = tight ? '' : ' ';
-  if (!prefix) return text + gap + scale + unit;
-  const sign = text[0] === '-' || text[0] === '+' ? text[0] : '';
-  return sign + unit + gap + text.slice(sign.length) + scale;
+  if (!prefix) {
+    const suffix = gap + scale + unit;
+    return (text) => (text ? text + suffix : text);
+  }
+  const lead = unit + gap;
+  return (text) => {
+    if (!text) return text;
+    const signed = text[0] === '-' || text[0] === '+';
+    return signed
+      ? text[0] + lead + text.slice(1) + scale
+      : lead + text + scale;
+  };
 }

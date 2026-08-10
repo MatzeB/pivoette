@@ -59,16 +59,32 @@ export function Axis({ side, grid = false, label, ticks: count }: AxisProps) {
   // `unitPlacement` comes from the box, not from here: two axes and several
   // marks are describing one value scale, and they have to agree about which
   // of them says what it is measured in.
-  const { x, y, plot, data, locale, timeZone, unitPlacement, ticks } =
-    useGraph();
+  const {
+    x,
+    y,
+    plot,
+    data,
+    locale,
+    timeZone,
+    unitPlacement,
+    ticks,
+    formatValue,
+    xTicks,
+  } = useGraph();
   const vertical = side === 'left';
   const scale = vertical ? y : x;
   const meta = vertical ? data.yMeta : data.xMeta;
   const showTitle = label ?? vertical;
 
-  // Falls back to the box's own target rather than the scale's default, so
-  // `<GraphBox ticks={12}>` reaches the axis that draws them.
-  const set = useMemo(() => scale.ticks(count ?? ticks), [scale, count, ticks]);
+  // The x set is generated once on the geometry, because `Scrubber` reads the
+  // calendar interval off it too; only an axis asking for its own tick count
+  // regenerates. The box's target is the fallback, so `<GraphBox ticks={12}>`
+  // reaches the axis that draws them.
+  const set = useMemo(
+    () =>
+      !vertical && count === undefined ? xTicks : scale.ticks(count ?? ticks),
+    [vertical, scale, count, ticks, xTicks],
+  );
 
   const labels = useMemo(() => unitLabels(meta, locale), [meta, locale]);
 
@@ -98,7 +114,12 @@ export function Axis({ side, grid = false, label, ticks: count }: AxisProps) {
       return (_index: number, value: number) =>
         coarse.has(value) ? fmt.rollover(value) : fmt.label(value);
     }
-    // Numbers, through the same formatting pipeline a cell of this column uses.
+    // The value axis goes through the box's shared formatter, so the room the
+    // margin reserved for this text and the text itself cannot disagree. An x
+    // axis has its own metadata and formats itself.
+    if (vertical) {
+      return (_i: number, value: number) => formatValue(value, set.decimals);
+    }
     const format = tickFormatter(
       meta,
       data.frame,
@@ -118,6 +139,7 @@ export function Axis({ side, grid = false, label, ticks: count }: AxisProps) {
     timeZone,
     labels,
     unitPlacement,
+    formatValue,
   ]);
 
   // The title carries the unit only when it is the one saying it.
