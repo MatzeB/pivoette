@@ -67,8 +67,14 @@ export interface ContinuousScale extends ScaleBase {
 
 export interface BandScale extends ScaleBase {
   readonly kind: 'band';
-  /** Category labels, index-aligned with the numeric domain `0 … n-1`. */
-  readonly categories: readonly string[];
+  /**
+   * How many bands the range is divided into — the domain is `0 … count-1`.
+   *
+   * A count rather than the labels: a scale is domain-to-pixel geometry, and
+   * what each band is *called* is a fact about the data. `GraphData.categories`
+   * holds those, and every consumer reads them from there.
+   */
+  readonly count: number;
   /** Width of one band with the padding removed. Zero for a point scale. */
   bandwidth(): number;
   /** Centre-to-centre distance between bands. */
@@ -224,16 +230,16 @@ export function linearScale(opts: {
 }
 
 export function bandScale(opts: {
-  categories: readonly string[];
+  /** Number of bands to divide the range into. */
+  count: number;
   range: readonly [number, number];
   /** Fraction of each step left as air between bands. Default 0.2. */
   padding?: number;
   /** Zero-width bands centred on the step, for line and point marks. */
   point?: boolean;
 }): BandScale {
-  const categories = [...opts.categories];
   const [r0, r1] = opts.range;
-  const n = categories.length;
+  const n = Math.max(0, Math.floor(opts.count));
   const padding = opts.point ? 1 : (opts.padding ?? 0.2);
   const step = n === 0 ? 0 : (r1 - r0) / n;
   const inner = step * (1 - padding);
@@ -241,7 +247,7 @@ export function bandScale(opts: {
 
   const scale: BandScale = {
     kind: 'band',
-    categories,
+    count: n,
     range: [r0, r1],
     at: (value) => start(value) + inner / 2,
     // The half-step is the band's own centre offset: pixel r0 sits at the left
@@ -251,7 +257,7 @@ export function bandScale(opts: {
     step: () => step,
     start,
     ticks: () => ({
-      ticks: categories.map((_c, i) => ({
+      ticks: Array.from({ length: n }, (_v, i) => ({
         value: i,
         pos: start(i) + inner / 2,
       })),

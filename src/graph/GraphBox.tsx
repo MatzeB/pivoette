@@ -260,7 +260,7 @@ export function GraphBox({
       });
     } else if (graph.xKind === 'band') {
       xScale = bandScale({
-        categories: graph.categories,
+        count: graph.categories.length,
         range: xRange,
         padding: bandPadding,
       });

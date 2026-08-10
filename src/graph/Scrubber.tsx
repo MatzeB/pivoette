@@ -236,10 +236,7 @@ function ScrubHitArea() {
     const px = clientX - host.getBoundingClientRect().left + plot.left;
     const index =
       x.kind === 'band'
-        ? Math.min(
-            Math.max(Math.round(x.invert(px)), 0),
-            data.categories.length - 1,
-          )
+        ? Math.min(Math.max(Math.round(x.invert(px)), 0), data.xs.length - 1)
         : nearestIndex(data.xs, x.invert(px));
     if (index < 0) return;
     setHover((prev) => (prev && prev.index === index ? prev : { index, px }));
