@@ -124,10 +124,10 @@ describe('linearScale', () => {
 });
 
 describe('bandScale', () => {
-  const cats = ['a', 'b', 'c', 'd'];
+  const n = 4;
 
   it('divides the range evenly and leaves the padding as air', () => {
-    const b = bandScale({ categories: cats, range: [0, 400], padding: 0.2 });
+    const b = bandScale({ count: n, range: [0, 400], padding: 0.2 });
     expect(b.step()).toBe(100);
     expect(b.bandwidth()).toBe(80);
     expect(b.start(0)).toBe(10);
@@ -136,21 +136,21 @@ describe('bandScale', () => {
   });
 
   it('fills the step when there is no padding', () => {
-    const b = bandScale({ categories: cats, range: [0, 400], padding: 0 });
+    const b = bandScale({ count: n, range: [0, 400], padding: 0 });
     expect(b.bandwidth()).toBe(100);
     expect(b.start(0)).toBe(0);
     expect(b.at(0)).toBe(50);
   });
 
   it('collapses to centred points for a line mark', () => {
-    const b = bandScale({ categories: cats, range: [0, 400], point: true });
+    const b = bandScale({ count: n, range: [0, 400], point: true });
     expect(b.bandwidth()).toBe(0);
     expect(b.at(0)).toBe(50);
     expect(b.at(3)).toBe(350);
   });
 
   it('inverts to a fractional index that rounds to the right band', () => {
-    const b = bandScale({ categories: cats, range: [0, 400] });
+    const b = bandScale({ count: n, range: [0, 400] });
     expect(Math.round(b.invert(50))).toBe(0);
     expect(Math.round(b.invert(99))).toBe(0);
     expect(Math.round(b.invert(101))).toBe(1);
@@ -158,15 +158,15 @@ describe('bandScale', () => {
   });
 
   it('does not divide by zero when there is nothing to show', () => {
-    const b = bandScale({ categories: [], range: [0, 400] });
+    const b = bandScale({ count: 0, range: [0, 400] });
     expect(b.step()).toBe(0);
     expect(b.at(0)).toBe(0);
     expect(b.invert(200)).toBe(0);
     expect(b.ticks().ticks).toEqual([]);
   });
 
-  it('ticks once per category', () => {
-    const t = bandScale({ categories: cats, range: [0, 400] }).ticks();
+  it('ticks once per band', () => {
+    const t = bandScale({ count: n, range: [0, 400] }).ticks();
     expect(t.ticks.map((x) => x.value)).toEqual([0, 1, 2, 3]);
     expect(t.decimals).toBe(0);
   });
