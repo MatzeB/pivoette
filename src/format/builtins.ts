@@ -17,6 +17,8 @@ export const Format = {
   Weekday: 'weekday',
   /** 1..12 -> month name. */
   Month: 'month',
+  /** An instant -> its distance from now: `3 years ago`, `in 2 days`. */
+  RelativeTime: 'relativeTime',
 } as const;
 
 export const Style = {

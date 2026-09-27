@@ -1105,3 +1105,37 @@ describe('a computed member under a formatted level', () => {
     ).not.toThrow();
   });
 });
+
+describe('timestamp measures', () => {
+  const frame = fromRows([
+    { pkg: 'a', publishedAt: '2024-04-26T16:42:26Z' },
+    { pkg: 'a', publishedAt: '2026-09-09T17:21:30Z' },
+    { pkg: 'b', publishedAt: '2021-02-20T15:42:16Z' },
+  ]);
+  const view: ViewSpec = {
+    meta: { publishedAt: { kind: ['timestamp'], encoding: 'rfc3339' } },
+    pivotRows: [{ field: 'pkg' }],
+    columns: [
+      { id: 'newest', source: 'publishedAt', agg: 'max' },
+      { id: 'oldest', source: 'publishedAt', agg: 'min' },
+    ],
+    showSummary: true,
+  };
+
+  it('aggregates decoded instants rather than skipping the text', () => {
+    const res = computeView(frame, view);
+    expect(res.rows[0]!.cells.map((c) => c.value)).toEqual([
+      Date.parse('2026-09-09T17:21:30Z'),
+      Date.parse('2024-04-26T16:42:26Z'),
+    ]);
+    expect(res.summary!.map((c) => c.value)).toEqual([
+      Date.parse('2026-09-09T17:21:30Z'),
+      Date.parse('2021-02-20T15:42:16Z'),
+    ]);
+  });
+
+  it('leaves an undeclared date column as text', () => {
+    const res = computeView(frame, { ...view, meta: undefined });
+    expect(res.rows[0]!.cells[0]!.value).toBeNull();
+  });
+});

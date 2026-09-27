@@ -13,6 +13,7 @@ import {
 } from '../data/meta';
 import { requireColumn, withMeta } from '../data/frame';
 import { deriveColumns } from '../data/derive';
+import { decodeTime, isTimestamp } from '../data/temporal';
 import type { Align, FormatFn, ResolvedColumn } from '../format/context';
 import { columnFormat, scaledColumnFormat } from '../format/deduce';
 import {
@@ -89,6 +90,17 @@ function sourceField(def: ColumnDef): string | undefined {
  * even for a measure that also carries a `compute`. */
 function measureSource(measure: MeasureColumn): string {
   return measure.source ?? measure.id;
+}
+
+/**
+ * The values a measure aggregates. A timestamp column's are decoded to epoch
+ * millis first, so `min`/`max` compare instants rather than dropping RFC 3339
+ * text as non-numeric — the same decoding `derive` applies to its inputs.
+ */
+function measureValues(frame: DataFrame, measure: MeasureColumn): CellValue[] {
+  const col = requireColumn(frame, measureSource(measure));
+  if (!isTimestamp(col.meta)) return col.values;
+  return col.values.map((v) => decodeTime(v, col.meta));
 }
 
 /**
@@ -483,9 +495,7 @@ function computePivot(
     );
   }
 
-  const fieldValues = measures.map(
-    (m) => requireColumn(frame, measureSource(m)).values,
-  );
+  const fieldValues = measures.map((m) => measureValues(frame, m));
   const includeMeasure = measures.length > 1 || pivotColumns.length === 0;
 
   // Build base measure descriptors in colKey × measure order.
@@ -793,9 +803,7 @@ function pivotMeasuresOnRows(
   emptyDisplay: string,
 ): ViewResult {
   const { pivotRows, pivotColumns, measures } = norm;
-  const fieldValues = measures.map(
-    (m) => requireColumn(frame, measureSource(m)).values,
-  );
+  const fieldValues = measures.map((m) => measureValues(frame, m));
 
   const colKeyStrs = colKeys.map(keyOf);
   const colMember = pivotColumns.map((a) =>

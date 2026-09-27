@@ -6,7 +6,7 @@
 import type { CellCtx, FormatFn } from './context';
 import type { FormatSpec } from '../pivot/spec';
 import { Format } from './builtins';
-import { ordinalToIsoDay } from '../data/temporal';
+import { ordinalToIsoDay, parseTime } from '../data/temporal';
 import { evalCell } from './expression';
 import { asNumber } from '../util';
 
@@ -129,6 +129,58 @@ registry.set('month', (options) => {
     const n = asNumber(ctx.value);
     if (n === null || n < 1 || n > 12) return String(ctx.value);
     return fmt.format(REF_MONTH(n));
+  };
+});
+
+// --- relative time ----------------------------------------------------------
+
+const SECOND = 1000;
+const DAY = 86_400 * SECOND;
+const YEAR = 365.2425 * DAY;
+
+/** Largest first, so the first unit a span reaches is the one it is told in. */
+const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+  ['year', YEAR],
+  ['month', YEAR / 12],
+  ['day', DAY],
+  ['hour', 3600 * SECOND],
+  ['minute', 60 * SECOND],
+  ['second', SECOND],
+];
+
+/**
+ * An instant as its distance from now: `3 years ago`, `18 days ago`, `in 2
+ * hours`. Takes epoch millis or anything `parseTime` reads, so it formats a
+ * raw RFC 3339 column and an aggregated (decoded) one alike.
+ *
+ * The span is told in the largest unit it reaches, rounded. When rounding
+ * reaches the next unit up it is told in that one, so 11.8 months reads
+ * `1 year ago` rather than `12 months ago`.
+ *
+ * Options: `locale`, `style` (`long` | `short` | `narrow`), `numeric`
+ * (`always`, the default, or `auto` for `yesterday` / `last year`), and `now`
+ * to pin the reference instant.
+ */
+registry.set('relativeTime', (options) => {
+  const rtf = new Intl.RelativeTimeFormat(opt<string>(options, 'locale'), {
+    style: opt<Intl.RelativeTimeFormatStyle>(options, 'style') ?? 'long',
+    numeric:
+      opt<Intl.RelativeTimeFormatNumeric>(options, 'numeric') ?? 'always',
+  });
+  const pinned = parseTime(options.now);
+  return (ctx) => {
+    const t = parseTime(ctx.value);
+    if (t === null) return String(ctx.value);
+    const diff = t - (pinned ?? Date.now());
+    const abs = Math.abs(diff);
+    let i = RELATIVE_UNITS.findIndex(([, size]) => abs >= size);
+    if (i === -1) i = RELATIVE_UNITS.length - 1;
+    let n = Math.round(abs / RELATIVE_UNITS[i]![1]);
+    if (i > 0 && n * RELATIVE_UNITS[i]![1] >= RELATIVE_UNITS[i - 1]![1]) {
+      i -= 1;
+      n = Math.round(abs / RELATIVE_UNITS[i]![1]);
+    }
+    return rtf.format(diff < 0 ? -n : n, RELATIVE_UNITS[i]![0]);
   };
 });
 

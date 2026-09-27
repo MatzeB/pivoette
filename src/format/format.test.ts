@@ -167,3 +167,42 @@ describe('resolveFormat with an options-only spec', () => {
     expect(fn({ value: 1.5 } as unknown as CellCtx)).toBe('1.50');
   });
 });
+
+describe('relativeTime', () => {
+  const now = '2026-09-27T12:00:00Z';
+  const rel = (value: unknown, options: Record<string, unknown> = {}) =>
+    fmt(
+      { fnName: 'relativeTime', options: { locale: 'en-US', now, ...options } },
+      value,
+    );
+
+  it('tells a span in the largest unit it reaches', () => {
+    expect(rel('2026-09-09T12:00:00Z')).toBe('18 days ago');
+    expect(rel('2026-04-01T12:00:00Z')).toBe('6 months ago');
+    expect(rel('2021-02-20T12:00:00Z')).toBe('6 years ago');
+    expect(rel('2026-09-27T09:00:00Z')).toBe('3 hours ago');
+    expect(rel('2026-09-27T11:59:30Z')).toBe('30 seconds ago');
+  });
+
+  it('moves up a unit when rounding reaches it', () => {
+    // 362 days is 11.9 months, which rounds to 12: say a year instead.
+    expect(rel('2025-09-30T12:00:00Z')).toBe('1 year ago');
+    // 23.6 hours rounds to 24.
+    expect(rel('2026-09-26T12:25:00Z')).toBe('1 day ago');
+  });
+
+  it('reads epoch millis and future instants', () => {
+    expect(rel(Date.parse('2026-09-30T12:00:00Z'))).toBe('in 3 days');
+  });
+
+  it('passes Intl options through', () => {
+    expect(rel('2026-09-26T12:00:00Z', { numeric: 'auto' })).toBe('yesterday');
+    expect(rel('2023-09-27T12:00:00Z', { locale: 'de-DE' })).toBe(
+      'vor 3 Jahren',
+    );
+  });
+
+  it('leaves what is not an instant as text', () => {
+    expect(rel('soon')).toBe('soon');
+  });
+});
