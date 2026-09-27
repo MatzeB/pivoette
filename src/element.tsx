@@ -169,6 +169,28 @@ export class PivoetteTableElement extends HTMLElement {
     this.#changed();
   }
 
+  /** True once the view or display differs from the bundle's. */
+  get edited(): boolean {
+    const loaded = this.#loaded;
+    return (
+      !!loaded &&
+      (loaded.view !== loaded.bundle.view ||
+        loaded.display !== loaded.bundle.display)
+    );
+  }
+
+  /** Back to the view and display the bundle was loaded with. */
+  reset() {
+    const loaded = this.#loaded;
+    if (!loaded || !this.edited) return;
+    this.#loaded = {
+      ...loaded,
+      view: loaded.bundle.view,
+      display: loaded.bundle.display,
+    };
+    this.#changed();
+  }
+
   /** The bundle with the edits folded in — what a host would save. */
   get bundle(): PivoetteBundle | undefined {
     if (!this.#loaded) return undefined;
@@ -281,7 +303,8 @@ export class PivoetteTableElement extends HTMLElement {
 
 /**
  * `<pivoette-editor for="table-id">`: the field lists of a table's view, to
- * reorder, remove, or re-aggregate.
+ * reorder, remove, or re-aggregate, and a Reset button to undo all of it.
+ * `no-reset` hides the button.
  *
  * It holds no view of its own. It reads the table's, writes edits back
  * through the table's `view` / `display` setters, and redraws on the table's
@@ -292,7 +315,7 @@ export class PivoetteTableElement extends HTMLElement {
  * and may arrive later than the editor does.
  */
 export class PivoetteEditorElement extends HTMLElement {
-  static observedAttributes = ['for', 'theme'];
+  static observedAttributes = ['for', 'theme', 'no-reset'];
 
   #root?: Root;
   #table?: PivoetteTableElement;
@@ -378,6 +401,10 @@ export class PivoetteEditorElement extends HTMLElement {
         theme={themeOf(this.getAttribute('theme')) ?? table.theme}
         onViewChange={(next) => (table.view = next)}
         onDisplayChange={(next) => (table.display = next)}
+        onReset={
+          this.hasAttribute('no-reset') ? undefined : () => table.reset()
+        }
+        canReset={table.edited}
       />,
     );
   }

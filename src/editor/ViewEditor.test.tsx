@@ -207,3 +207,37 @@ describe('<ViewEditor> reaching every position in a list', () => {
     expect(next!.pivotRows!.map((a) => a.field)).toEqual(['project', 'team']);
   });
 });
+
+describe('reset', () => {
+  async function mountWith(props: {
+    onReset?: () => void;
+    canReset?: boolean;
+  }) {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    await act(async () => {
+      createRoot(container!).render(
+        <ViewEditor view={view} onViewChange={() => {}} {...props} />,
+      );
+    });
+    return [...container.querySelectorAll('button')].find(
+      (b) => b.textContent === 'Reset',
+    );
+  }
+
+  it('offers no reset unless the host can do one', async () => {
+    expect(await mountWith({})).toBeUndefined();
+  });
+
+  it('calls the host, and is disabled with nothing to reset', async () => {
+    let resets = 0;
+    const button = (await mountWith({ onReset: () => resets++ }))!;
+    expect(button.disabled).toBe(false);
+    await act(async () => button.click());
+    expect(resets).toBe(1);
+
+    container!.remove();
+    const idle = (await mountWith({ onReset: () => {}, canReset: false }))!;
+    expect(idle.disabled).toBe(true);
+  });
+});

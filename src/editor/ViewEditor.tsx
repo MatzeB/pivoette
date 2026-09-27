@@ -35,6 +35,35 @@ export interface ViewEditorProps {
    */
   theme?: 'auto' | 'light' | 'dark';
   className?: string;
+  /**
+   * Show a Reset button, which calls this. The panel does not know what the
+   * view started as — the host does, so the host restores it.
+   */
+  onReset?: () => void;
+  /** Whether there is anything to reset; the button is disabled if not. */
+  canReset?: boolean;
+}
+
+function ResetButton({
+  onReset,
+  enabled,
+}: {
+  onReset: () => void;
+  enabled: boolean;
+}) {
+  return (
+    <div className={styles.actions}>
+      <button
+        type="button"
+        className={styles.reset}
+        disabled={!enabled}
+        title="Restore the view as it was loaded"
+        onClick={onReset}
+      >
+        Reset
+      </button>
+    </div>
+  );
 }
 
 function Row({
@@ -120,6 +149,8 @@ export function ViewEditor({
   frame,
   theme = 'auto',
   className,
+  onReset,
+  canReset = true,
 }: ViewEditorProps) {
   const dragged = useRef<DragRef | null>(null);
   const [over, setOver] = useState<DragRef | null>(null);
@@ -140,6 +171,7 @@ export function ViewEditor({
         <p className={styles.note}>
           A flat table has no axes to pivot; editing is limited to pivot views.
         </p>
+        {onReset && <ResetButton onReset={onReset} enabled={canReset} />}
       </div>
     );
   }
@@ -294,6 +326,7 @@ export function ViewEditor({
           ))}
         </Section>
       )}
+      {onReset && <ResetButton onReset={onReset} enabled={canReset} />}
     </div>
   );
 }

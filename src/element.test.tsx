@@ -197,4 +197,29 @@ describe('editing', () => {
     await unmount(el);
     box.remove();
   });
+
+  it('resets to the bundle from the editor, and can hide the button', async () => {
+    const { table, editor } = await mountPair();
+    const reset = () =>
+      [...editor.shadowRoot!.querySelectorAll('button')].find(
+        (b) => b.textContent === 'Reset',
+      );
+    expect(reset()!.disabled).toBe(true);
+
+    await act(async () => {
+      table.view = { ...table.view!, pivotColumns: [] };
+    });
+    expect(table.edited).toBe(true);
+    expect(reset()!.disabled).toBe(false);
+
+    await act(async () => reset()!.click());
+    expect(table.view).toEqual(good.view);
+    expect(table.edited).toBe(false);
+    expect(reset()!.disabled).toBe(true);
+
+    await act(async () => editor.setAttribute('no-reset', ''));
+    expect(reset()).toBeUndefined();
+    await unmount(editor);
+    await unmount(table);
+  });
 });

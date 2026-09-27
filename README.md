@@ -411,7 +411,8 @@ view, so edits made in either place show up in both:
 
 Every edit fires `pivoette-change`, and `table.bundle` is the original bundle
 with the edits folded in. `table.view` and `table.display` can also be set
-from script. [Try it live](https://matzeb.github.io/pivoette/demo/element.html).
+from script. The editor's Reset button, or `table.reset()`, returns to the
+bundle as loaded; add `no-reset` to the editor to hide the button. [Try it live](https://matzeb.github.io/pivoette/demo/element.html).
 
 ## Examples
 
