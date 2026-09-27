@@ -11,6 +11,7 @@ import { fromRows } from './data/import';
 import { parseCsv } from './data/csv';
 import type { CsvOptions } from './data/csv';
 import { mergeMeta, normalizeMeta, storedMagnitude } from './data/meta';
+import { isTimestamp } from './data/temporal';
 import type { ColumnMetaInput } from './data/meta';
 import type { DataFrame } from './data/types';
 import { hasLadder, ladderIds } from './format/ladders';
@@ -18,6 +19,19 @@ import { aggregationIds } from './pivot/aggregations';
 import { autoScaleOf, isFlat } from './pivot/spec';
 import type { AutoScaleSpec, ColumnDef, ViewSpec } from './pivot/spec';
 import type { DataTableDisplay } from './components/DataTable';
+
+/** Aggregations that mean something over points in time. */
+const INSTANT_AGGS = new Set([
+  'min',
+  'max',
+  'first',
+  'last',
+  'mean',
+  'median',
+  'p25',
+  'p50',
+  'p75',
+]);
 
 /** Exactly one of `rows`, `csv`, or `url`. */
 export interface BundleData {
@@ -287,7 +301,19 @@ export function validateBundle(
       const column = source ? frame?.columnByName.get(source) : undefined;
       // A non-numeric column can still be counted, just not summed.
       const counts = def.agg === 'count' || def.agg === 'countDistinct';
-      if (
+      // A declared timestamp aggregates as instants (see `measureValues`):
+      // the latest or middle one means something, their sum does not.
+      const instants =
+        source !== undefined &&
+        (isTimestamp(column?.meta) ||
+          [view.meta?.[source]?.kind].flat().includes('timestamp'));
+      if (instants) {
+        if (!counts && !INSTANT_AGGS.has(def.agg)) {
+          add(
+            `${at}: "${source}" holds timestamps; ${def.agg} does not apply to them. Use one of: ${[...INSTANT_AGGS].join(', ')}`,
+          );
+        }
+      } else if (
         column &&
         !counts &&
         column.type !== 'int' &&

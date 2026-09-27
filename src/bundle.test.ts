@@ -129,6 +129,31 @@ describe('validation', () => {
     ).toBe(true);
   });
 
+  it('aggregates a declared timestamp by time, not by sum', () => {
+    const releases = [
+      { pkg: 'a', published: '2024-04-26T16:42:26Z' },
+      { pkg: 'a', published: '2026-09-09T17:21:30Z' },
+    ];
+    const check = (agg: string, where: 'data' | 'view') => {
+      const meta = {
+        published: { kind: ['timestamp'], encoding: 'rfc3339' as const },
+      };
+      const v: ViewSpec = {
+        ...(where === 'view' ? { meta } : {}),
+        pivotRows: [{ field: 'pkg' }],
+        columns: [{ id: 't', source: 'published', agg }],
+      };
+      const f = fromRows(releases, where === 'data' ? meta : undefined);
+      return validateBundle({ data: { rows: releases }, view: v }, f).problems;
+    };
+    // Declared in the data's metadata or in the view's, it's the same column.
+    expect(check('max', 'data')).toEqual([]);
+    expect(check('min', 'view')).toEqual([]);
+    expect(check('sum', 'data')).toEqual([
+      'view.columns[0]: "published" holds timestamps; sum does not apply to them. Use one of: min, max, first, last, mean, median, p25, p50, p75',
+    ]);
+  });
+
   it('rejects pivot-only options on a flat view', () => {
     const { problems } = validateBundle(
       {
