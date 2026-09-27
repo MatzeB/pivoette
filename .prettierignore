@@ -1,4 +1,6 @@
 dist
+dist-demo
+dist-element
 pnpm-lock.yaml
 demo/examples/**/data.json
 demo/examples/**/stress.json

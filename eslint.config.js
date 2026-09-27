@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'demo/examples/**/data.json', 'demo/examples/**/*.json'],
+    ignores: ['dist', 'dist-demo', 'dist-element', 'demo/examples/**/data.json', 'demo/examples/**/*.json'],
   },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],

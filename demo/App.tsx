@@ -488,7 +488,8 @@ export function App() {
 
   useEffect(() => {
     if (stress && isRegression && !stressData) {
-      fetch('/demo/examples/regression/stress.json')
+      // Relative, so it resolves under the subpath GitHub Pages serves from.
+      fetch('demo/examples/regression/stress.json')
         .then((r) => (r.ok ? r.json() : null))
         .then((d) => setStressData(d))
         .catch(() => setStressData(null));

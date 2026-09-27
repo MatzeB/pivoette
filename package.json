@@ -29,7 +29,9 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build:element": "vite build --config vite.element.config.ts"
+    "build:element": "vite build --config vite.element.config.ts",
+    "build:demo": "vite build --config vite.demo.config.ts",
+    "build:pages": "vite build --config vite.demo.config.ts && vite build --config vite.element.config.ts && cp dist-element/pivoette-element.js dist-demo/ && python3 demo/examples/regression/generate.py --stress && mkdir -p dist-demo/demo/examples/regression && cp demo/examples/regression/stress.json dist-demo/demo/examples/regression/"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
