@@ -164,7 +164,7 @@ export type {
   ViewSpec,
 } from './pivot/spec';
 
-// Bundles — data + metadata + view as one JSON document (see agent_usage.md)
+// Bundles — data + metadata + view as one JSON document
 export { describeFrame, loadBundle, loadRows, validateBundle } from './bundle';
 export type { BundleData, ColumnSummary, PivoetteBundle } from './bundle';
 
