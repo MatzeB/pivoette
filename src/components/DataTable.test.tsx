@@ -837,6 +837,7 @@ describe('<DataTable> measure drag', () => {
       effectAllowed: '',
       setData: () => {},
       getData: () => '',
+      setDragImage: () => {},
     };
     const fire = (el: HTMLElement, type: string) => {
       const e = new Event(type, { bubbles: true, cancelable: true });
@@ -968,6 +969,7 @@ describe('<DataTable> column level drag', () => {
       effectAllowed: '',
       setData: () => {},
       getData: () => '',
+      setDragImage: () => {},
     };
     const fire = (el: HTMLElement, type: string) => {
       const e = new Event(type, { bubbles: true, cancelable: true });
@@ -1048,7 +1050,12 @@ describe('<DataTable> computed columns and footer order', () => {
   function fire(el: HTMLElement, type: string) {
     const e = new Event(type, { bubbles: true, cancelable: true });
     Object.defineProperty(e, 'dataTransfer', {
-      value: { effectAllowed: '', setData: () => {}, getData: () => '' },
+      value: {
+        effectAllowed: '',
+        setData: () => {},
+        getData: () => '',
+        setDragImage: () => {},
+      },
     });
     el.dispatchEvent(e);
   }
