@@ -14,43 +14,81 @@ edited interactively, or written by an LLM.
 pnpm add pivoette react react-dom
 ```
 
+Weekly npm downloads of the three most-downloaded versions of three popular
+packages, one row per version:
+
 ```tsx
-import { DataTable } from 'pivoette';
+import { DataTable, Format, fromCsv } from 'pivoette';
+import type { ViewSpec } from 'pivoette';
 import 'pivoette/style.css';
 
-const rows = [
-  { region: 'EU', quarter: 'Q1', revenue: 120 },
-  { region: 'EU', quarter: 'Q2', revenue: 150 },
-  { region: 'US', quarter: 'Q1', revenue: 340 },
-  { region: 'US', quarter: 'Q2', revenue: 310 },
-];
+const data = fromCsv(`package,version,published,downloads
+react,18.3.1,2024-04-26T16:42:26Z,42823626
+react,19.2.8,2026-07-21T15:41:28Z,38791051
+react,19.3.0,2026-09-09T17:21:30Z,28629967
+typescript,5.9.3,2025-09-30T21:19:38Z,138334912
+typescript,6.0.3,2026-04-16T23:38:27Z,53278987
+typescript,7.0.2,2026-07-08T15:55:18Z,38442800
+lodash,4.18.1,2026-04-01T21:01:20Z,117478934
+lodash,4.17.21,2021-02-20T15:42:16Z,47190812
+lodash,4.17.23,2026-01-21T17:29:52Z,16836258
+`);
 
-export function Revenue() {
-  return (
-    <DataTable
-      data={rows}
-      height={400}
-      view={{
-        pivotRows: [{ field: 'region' }],
-        pivotColumns: [{ field: 'quarter' }],
-        columns: [{ id: 'rev', source: 'revenue', agg: 'sum' }],
-      }}
-    />
-  );
+const view: ViewSpec = {
+  // Say what the columns are; formats and aggregation follow from it.
+  meta: {
+    published: { kind: ['timestamp'], encoding: 'rfc3339' },
+    downloads: { kind: ['count'] },
+  },
+  pivotRows: [{ field: 'package', label: 'Package', sort: 'asc' }],
+  columns: [
+    { id: 'downloads', label: 'Weekly downloads', agg: 'sum' },
+    {
+      id: 'newest',
+      label: 'Newest release',
+      source: 'published',
+      agg: 'max',
+      format: { fnName: Format.RelativeTime },
+    },
+    {
+      id: 'oldest',
+      label: 'Oldest release',
+      source: 'published',
+      agg: 'min',
+      format: { fnName: Format.RelativeTime },
+    },
+  ],
+  showSummary: true,
+};
+
+export function Downloads() {
+  return <DataTable data={data} view={view} height={240} />;
 }
 ```
 
-|        | Q1  | Q2  |
-| ------ | --- | --- |
-| **EU** | 120 | 150 |
-| **US** | 340 | 310 |
+Rendered on 2026-09-27:
 
-`pivotRows` and `pivotColumns` name the fields to group by, and `columns` is
-what gets displayed. Everything else is refinement.
+| Package    | Weekly downloads | Newest release | Oldest release |
+| ---------- | ---------------: | -------------- | -------------- |
+| lodash     |      181,506,004 | 6 months ago   | 6 years ago    |
+| react      |      110,244,644 | 18 days ago    | 2 years ago    |
+| typescript |      230,056,699 | 3 months ago   | 1 year ago     |
+| **Total**  |  **521,807,347** | 18 days ago    | 6 years ago    |
+
+A few things happen without being spelled out:
+
+- **Grouping.** `pivotRows` groups the versions by package, and every column
+  with an `agg` is aggregated over each group. The total row is computed
+  from the source rows, not by adding up the displayed cells.
+- **Dates.** Because `published` is declared a timestamp, `max` and `min`
+  compare instants rather than text, and `relativeTime` shows them as
+  "18 days ago".
+- **Numbers.** `kind: ['count']` makes the downloads an integer with the
+  reader's digit grouping. Click a header to sort by it.
 
 ## Features
 
-### Pivot and flat tables
+### Pivot rows and columns
 
 Both kinds of table share a single vocabulary. `columns` always lists the
 displayed columns, and a view is a pivot exactly when it groups (declares
@@ -126,6 +164,9 @@ meta: {
   `Intl.NumberFormat` options on top of the deduced format.
 - **Converting values.** `factor` converts stored values to displayed ones,
   and sorting and totals use the converted values too.
+- **Dates and times.** Columns declared as timestamps aggregate as instants,
+  so `min` and `max` give the earliest and latest. `relativeTime` shows an
+  instant as "3 months ago" or "in 2 days".
 
 **Automatic scaling.** With `autoScale: true`, the data picks the magnitude, so
 a column stored in nanoseconds shows as `4.34 µs` without the spec saying so.
@@ -196,13 +237,6 @@ expression string. Every hook receives the same cell context: value, inputs,
 row and column path, and the source frame. Register your own with
 `registerFormat`, `registerStyle` and `registerRender`.
 
-### Presentation
-
-`display` options change how the table looks without changing its data: zebra
-striping, a frameless look, spacing between column and row groups, tinted
-index columns, click-to-sort headers, header highlighting on hover, and
-light, dark or automatic theming.
-
 ### Interactive editing
 
 Pass `editing` and own the view in state, and users can build the table in
@@ -219,7 +253,25 @@ items can be reordered, removed, or given a different aggregation. The same
 operations (`addField`, `moveField`, `setColumnAgg`, …) are exported as
 pure functions over a `ViewSpec`.
 
-### Charts
+### Presentation
+
+`display` options change how the table looks without changing its data: zebra
+striping, a frameless look, spacing between column and row groups, tinted
+index columns, click-to-sort headers, header highlighting on hover, and
+light, dark or automatic theming.
+
+### Framework-agnostic engine
+
+The data model and pivot engine (`fromRows`, `fromCsv`, `computeView`,
+`loadBundle`, …) don't depend on React, so they can be used on their own. For
+example, you can compute a pivot on a server or in a worker.
+
+> [!WARNING]
+> `compute`, `expression` and inline expression hooks are JavaScript evaluated
+> with `new Function`. Only render view specs from sources you trust, or
+> render them in a sandboxed iframe on a separate origin.
+
+## Charts
 
 Charts are built by nesting components rather than through a config object.
 `GraphBox` works out the scales from the field names, and every mark inside it
@@ -246,7 +298,7 @@ without extra configuration.
 `BarSeries`, `Scrubber` (a hover readout), point marks and labels are
 included too. Custom marks can read `useGraph()` and `useDatum()`.
 
-### Web component
+## Web component
 
 For pages that don't use React, `pnpm build:element` produces
 `dist-element/pivoette-element.js`. It's a single self-contained file that
@@ -261,17 +313,6 @@ The element takes a **bundle**: one JSON document holding the data, the
 column metadata and the view. It renders inside a shadow root, so page CSS and
 table CSS stay separate. `validateBundle` reports every problem in a bundle at
 once instead of rendering a blank box.
-
-### Framework-agnostic engine
-
-The data model and pivot engine (`fromRows`, `fromCsv`, `computeView`,
-`loadBundle`, …) don't depend on React, so they can be used on their own. For
-example, you can compute a pivot on a server or in a worker.
-
-> [!WARNING]
-> `compute`, `expression` and inline expression hooks are JavaScript evaluated
-> with `new Function`. Only render view specs from sources you trust, or
-> render them in a sandboxed iframe on a separate origin.
 
 ## Examples
 
