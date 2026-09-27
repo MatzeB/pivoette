@@ -8,6 +8,9 @@ format and style it. Pivoette computes the pivot client-side and renders it as
 a virtualized table. Because the view is plain data, it can be saved, diffed,
 edited interactively, or written by an LLM.
 
+**[Live demo](https://matzeb.github.io/pivoette/)**: worked examples of flat
+tables, pivots, units, dates and charts, each shown next to its source.
+
 ## Getting started
 
 ```sh
