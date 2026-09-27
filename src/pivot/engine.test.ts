@@ -1139,3 +1139,46 @@ describe('timestamp measures', () => {
     expect(res.rows[0]!.cells[0]!.value).toBeNull();
   });
 });
+
+describe('measure headers', () => {
+  const frame = fromRows([
+    { pkg: 'a', dl: 3 },
+    { pkg: 'b', dl: 5 },
+  ]);
+  const labels = (view: ViewSpec) =>
+    computeView(frame, view).leaves.map((l) => l.column.label);
+
+  it("names a measure by its field's display name, as a flat column is", () => {
+    const meta = { dl: { displayName: 'Downloads' } };
+    expect(
+      labels({
+        meta,
+        pivotRows: [{ field: 'pkg' }],
+        columns: [{ id: 'total', source: 'dl', agg: 'sum' }],
+      }),
+    ).toEqual(['Downloads']);
+    expect(labels({ meta, columns: [{ id: 'dl' }] })).toEqual(['Downloads']);
+  });
+
+  it('keeps the ids of measures that share a field', () => {
+    expect(
+      labels({
+        meta: { dl: { displayName: 'Downloads' } },
+        pivotRows: [{ field: 'pkg' }],
+        columns: [
+          { id: 'mean', source: 'dl', agg: 'mean' },
+          { id: 'max', source: 'dl', agg: 'max', label: 'Peak' },
+        ],
+      }),
+    ).toEqual(['mean', 'Peak']);
+  });
+});
+
+describe('factor', () => {
+  it('adds no floating-point noise of its own', () => {
+    const res = computeView(fromRows([{ dl: 38791051 }]), {
+      columns: [{ id: 'dl', factor: 1e-6 }],
+    });
+    expect(res.rows[0]!.cells[0]!.value).toBe(38.791051);
+  });
+});

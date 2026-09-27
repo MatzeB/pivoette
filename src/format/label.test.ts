@@ -66,7 +66,14 @@ describe('affixOf', () => {
       unit: 'm',
       prefix: false,
       tight: false,
+      spaced: false,
     });
+  });
+
+  it('keeps a spaced scale apart from its unit on the value', () => {
+    expect(attachUnit('42.8', affix({ unit: 'download', scale: 'mega' }))).toBe(
+      '42.8 M download',
+    );
   });
 
   it('keeps a compound label whole, since it has no separable halves', () => {

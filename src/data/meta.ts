@@ -371,6 +371,12 @@ export interface UnitLabels {
   /** True when the label hugs the number ($12.50, 45.6%) rather than standing
    * off it (15467 MB). */
   tight: boolean;
+  /**
+   * True when the scale and unit halves are written apart: `M download`. A
+   * symbol takes its scale directly (`MB`, `ktok`), but a unit with no short
+   * form is shown as its name, and `Mdownload` reads as one misspelt word.
+   */
+  spaced: boolean;
 }
 
 interface Factor {
@@ -378,6 +384,8 @@ interface Factor {
   unit: string;
   inverted: boolean;
   exponent: number;
+  /** Scale and unit are written apart: see `UnitLabels.spaced`. */
+  spaced: boolean;
 }
 
 const SUPERSCRIPTS = '⁰¹²³⁴⁵⁶⁷⁸⁹';
@@ -396,6 +404,7 @@ function superscript(n: number): string {
 function factorsOf(
   units: (string | null)[] | undefined,
   scales: (string | null)[] | undefined,
+  longUnits?: (string | null)[],
 ): Factor[] {
   const count = Math.max(units?.length ?? 0, scales?.length ?? 0);
   const byKey = new Map<string, Factor>();
@@ -416,6 +425,11 @@ function factorsOf(
       unit: u.base,
       inverted,
       exponent: 1,
+      // A unit shown under its own long name is a word, not a symbol.
+      spaced:
+        !!s.base &&
+        !!u.base &&
+        splitInverse(longUnits?.[i] ?? '').base === u.base,
     };
     byKey.set(key, factor);
     out.push(factor);
@@ -426,7 +440,10 @@ function factorsOf(
 /** Render merged factors as `num/den`, with superscripts for powers. */
 function compose(factors: Factor[]): string {
   const term = (f: Factor) =>
-    f.scale + f.unit + (f.exponent > 1 ? superscript(f.exponent) : '');
+    f.scale +
+    (f.spaced ? ' ' : '') +
+    f.unit +
+    (f.exponent > 1 ? superscript(f.exponent) : '');
   const num = factors
     .filter((f) => !f.inverted)
     .map(term)
@@ -446,6 +463,7 @@ const EMPTY_LABELS: UnitLabels = {
   unitPart: '',
   prefix: false,
   tight: false,
+  spaced: false,
 };
 
 const labelCache = new Map<string, WeakMap<ColumnMeta, UnitLabels>>();
@@ -465,7 +483,7 @@ export function unitLabels(
   const cached = perLocale.get(meta);
   if (cached) return cached;
 
-  const factors = factorsOf(meta.unitShort, meta.scaleShort);
+  const factors = factorsOf(meta.unitShort, meta.scaleShort, meta.unit);
   const only = factors.length === 1 ? factors[0]! : undefined;
   const simple = !!only && !only.inverted && only.exponent === 1;
   // A currency's placement comes from the locale; otherwise the symbol itself
@@ -486,6 +504,8 @@ export function unitLabels(
       : only.unit
     : '';
   const scalePart = simple ? only.scale : '';
+  // A currency is written by its symbol, which takes the scale directly.
+  const spaced = simple && only.spaced && !currency;
 
   // A leading symbol keeps the scale on the far side of the digits — `$300k`,
   // not `k$300` — so the composed label has to agree: `$k`, so that a header
@@ -494,7 +514,7 @@ export function unitLabels(
     ? compose(factors)
     : prefix
       ? unitPart + scalePart
-      : scalePart + unitPart;
+      : scalePart + (spaced ? ' ' : '') + unitPart;
 
   const labels: UnitLabels = {
     full,
@@ -503,6 +523,7 @@ export function unitLabels(
     unitPart,
     prefix,
     tight: prefix || (simple && SYMBOL_TIGHT.has(full)),
+    spaced,
   };
   perLocale.set(meta, labels);
   return labels;

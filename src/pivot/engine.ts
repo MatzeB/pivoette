@@ -97,6 +97,30 @@ function measureSource(measure: MeasureColumn): string {
  * millis first, so `min`/`max` compare instants rather than dropping RFC 3339
  * text as non-numeric — the same decoding `derive` applies to its inputs.
  */
+/**
+ * Header text for each measure, by id. An explicit `label` wins. Otherwise a
+ * measure that is the only one reading its field is named by the field's
+ * display name, as a flat column is; measures sharing a field (its mean and
+ * its max) keep their ids, since the field's name would label them all alike.
+ */
+function measureLabels(
+  frame: DataFrame,
+  measures: MeasureColumn[],
+): Map<string, string> {
+  const readers = new Map<string, number>();
+  for (const m of measures) {
+    const src = measureSource(m);
+    readers.set(src, (readers.get(src) ?? 0) + 1);
+  }
+  return new Map(
+    measures.map((m) => {
+      const src = measureSource(m);
+      const own = readers.get(src)! > 1 ? undefined : columnMeta(frame, m, src);
+      return [m.id, m.label ?? own?.displayName ?? m.id];
+    }),
+  );
+}
+
 function measureValues(frame: DataFrame, measure: MeasureColumn): CellValue[] {
   const col = requireColumn(frame, measureSource(measure));
   if (!isTimestamp(col.meta)) return col.values;
@@ -368,11 +392,19 @@ function sortTuples(keys: CellValue[][], fields: AxisField[]): CellValue[][] {
  * Convert a stored value to display units. Applied once, at cell construction,
  * so format/style/render, sorting, and footer aggregates all agree — unlike a
  * format option, which only the formats that implement it would honour.
+ *
+ * The product is rounded to 15 significant digits, all a double carries
+ * exactly, so the conversion adds no binary noise of its own: `38791051 *
+ * 1e-6` is `38.791051`, not `38.791050999999996`, even in an unformatted cell.
  */
 function scaled(value: CellValue, factor: number | undefined): CellValue {
   if (factor === undefined || value === null) return value;
   const n = asNumber(value);
-  return n === null ? value : n * factor;
+  return n === null ? value : convert(n, factor);
+}
+
+function convert(n: number, factor: number): number {
+  return Number((n * factor).toPrecision(15));
 }
 
 function aggregate(measure: MeasureColumn, values: CellValue[]): CellValue {
@@ -496,6 +528,7 @@ function computePivot(
   }
 
   const fieldValues = measures.map((m) => measureValues(frame, m));
+  const measureLabel = measureLabels(frame, measures);
   const includeMeasure = measures.length > 1 || pivotColumns.length === 0;
 
   // Build base measure descriptors in colKey × measure order.
@@ -504,7 +537,7 @@ function computePivot(
     const colStrs = colKey.map((v, i) => colMember[i]!(v));
     const colKeyStr = keyOf(colKey);
     measures.forEach((measure, measureIndex) => {
-      const measLabel = measure.label ?? measure.id;
+      const measLabel = measureLabel.get(measure.id)!;
       baseDescs.push({
         kind: 'measure',
         colKey,
@@ -587,7 +620,7 @@ function computePivot(
           colPath: [
             ...prefix.map((v, i) => colMember[i]!(v)),
             label,
-            ...(measure ? [measure.label ?? measure.id] : []),
+            ...(measure ? [measureLabel.get(measure.id)!] : []),
           ],
           aliases,
           argNames,
@@ -610,7 +643,7 @@ function computePivot(
       const format = columnFormat(d.measure, meta, spec.locale);
       const column: ResolvedColumn = {
         id: d.baseKey,
-        label: d.measure.label ?? d.measure.id,
+        label: measureLabel.get(d.measure.id)!,
         align: alignFor('float', format),
         def: d.measure,
         meta,
@@ -804,6 +837,7 @@ function pivotMeasuresOnRows(
 ): ViewResult {
   const { pivotRows, pivotColumns, measures } = norm;
   const fieldValues = measures.map((m) => measureValues(frame, m));
+  const measureLabel = measureLabels(frame, measures);
 
   const colKeyStrs = colKeys.map(keyOf);
   const colMember = pivotColumns.map((a) =>
@@ -835,7 +869,7 @@ function pivotMeasuresOnRows(
           value: idxs ? scaled(aggregate(measure, vals), measure.factor) : null,
         };
       });
-      rows.push({ path: [...rowKey, measure.label ?? measure.id], cells });
+      rows.push({ path: [...rowKey, measureLabel.get(measure.id)!], cells });
     });
   }
 
@@ -933,7 +967,7 @@ function leafValues(
 function scaleFormat(base: FormatFn, factor: number): FormatFn {
   return (ctx) => {
     const n = asNumber(ctx.value as CellValue);
-    return n === null ? base(ctx) : base({ ...ctx, value: n * factor });
+    return n === null ? base(ctx) : base({ ...ctx, value: convert(n, factor) });
   };
 }
 

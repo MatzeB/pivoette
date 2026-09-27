@@ -138,6 +138,7 @@ describe('unitLabels', () => {
       unitPart: 's',
       prefix: false,
       tight: false,
+      spaced: false,
     });
 
     const compound = unitLabels(meta({ unit: ['byte', '1/second'] }));
@@ -147,6 +148,38 @@ describe('unitLabels', () => {
 
     // A single *inverted* factor is not simple either.
     expect(unitLabels(meta({ unit: ['1/second'] })).simple).toBe(false);
+  });
+});
+
+describe('unit names without a symbol', () => {
+  it('keeps the scale apart from a unit shown by its name', () => {
+    const labels = unitLabels(meta({ unit: 'download', scale: 'mega' }));
+    expect(labels.full).toBe('M download');
+    expect(labels.spaced).toBe(true);
+    // Compound units follow the same rule per factor.
+    expect(
+      unitLabels(
+        meta({ unit: ['download', '1/second'], scale: ['kilo', null] }),
+      ).full,
+    ).toBe('k download/s');
+  });
+
+  it('attaches the scale directly to a symbol', () => {
+    expect(unitLabels(meta({ unit: 'token', scale: 'mega' })).full).toBe(
+      'Mtok',
+    );
+    expect(unitLabels(meta({ unit: 'byte', scale: 'mega' })).full).toBe('MB');
+    // An explicit short form is a symbol by declaration.
+    expect(
+      unitLabels(meta({ unit: 'download', unitShort: 'dl', scale: 'kilo' }))
+        .full,
+    ).toBe('kdl');
+  });
+
+  it('needs no gap without a scale', () => {
+    const labels = unitLabels(meta({ unit: 'download' }));
+    expect(labels.full).toBe('download');
+    expect(labels.spaced).toBe(false);
   });
 });
 

@@ -747,9 +747,10 @@ export function DataTable({
    */
   function removableAt(hc: HCell): { index: number; noun: string } | undefined {
     if (!editable || !spec || hc.leafStart !== hc.leafEnd) return undefined;
-    const own = leaves[hc.leafStart]?.column.def;
+    const column = leaves[hc.leafStart]?.column;
+    const own = column?.def;
     if (!own) return undefined;
-    if (hc.specLabel !== (own.label ?? own.id)) return undefined;
+    if (hc.specLabel !== column.label) return undefined;
     // A computed axis member is not in `view.columns`, so it finds no index —
     // removing it means editing the level it belongs to, not this list.
     const index = spec.columns.findIndex((c) => c.id === own.id);

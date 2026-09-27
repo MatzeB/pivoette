@@ -30,6 +30,8 @@ export interface UnitAffix {
   prefix: boolean;
   /** The label hugs the digits rather than standing off with a space. */
   tight: boolean;
+  /** Scale and unit are written apart (`42.8 M download`); see `UnitLabels`. */
+  spaced?: boolean;
 }
 
 /** The affix a set of composed labels implies. */
@@ -42,6 +44,7 @@ export function affixOf(labels: UnitLabels): UnitAffix {
         unit: labels.unitPart,
         prefix: labels.prefix,
         tight: labels.tight,
+        spaced: labels.spaced,
       }
     : { scale: '', unit: labels.full, prefix: false, tight: labels.tight };
 }
@@ -69,11 +72,11 @@ export function attachUnit(text: string, affix: UnitAffix): string {
  * times per column while measuring its width.
  */
 export function attacherFor(affix: UnitAffix): (text: string) => string {
-  const { scale, unit, prefix, tight } = affix;
+  const { scale, unit, prefix, tight, spaced } = affix;
   if (!scale && !unit) return (text) => text;
   const gap = tight ? '' : ' ';
   if (!prefix) {
-    const suffix = gap + scale + unit;
+    const suffix = gap + scale + (spaced && scale && unit ? ' ' : '') + unit;
     return (text) => (text ? text + suffix : text);
   }
   const lead = unit + gap;
