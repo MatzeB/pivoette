@@ -14,11 +14,14 @@ edited interactively, or written by an LLM.
 pnpm add pivoette react react-dom
 ```
 
-Weekly npm downloads of the three most-downloaded versions of three popular
-packages, one row per version:
+This walkthrough builds one table in three steps. The data is weekly npm
+downloads of the three most-downloaded versions of react, typescript and
+lodash.
+
+### 1. Show the data
 
 ```tsx
-import { DataTable, Format, fromCsv } from 'pivoette';
+import { DataTable, fromCsv } from 'pivoette';
 import type { ViewSpec } from 'pivoette';
 import 'pivoette/style.css';
 
@@ -35,14 +38,85 @@ lodash,4.17.23,2026-01-21T17:29:52Z,16836258
 `);
 
 const view: ViewSpec = {
-  // Say what the columns are; formats and aggregation follow from it.
+  columns: [
+    { id: 'package' },
+    { id: 'version' },
+    { id: 'published' },
+    { id: 'downloads' },
+  ],
+};
+
+export function Downloads() {
+  return <DataTable data={data} view={view} height={320} />;
+}
+```
+
+| package    | version | published            | downloads |
+| ---------- | ------- | -------------------- | --------: |
+| react      | 18.3.1  | 2024-04-26T16:42:26Z |  42823626 |
+| react      | 19.2.8  | 2026-07-21T15:41:28Z |  38791051 |
+| react      | 19.3.0  | 2026-09-09T17:21:30Z |  28629967 |
+| typescript | 5.9.3   | 2025-09-30T21:19:38Z | 138334912 |
+| …          |         |                      |           |
+
+`columns` lists what to display. With no grouping and no aggregation, you get
+one row per source row, and every value is shown as it was read.
+
+### 2. Show downloads in millions
+
+Nine-digit numbers are hard to compare. Declare what the column counts and let
+Pivoette pick the scale:
+
+```tsx
+const view: ViewSpec = {
   meta: {
+    downloads: { unit: ['download'] },
+  },
+  columns: [
+    { id: 'package' },
+    { id: 'version' },
+    { id: 'published' },
+    { id: 'downloads', label: 'Weekly downloads', autoScale: true },
+  ],
+};
+
+<DataTable data={data} view={view} display={{ scalePlacement: 'header' }} />;
+```
+
+| package    | version | published            | Weekly downloads (M) |
+| ---------- | ------- | -------------------- | -------------------: |
+| react      | 18.3.1  | 2024-04-26T16:42:26Z |                 42.8 |
+| react      | 19.2.8  | 2026-07-21T15:41:28Z |                 38.8 |
+| react      | 19.3.0  | 2026-09-09T17:21:30Z |                 28.6 |
+| typescript | 5.9.3   | 2025-09-30T21:19:38Z |                  138 |
+| …          |         |                      |                      |
+
+- **`meta`** describes the data, not the view. Here it says that `downloads`
+  is measured in downloads. Units are labels, so declaring one never changes
+  a number.
+- **`autoScale`** reads the magnitude off the data and picks mega, so the
+  values are displayed in millions. Only the display changes: sorting still
+  uses the exact counts.
+- **`scalePlacement: 'header'`** puts the `M` in the header. Use `'value'` to
+  put it next to every number instead.
+
+### 3. Group by package, with release dates
+
+Now group the versions by package. Declaring `published` as a timestamp lets
+`min` and `max` compare the dates as points in time, and `relativeTime` shows
+how long ago they were:
+
+```tsx
+import { Format } from 'pivoette';
+
+const view: ViewSpec = {
+  meta: {
+    downloads: { unit: ['download'] },
     published: { kind: ['timestamp'], encoding: 'rfc3339' },
-    downloads: { kind: ['count'] },
   },
   pivotRows: [{ field: 'package', label: 'Package', sort: 'asc' }],
   columns: [
-    { id: 'downloads', label: 'Weekly downloads', agg: 'sum' },
+    { id: 'downloads', label: 'Weekly downloads', agg: 'sum', autoScale: true },
     {
       id: 'newest',
       label: 'Newest release',
@@ -60,31 +134,27 @@ const view: ViewSpec = {
   ],
   showSummary: true,
 };
-
-export function Downloads() {
-  return <DataTable data={data} view={view} height={240} />;
-}
 ```
 
 Rendered on 2026-09-27:
 
-| Package    | Weekly downloads | Newest release | Oldest release |
-| ---------- | ---------------: | -------------- | -------------- |
-| lodash     |      181,506,004 | 6 months ago   | 6 years ago    |
-| react      |      110,244,644 | 18 days ago    | 2 years ago    |
-| typescript |      230,056,699 | 3 months ago   | 1 year ago     |
-| **Total**  |  **521,807,347** | 18 days ago    | 6 years ago    |
+| Package    | Weekly downloads (M) | Newest release | Oldest release |
+| ---------- | -------------------: | -------------- | -------------- |
+| lodash     |                  182 | 6 months ago   | 6 years ago    |
+| react      |                  110 | 18 days ago    | 2 years ago    |
+| typescript |                  230 | 3 months ago   | 1 year ago     |
+| **Total**  |              **522** | 18 days ago    | 6 years ago    |
 
-A few things happen without being spelled out:
-
-- **Grouping.** `pivotRows` groups the versions by package, and every column
-  with an `agg` is aggregated over each group. The total row is computed
-  from the source rows, not by adding up the displayed cells.
-- **Dates.** Because `published` is declared a timestamp, `max` and `min`
-  compare instants rather than text, and `relativeTime` shows them as
-  "18 days ago".
-- **Numbers.** `kind: ['count']` makes the downloads an integer with the
-  reader's digit grouping. Click a header to sort by it.
+- **`pivotRows`** groups the rows by package. In a grouped table every
+  column needs an `agg`, which it's aggregated with over each group, or a
+  `compute` over other columns.
+- **`source`** lets several columns read the same field: both `newest` and
+  `oldest` read `published`.
+- **`encoding: 'rfc3339'`** says how the text encodes a point in time, so
+  `max` finds the latest release instead of skipping text it can't compare.
+- **`showSummary`** adds a total row computed from the source rows. For
+  `newest` and `oldest` that is the newest and oldest release across all
+  packages, not a sum.
 
 ## Features
 
