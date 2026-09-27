@@ -70,13 +70,13 @@ Pivoette pick the scale:
 ```tsx
 const view: ViewSpec = {
   meta: {
-    downloads: { unit: ['download'] },
+    downloads: { displayName: 'Weekly downloads', unit: ['download'] },
   },
   columns: [
     { id: 'package' },
     { id: 'version' },
     { id: 'published' },
-    { id: 'downloads', label: 'Weekly downloads', autoScale: true },
+    { id: 'downloads', autoScale: true },
   ],
 };
 
@@ -91,9 +91,9 @@ const view: ViewSpec = {
 | typescript | 5.9.3   | 2025-09-30T21:19:38Z |                  138 |
 | …          |         |                      |                      |
 
-- **`meta`** describes the data, not the view. Here it says that `downloads`
-  is measured in downloads. Units are labels, so declaring one never changes
-  a number.
+- **`meta`** describes the data, not the view. Here it gives `downloads` a
+  display name and says it counts downloads. Units are labels, so declaring
+  one never changes a number.
 - **`autoScale`** reads the magnitude off the data and picks mega, so the
   values are displayed in millions. Only the display changes: sorting still
   uses the exact counts.
@@ -111,12 +111,12 @@ import { Format } from 'pivoette';
 
 const view: ViewSpec = {
   meta: {
-    downloads: { unit: ['download'] },
+    downloads: { displayName: 'Weekly downloads', unit: ['download'] },
     published: { kind: ['timestamp'], encoding: 'rfc3339' },
   },
   pivotRows: [{ field: 'package', label: 'Package', sort: 'asc' }],
   columns: [
-    { id: 'downloads', label: 'Weekly downloads', agg: 'sum', autoScale: true },
+    { id: 'downloads', agg: 'sum', autoScale: true },
     {
       id: 'newest',
       label: 'Newest release',
