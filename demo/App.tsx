@@ -552,6 +552,8 @@ export function App() {
           <h1 style={{ marginBottom: 4 }}>Pivoette</h1>
           <p style={{ color: 'var(--page-muted)', marginTop: 0 }}>
             In-browser pivot-table / data-analysis component — worked examples.
+            Also as a{' '}
+            <a href="demo/element.html">web component with an editor</a>.
           </p>
         </div>
         <div

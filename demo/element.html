@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pivoette web component</title>
+    <!-- A classic script, not a module: this is exactly what a host page adds. -->
+    <script src="../pivoette-element.js" defer></script>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --page-bg: #ffffff;
+        --page-text: #1d1d1f;
+        --page-muted: #6e6e73;
+        --code-bg: #f5f5f7;
+        --rule: #d2d2d7;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --page-bg: #0f0f10;
+          --page-text: #f2f2f7;
+          --page-muted: #a1a1a6;
+          --code-bg: #1c1c1e;
+          --rule: #3a3a3d;
+        }
+      }
+      body {
+        margin: 0;
+        background: var(--page-bg);
+        color: var(--page-text);
+        font:
+          15px/1.5 system-ui,
+          -apple-system,
+          sans-serif;
+      }
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 16px 64px;
+      }
+      h1 {
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-size: 17px;
+        margin: 32px 0 8px;
+      }
+      p {
+        margin: 0 0 12px;
+        color: var(--page-muted);
+      }
+      a {
+        color: inherit;
+      }
+      code,
+      pre {
+        font:
+          13px/1.5 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+      }
+      pre {
+        background: var(--code-bg);
+        border-radius: 8px;
+        padding: 12px 14px;
+        overflow-x: auto;
+        margin: 0;
+      }
+      .pair {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr);
+        gap: 16px;
+        align-items: start;
+      }
+      @media (max-width: 720px) {
+        .pair {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+      #changes {
+        max-height: 320px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p><a href="../">← All examples</a></p>
+      <h1>Web component</h1>
+      <p>
+        One script tag defines <code>&lt;pivoette-table&gt;</code> and
+        <code>&lt;pivoette-editor&gt;</code>. No React on the page, no build
+        step. Rearrange the table with the panel, or with the
+        <code>+</code> buttons and drag handles on the table itself.
+      </p>
+
+      <div class="pair">
+        <pivoette-editor for="downloads"></pivoette-editor>
+        <pivoette-table id="downloads" editable height="320">
+          <script type="application/json">
+            {
+              "data": {
+                "csv": "package,version,published,downloads\nreact,18.3.1,2024-04-26T16:42:26Z,42823626\nreact,19.2.8,2026-07-21T15:41:28Z,38791051\nreact,19.3.0,2026-09-09T17:21:30Z,28629967\ntypescript,5.9.3,2025-09-30T21:19:38Z,138334912\ntypescript,6.0.3,2026-04-16T23:38:27Z,53278987\ntypescript,7.0.2,2026-07-08T15:55:18Z,38442800\nlodash,4.18.1,2026-04-01T21:01:20Z,117478934\nlodash,4.17.21,2021-02-20T15:42:16Z,47190812\nlodash,4.17.23,2026-01-21T17:29:52Z,16836258\n"
+              },
+              "meta": {
+                "downloads": {
+                  "displayName": "Weekly downloads",
+                  "unit": ["download"]
+                },
+                "published": { "kind": ["timestamp"], "encoding": "rfc3339" }
+              },
+              "view": {
+                "pivotRows": [
+                  { "field": "package", "label": "Package", "sort": "asc" },
+                  { "field": "version", "label": "Version" }
+                ],
+                "columns": [
+                  { "id": "downloads", "agg": "sum", "autoScale": true },
+                  {
+                    "id": "released",
+                    "label": "Released",
+                    "source": "published",
+                    "agg": "max",
+                    "format": { "fnName": "relativeTime" }
+                  }
+                ],
+                "showSummary": true
+              },
+              "display": { "scalePlacement": "header", "rowGroupSpacing": 6 }
+            }
+          </script>
+        </pivoette-table>
+      </div>
+
+      <h2>The markup</h2>
+      <pre><code>&lt;script src="https://matzeb.github.io/pivoette/pivoette-element.js" defer&gt;&lt;/script&gt;
+
+&lt;pivoette-editor for="downloads"&gt;&lt;/pivoette-editor&gt;
+&lt;pivoette-table id="downloads" editable&gt;
+  &lt;script type="application/json"&gt;{ "data": …, "meta": …, "view": … }&lt;/script&gt;
+&lt;/pivoette-table&gt;</code></pre>
+
+      <h2>What the page sees</h2>
+      <p>
+        Every edit fires a <code>pivoette-change</code> event, and
+        <code>table.bundle</code> is the bundle with the edits folded in, ready
+        to save:
+      </p>
+      <pre id="changes">Waiting for the first change…</pre>
+    </main>
+
+    <script>
+      const table = document.getElementById('downloads');
+      const out = document.getElementById('changes');
+      table.addEventListener('pivoette-change', () => {
+        out.textContent = JSON.stringify(table.bundle.view, null, 2);
+      });
+    </script>
+  </body>
+</html>

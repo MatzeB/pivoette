@@ -373,19 +373,45 @@ included too. Custom marks can read `useGraph()` and `useDatum()`.
 
 ## Web component
 
-For pages that don't use React, `pnpm build:element` produces
-`dist-element/pivoette-element.js`. It's a single self-contained file that
-defines `<pivoette-table>`:
+For pages that don't use React, one self-contained script defines
+`<pivoette-table>` and `<pivoette-editor>`. Use the hosted copy, or build your
+own with `pnpm build:element` (it lands in `dist-element/`):
 
 ```html
-<script src="/static/pivoette-element.js" defer></script>
-<pivoette-table src="/data/revenue.pivoette.json"></pivoette-table>
+<script
+  src="https://matzeb.github.io/pivoette/pivoette-element.js"
+  defer
+></script>
+<pivoette-table src="/data/downloads.pivoette.json"></pivoette-table>
 ```
 
-The element takes a **bundle**: one JSON document holding the data, the
-column metadata and the view. It renders inside a shadow root, so page CSS and
-table CSS stay separate. `validateBundle` reports every problem in a bundle at
-once instead of rendering a blank box.
+The table takes a **bundle**: one JSON document holding the data, the column
+metadata and the view, either from `src` or from a
+`<script type="application/json">` child. It renders inside a shadow root, so
+page CSS and table CSS stay separate. A bundle with mistakes shows every
+problem in place instead of rendering a blank box.
+
+**Editing.** Add `editable` to get the in-table editing controls, and point a
+`<pivoette-editor>` at the table's `id` for the side panel. The table owns the
+view, so edits made in either place show up in both:
+
+```html
+<pivoette-editor for="downloads"></pivoette-editor>
+<pivoette-table
+  id="downloads"
+  editable
+  src="/data/downloads.pivoette.json"
+></pivoette-table>
+
+<script>
+  const table = document.getElementById('downloads');
+  table.addEventListener('pivoette-change', () => save(table.bundle));
+</script>
+```
+
+Every edit fires `pivoette-change`, and `table.bundle` is the original bundle
+with the edits folded in. `table.view` and `table.display` can also be set
+from script. [Try it live](https://matzeb.github.io/pivoette/demo/element.html).
 
 ## Examples
 
