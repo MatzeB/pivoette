@@ -11,7 +11,7 @@ import {
   storedMagnitude,
   unitLabels,
 } from '../data/meta';
-import { requireColumn, withMeta } from '../data/frame';
+import { requireColumn, selectRows, withMeta } from '../data/frame';
 import { deriveColumns } from '../data/derive';
 import { decodeTime, isTimestamp } from '../data/temporal';
 import type { Align, FormatFn, ResolvedColumn } from '../format/context';
@@ -342,6 +342,62 @@ function sortFlatRows(rows: ResultRow[], spec: ViewSpec): void {
 
 function keyOf(tuple: CellValue[]): string {
   return JSON.stringify(tuple);
+}
+
+/** One member's identity: what grouping and filtering both compare by. */
+function memberKey(value: CellValue | undefined): string {
+  return JSON.stringify(value ?? null);
+}
+
+/** The rows a view's `filter` leaves in. */
+function applyFilter(frame: DataFrame, filter: ViewSpec['filter']): DataFrame {
+  const tests = Object.entries(filter ?? {})
+    .filter(([, f]) => f.exclude.length > 0)
+    .map(([field, f]) => {
+      const values = requireColumn(frame, field).values;
+      const out = new Set(f.exclude.map(memberKey));
+      return (r: number) => !out.has(memberKey(values[r]));
+    });
+  if (tests.length === 0) return frame;
+  return selectRows(frame, (r) => tests.every((keep) => keep(r)));
+}
+
+/** A value a field takes, and how the table would print it. */
+export interface Member {
+  value: CellValue;
+  label: string;
+}
+
+/**
+ * Every value `field` takes in the data, labelled and ordered as the table
+ * would show them on an axis — weekdays by name and in calendar order, not as
+ * 0–6. The view's own `filter` is ignored: this is what a filter chooses from,
+ * so an excluded member has to stay on the list to be let back in.
+ *
+ * Order follows the field's axis level when it is on one, so the list reads
+ * like the table; a field on neither axis is sorted ascending.
+ */
+export function fieldMembers(
+  frame: DataFrame,
+  spec: ViewSpec,
+  field: string,
+): Member[] {
+  const prepared = prepare(frame, spec, normalizeView(spec));
+  const column = prepared.columnByName.get(field);
+  if (!column) return [];
+  const seen = new Map<string, CellValue>();
+  for (const value of column.values) {
+    const key = memberKey(value);
+    if (!seen.has(key)) seen.set(key, value ?? null);
+  }
+  const axis = [...(spec.pivotRows ?? []), ...(spec.pivotColumns ?? [])].find(
+    (a) => a.field === field,
+  ) ?? { field, sort: 'asc' as const };
+  const format = memberFormat(prepared, field, spec.locale);
+  return sortTuples(
+    [...seen.values()].map((v) => [v]),
+    [axis],
+  ).map(([value]) => ({ value: value!, label: format(value!) }));
 }
 
 /**
@@ -1101,7 +1157,7 @@ function applyAutoScale(result: ViewResult, spec: ViewSpec): ViewResult {
 
 export function computeView(frame: DataFrame, spec: ViewSpec): ViewResult {
   const norm = normalizeView(spec);
-  const prepared = prepare(frame, spec, norm);
+  const prepared = applyFilter(prepare(frame, spec, norm), spec.filter);
   const result = isFlat(spec)
     ? computeFlat(prepared, spec)
     : computePivot(prepared, spec, norm);

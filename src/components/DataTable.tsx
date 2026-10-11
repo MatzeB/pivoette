@@ -27,7 +27,7 @@ import {
   removeFooterRow,
   setShowSummary,
 } from '../editor/ops';
-import type { DragRef } from '../editor/ops';
+import type { DragRef, RemovalRef } from '../editor/ops';
 import styles from './DataTable.module.css';
 
 export interface DataTableDisplay {
@@ -71,6 +71,12 @@ export interface DataTableProps {
   onViewChange?: (next: ViewSpec) => void;
   /** Emitted when an edit changes presentation (the footer rows). */
   onDisplayChange?: (next: DataTableDisplay) => void;
+  /**
+   * Show what removing this would take, as the table's own remove controls
+   * do on hover — for a panel outside the table, such as `ViewEditor`'s
+   * `onRemovePreview`. Shown whether or not the table is editing.
+   */
+  removing?: RemovalRef | null;
   height?: number | string;
   theme?: 'auto' | 'light' | 'dark';
   display?: DataTableDisplay;
@@ -310,12 +316,33 @@ function isFrame(
 
 // ---------------------------------------------------------------------------
 
+/** A pending removal, in the terms the header and index cells are tinted by. */
+type RemoveHover =
+  | { kind: 'pivotRow'; level: number }
+  | { kind: 'pivotColumn'; level: number }
+  | { kind: 'column'; index: number };
+
+/** The same, for a removal named from outside. Footer lines tint themselves. */
+function hoverOf(ref: RemovalRef | null | undefined): RemoveHover | null {
+  switch (ref?.zone) {
+    case 'pivotRows':
+      return { kind: 'pivotRow', level: ref.index };
+    case 'pivotColumns':
+      return { kind: 'pivotColumn', level: ref.index };
+    case 'columns':
+      return { kind: 'column', index: ref.index };
+    default:
+      return null;
+  }
+}
+
 export function DataTable({
   data,
   view,
   editing = false,
   onViewChange,
   onDisplayChange,
+  removing,
   height = 480,
   theme = 'auto',
   display = {},
@@ -623,12 +650,10 @@ export function DataTable({
   /** Which field a remove control is pointing at, so the column it would drop
    * can be tinted — and so a measure's controls, which repeat per column
    * group, all light together. */
-  const [removeHover, setRemoveHover] = useState<
-    | { kind: 'pivotRow'; level: number }
-    | { kind: 'pivotColumn'; level: number }
-    | { kind: 'column'; index: number }
-    | null
-  >(null);
+  const [ownRemoveHover, setRemoveHover] = useState<RemoveHover | null>(null);
+  const pointedAt = useMemo(() => hoverOf(removing), [removing]);
+  // The table's own controls first; otherwise whatever a panel points at.
+  const removeHover = ownRemoveHover ?? pointedAt;
 
   /**
    * What the opened column offers, one entry per body row: the groupable
@@ -732,10 +757,20 @@ export function DataTable({
   const totalCols = rowLevels.length + leaves.length + editCols;
   const frameCls = cls(styles.frame, frameless && styles.frameless, className);
 
+  // Nothing to show, typically because a filter excludes everything. The body
+  // says so; the footer is dropped, since a total over no rows reads as a real
+  // `0` rather than as the absence it is.
+  const empty = result.rows.length === 0;
+  const filtered = Object.values(view.filter ?? {}).some(
+    (f) => f.exclude.length > 0,
+  );
+
   // Footer content lines (column footers first, then the source summary).
-  const footerLines = summary
-    ? [...footerRows, { label: 'Total', cells: summary }]
-    : footerRows;
+  const footerLines = empty
+    ? []
+    : summary
+      ? [...footerRows, { label: 'Total', cells: summary }]
+      : footerRows;
   const footerBottom = footerLines.length * ROW_HEIGHT;
 
   /**
@@ -774,8 +809,9 @@ export function DataTable({
   return (
     <div className={frameCls} data-theme={theme === 'auto' ? undefined : theme}>
       {/* Pinned to the frame, so a wide table can scroll under them. Each sits
-          in the band of the header row it would remove. */}
-      {editable && spec && (spec.pivotColumns?.length ?? 0) > 0 && (
+          in the band of the header row it would remove — which an empty
+          result does not draw, so neither are they. */}
+      {editable && spec && !empty && (spec.pivotColumns?.length ?? 0) > 0 && (
         <div className={styles.columnControls} style={{ right: scrollbarW }}>
           {spec.pivotColumns!.map((axisField, level) => (
             <RemoveField
@@ -1058,6 +1094,13 @@ export function DataTable({
                 <td colSpan={totalCols} />
               </tr>
             )}
+            {empty && (
+              <tr>
+                <td className={styles.emptyState} colSpan={totalCols || 1}>
+                  {filtered ? 'No rows match the filter.' : 'No rows.'}
+                </td>
+              </tr>
+            )}
           </tbody>
 
           {(footerLines.length > 0 || editable) && (
@@ -1089,7 +1132,13 @@ export function DataTable({
                   bottom={(footerLines.length - 1 - fi) * ROW_HEIGHT}
                   leftOffset={leftOffset}
                   extraIndexCols={editCols}
+                  indexColumns={indexColumns}
                   tintLeaves={tintLeaves}
+                  tinted={
+                    fi < footerRows.length
+                      ? removing?.zone === 'footer' && removing.index === fi
+                      : removing?.zone === 'summary'
+                  }
                   drag={
                     // The grand total is not part of `display.footer`, so it
                     // has no position in the list to move.
@@ -1420,7 +1469,11 @@ interface FooterRowProps {
   leftOffset: number[];
   /** The label cell spans the pending column too, when one is showing. */
   extraIndexCols: number;
+  /** A flat table's leading identifier columns; see `FooterRow`. */
+  indexColumns: number;
   tintLeaves?: Set<number>;
+  /** Pointed at from outside the table: shown as about to go. */
+  tinted?: boolean;
   /** Drag handle props; absent for the grand total, which is not in the list. */
   drag?: React.HTMLAttributes<HTMLTableRowElement> & { draggable?: boolean };
   /** Present in edit mode: drops this line from the footer. */
@@ -1438,15 +1491,26 @@ function FooterRow({
   bottom,
   leftOffset,
   extraIndexCols,
+  indexColumns,
   tintLeaves,
+  tinted,
   drag,
   onRemove,
   onHover,
 }: FooterRowProps) {
   const sticky: CSSProperties = { position: 'sticky', bottom, zIndex: 1 };
+  // A pivot labels the row in its row-index columns. A flat table has none,
+  // so the label takes the place of its leading identifier columns' cells —
+  // a median of host names says nothing anyway — or of the first column's,
+  // if it declares none. Without this a flat footer is a row of bare numbers.
+  const pivot = rowLevels.length > 0;
+  const covered = pivot
+    ? 0
+    : Math.min(leaves.length, Math.max(1, indexColumns));
   // What this row's own remove control would take is the whole row, so the
   // state is local rather than shared with the column tints.
-  const [removing, setRemoving] = useState(false);
+  const [ownRemoving, setRemoving] = useState(false);
+  const removing = ownRemoving || !!tinted;
 
   const rowDrag = drag && {
     ...drag,
@@ -1461,15 +1525,19 @@ function FooterRow({
       style={{ height: ROW_HEIGHT }}
       {...rowDrag}
     >
-      {rowLevels.length > 0 && (
+      {(pivot || covered > 0) && (
         <th
           className={cls(
             styles.summaryLabel,
             styles.indexTint,
             removing && styles.removeTint,
           )}
-          colSpan={rowLevels.length + extraIndexCols}
-          style={{ ...sticky, left: leftOffset[0], zIndex: 3 }}
+          colSpan={pivot ? rowLevels.length + extraIndexCols : covered}
+          style={
+            pivot
+              ? { ...sticky, left: leftOffset[0], zIndex: 3 }
+              : { ...sticky, ...cellGap[covered - 1] }
+          }
           onMouseEnter={() => onHover({ row: -1, leaf: -1 })}
         >
           {label}
@@ -1483,6 +1551,7 @@ function FooterRow({
         </th>
       )}
       {cells.map((cell, i) => {
+        if (i < covered) return null;
         const leaf = leaves[i]!;
         const ctx = makeCtx(leaf, cell, [], frame);
         const node: ReactNode = leaf.render

@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { DataTable } from './DataTable';
 import type { DataTableDisplay } from './DataTable';
 import type { ViewSpec } from '../pivot/spec';
+import type { RemovalRef } from '../editor/ops';
 
 // react-dom needs this flag; @tanstack/react-virtual needs ResizeObserver.
 (
@@ -815,6 +816,33 @@ describe('<DataTable> footer row tint', () => {
     });
     expect(map(el)).toEqual(['.', '...', '...']);
   });
+
+  it('tints what a panel outside the table points at', async () => {
+    const show = (removing: RemovalRef | null) =>
+      render(
+        <DataTable
+          data={data}
+          view={view}
+          display={{ footer: [{ label: 'med', agg: 'median' }] }}
+          removing={removing}
+        />,
+      );
+    // Not editing: the panel's buttons are what is hovered, not the table's.
+    expect(map(await show({ zone: 'summary' }))).toEqual(['.', '...', 'TTT']);
+    expect(map(await show({ zone: 'footer', index: 0 }))).toEqual([
+      '.',
+      'TTT',
+      '...',
+    ]);
+
+    // A measure takes its leaves in the body, header and footer alike.
+    const el = await show({ zone: 'columns', index: 0 });
+    expect(map(el)).toEqual(['.', '.TT', '.TT']);
+    const rowField = await show({ zone: 'pivotRows', index: 0 });
+    expect(
+      rowField.querySelector('thead th')!.className.includes('removeTint'),
+    ).toBe(true);
+  });
 });
 
 describe('<DataTable> measure drag', () => {
@@ -1309,5 +1337,87 @@ describe('<DataTable> editing controls vs the unit suffix', () => {
         'Remove the max measure',
       ]),
     );
+  });
+});
+
+describe('<DataTable> flat footer labels', () => {
+  const rows = [
+    { host: 'a', region: 'eu', ms: 1 },
+    { host: 'b', region: 'us', ms: 3 },
+  ];
+  const view: ViewSpec = {
+    columns: [{ id: 'host' }, { id: 'region' }, { id: 'ms' }],
+  };
+  const footRow = (el: HTMLElement) =>
+    [...el.querySelectorAll('tfoot tr')].at(-1)!;
+
+  it('puts the label over the identifier columns, in place of their cells', async () => {
+    const el = await render(
+      <DataTable
+        data={rows}
+        view={view}
+        display={{ indexColumns: 2, footer: [{ label: 'med', agg: 'median' }] }}
+      />,
+    );
+    const label = footRow(el).querySelector('th')!;
+    expect(label.textContent).toBe('med');
+    expect(label.colSpan).toBe(2);
+    // One label cell plus the one remaining column: three columns in all.
+    expect(footRow(el).children).toHaveLength(2);
+    expect(footRow(el).textContent).toContain('2');
+  });
+
+  it('takes the first column when none is declared an identifier', async () => {
+    const el = await render(
+      <DataTable
+        data={rows}
+        view={view}
+        display={{ footer: [{ label: 'med', agg: 'median' }] }}
+      />,
+    );
+    expect(footRow(el).querySelector('th')!.textContent).toBe('med');
+    expect(footRow(el).children).toHaveLength(3);
+  });
+});
+
+describe('<DataTable> with every row filtered out', () => {
+  const rows = [
+    { app: 'a', p: 'X', t: 1 },
+    { app: 'b', p: 'Y', t: 2 },
+  ];
+  const filter = { p: { exclude: ['X', 'Y'] } };
+
+  it('says so, and drops the totals rather than showing them as 0', async () => {
+    const el = await render(
+      <DataTable
+        data={rows}
+        view={{
+          pivotRows: [{ field: 'app' }],
+          pivotColumns: [{ field: 'p' }],
+          columns: [{ id: 't', agg: 'sum' }],
+          showSummary: true,
+          filter,
+        }}
+        display={{ footer: [{ label: 'sum', agg: 'sum' }] }}
+      />,
+    );
+    expect(el.querySelector('tbody')!.textContent).toBe(
+      'No rows match the filter.',
+    );
+    expect(el.querySelector('tfoot')).toBeNull();
+  });
+
+  it('does the same for a flat table', async () => {
+    const el = await render(
+      <DataTable
+        data={rows}
+        view={{ columns: [{ id: 'app' }, { id: 't' }], filter }}
+        display={{ footer: [{ label: 'sum', agg: 'sum' }] }}
+      />,
+    );
+    expect(el.querySelector('tbody')!.textContent).toBe(
+      'No rows match the filter.',
+    );
+    expect(el.querySelector('tfoot')).toBeNull();
   });
 });

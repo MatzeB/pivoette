@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { fromRows } from '../data/import';
 import { withMeta } from '../data/frame';
 import { unitLabels } from '../data/meta';
-import { computeView } from './engine';
+import { computeView, fieldMembers } from './engine';
 import type { ViewResult } from './result';
 import { isFlat, normalizeView } from './spec';
 import type { ViewSpec } from './spec';
@@ -1180,5 +1180,89 @@ describe('factor', () => {
       columns: [{ id: 'dl', factor: 1e-6 }],
     });
     expect(res.rows[0]!.cells[0]!.value).toBe(38.791051);
+  });
+});
+
+describe('filtering', () => {
+  const frame = fromRows([
+    { app: 'a', platform: 'Intel', t: 1 },
+    { app: 'a', platform: 'GPU', t: 10 },
+    { app: 'b', platform: 'AMD', t: 2 },
+    { app: 'b', platform: 'GPU', t: 20 },
+    { app: 'c', platform: 'GPU', t: 30 },
+  ]);
+  const view: ViewSpec = {
+    pivotRows: [{ field: 'app' }],
+    pivotColumns: [{ field: 'platform' }],
+    columns: [{ id: 't', agg: 'sum' }],
+    showSummary: true,
+  };
+
+  it('leaves the excluded rows out of groups, members and totals', () => {
+    const res = computeView(frame, {
+      ...view,
+      filter: { platform: { exclude: ['GPU'] } },
+    });
+    expect(res.leaves.map((l) => l.colPath[0])).toEqual(['Intel', 'AMD']);
+    // `c` had only GPU rows, so it goes with them.
+    expect(res.rows.map((r) => r.path[0])).toEqual(['a', 'b']);
+    expect(res.summary!.map((c) => c.value)).toEqual([1, 2]);
+  });
+
+  it('filters on a field on neither axis, and on a flat table', () => {
+    const flat = computeView(frame, {
+      columns: [{ id: 'app' }, { id: 't' }],
+      filter: { platform: { exclude: ['GPU', 'AMD'] } },
+    });
+    expect(flat.rows).toHaveLength(1);
+  });
+
+  it('ignores an empty filter', () => {
+    const res = computeView(frame, {
+      ...view,
+      filter: { platform: { exclude: [] } },
+    });
+    expect(res.leaves).toHaveLength(3);
+  });
+});
+
+describe('fieldMembers', () => {
+  it('lists every member, labelled and ordered as the axis shows them', () => {
+    const frame = withMeta(
+      fromRows([
+        { dow: 3, n: 1 },
+        { dow: 1, n: 1 },
+        { dow: 3, n: 1 },
+      ]),
+      { dow: { kind: ['weekday'] } },
+    );
+    const view: ViewSpec = {
+      pivotRows: [{ field: 'dow', sort: 'asc' }],
+      columns: [{ id: 'n', agg: 'sum' }],
+      locale: 'en-US',
+      // A filter does not hide what it chooses from.
+      filter: { dow: { exclude: [1] } },
+    };
+    expect(fieldMembers(frame, view, 'dow')).toEqual([
+      { value: 1, label: 'Mon' },
+      { value: 3, label: 'Wed' },
+    ]);
+  });
+
+  it('sorts a field on neither axis, and knows derived fields', () => {
+    const frame = fromRows([{ x: 'b' }, { x: 'a' }, { x: 'b' }]);
+    const view: ViewSpec = {
+      columns: [{ id: 'x' }],
+      derive: { up: { compute: 'x + "!"' } },
+    };
+    expect(fieldMembers(frame, view, 'x').map((m) => m.value)).toEqual([
+      'a',
+      'b',
+    ]);
+    expect(fieldMembers(frame, view, 'up').map((m) => m.value)).toEqual([
+      'a!',
+      'b!',
+    ]);
+    expect(fieldMembers(frame, view, 'nope')).toEqual([]);
   });
 });

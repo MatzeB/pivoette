@@ -433,3 +433,25 @@ describe('metadata layering matches the engine', () => {
     ).toBe(true);
   });
 });
+
+describe('filter validation', () => {
+  const frame = fromRows([{ region: 'EU', n: 1 }]);
+  const view: ViewSpec = { columns: [{ id: 'region' }, { id: 'n' }] };
+  const check = (filter: unknown) =>
+    validateBundle(
+      { data: { rows: [] }, view: { ...view, filter } as ViewSpec },
+      frame,
+    ).problems;
+
+  it('accepts a filter on a real field', () => {
+    expect(check({ region: { exclude: ['EU'] } })).toEqual([]);
+  });
+
+  it('names an unknown field and a missing exclude list', () => {
+    const problems = check({ nope: { exclude: [] }, region: {} });
+    expect(problems.join('\n')).toContain('view.filter.nope: no column named');
+    expect(problems.join('\n')).toContain(
+      'view.filter.region: needs `exclude`',
+    );
+  });
+});

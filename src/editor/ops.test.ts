@@ -8,8 +8,10 @@ import {
   moveFooterRow,
   removeColumn,
   removeField,
+  removeFilter,
   removeFooterRow,
   setColumnAgg,
+  setExcluded,
 } from './ops';
 import type { ViewSpec } from '../pivot/spec';
 
@@ -267,5 +269,21 @@ describe('reordering footer rows', () => {
   it('is a no-op for a position that is not there', () => {
     expect(moveFooterRow(display, 7, 0)).toBe(display);
     expect(moveFooterRow({}, 0, 1)).toEqual({});
+  });
+});
+
+describe('filters', () => {
+  const flat: ViewSpec = { columns: [{ id: 'x' }] };
+
+  it('sets and drops a field filter, flat or not', () => {
+    const one = setExcluded(flat, 'p', ['GPU']);
+    expect(one.filter).toEqual({ p: { exclude: ['GPU'] } });
+    const two = setExcluded(one, 'q', []);
+    expect(two.filter).toEqual({ p: { exclude: ['GPU'] }, q: { exclude: [] } });
+    expect(removeFilter(two, 'q').filter).toEqual({ p: { exclude: ['GPU'] } });
+    // The last one takes the key with it, leaving the spec as it was.
+    expect(removeFilter(one, 'p')).toEqual(flat);
+    expect(removeFilter(flat, 'p')).toBe(flat);
+    expect(flat.filter).toBeUndefined();
   });
 });

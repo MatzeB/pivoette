@@ -58,6 +58,26 @@ export function withMeta(
   return { columns, length: frame.length, columnByName };
 }
 
+/**
+ * The rows `keep` says yes to, as a frame of their own. Metadata objects are
+ * shared rather than re-normalized, as in `withMeta`.
+ */
+export function selectRows(
+  frame: DataFrame,
+  keep: (row: number) => boolean,
+): DataFrame {
+  const rows: number[] = [];
+  for (let r = 0; r < frame.length; r++) if (keep(r)) rows.push(r);
+  if (rows.length === frame.length) return frame;
+  const columns = frame.columns.map((col) => ({
+    ...col,
+    values: rows.map((r) => col.values[r]!),
+  }));
+  const columnByName = new Map<string, DataColumn>();
+  for (const col of columns) columnByName.set(col.name, col);
+  return { columns, length: rows.length, columnByName };
+}
+
 /** Look up a column, throwing a helpful error if the field is unknown. */
 export function requireColumn(frame: DataFrame, name: string): DataColumn {
   const col = frame.columnByName.get(name);

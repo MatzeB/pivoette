@@ -10,6 +10,7 @@
  */
 import type { CellRender, FormatFn, StyleFn } from '../format/context';
 import type { ColumnMetaInput } from '../data/meta';
+import type { CellValue } from '../data/types';
 
 export type Direction = 'asc' | 'desc';
 
@@ -226,6 +227,17 @@ export interface DerivedField {
 }
 
 /**
+ * Rows to leave out, by the value of one field. It names what to *exclude*
+ * rather than what to keep, so a member that turns up later — in new data —
+ * shows by default instead of being silently filtered away. The flip side:
+ * excluding every member there is today leaves an empty table only until a
+ * new one arrives.
+ */
+export interface FieldFilter {
+  exclude: CellValue[];
+}
+
+/**
  * A view: the columns to display, and optionally the axes to pivot them over.
  *
  * There is no mode flag. A flat table is the case where nothing is grouped and
@@ -247,6 +259,14 @@ export interface ViewSpec {
   sort?: SortSpec[];
   /** Pivot only: a grand-total footer row. */
   showSummary?: boolean;
+  /**
+   * Leave rows out before anything is grouped, totalled or listed, keyed by
+   * field: `{ platform: { exclude: ['GPU'] } }`. Keyed by field rather than
+   * set on an axis level, so a filter outlives its field being moved or taken
+   * off the axes, and can name a field that is on neither. Applied after
+   * `derive`, so a derived field can be filtered on.
+   */
+  filter?: Record<string, FieldFilter>;
   /** Virtual columns added before grouping, so the axes may name them.
    * Evaluated in declaration order, so one may reference an earlier one. */
   derive?: Record<string, DerivedField>;

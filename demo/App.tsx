@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   DataTable,
-  ViewEditor,
   autoScaleOf,
   fromRows,
   parseCsv,
@@ -14,9 +13,13 @@ import type {
   DataTableDisplay,
   DatasetJson,
   GraphUnitPlacement,
+  PivoetteBundle,
   UnitPlacement,
   ViewSpec,
 } from '../src';
+// Registers <pivoette-table> and <pivoette-editor>.
+import '../src/element';
+import type { PivoetteTableElement } from '../src/element';
 
 import {
   view as tickerView,
@@ -259,6 +262,50 @@ function rawView(rows: Row[]): ViewSpec {
   };
 }
 
+/** The demo's own controls, laid over whatever view the table shows. */
+interface Settings {
+  scalePer: 'column' | 'value';
+  /** '' leaves the view's own (or the runtime's) choice alone. */
+  locale: string;
+  timeZone: string;
+}
+
+/**
+ * `view` as the controls say to show it. `example` is the view as shipped, so
+ * a control set back to Auto restores the example's own choice rather than
+ * keeping the last override — this also runs over the reader's edited views,
+ * which already carry one.
+ */
+function present(view: ViewSpec, example: ViewSpec, s: Settings): ViewSpec {
+  const out: ViewSpec = {
+    ...view,
+    columns:
+      s.scalePer === 'column'
+        ? view.columns
+        : view.columns.map((c) =>
+            autoScaleOf(c) === undefined
+              ? c
+              : // A pool exists to pick *one* scale, so it means nothing once
+                // every cell picks its own — drop it rather than leave the
+                // spec self-contradictory.
+                {
+                  ...c,
+                  autoScale: { per: 'value' as const },
+                  scalePool: undefined,
+                },
+          ),
+  };
+  delete out.locale;
+  delete out.timeZone;
+  const locale = s.locale || example.locale;
+  const timeZone = s.timeZone || example.timeZone;
+  return {
+    ...out,
+    ...(locale ? { locale } : {}),
+    ...(timeZone ? { timeZone } : {}),
+  };
+}
+
 /** A collapsible panel; its body is mounted only while open. */
 function Panel({
   title,
@@ -395,92 +442,13 @@ export function App() {
   // table's chrome is gated on this rather than duplicated in a second page.
   const isChart = example.kind === 'chart';
 
-  // Editing makes the spec state rather than a constant. Seeded from the
-  // example and reset whenever it changes, so switching examples starts clean.
-  const [editing, setEditing] = useState(false);
-  const [edited, setEdited] = useState<ViewSpec | null>(null);
-  const [editedDisplay, setEditedDisplay] = useState<DataTableDisplay | null>(
-    null,
+  // Memoized so the table is only handed a new bundle when a control moves.
+  const exampleView = example.kind === 'table' ? example.view : NO_VIEW;
+  const view = useMemo(
+    () => present(exampleView, exampleView, { scalePer, locale, timeZone }),
+    [exampleView, locale, timeZone, scalePer],
   );
-  // Dropped during render, not in an effect. An effect runs after the paint,
-  // which leaves one render with the previous example's spec over this
-  // example's data — and the engine throws on a field that is not there,
-  // taking the whole page down rather than showing the new example.
-  const [editedFor, setEditedFor] = useState(selected);
-  const staleEdit = editedFor !== selected;
-  if (staleEdit) {
-    setEditedFor(selected);
-    setEdited(null);
-    setEditedDisplay(null);
-  }
-
-  // `e` toggles editing, except while a form control has focus — the locale
-  // and placement selects would otherwise swallow or fight for the key.
-  // Read through a ref: the listener is installed once, and re-binding it on
-  // every example switch would be a lot of churn for one comparison.
-  const isChartRef = useRef(isChart);
-  isChartRef.current = isChart;
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'e' || e.metaKey || e.ctrlKey || e.altKey) return;
-      const el = e.target as HTMLElement | null;
-      if (
-        el?.isContentEditable ||
-        (el && /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName))
-      ) {
-        return;
-      }
-      // A chart has no spec to edit, and every consumer of `editing` is gated
-      // on that — so flipping it here would do nothing now and surprise the
-      // reader on the next table example they open.
-      if (isChartRef.current) return;
-      e.preventDefault();
-      setEditing((v) => !v);
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, []);
-
-  // Overriding the view's locale changes number separators and, for currency
-  // units, where the symbol sits and how many decimals it takes. Memoized so
-  // the engine is not re-run on unrelated renders.
-  // The re-render React schedules above is what actually clears these; reading
-  // through `staleEdit` keeps the discarded pass coherent too.
-  const baseView =
-    (staleEdit ? null : edited) ??
-    (example.kind === 'table' ? example.view : NO_VIEW);
-  const view = useMemo(() => {
-    const scaled =
-      scalePer === 'column'
-        ? baseView
-        : {
-            ...baseView,
-            columns: baseView.columns.map((c) =>
-              autoScaleOf(c) === undefined
-                ? c
-                : // A pool exists to pick *one* scale, so it means nothing once
-                  // every cell picks its own — drop it rather than leave the
-                  // spec self-contradictory.
-                  {
-                    ...c,
-                    autoScale: { per: 'value' as const },
-                    scalePool: undefined,
-                  },
-            ),
-          };
-    if (!locale && !timeZone) return scaled;
-    return {
-      ...scaled,
-      ...(locale ? { locale } : {}),
-      ...(timeZone ? { timeZone } : {}),
-    };
-  }, [baseView, locale, timeZone, scalePer]);
-
-  const display =
-    (staleEdit ? null : editedDisplay) ??
-    (example.kind === 'table' ? example.display : undefined) ??
-    {};
+  const display = example.kind === 'table' ? example.display : undefined;
 
   // Only a view that derives something can be affected by the zone — but a
   // time axis always is, since the zone decides where a day boundary falls.
@@ -505,6 +473,9 @@ export function App() {
 
   const data = isRegression && stress && stressData ? stressData : example.data;
   const rowCount = Array.isArray(data) ? data.length : data.rows.length;
+  // One object per dataset: the table keeps its frame, and the reader's edits,
+  // for as long as it is handed the same one.
+  const bundleData = useMemo(() => ({ rows: sourceRows(data) }), [data]);
 
   // The collapsible at the bottom renders these; both memoized so opening it
   // does not re-derive on every render.
@@ -523,6 +494,49 @@ export function App() {
   const hasSplit = labels.some((l) => l.scalePart !== '' && l.unitPart !== '');
   /** Only a view that lets the data pick a scale has anything to switch. */
   const hasAutoScale = view.columns.some((c) => autoScaleOf(c) !== undefined);
+
+  const bundle = useMemo<PivoetteBundle>(
+    () => ({
+      data: bundleData,
+      meta: datasetMeta,
+      view,
+      display: { ...display, unitPlacement, scalePlacement },
+      height: 560,
+    }),
+    [bundleData, datasetMeta, view, display, unitPlacement, scalePlacement],
+  );
+
+  // The table owns the edits, so the example is handed over as its baseline:
+  // what the editor's Reset returns to. A control that moves while the reader
+  // has rearranged the table re-applies itself to their arrangement rather
+  // than discarding it — possible because a bundle over the same data swaps
+  // in at once. A layout effect, so the table never paints the old example.
+  const tableRef = useRef<PivoetteTableElement>(null);
+  useLayoutEffect(() => {
+    const table = tableRef.current;
+    if (!table) return;
+    const carried =
+      table.edited && table.bundle?.data === bundle.data
+        ? { view: table.view!, display: table.display }
+        : undefined;
+    table.bundle = bundle;
+    if (carried) {
+      table.view = present(carried.view, exampleView, {
+        scalePer,
+        locale,
+        timeZone,
+      });
+      table.display = { ...carried.display, unitPlacement, scalePlacement };
+    }
+  }, [
+    bundle,
+    exampleView,
+    scalePer,
+    locale,
+    timeZone,
+    unitPlacement,
+    scalePlacement,
+  ]);
 
   function setBoth(v: UnitPlacement) {
     setUnitPlacement(v);
@@ -550,11 +564,6 @@ export function App() {
       >
         <div>
           <h1 style={{ marginBottom: 4 }}>Pivoette</h1>
-          <p style={{ color: 'var(--page-muted)', marginTop: 0 }}>
-            In-browser pivot-table / data-analysis component — worked examples.
-            Also as a{' '}
-            <a href="demo/element.html">web component with an editor</a>.
-          </p>
         </div>
         <div
           style={{
@@ -622,6 +631,23 @@ export function App() {
             {e.title}
           </button>
         ))}
+        {/* Its own page rather than a tab: it shows the element the way a
+            host page uses it — one script tag, no React — which this app,
+            being React, cannot. */}
+        <a
+          href="demo/element.html"
+          style={{
+            padding: '6px 12px',
+            borderRadius: 6,
+            border: '1px solid var(--btn-border)',
+            background: 'var(--btn-bg)',
+            color: 'var(--btn-fg)',
+            fontSize: 13,
+            textDecoration: 'none',
+          }}
+        >
+          8 · Web component (plain HTML) ↗
+        </a>
       </div>
 
       <p style={{ color: 'var(--page-subtle)', fontSize: 13, minHeight: 34 }}>
@@ -715,103 +741,18 @@ export function App() {
           unitPlacement={graphPlacement}
         />
       ) : (
-        <DataTable
-          key={example.id + (stress ? '-stress' : '')}
-          data={data}
-          view={view}
-          height={560}
-          theme={theme}
-          display={{ ...display, unitPlacement, scalePlacement }}
-          editing={editing}
-          onViewChange={setEdited}
-          onDisplayChange={setEditedDisplay}
-        />
+        <>
+          <pivoette-table id="example-table" ref={tableRef} theme={theme} />
+          {/* Below the table rather than beside it: a panel beside it would
+              take its width out of the table, the thing being edited. Opening
+              it is what turns on the table's own + buttons and drag handles. */}
+          <pivoette-editor for="example-table" style={{ marginTop: 10 }} />
+        </>
       )}
 
-      {/* Below the table rather than beside it: the panel used to take its
-          width out of the table, which is the one thing being edited. */}
-      {editing && !isChart && (
-        <div style={{ marginTop: 10 }}>
-          {/* No `frame`: the panel shows the spec, so raw field names are the
-              right identifiers here — they are what the config says. */}
-          <ViewEditor
-            view={view}
-            display={display}
-            theme={theme}
-            onViewChange={setEdited}
-            onDisplayChange={setEditedDisplay}
-          />
-        </div>
-      )}
-
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          marginTop: 10,
-        }}
-      >
-        {!isChart && (
-          <button
-            onClick={() => setEditing((v) => !v)}
-            style={{
-              padding: '4px 10px',
-              borderRadius: 6,
-              border: '1px solid var(--btn-border)',
-              cursor: 'pointer',
-              background: editing ? 'var(--btn-active-bg)' : 'var(--btn-bg)',
-              color: editing ? 'var(--btn-active-fg)' : 'var(--btn-fg)',
-              fontSize: 12,
-            }}
-          >
-            {editing ? 'Done editing' : 'Edit'}
-          </button>
-        )}
-        {editing && !isChart && (
-          <button
-            disabled={!edited && !editedDisplay}
-            onClick={() => {
-              setEdited(null);
-              setEditedDisplay(null);
-            }}
-            style={{
-              padding: '4px 10px',
-              borderRadius: 6,
-              border: '1px solid var(--btn-border)',
-              background: 'var(--btn-bg)',
-              color: 'var(--btn-fg)',
-              cursor: edited || editedDisplay ? 'pointer' : 'default',
-              opacity: edited || editedDisplay ? 1 : 0.45,
-              fontSize: 12,
-            }}
-          >
-            Reset to the example
-          </button>
-        )}
-        <span style={{ color: 'var(--page-muted)', fontSize: 12 }}>
-          {rowCount.toLocaleString()} source rows
-          {!isChart && (
-            <>
-              {' · press '}
-              <kbd
-                style={{
-                  padding: '1px 5px',
-                  borderRadius: 4,
-                  border: '1px solid var(--btn-border)',
-                  background: 'var(--btn-bg)',
-                  color: 'var(--btn-fg)',
-                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                  fontSize: 11,
-                }}
-              >
-                e
-              </kbd>{' '}
-              to {editing ? 'stop editing' : 'edit'}
-            </>
-          )}
-        </span>
-      </div>
+      <p style={{ color: 'var(--page-muted)', fontSize: 12, margin: '10px 0' }}>
+        {rowCount.toLocaleString()} source rows
+      </p>
 
       <Panel
         title={

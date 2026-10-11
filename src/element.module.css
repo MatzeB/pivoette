@@ -1,0 +1,68 @@
+/**
+ * The custom elements' own styles: their box, and `<pivoette-editor>`'s
+ * disclosure — closed, one small control under or beside the table; open, the
+ * panel follows it.
+ */
+
+/*
+ * Both elements share this sheet. A custom element is inline unless told
+ * otherwise, which would ignore a margin set on it; a host page's own rule
+ * for the tag still wins over `:host`.
+ */
+:host {
+  display: block;
+}
+
+.disclosure {
+  composes: palette from './theme.module.css';
+
+  color: var(--pv-text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+}
+
+.summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--pv-border);
+  background: var(--pv-bg);
+  cursor: pointer;
+  user-select: none;
+  /* The marker is drawn below, so it can turn rather than swap glyphs. */
+  list-style: none;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-block: 4px solid transparent;
+  border-inline-start: 5px solid currentColor;
+  opacity: 0.6;
+  transition: transform 0.15s ease;
+}
+
+.disclosure[open] > .summary::before {
+  transform: rotate(90deg);
+}
+
+.summary:hover {
+  background: var(--pv-hover);
+}
+
+.summary:focus-visible {
+  outline: 2px solid light-dark(#3b82f6, #60a5fa);
+  outline-offset: 2px;
+}
+
+.body {
+  margin-top: 8px;
+}

@@ -266,6 +266,18 @@ pivotColumns: [{ field: 'weekday' }],
 Weekdays come out in the locale's calendar order, and a `timeZone` on the
 view controls how timestamps are interpreted.
 
+**`filter`** leaves rows out before anything is grouped or totalled, by the
+values of a field. It lists what to exclude, so values that appear in new data
+show up by default. It applies after `derive`, works on flat tables too, and
+can name a field that isn't on either axis:
+
+```ts
+filter: { platform: { exclude: ['GPU'] } },
+```
+
+The editor panel has a Filter section with a checkbox per value for each axis
+field, and a menu to filter on any other field.
+
 **Computed columns** compute a value from other columns in the same row:
 
 ```ts
@@ -391,17 +403,17 @@ metadata and the view, either from `src` or from a
 page CSS and table CSS stay separate. A bundle with mistakes shows every
 problem in place instead of rendering a blank box.
 
-**Editing.** Add `editable` to get the in-table editing controls, and point a
-`<pivoette-editor>` at the table's `id` for the side panel. The table owns the
-view, so edits made in either place show up in both:
+**Editing.** Point a `<pivoette-editor>` at the table's `id`. It starts as a
+closed _Edit_ disclosure; opening it shows the panel and turns on the
+in-table editing controls (the `+` buttons and drag handles), and closing it
+turns them off again. Give it `open` to start open, or children to replace the
+summary text. A table with `editable` shows its controls with or without an
+editor. The table owns the view, so edits made in either place show up in both:
 
 ```html
+<pivoette-table id="downloads" src="/data/downloads.pivoette.json">
+</pivoette-table>
 <pivoette-editor for="downloads"></pivoette-editor>
-<pivoette-table
-  id="downloads"
-  editable
-  src="/data/downloads.pivoette.json"
-></pivoette-table>
 
 <script>
   const table = document.getElementById('downloads');
@@ -411,7 +423,8 @@ view, so edits made in either place show up in both:
 
 Every edit fires `pivoette-change`, and `table.bundle` is the original bundle
 with the edits folded in. `table.view` and `table.display` can also be set
-from script. The editor's Reset button, or `table.reset()`, returns to the
+from script, and so can `table.bundle`, for a page that builds its bundle in
+code rather than serving one. The editor's Reset button, or `table.reset()`, returns to the
 bundle as loaded; add `no-reset` to the editor to hide the button. [Try it live](https://matzeb.github.io/pivoette/demo/element.html).
 
 ## Examples

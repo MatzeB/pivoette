@@ -88,12 +88,13 @@ describe('<pivoette-table>', () => {
   });
 });
 
-/** Mount a table, then an editor pointed at it. */
-async function mountPair() {
+/** Mount a table, then an editor pointed at it — open unless told not to. */
+async function mountPair({ open = true } = {}) {
   const table = await mount(good);
   table.id = 'sales';
   const editor = document.createElement('pivoette-editor');
   editor.setAttribute('for', 'sales');
+  editor.toggleAttribute('open', open);
   await act(async () => {
     document.body.appendChild(editor);
     await Promise.resolve();
@@ -102,6 +103,11 @@ async function mountPair() {
     table: table as PivoetteTableElement,
     editor: editor as PivoetteEditorElement,
   };
+}
+
+/** How many of its edit controls the table is showing. */
+function editControls(table: HTMLElement) {
+  return table.shadowRoot!.querySelectorAll('button[title^="Remove"]').length;
 }
 
 describe('editing', () => {
@@ -154,7 +160,11 @@ describe('editing', () => {
     await act(async () => {
       table.view = { ...table.view!, pivotColumns: [] };
     });
-    expect(editor.shadowRoot!.textContent).not.toContain('quarter');
+    // Gone from the lists; it is on offer in the add menus instead.
+    const listed = [...editor.shadowRoot!.querySelectorAll('li')].map(
+      (li) => li.textContent,
+    );
+    expect(listed.join()).not.toContain('quarter');
     await unmount(editor);
     await unmount(table);
   });
@@ -162,6 +172,7 @@ describe('editing', () => {
   it('waits for a table that is not in the page yet', async () => {
     const editor = document.createElement('pivoette-editor');
     editor.setAttribute('for', 'later');
+    editor.setAttribute('open', '');
     await act(async () => {
       document.body.appendChild(editor);
       await Promise.resolve();
@@ -219,6 +230,122 @@ describe('editing', () => {
 
     await act(async () => editor.setAttribute('no-reset', ''));
     expect(reset()).toBeUndefined();
+    await unmount(editor);
+    await unmount(table);
+  });
+
+  it('stays closed, and leaves the table alone, until opened', async () => {
+    const { table, editor } = await mountPair({ open: false });
+    const summary = editor.shadowRoot!.querySelector('summary')!;
+    expect(summary.textContent).toBe('Edit');
+    // Closed, the panel's lists are not even mounted.
+    expect(editor.shadowRoot!.textContent).not.toContain('quarter');
+    expect(editControls(table)).toBe(0);
+
+    await act(async () => {
+      editor.open = true;
+    });
+    expect(editor.shadowRoot!.textContent).toContain('quarter');
+    expect(editControls(table)).toBeGreaterThan(0);
+
+    await act(async () => {
+      editor.open = false;
+    });
+    expect(editControls(table)).toBe(0);
+    await unmount(editor);
+    await unmount(table);
+  });
+
+  it('keeps the table editable while any reason to remains', async () => {
+    const { table, editor } = await mountPair();
+    const second = document.createElement('pivoette-editor');
+    second.setAttribute('for', 'sales');
+    second.setAttribute('open', '');
+    await act(async () => {
+      document.body.appendChild(second);
+      await Promise.resolve();
+    });
+
+    // Another editor is still open.
+    await act(async () => {
+      (editor as PivoetteEditorElement).open = false;
+    });
+    expect(editControls(table)).toBeGreaterThan(0);
+
+    // Removing an open editor lets go too.
+    await unmount(second);
+    expect(editControls(table)).toBe(0);
+
+    // The table's own attribute outlasts any editor.
+    await act(async () => {
+      table.setAttribute('editable', '');
+      (editor as PivoetteEditorElement).open = true;
+    });
+    await act(async () => {
+      (editor as PivoetteEditorElement).open = false;
+    });
+    expect(editControls(table)).toBeGreaterThan(0);
+    await unmount(editor);
+    await unmount(table);
+  });
+});
+
+describe('the bundle property', () => {
+  it('replaces the inline bundle and becomes what reset returns to', async () => {
+    const el = (await mount(good)) as PivoetteTableElement;
+    const flat = {
+      ...good,
+      data: { csv: 'region,revenue\nEU,1\n' },
+      view: { columns: [{ id: 'region' }, { id: 'revenue' }] },
+    };
+    await act(async () => {
+      el.bundle = flat;
+      await Promise.resolve();
+    });
+    expect(el.view).toBe(flat.view);
+    expect(el.shadowRoot!.textContent).not.toContain('Q1');
+    expect(el.edited).toBe(false);
+    await unmount(el);
+  });
+
+  it('takes effect at once over the same data, keeping the frame', async () => {
+    const el = (await mount(good)) as PivoetteTableElement;
+    const frame = el.frame;
+    const edited = { ...el.view!, pivotColumns: [] };
+    await act(async () => {
+      el.view = edited;
+    });
+    const restyled = { ...el.bundle!, view: { ...good.view, locale: 'de-DE' } };
+    await act(async () => {
+      el.bundle = restyled;
+    });
+    // Synchronous, so a host can carry its edits over straight away.
+    expect(el.view).toBe(restyled.view);
+    expect(el.frame).toBe(frame);
+    expect(el.edited).toBe(false);
+    await unmount(el);
+  });
+});
+
+describe('removal preview', () => {
+  it("shows in the table what the editor's remove button would take", async () => {
+    const { table, editor } = await mountPair();
+    const tinted = () =>
+      table.shadowRoot!.querySelectorAll('[class*="removeTint"]').length;
+    const x = editor.shadowRoot!.querySelector<HTMLButtonElement>(
+      'button[title="Remove"]',
+    )!;
+    expect(tinted()).toBe(0);
+    await act(async () => {
+      x.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+    });
+    expect(tinted()).toBeGreaterThan(0);
+
+    // Closing the panel under the pointer clears it too.
+    await act(async () => {
+      editor.open = false;
+    });
+    expect(tinted()).toBe(0);
     await unmount(editor);
     await unmount(table);
   });

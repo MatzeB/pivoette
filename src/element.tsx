@@ -15,6 +15,11 @@
  * table by id. The table owns the view — edits from its own headers and from
  * any editor land in the same place — and announces each change with a
  * `pivoette-change` event, which is also how a host page learns of one.
+ *
+ * The editor is a disclosure, closed until the reader opens it, and an open
+ * editor is also what puts its table into edit mode. Reading a table and
+ * rearranging it are different activities; the `+` buttons and drag handles
+ * belong to the second, so they appear with the panel and leave with it.
  */
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -26,6 +31,8 @@ import { loadBundle, validateBundle } from './bundle';
 import type { PivoetteBundle } from './bundle';
 import type { DataFrame } from './data/types';
 import type { ViewSpec } from './pivot/spec';
+import type { RemovalRef } from './editor/ops';
+import styles from './element.module.css';
 
 declare const __PIVOETTE_CSS__: string | undefined;
 
@@ -43,11 +50,49 @@ export interface PivoetteChangeDetail {
 type Theme = 'auto' | 'light' | 'dark';
 
 let sheet: CSSStyleSheet | undefined;
-function styles(): CSSStyleSheet | undefined {
-  if (sheet || typeof __PIVOETTE_CSS__ !== 'string') return sheet;
+function shadowStyles(): CSSStyleSheet | undefined {
+  if (sheet) return sheet;
+  // Constructable sheets are missing from jsdom, where there is nothing to
+  // see anyway.
+  if (
+    typeof CSSStyleSheet === 'undefined' ||
+    typeof CSSStyleSheet.prototype.replaceSync !== 'function'
+  ) {
+    return;
+  }
   sheet = new CSSStyleSheet();
-  sheet.replaceSync(__PIVOETTE_CSS__);
+  if (typeof __PIVOETTE_CSS__ === 'string') sheet.replaceSync(__PIVOETTE_CSS__);
+  else mirrorDocumentStyles(sheet);
   return sheet;
+}
+
+/**
+ * Run from source rather than from the element build — as the React demo
+ * does — there is no inlined CSS: the bundler put the component styles in the
+ * document, where a shadow root cannot see them. Copy them in, and copy again
+ * whenever the head changes or a stylesheet finishes loading, so a
+ * hot-reloaded style reaches the shadow root too.
+ */
+function mirrorDocumentStyles(target: CSSStyleSheet) {
+  const sync = () =>
+    target.replaceSync(
+      [...document.styleSheets]
+        .map((s) => {
+          try {
+            return [...s.cssRules].map((r) => r.cssText).join('\n');
+          } catch {
+            return ''; // Cross-origin: its rules are not readable.
+          }
+        })
+        .join('\n'),
+    );
+  sync();
+  new MutationObserver(sync).observe(document.head, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  });
+  document.addEventListener('load', sync, true);
 }
 
 /**
@@ -59,12 +104,22 @@ function mountRoot(host: HTMLElement): Root {
   let shadow = host.shadowRoot;
   if (!shadow) {
     shadow = host.attachShadow({ mode: 'open' });
-    const adopted = styles();
+    const adopted = shadowStyles();
     if (adopted) shadow.adoptedStyleSheets = [adopted];
   }
   const mount = document.createElement('div');
   shadow.replaceChildren(mount);
   return createRoot(mount);
+}
+
+/**
+ * A bare number is pixels, as in `height="320"`; anything else is CSS. An
+ * attribute is always a string, and React would hand `"320"` to the style
+ * as-is — a length with no unit, which the browser drops.
+ */
+function heightOf(value: string | null): number | string | undefined {
+  if (value === null) return undefined;
+  return /^\d+(\.\d+)?$/.test(value.trim()) ? Number(value) : value;
 }
 
 function themeOf(value: string | null): Theme | undefined {
@@ -106,9 +161,30 @@ function Problem({ title, lines }: { title: string; lines: string[] }) {
 interface Loaded {
   bundle: PivoetteBundle;
   frame: DataFrame;
+  /**
+   * Which frame this is. The table is remounted when it changes, so a sort or
+   * scroll position on one dataset does not carry over to the next.
+   */
+  generation: number;
   view: ViewSpec;
   display: DataTableDisplay | undefined;
 }
+
+/**
+ * How an open editor puts its table into edit mode, and takes it out again.
+ * Assigned by the table class, which keeps the set of editors private.
+ */
+let holdEditing: (
+  table: PivoetteTableElement,
+  editor: PivoetteEditorElement,
+  held: boolean,
+) => void;
+
+/** How an editor shows, in its table, what a hovered remove button would take. */
+let previewRemoval: (
+  table: PivoetteTableElement,
+  ref: RemovalRef | null,
+) => void;
 
 export class PivoetteTableElement extends HTMLElement {
   static observedAttributes = ['src', 'height', 'theme', 'editable'];
@@ -116,7 +192,28 @@ export class PivoetteTableElement extends HTMLElement {
   #root?: Root;
   /** Bumped on every (re)load so a slow fetch cannot overwrite a newer one. */
   #token = 0;
+  #generation = 0;
   #loaded?: Loaded;
+  /** A bundle handed over through the `bundle` property, which beats `src`. */
+  #given?: PivoetteBundle;
+  /** The editors open on this table. Any one of them is enough to edit. */
+  #editors = new Set<PivoetteEditorElement>();
+  /** What an editor's hovered remove button points at, shown in red. */
+  #removing: RemovalRef | null = null;
+
+  static {
+    holdEditing = (table, editor, held) => {
+      const before = table.#editors.size > 0;
+      if (held) table.#editors.add(editor);
+      else table.#editors.delete(editor);
+      if (table.#editors.size > 0 !== before) table.#render();
+    };
+    previewRemoval = (table, ref) => {
+      if (ref === table.#removing) return;
+      table.#removing = ref;
+      table.#render();
+    };
+  }
 
   connectedCallback() {
     // A move within the DOM disconnects then reconnects; the root survives it.
@@ -129,8 +226,10 @@ export class PivoetteTableElement extends HTMLElement {
     if (!this.#root) return;
     // Only a new source means new data. The rest is presentation, and
     // re-reading the bundle for it would throw away the reader's edits.
-    if (name === 'src') void this.#load();
-    else this.#render();
+    if (name === 'src') {
+      this.#given = undefined;
+      void this.#load();
+    } else this.#render();
   }
 
   disconnectedCallback() {
@@ -198,12 +297,42 @@ export class PivoetteTableElement extends HTMLElement {
     return { ...bundle, view, ...(display ? { display } : {}) };
   }
 
+  /**
+   * Show this bundle instead of the one from `src` or the inline script, for a
+   * host that builds it in code. Edits are discarded: this is the new baseline
+   * that `reset()` returns to.
+   *
+   * A bundle over the same `data` and `meta` objects as the current one takes
+   * effect at once, keeping the frame — so a host can restyle a large table
+   * without re-parsing its rows, and carry edits over by setting `view` right
+   * after. New data loads asynchronously, like `src`.
+   */
+  set bundle(next: PivoetteBundle) {
+    this.#given = next;
+    const loaded = this.#loaded;
+    if (
+      loaded &&
+      next.data === loaded.bundle.data &&
+      next.meta === loaded.bundle.meta
+    ) {
+      // Supersede any load still in flight.
+      ++this.#token;
+      this.#accept(next, loaded.frame, loaded.generation);
+    } else void this.#load();
+  }
+
+  /** The palette in effect: the attribute, else the bundle's, else `auto`. */
   get theme(): Theme {
     return (
       themeOf(this.getAttribute('theme')) ??
       this.#loaded?.bundle.theme ??
       'auto'
     );
+  }
+
+  /** Sets the attribute. React assigns a property when the element has one. */
+  set theme(next: Theme) {
+    this.setAttribute('theme', next);
   }
 
   #changed() {
@@ -227,20 +356,30 @@ export class PivoetteTableElement extends HTMLElement {
     if (!loaded) return;
     this.#show(
       <DataTable
+        key={loaded.generation}
         data={loaded.frame}
         view={loaded.view}
         display={loaded.display}
-        editing={this.hasAttribute('editable')}
+        editing={this.hasAttribute('editable') || this.#editors.size > 0}
         onViewChange={(view) => (this.view = view)}
         onDisplayChange={(display) => (this.display = display)}
-        height={this.getAttribute('height') ?? loaded.bundle.height ?? 420}
+        removing={this.#removing}
+        height={
+          heightOf(this.getAttribute('height')) ?? loaded.bundle.height ?? 420
+        }
         theme={this.theme}
       />,
     );
   }
 
-  /** The bundle, from `src` or from a child `<script type="application/json">`. */
+  /**
+   * The bundle: the one set as a property, else from `src`, else from a child
+   * `<script type="application/json">`.
+   */
   async #bundle(): Promise<{ bundle: PivoetteBundle; baseUrl?: string }> {
+    if (this.#given) {
+      return { bundle: this.#given, baseUrl: document.baseURI };
+    }
     const src = this.getAttribute('src');
     if (src) {
       const url = new URL(src, document.baseURI).href;
@@ -274,21 +413,7 @@ export class PivoetteTableElement extends HTMLElement {
       const { bundle, baseUrl } = await this.#bundle();
       const frame = await loadBundle(bundle, baseUrl);
       if (!current()) return;
-      const { ok, problems } = validateBundle(bundle, frame);
-      if (!ok) {
-        this.#show(
-          <Problem title="This table's spec has problems:" lines={problems} />,
-        );
-        return;
-      }
-      this.#loaded = {
-        bundle,
-        frame,
-        view: bundle.view,
-        display: bundle.display,
-      };
-      // Announced like an edit, so an editor that connected first catches up.
-      this.#changed();
+      this.#accept(bundle, frame, ++this.#generation);
     } catch (error) {
       if (!current()) return;
       this.#show(
@@ -299,12 +424,41 @@ export class PivoetteTableElement extends HTMLElement {
       );
     }
   }
+
+  /** Show a bundle whose frame is built, if it validates against it. */
+  #accept(bundle: PivoetteBundle, frame: DataFrame, generation: number) {
+    const { ok, problems } = validateBundle(bundle, frame);
+    if (!ok) {
+      this.#loaded = undefined;
+      this.#show(
+        <Problem title="This table's spec has problems:" lines={problems} />,
+      );
+      return;
+    }
+    this.#loaded = {
+      bundle,
+      frame,
+      generation,
+      view: bundle.view,
+      display: bundle.display,
+    };
+    // Announced like an edit, so an editor that connected first catches up.
+    this.#changed();
+  }
 }
 
 /**
- * `<pivoette-editor for="table-id">`: the field lists of a table's view, to
- * reorder, remove, or re-aggregate, and a Reset button to undo all of it.
- * `no-reset` hides the button.
+ * `<pivoette-editor for="table-id">`: a disclosure, closed by default, that
+ * opens onto the field lists of a table's view — to reorder, remove, or
+ * re-aggregate — and a Reset button to undo all of it. `no-reset` hides the
+ * button.
+ *
+ * Opening it puts the table into edit mode, showing the `+` buttons and drag
+ * handles on the table itself; closing it takes them away again, unless the
+ * table is `editable` on its own or another editor on it is still open. Like
+ * `<details>`, the `open` attribute (and property) starts it open, and is
+ * kept in step as the reader toggles it. The summary reads "Edit"; the
+ * element's children replace that text.
  *
  * It holds no view of its own. It reads the table's, writes edits back
  * through the table's `view` / `display` setters, and redraws on the table's
@@ -315,12 +469,14 @@ export class PivoetteTableElement extends HTMLElement {
  * and may arrive later than the editor does.
  */
 export class PivoetteEditorElement extends HTMLElement {
-  static observedAttributes = ['for', 'theme', 'no-reset'];
+  static observedAttributes = ['for', 'theme', 'no-reset', 'open'];
 
   #root?: Root;
   #table?: PivoetteTableElement;
   /** Watches for the table while it has not appeared yet. */
   #waiting?: MutationObserver;
+  /** The table this editor currently has in edit mode, if any. */
+  #holding?: PivoetteTableElement;
 
   #onChange = () => this.#render();
 
@@ -332,7 +488,10 @@ export class PivoetteEditorElement extends HTMLElement {
   attributeChangedCallback(name: string) {
     if (!this.#root) return;
     if (name === 'for') this.#connect();
-    else this.#render();
+    else {
+      if (name === 'open') this.#hold();
+      this.#render();
+    }
   }
 
   disconnectedCallback() {
@@ -349,63 +508,110 @@ export class PivoetteEditorElement extends HTMLElement {
     return this.#table;
   }
 
+  get open(): boolean {
+    return this.hasAttribute('open');
+  }
+
+  set open(next: boolean) {
+    this.toggleAttribute('open', next);
+  }
+
+  /** Edit mode on the table while open and attached to one, off otherwise. */
+  #hold() {
+    const want = this.open ? this.#table : undefined;
+    if (want === this.#holding) return;
+    if (this.#holding) {
+      // A panel that closes under the pointer gets no mouseleave.
+      previewRemoval(this.#holding, null);
+      holdEditing(this.#holding, this, false);
+    }
+    this.#holding = want;
+    if (want) holdEditing(want, this, true);
+  }
+
   #disconnect() {
     this.#waiting?.disconnect();
     this.#waiting = undefined;
     this.#table?.removeEventListener(CHANGE_EVENT, this.#onChange);
     this.#table = undefined;
+    this.#hold();
   }
 
   #connect() {
     this.#disconnect();
     const id = this.getAttribute('for');
-    if (!id) {
-      this.#show(<Note text="Set `for` to the id of a <pivoette-table>." />);
-      return;
-    }
-    const scope = this.getRootNode() as Document | ShadowRoot;
-    const found = scope.getElementById(id);
-    if (found instanceof PivoetteTableElement) {
-      this.#table = found;
-      found.addEventListener(CHANGE_EVENT, this.#onChange);
-      this.#render();
-      return;
-    }
-    this.#show(<Note text={`Waiting for <pivoette-table id="${id}">…`} />);
-    this.#waiting = new MutationObserver(() => {
-      if (scope.getElementById(id) instanceof PivoetteTableElement) {
-        this.#connect();
+    if (id) {
+      const scope = this.getRootNode() as Document | ShadowRoot;
+      const found = scope.getElementById(id);
+      if (found instanceof PivoetteTableElement) {
+        this.#table = found;
+        found.addEventListener(CHANGE_EVENT, this.#onChange);
+        this.#hold();
+      } else {
+        this.#waiting = new MutationObserver(() => {
+          if (scope.getElementById(id) instanceof PivoetteTableElement) {
+            this.#connect();
+          }
+        });
+        this.#waiting.observe(scope, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['id'],
+        });
       }
-    });
-    this.#waiting.observe(scope, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['id'],
-    });
+    }
+    this.#render();
   }
 
-  #show(node: React.ReactNode) {
-    this.#root?.render(<StrictMode>{node}</StrictMode>);
-  }
-
-  #render() {
+  /** What the panel holds once opened: the lists, or why there are none. */
+  #body(): React.ReactNode {
+    const id = this.getAttribute('for');
+    if (!id) return <Note text="Set `for` to the id of a <pivoette-table>." />;
     const table = this.#table;
-    const view = table?.view;
-    if (!table || !view) return;
-    this.#show(
+    if (!table)
+      return <Note text={`Waiting for <pivoette-table id="${id}">…`} />;
+    const view = table.view;
+    if (!view) return null;
+    return (
       <ViewEditor
         view={view}
         display={table.display}
         frame={table.frame}
-        theme={themeOf(this.getAttribute('theme')) ?? table.theme}
+        theme={this.#theme()}
         onViewChange={(next) => (table.view = next)}
         onDisplayChange={(next) => (table.display = next)}
         onReset={
           this.hasAttribute('no-reset') ? undefined : () => table.reset()
         }
         canReset={table.edited}
-      />,
+        onRemovePreview={(ref) => previewRemoval(table, ref)}
+      />
+    );
+  }
+
+  #theme(): Theme {
+    return themeOf(this.getAttribute('theme')) ?? this.#table?.theme ?? 'auto';
+  }
+
+  #render() {
+    const theme = this.#theme();
+    const open = this.open;
+    this.#root?.render(
+      <StrictMode>
+        <details
+          className={styles.disclosure}
+          data-theme={theme === 'auto' ? undefined : theme}
+          open={open}
+          onToggle={(e) => (this.open = e.currentTarget.open)}
+        >
+          <summary className={styles.summary}>
+            <slot>Edit</slot>
+          </summary>
+          {/* Mounted only while open: a closed panel has nothing to keep. */}
+          {open && <div className={styles.body}>{this.#body()}</div>}
+        </details>
+      </StrictMode>,
     );
   }
 }

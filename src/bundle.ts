@@ -339,6 +339,25 @@ export function validateBundle(
     }
   });
 
+  // Filters name a field like an axis does, derived ones included.
+  if (view.filter !== undefined) {
+    if (
+      !view.filter ||
+      typeof view.filter !== 'object' ||
+      Array.isArray(view.filter)
+    ) {
+      add('view.filter must be an object keyed by field name');
+    } else {
+      for (const [field, f] of Object.entries(view.filter)) {
+        const at = `view.filter.${field}`;
+        checkField(field, at);
+        if (!f || !Array.isArray(f.exclude)) {
+          add(`${at}: needs \`exclude\`, an array of the values to leave out`);
+        }
+      }
+    }
+  }
+
   // Computed axis members. The engine reads them off the innermost column
   // level — that is what tells it how often each one repeats — so the places it
   // would not look for them are worth saying out loud rather than dropping.

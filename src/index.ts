@@ -130,7 +130,8 @@ export type {
 } from './data/meta';
 
 // Engine
-export { computeView } from './pivot/engine';
+export { computeView, fieldMembers } from './pivot/engine';
+export type { Member } from './pivot/engine';
 export { buildHeader } from './pivot/result';
 export type {
   Cell,
@@ -150,6 +151,7 @@ export type {
   ColumnDef,
   ComputedMember,
   DerivedField,
+  FieldFilter,
   MemberRef,
   FormatOptionsSpec,
   CompositeSpec,
@@ -180,11 +182,13 @@ export {
   moveFooterRow,
   removeColumn,
   removeField,
+  removeFilter,
   removeFooterRow,
   setColumnAgg,
+  setExcluded,
   setShowSummary,
 } from './editor/ops';
-export type { FieldRef, FieldZone } from './editor/ops';
+export type { FieldRef, FieldZone, RemovalRef } from './editor/ops';
 
 // Registries (built-ins + extension points)
 export {

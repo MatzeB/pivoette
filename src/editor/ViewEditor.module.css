@@ -76,6 +76,108 @@
   font-size: 11px;
 }
 
+/*
+ * A filter entry: its disclosure takes the row, the × stays at the top right
+ * however far the member list opens below.
+ */
+.filter {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+.filterBody {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.filterSummary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.filterSummary::-webkit-details-marker {
+  display: none;
+}
+
+.filterSummary::before {
+  content: '';
+  flex: 0 0 auto;
+  border-block: 3.5px solid transparent;
+  border-inline-start: 4.5px solid currentColor;
+  opacity: 0.5;
+  transition: transform 0.15s ease;
+}
+
+.filterBody[open] > .filterSummary::before {
+  transform: rotate(90deg);
+}
+
+.filterStatus {
+  flex: 0 0 auto;
+  color: var(--pv-muted);
+  font-size: 11px;
+}
+
+/* Long lists scroll in place rather than stretching the panel. */
+.members {
+  margin: 4px 0 0;
+  padding: 0 0 0 10px;
+  list-style: none;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 0;
+  cursor: pointer;
+}
+
+.member input {
+  margin: 0;
+}
+
+.showAll {
+  margin: 4px 0 0 10px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--pv-muted);
+  font: inherit;
+  font-size: 11px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.showAll:hover {
+  color: inherit;
+}
+
+/* Adds a total row; reads as a control rather than as another entry. */
+.add {
+  display: block;
+  margin-top: 2px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1px dashed var(--pv-border);
+  background: transparent;
+  color: var(--pv-muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.add:hover {
+  color: inherit;
+}
+
 .remove {
   flex: 0 0 auto;
   width: 18px;

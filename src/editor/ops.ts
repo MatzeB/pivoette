@@ -13,6 +13,7 @@ import type { DataTableDisplay } from '../components/DataTable';
 import { isFlat } from '../pivot/spec';
 import { clampIndex } from '../util';
 import type { AxisField, ColumnDef, ViewSpec } from '../pivot/spec';
+import type { CellValue } from '../data/types';
 
 /** The two axes a grouping field can live on. */
 export type FieldZone = 'pivotRows' | 'pivotColumns';
@@ -28,6 +29,13 @@ export type DragRef =
   | FieldRef
   | { zone: 'columns'; index: number }
   | { zone: 'footer'; index: number };
+
+/**
+ * What a remove control would take: any list entry, or the grand total, which
+ * is a flag on the view rather than an entry in a list. A panel reports the one
+ * under the pointer so the table can show it before it goes.
+ */
+export type RemovalRef = DragRef | { zone: 'summary' };
 
 /** Where a drop can send its changes. */
 export interface DropTargets {
@@ -173,10 +181,16 @@ function columnId(columns: ColumnDef[], field: string, agg: string): string {
   return `${base}_${n}`;
 }
 
+/**
+ * Append a measure. Its label defaults to naming both halves, `sum revenue`;
+ * a caller that knows better — the field's display name, a format for what
+ * the aggregate is — passes `extra`.
+ */
 export function addColumn(
   spec: ViewSpec,
   field: string,
   agg: string,
+  extra: Pick<ColumnDef, 'label' | 'format'> = {},
 ): ViewSpec {
   const p = pivot(spec);
   if (!p) return spec;
@@ -185,7 +199,7 @@ export function addColumn(
     ...p,
     columns: [
       ...p.columns,
-      { id, source: field, agg, label: `${agg} ${field}` },
+      { id, source: field, agg, label: `${agg} ${field}`, ...extra },
     ],
   };
 }
@@ -224,6 +238,31 @@ export function setShowSummary(spec: ViewSpec, on: boolean): ViewSpec {
   const p = pivot(spec);
   if (!p) return spec;
   return { ...p, showSummary: on };
+}
+
+// --- filters ----------------------------------------------------------------
+
+/**
+ * Leave out the rows where `field` takes one of `exclude`. Not pivot-only: a
+ * flat table can be filtered as well as a pivot can. An empty list keeps the
+ * filter, so a field filtered on from the panel stays listed there.
+ */
+export function setExcluded(
+  spec: ViewSpec,
+  field: string,
+  exclude: CellValue[],
+): ViewSpec {
+  return { ...spec, filter: { ...spec.filter, [field]: { exclude } } };
+}
+
+/** Drop the filter on `field`, letting every row back in. */
+export function removeFilter(spec: ViewSpec, field: string): ViewSpec {
+  if (!spec.filter || !(field in spec.filter)) return spec;
+  const filter = { ...spec.filter };
+  delete filter[field];
+  const next: ViewSpec = { ...spec, filter };
+  if (Object.keys(filter).length === 0) delete next.filter;
+  return next;
 }
 
 // --- footer rows ------------------------------------------------------------

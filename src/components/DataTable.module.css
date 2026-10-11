@@ -146,6 +146,14 @@
   text-align: left;
 }
 
+/* In place of the body when there are no rows to show. */
+.emptyState {
+  padding: 16px 12px !important;
+  color: var(--pv-muted);
+  font-style: italic;
+  text-align: left;
+}
+
 /* Space between the body and the footer. */
 .footSpace {
   height: 8px;
