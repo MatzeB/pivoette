@@ -424,14 +424,14 @@ it turns them off again.
 
 | You want                                   | Write                                                  |
 | ------------------------------------------ | ------------------------------------------------------ |
-| Editing on demand (the usual case)         | `<pivoette-editor for="…">`, no `editable`             |
+| Editing on demand (the usual case)         | `<pivoette-editor for="…">`                            |
 | The panel open from the start              | `<pivoette-editor for="…" open>`                       |
 | Your own label instead of "Edit"           | `<pivoette-editor for="…">Customize</pivoette-editor>` |
-| In-table controls always on, with no panel | `<pivoette-table editable>`, no editor                 |
+| In-table controls always on, with no panel | `<pivoette-table editable>`, and no editor             |
 
-Don't combine `editable` with an editor: `editable` means _always_ editable,
-so the table stays in edit mode while the panel is closed. Pages written for
-earlier versions, which needed both, should drop `editable`.
+`editable` is for a table without an editor. Once an editor is attached, the
+editor decides, so `editable` on the table is ignored; pages written for
+earlier versions, which needed both, behave like the first row.
 
 Every edit fires `pivoette-change`, and `table.bundle` is the original bundle
 with the edits folded in. `table.view` and `table.display` can also be set

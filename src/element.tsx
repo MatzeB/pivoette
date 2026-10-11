@@ -171,13 +171,14 @@ interface Loaded {
 }
 
 /**
- * How an open editor puts its table into edit mode, and takes it out again.
- * Assigned by the table class, which keeps the set of editors private.
+ * How an editor tells its table that it is attached, and whether it is open
+ * (`true` / `false`), or that it has let go (`null`). Assigned by the table
+ * class, which keeps its editors private.
  */
 let holdEditing: (
   table: PivoetteTableElement,
   editor: PivoetteEditorElement,
-  held: boolean,
+  open: boolean | null,
 ) => void;
 
 /** How an editor shows, in its table, what a hovered remove button would take. */
@@ -196,17 +197,17 @@ export class PivoetteTableElement extends HTMLElement {
   #loaded?: Loaded;
   /** A bundle handed over through the `bundle` property, which beats `src`. */
   #given?: PivoetteBundle;
-  /** The editors open on this table. Any one of them is enough to edit. */
-  #editors = new Set<PivoetteEditorElement>();
+  /** The editors attached to this table, and whether each is open. */
+  #editors = new Map<PivoetteEditorElement, boolean>();
   /** What an editor's hovered remove button points at, shown in red. */
   #removing: RemovalRef | null = null;
 
   static {
-    holdEditing = (table, editor, held) => {
-      const before = table.#editors.size > 0;
-      if (held) table.#editors.add(editor);
-      else table.#editors.delete(editor);
-      if (table.#editors.size > 0 !== before) table.#render();
+    holdEditing = (table, editor, open) => {
+      const before = table.#editing();
+      if (open === null) table.#editors.delete(editor);
+      else table.#editors.set(editor, open);
+      if (table.#editing() !== before) table.#render();
     };
     previewRemoval = (table, ref) => {
       if (ref === table.#removing) return;
@@ -335,6 +336,18 @@ export class PivoetteTableElement extends HTMLElement {
     this.setAttribute('theme', next);
   }
 
+  /**
+   * Whether to show the editing controls. An attached editor decides: they
+   * show while one is open. `editable` is for a table with no editor, which
+   * would otherwise have no way to turn them on — so a page that sets both,
+   * as pages had to before the editor could open and close, still gets a
+   * table that reads as a table until someone opens the panel.
+   */
+  #editing(): boolean {
+    if (this.#editors.size === 0) return this.hasAttribute('editable');
+    return [...this.#editors.values()].some(Boolean);
+  }
+
   #changed() {
     this.#render();
     const { view, display } = this.#loaded!;
@@ -360,7 +373,7 @@ export class PivoetteTableElement extends HTMLElement {
         data={loaded.frame}
         view={loaded.view}
         display={loaded.display}
-        editing={this.hasAttribute('editable') || this.#editors.size > 0}
+        editing={this.#editing()}
         onViewChange={(view) => (this.view = view)}
         onDisplayChange={(display) => (this.display = display)}
         removing={this.#removing}
@@ -454,8 +467,9 @@ export class PivoetteTableElement extends HTMLElement {
  * button.
  *
  * Opening it puts the table into edit mode, showing the `+` buttons and drag
- * handles on the table itself; closing it takes them away again, unless the
- * table is `editable` on its own or another editor on it is still open. Like
+ * handles on the table itself; closing it takes them away again, unless
+ * another editor on it is still open. An attached editor overrides the
+ * table's `editable`, which is for tables without one. Like
  * `<details>`, the `open` attribute (and property) starts it open, and is
  * kept in step as the reader toggles it. The summary reads "Edit"; the
  * element's children replace that text.
@@ -516,17 +530,18 @@ export class PivoetteEditorElement extends HTMLElement {
     this.toggleAttribute('open', next);
   }
 
-  /** Edit mode on the table while open and attached to one, off otherwise. */
+  /** Keep the table told whether this editor is attached, and open. */
   #hold() {
-    const want = this.open ? this.#table : undefined;
-    if (want === this.#holding) return;
-    if (this.#holding) {
-      // A panel that closes under the pointer gets no mouseleave.
+    const table = this.#table;
+    if (this.#holding && this.#holding !== table) {
       previewRemoval(this.#holding, null);
-      holdEditing(this.#holding, this, false);
+      holdEditing(this.#holding, this, null);
     }
-    this.#holding = want;
-    if (want) holdEditing(want, this, true);
+    this.#holding = table;
+    if (!table) return;
+    // A panel that closes under the pointer gets no mouseleave.
+    if (!this.open) previewRemoval(table, null);
+    holdEditing(table, this, this.open);
   }
 
   #disconnect() {

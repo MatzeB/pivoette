@@ -276,16 +276,27 @@ describe('editing', () => {
     await unmount(second);
     expect(editControls(table)).toBe(0);
 
-    // The table's own attribute outlasts any editor.
+    await unmount(editor);
+    await unmount(table);
+  });
+
+  it('lets an attached editor overrule `editable`', async () => {
+    // How pages were written before the editor could open and close.
+    const { table, editor } = await mountPair({ open: false });
+    await act(async () => table.setAttribute('editable', ''));
+    expect(editControls(table)).toBe(0);
+
     await act(async () => {
-      table.setAttribute('editable', '');
       (editor as PivoetteEditorElement).open = true;
     });
+    expect(editControls(table)).toBeGreaterThan(0);
+
+    // With the editor gone, `editable` is back in charge.
     await act(async () => {
       (editor as PivoetteEditorElement).open = false;
     });
-    expect(editControls(table)).toBeGreaterThan(0);
     await unmount(editor);
+    expect(editControls(table)).toBeGreaterThan(0);
     await unmount(table);
   });
 });
