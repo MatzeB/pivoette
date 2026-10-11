@@ -403,12 +403,8 @@ metadata and the view, either from `src` or from a
 page CSS and table CSS stay separate. A bundle with mistakes shows every
 problem in place instead of rendering a blank box.
 
-**Editing.** Point a `<pivoette-editor>` at the table's `id`. It starts as a
-closed _Edit_ disclosure; opening it shows the panel and turns on the
-in-table editing controls (the `+` buttons and drag handles), and closing it
-turns them off again. Give it `open` to start open, or children to replace the
-summary text. A table with `editable` shows its controls with or without an
-editor. The table owns the view, so edits made in either place show up in both:
+**Editing.** Point a `<pivoette-editor>` at the table's `id`. The table owns
+the view, so edits made in the panel or on the table itself show up in both:
 
 ```html
 <pivoette-table id="downloads" src="/data/downloads.pivoette.json">
@@ -421,11 +417,28 @@ editor. The table owns the view, so edits made in either place show up in both:
 </script>
 ```
 
+The editor starts as a closed _Edit_ button, so the table reads as a plain
+table until someone opens it. Opening it shows the panel and turns on the
+table's own editing controls (the `+` buttons, drag handles and ×); closing
+it turns them off again.
+
+| You want                                   | Write                                                  |
+| ------------------------------------------ | ------------------------------------------------------ |
+| Editing on demand (the usual case)         | `<pivoette-editor for="…">`, no `editable`             |
+| The panel open from the start              | `<pivoette-editor for="…" open>`                       |
+| Your own label instead of "Edit"           | `<pivoette-editor for="…">Customize</pivoette-editor>` |
+| In-table controls always on, with no panel | `<pivoette-table editable>`, no editor                 |
+
+Don't combine `editable` with an editor: `editable` means _always_ editable,
+so the table stays in edit mode while the panel is closed. Pages written for
+earlier versions, which needed both, should drop `editable`.
+
 Every edit fires `pivoette-change`, and `table.bundle` is the original bundle
 with the edits folded in. `table.view` and `table.display` can also be set
 from script, and so can `table.bundle`, for a page that builds its bundle in
-code rather than serving one. The editor's Reset button, or `table.reset()`, returns to the
-bundle as loaded; add `no-reset` to the editor to hide the button. [Try it live](https://matzeb.github.io/pivoette/demo/element.html).
+code rather than serving one. The editor's Reset button, or `table.reset()`,
+returns to the bundle as loaded; add `no-reset` to the editor to hide the
+button. [Try it live](https://matzeb.github.io/pivoette/demo/element.html).
 
 ## Examples
 
