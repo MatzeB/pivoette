@@ -22,6 +22,7 @@ import { Marker, PointLabel, ReferenceLine, Whisker } from './marks';
 import { Scrubber } from './Scrubber';
 import { graphFromView } from './pivot-chart';
 import type { PivotGraph } from './pivot-chart';
+import { categoryMargin } from './levels';
 import { MAX_BAR_WIDTH } from './BarSeries';
 import styles from './Graph.module.css';
 
@@ -40,6 +41,9 @@ export interface PivotChartProps {
 
 /** Room past the longest bar for its printed value. */
 const LABEL_ROOM = 44;
+/** Space between two side-by-side panels, and the left margin of all but the
+ * first: room for the value axis's first tick label to centre on its edge. */
+const PANEL_GAP = 24;
 /** Air above and below each category's group of bars. */
 const GROUP_PAD = 18;
 /** The plot's own margins plus the value axis and its title. */
@@ -71,14 +75,15 @@ export function PivotChart({
       // A view mid-edit can name a field that is gone; say so in place.
       return {
         graph: null,
+        panels: [],
         problems: [e instanceof Error ? e.message : String(e)],
         notes: [],
       };
     }
   }, [frame, view, chart]);
 
-  const { graph, problems, notes } = built;
-  if (!graph) {
+  const { panels, problems, notes } = built;
+  if (panels.length === 0) {
     return (
       <div
         className={`${styles.root} ${styles.problems} ${className ?? ''}`}
@@ -95,49 +100,97 @@ export function PivotChart({
   const horizontal = (chart?.orientation ?? 'horizontal') === 'horizontal';
   const labels = chart?.labels ?? true;
   const hover = chart?.hover ?? true;
+  const first = panels[0]!.graph;
   // Lying down, the chart is as tall as its bars need: a list grows with its
   // entries. Standing up, the bars share the width, and a fixed height reads.
-  const bars = graph.series.length;
+  // Panels share one height, so their rows line up across them.
+  const bars = Math.max(...panels.map((x) => x.graph.series.length));
   const height =
     chart?.height ??
     (horizontal
       ? Math.max(
           160,
-          graph.categories.length * (bars * (MAX_BAR_WIDTH - 4) + GROUP_PAD) +
+          first.categories.length * (bars * (MAX_BAR_WIDTH - 4) + GROUP_PAD) +
             CHROME,
         )
       : 320);
 
+  // Side by side, only the first panel names the categories; the rest start
+  // a gap's width from the one before. Each panel's flex basis is the margin
+  // it carries, so the space that is left — the plots — is shared equally.
+  const split = panels.length > 1;
+  const labelled = horizontal
+    ? categoryMargin(first.categories, first.categoryPaths)
+    : undefined;
+  const leftOf = (i: number) =>
+    !split || !horizontal ? undefined : i === 0 ? labelled! : PANEL_GAP;
+  const share =
+    width === undefined
+      ? undefined
+      : split && horizontal
+        ? (width - labelled! - PANEL_GAP * (panels.length - 1)) / panels.length
+        : width / panels.length;
+  const widthOf = (i: number) =>
+    share === undefined
+      ? undefined
+      : split && horizontal
+        ? Math.floor(share + leftOf(i)!)
+        : Math.floor(share);
+
   return (
     <div className={className}>
-      <GraphBox
-        graph={graph}
-        orientation={horizontal ? 'horizontal' : 'vertical'}
-        baseline={chart?.baseline}
-        symmetric={chart?.symmetric}
-        headroom={labels ? LABEL_ROOM : 0}
-        height={height}
-        width={width}
-        theme={theme}
-        locale={locale}
-        timeZone={timeZone}
-        // A value axis that does not reach zero would draw bars from wherever
-        // it starts, which overstates every difference between them.
-        includeZero={chart?.baseline === undefined}
-        // Bars are few and wide; standing up, the labels need the room above.
-        margin={horizontal ? undefined : { top: 24 }}
-      >
-        <Axis side={horizontal ? 'bottom' : 'left'} grid />
-        <Axis side={horizontal ? 'left' : 'bottom'} />
-        {hover && <Scrubber dots={false} />}
-        <BarSeries>
-          <Whisker />
-          <Marker />
-          {labels && <PointLabel at="all" side="outside" />}
-        </BarSeries>
-        {chart?.baseline !== undefined && <ReferenceLine />}
-        <Legend />
-      </GraphBox>
+      <div className={styles.panels}>
+        {panels.map((panel, i) => (
+          <div
+            key={panel.key || i}
+            className={styles.panel}
+            style={{
+              flex:
+                width === undefined
+                  ? `1 1 ${leftOf(i) ?? 0}px`
+                  : `0 0 ${widthOf(i)}px`,
+            }}
+          >
+            <GraphBox
+              graph={panel.graph}
+              orientation={horizontal ? 'horizontal' : 'vertical'}
+              baseline={chart?.baseline}
+              symmetric={chart?.symmetric}
+              headroom={labels ? LABEL_ROOM : 0}
+              height={height}
+              width={widthOf(i)}
+              theme={theme}
+              locale={locale}
+              timeZone={timeZone}
+              // A value axis that does not reach zero would draw bars from
+              // wherever it starts, which overstates every difference.
+              includeZero={chart?.baseline === undefined}
+              margin={
+                horizontal
+                  ? leftOf(i) === undefined
+                    ? undefined
+                    : { left: leftOf(i) }
+                  : // Standing up, the labels need the room above the bars.
+                    { top: 24 }
+              }
+            >
+              <Axis side={horizontal ? 'bottom' : 'left'} grid />
+              {(!split || !horizontal || i === 0) && (
+                <Axis side={horizontal ? 'left' : 'bottom'} />
+              )}
+              {hover && <Scrubber dots={false} />}
+              <BarSeries>
+                <Whisker />
+                <Marker />
+                {labels && <PointLabel at="all" side="outside" />}
+              </BarSeries>
+              {chart?.baseline !== undefined && <ReferenceLine />}
+              {/* Once: the bars are the same in every panel. */}
+              {i === 0 && <Legend />}
+            </GraphBox>
+          </div>
+        ))}
+      </div>
       {notes.length > 0 && (
         <div className={styles.notes}>
           {notes.map((n) => (

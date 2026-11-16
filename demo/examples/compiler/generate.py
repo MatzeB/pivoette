@@ -27,6 +27,21 @@ of the steps it has taken. How much each step buys depends on the program:
     them (429.mcf, memory-bound) is slightly *slower* under FooCC,
     though one benchmark in a dozen barely moves a geomean.
 
+Every row carries two speedups, measured two ways:
+
+  * cycles  how much less *time* the build takes: what a user feels.
+  * ir      how many fewer *instructions* it retires. A compiler change that
+            only moves code around saves no instructions, so the two part
+            ways exactly where the interesting effects are:
+
+    - BOLT rewrites the layout and adds or removes almost nothing, so its
+      `ir` bar barely moves while its `cycles` bar grows.
+    - PGO wins some of its time by doing less (inlining, fewer branches) and
+      some by doing it in a better order, so it shows up in both, more in
+      cycles.
+    - 429.mcf's FooCC regression is memory stalls, not extra work: it is
+      there in cycles and absent in instructions.
+
 The rows are per benchmark; the chart reduces each suite with `geomean`, which
 is how speedups are summarised (2x and 0.5x cancel to 1x, as they should).
 """
@@ -41,10 +56,18 @@ META = {
     "benchmark": {"displayName": "Benchmark"},
     "compiler": {"displayName": "Compiler"},
     "variant": {"displayName": "Build"},
-    "speedup": {"displayName": "Speedup over BarCC -O2"},
+    "ir": {"displayName": "Instructions: speedup over BarCC -O2"},
+    "cycles": {"displayName": "Cycles: speedup over BarCC -O2"},
 }
 
 VARIANTS = ["base", "LTO+PGO", "LTO+PGO+Bolt"]
+
+# How much of each step's gain in cycles is also a gain in instructions: most
+# of a codegen change at -O2, under half of PGO's, and next to none of BOLT's.
+IR_SHARE = [0.7, 0.45, 0.05]
+
+# Its own generator, so adding `ir` leaves every `cycles` number as it was.
+ir_random = random.Random(42)
 
 # suite -> (benchmarks, base gain, PGO gain, BOLT gain, per-benchmark spread)
 # Gains are multiplicative factors on top of the variant before.
@@ -112,17 +135,23 @@ REGRESSIONS = {
 def main() -> None:
     rows = []
 
-    def emit(compiler, suite, bench, steps):
-        speedup = 1.0
-        for variant, step in zip(VARIANTS, steps):
-            speedup *= step
+    def emit(compiler, suite, bench, steps, penalty=1.0):
+        cycles = 1.0
+        ir = 1.0
+        for variant, step, share in zip(VARIANTS, steps, IR_SHARE):
+            cycles *= step
+            # A stall costs cycles, not instructions: the penalty stays out.
+            gain = step / penalty if variant == "base" else step
+            if step != 1.0:
+                ir *= (1 + (gain - 1) * share) * ir_random.gauss(1, 0.004)
             rows.append(
                 {
                     "suite": suite,
                     "benchmark": bench,
                     "compiler": compiler,
                     "variant": variant,
-                    "speedup": round(speedup, 4),
+                    "ir": round(ir, 4),
+                    "cycles": round(cycles, 4),
                 }
             )
 
@@ -138,7 +167,7 @@ def main() -> None:
                 pgo * random.gauss(1, spread),
                 bolt * random.gauss(1, spread / 2),
             ]
-            emit("FooCC", suite, bench, steps)
+            emit("FooCC", suite, bench, steps, penalty)
 
     for suite, (benchmarks, _base, _pgo, _bolt, spread) in SUITES.items():
         pgo, bolt = BARCC[suite]

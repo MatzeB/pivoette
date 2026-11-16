@@ -42,7 +42,7 @@ import { axisTitle, tickFormatter, tickSpec, withUnit } from './axis-format';
 import { buildGraphData } from './series';
 import type { GraphData, GraphFields } from './series';
 import { SERIES_SLOTS } from './palette';
-import { CHAR_W, LEVEL_INSET, levelsWidth } from './levels';
+import { CHAR_W, categoryMargin } from './levels';
 import styles from './Graph.module.css';
 
 // Its own module so the pure chart code can read it without importing this
@@ -338,9 +338,8 @@ export function GraphBox({
     const leftTitled = !horizontal && !!labels.full;
     // Categories with several levels take a column each, like a table's
     // row index, rather than one joined label.
-    const levels = horizontal && graph.categoryPaths;
-    const leftNeeded = levels
-      ? Math.ceil(2 + LEVEL_INSET + levelsWidth(levels))
+    const leftNeeded = horizontal
+      ? categoryMargin(graph.categories, graph.categoryPaths)
       : estimateLeft(leftText, leftTitled);
     const auto: GraphMargin = {
       ...DEFAULT_MARGIN,
@@ -381,7 +380,10 @@ export function GraphBox({
       // own lands them on different ticks unless the baseline is a multiple
       // of the step, and the middle would no longer be the middle.
       const step = tickStep(hi - lo, ticks);
-      const half = Math.ceil((hi - anchor) / step - 1e-9) * step;
+      // A twentieth of a step of slack: the label room is an estimate in
+      // pixels, and being a hair over a tick should not cost a whole step
+      // more axis, which on a narrow panel shrinks every bar by a third.
+      const half = Math.ceil((hi - anchor) / step - 0.05) * step;
       yScale = linearScale({
         domain: [clean(anchor - half), clean(anchor + half)],
         range: valueRange,

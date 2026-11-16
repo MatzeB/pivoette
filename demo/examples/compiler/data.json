@@ -12,8 +12,11 @@
   "variant": {
    "displayName": "Build"
   },
-  "speedup": {
-   "displayName": "Speedup over BarCC -O2"
+  "ir": {
+   "displayName": "Instructions: speedup over BarCC -O2"
+  },
+  "cycles": {
+   "displayName": "Cycles: speedup over BarCC -O2"
   }
  },
  "rows": [
@@ -22,1092 +25,1248 @@
    "benchmark": "richards",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0108
+   "ir": 1.007,
+   "cycles": 1.0108
   },
   {
    "suite": "CPython",
    "benchmark": "richards",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1888
+   "ir": 1.086,
+   "cycles": 1.1888
   },
   {
    "suite": "CPython",
    "benchmark": "richards",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.284
+   "ir": 1.0899,
+   "cycles": 1.284
   },
   {
    "suite": "CPython",
    "benchmark": "nbody",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0081
+   "ir": 1.0085,
+   "cycles": 1.0081
   },
   {
    "suite": "CPython",
    "benchmark": "nbody",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1791
+   "ir": 1.0849,
+   "cycles": 1.1791
   },
   {
    "suite": "CPython",
    "benchmark": "nbody",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.2594
+   "ir": 1.0821,
+   "cycles": 1.2594
   },
   {
    "suite": "CPython",
    "benchmark": "json_dumps",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0206
+   "ir": 1.0158,
+   "cycles": 1.0206
   },
   {
    "suite": "CPython",
    "benchmark": "json_dumps",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.2369
+   "ir": 1.1115,
+   "cycles": 1.2369
   },
   {
    "suite": "CPython",
    "benchmark": "json_dumps",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.3313
+   "ir": 1.1147,
+   "cycles": 1.3313
   },
   {
    "suite": "CPython",
    "benchmark": "regex_v8",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0505
+   "ir": 1.0358,
+   "cycles": 1.0505
   },
   {
    "suite": "CPython",
    "benchmark": "regex_v8",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.2432
+   "ir": 1.1224,
+   "cycles": 1.2432
   },
   {
    "suite": "CPython",
    "benchmark": "regex_v8",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.3192
+   "ir": 1.131,
+   "cycles": 1.3192
   },
   {
    "suite": "CPython",
    "benchmark": "django_template",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0128
+   "ir": 1.0116,
+   "cycles": 1.0128
   },
   {
    "suite": "CPython",
    "benchmark": "django_template",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1763
+   "ir": 1.0856,
+   "cycles": 1.1763
   },
   {
    "suite": "CPython",
    "benchmark": "django_template",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.2525
+   "ir": 1.0859,
+   "cycles": 1.2525
   },
   {
    "suite": "CPython",
    "benchmark": "go",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0422
+   "ir": 1.0253,
+   "cycles": 1.0422
   },
   {
    "suite": "CPython",
    "benchmark": "go",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.2224
+   "ir": 1.1062,
+   "cycles": 1.2224
   },
   {
    "suite": "CPython",
    "benchmark": "go",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.3258
+   "ir": 1.1167,
+   "cycles": 1.3258
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-text",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 0.9635
+   "ir": 0.9746,
+   "cycles": 0.9635
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-text",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0103
+   "ir": 0.9955,
+   "cycles": 1.0103
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-text",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.017
+   "ir": 0.9979,
+   "cycles": 1.017
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-binary",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 0.9851
+   "ir": 0.9838,
+   "cycles": 0.9851
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-binary",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0249
+   "ir": 1.0005,
+   "cycles": 1.0249
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-binary",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0229
+   "ir": 1.0023,
+   "cycles": 1.0229
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-text",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 0.9707
+   "ir": 0.9829,
+   "cycles": 0.9707
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-text",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0065
+   "ir": 0.9983,
+   "cycles": 1.0065
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-text",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0121
+   "ir": 1.0001,
+   "cycles": 1.0121
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-binary",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 0.9772
+   "ir": 0.985,
+   "cycles": 0.9772
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-binary",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0063
+   "ir": 1.0013,
+   "cycles": 1.0063
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-binary",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0111
+   "ir": 0.9971,
+   "cycles": 1.0111
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l1",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0167
+   "ir": 1.014,
+   "cycles": 1.0167
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l1",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0989
+   "ir": 1.0445,
+   "cycles": 1.0989
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l1",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1119
+   "ir": 1.0342,
+   "cycles": 1.1119
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l19",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0255
+   "ir": 1.0154,
+   "cycles": 1.0255
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l19",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0907
+   "ir": 1.0406,
+   "cycles": 1.0907
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l19",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1114
+   "ir": 1.0452,
+   "cycles": 1.1114
   },
   {
    "suite": "zstd",
    "benchmark": "decompress",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0163
+   "ir": 1.0141,
+   "cycles": 1.0163
   },
   {
    "suite": "zstd",
    "benchmark": "decompress",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0764
+   "ir": 1.036,
+   "cycles": 1.0764
   },
   {
    "suite": "zstd",
    "benchmark": "decompress",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0883
+   "ir": 1.0401,
+   "cycles": 1.0883
   },
   {
    "suite": "zstd",
    "benchmark": "dict-compress",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0334
+   "ir": 1.0193,
+   "cycles": 1.0334
   },
   {
    "suite": "zstd",
    "benchmark": "dict-compress",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.117
+   "ir": 1.056,
+   "cycles": 1.117
   },
   {
    "suite": "zstd",
    "benchmark": "dict-compress",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1641
+   "ir": 1.057,
+   "cycles": 1.1641
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "400.perlbench",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 0.9942
+   "ir": 0.9964,
+   "cycles": 0.9942
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "400.perlbench",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0591
+   "ir": 1.029,
+   "cycles": 1.0591
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "400.perlbench",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0817
+   "ir": 1.0328,
+   "cycles": 1.0817
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "401.bzip2",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0145
+   "ir": 1.0116,
+   "cycles": 1.0145
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "401.bzip2",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1032
+   "ir": 1.0541,
+   "cycles": 1.1032
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "401.bzip2",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1153
+   "ir": 1.0567,
+   "cycles": 1.1153
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "403.gcc",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0217
+   "ir": 1.0127,
+   "cycles": 1.0217
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "403.gcc",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0976
+   "ir": 1.0435,
+   "cycles": 1.0976
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "403.gcc",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1192
+   "ir": 1.0426,
+   "cycles": 1.1192
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "429.mcf",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 0.9316
+   "ir": 1.0032,
+   "cycles": 0.9316
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "429.mcf",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 0.9984
+   "ir": 1.0345,
+   "cycles": 0.9984
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "429.mcf",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0257
+   "ir": 1.0456,
+   "cycles": 1.0257
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "445.gobmk",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 0.9941
+   "ir": 0.9926,
+   "cycles": 0.9941
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "445.gobmk",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0456
+   "ir": 1.0113,
+   "cycles": 1.0456
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "445.gobmk",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0547
+   "ir": 1.0148,
+   "cycles": 1.0547
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "456.hmmer",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0057
+   "ir": 1.0097,
+   "cycles": 1.0057
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "456.hmmer",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0764
+   "ir": 1.0438,
+   "cycles": 1.0764
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "456.hmmer",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1128
+   "ir": 1.049,
+   "cycles": 1.1128
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "458.sjeng",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0518
+   "ir": 1.0421,
+   "cycles": 1.0518
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "458.sjeng",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0634
+   "ir": 1.0469,
+   "cycles": 1.0634
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "458.sjeng",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0895
+   "ir": 1.0423,
+   "cycles": 1.0895
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "462.libquantum",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0209
+   "ir": 1.0125,
+   "cycles": 1.0209
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "462.libquantum",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0884
+   "ir": 1.0466,
+   "cycles": 1.0884
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "462.libquantum",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.106
+   "ir": 1.0414,
+   "cycles": 1.106
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "464.h264ref",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0412
+   "ir": 1.029,
+   "cycles": 1.0412
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "464.h264ref",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.093
+   "ir": 1.0531,
+   "cycles": 1.093
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "464.h264ref",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1101
+   "ir": 1.0526,
+   "cycles": 1.1101
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "471.omnetpp",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0166
+   "ir": 1.0145,
+   "cycles": 1.0166
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "471.omnetpp",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1114
+   "ir": 1.0596,
+   "cycles": 1.1114
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "471.omnetpp",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1343
+   "ir": 1.0705,
+   "cycles": 1.1343
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "473.astar",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 0.9903
+   "ir": 0.9957,
+   "cycles": 0.9903
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "473.astar",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0557
+   "ir": 1.0228,
+   "cycles": 1.0557
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "473.astar",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0578
+   "ir": 1.0206,
+   "cycles": 1.0578
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "483.xalancbmk",
    "compiler": "FooCC",
    "variant": "base",
-   "speedup": 1.0097
+   "ir": 1.0035,
+   "cycles": 1.0097
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "483.xalancbmk",
    "compiler": "FooCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0676
+   "ir": 1.0333,
+   "cycles": 1.0676
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "483.xalancbmk",
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0739
+   "ir": 1.0312,
+   "cycles": 1.0739
   },
   {
    "suite": "CPython",
    "benchmark": "richards",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "CPython",
    "benchmark": "richards",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1101
+   "ir": 1.0492,
+   "cycles": 1.1101
   },
   {
    "suite": "CPython",
    "benchmark": "richards",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1813
+   "ir": 1.0558,
+   "cycles": 1.1813
   },
   {
    "suite": "CPython",
    "benchmark": "nbody",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "CPython",
    "benchmark": "nbody",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1208
+   "ir": 1.0513,
+   "cycles": 1.1208
   },
   {
    "suite": "CPython",
    "benchmark": "nbody",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1597
+   "ir": 1.0519,
+   "cycles": 1.1597
   },
   {
    "suite": "CPython",
    "benchmark": "json_dumps",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "CPython",
    "benchmark": "json_dumps",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1518
+   "ir": 1.0604,
+   "cycles": 1.1518
   },
   {
    "suite": "CPython",
    "benchmark": "json_dumps",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1926
+   "ir": 1.0577,
+   "cycles": 1.1926
   },
   {
    "suite": "CPython",
    "benchmark": "regex_v8",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "CPython",
    "benchmark": "regex_v8",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1734
+   "ir": 1.0756,
+   "cycles": 1.1734
   },
   {
    "suite": "CPython",
    "benchmark": "regex_v8",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.2364
+   "ir": 1.0803,
+   "cycles": 1.2364
   },
   {
    "suite": "CPython",
    "benchmark": "django_template",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "CPython",
    "benchmark": "django_template",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1968
+   "ir": 1.0937,
+   "cycles": 1.1968
   },
   {
    "suite": "CPython",
    "benchmark": "django_template",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.283
+   "ir": 1.0976,
+   "cycles": 1.283
   },
   {
    "suite": "CPython",
    "benchmark": "go",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "CPython",
    "benchmark": "go",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.1562
+   "ir": 1.0714,
+   "cycles": 1.1562
   },
   {
    "suite": "CPython",
    "benchmark": "go",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.2309
+   "ir": 1.0756,
+   "cycles": 1.2309
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-text",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-text",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0409
+   "ir": 1.0228,
+   "cycles": 1.0409
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-text",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0388
+   "ir": 1.0264,
+   "cycles": 1.0388
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-binary",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-binary",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0363
+   "ir": 1.0174,
+   "cycles": 1.0363
   },
   {
    "suite": "bzip2",
    "benchmark": "compress-binary",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0369
+   "ir": 1.0134,
+   "cycles": 1.0369
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-text",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-text",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0323
+   "ir": 1.0182,
+   "cycles": 1.0323
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-text",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0435
+   "ir": 1.0203,
+   "cycles": 1.0435
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-binary",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-binary",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.031
+   "ir": 1.0189,
+   "cycles": 1.031
   },
   {
    "suite": "bzip2",
    "benchmark": "decompress-binary",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.029
+   "ir": 1.0187,
+   "cycles": 1.029
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l1",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l1",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0393
+   "ir": 1.0256,
+   "cycles": 1.0393
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l1",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0479
+   "ir": 1.0246,
+   "cycles": 1.0479
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l19",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l19",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0632
+   "ir": 1.035,
+   "cycles": 1.0632
   },
   {
    "suite": "zstd",
    "benchmark": "compress-l19",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0929
+   "ir": 1.0369,
+   "cycles": 1.0929
   },
   {
    "suite": "zstd",
    "benchmark": "decompress",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "zstd",
    "benchmark": "decompress",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0342
+   "ir": 1.0133,
+   "cycles": 1.0342
   },
   {
    "suite": "zstd",
    "benchmark": "decompress",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0585
+   "ir": 1.0099,
+   "cycles": 1.0585
   },
   {
    "suite": "zstd",
    "benchmark": "dict-compress",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "zstd",
    "benchmark": "dict-compress",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0164
+   "ir": 1.0068,
+   "cycles": 1.0164
   },
   {
    "suite": "zstd",
    "benchmark": "dict-compress",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0389
+   "ir": 1.0136,
+   "cycles": 1.0389
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "400.perlbench",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "400.perlbench",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0587
+   "ir": 1.0298,
+   "cycles": 1.0587
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "400.perlbench",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0622
+   "ir": 1.0328,
+   "cycles": 1.0622
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "401.bzip2",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "401.bzip2",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0494
+   "ir": 1.0125,
+   "cycles": 1.0494
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "401.bzip2",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0687
+   "ir": 1.0163,
+   "cycles": 1.0687
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "403.gcc",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "403.gcc",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0685
+   "ir": 1.0331,
+   "cycles": 1.0685
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "403.gcc",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0905
+   "ir": 1.0319,
+   "cycles": 1.0905
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "429.mcf",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "429.mcf",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0605
+   "ir": 1.0247,
+   "cycles": 1.0605
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "429.mcf",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0575
+   "ir": 1.0245,
+   "cycles": 1.0575
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "445.gobmk",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "445.gobmk",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0563
+   "ir": 1.0324,
+   "cycles": 1.0563
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "445.gobmk",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0789
+   "ir": 1.0291,
+   "cycles": 1.0789
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "456.hmmer",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "456.hmmer",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0485
+   "ir": 1.0201,
+   "cycles": 1.0485
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "456.hmmer",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.057
+   "ir": 1.0261,
+   "cycles": 1.057
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "458.sjeng",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "458.sjeng",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0786
+   "ir": 1.0335,
+   "cycles": 1.0786
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "458.sjeng",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1022
+   "ir": 1.0331,
+   "cycles": 1.1022
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "462.libquantum",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "462.libquantum",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0492
+   "ir": 1.0225,
+   "cycles": 1.0492
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "462.libquantum",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0713
+   "ir": 1.0185,
+   "cycles": 1.0713
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "464.h264ref",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "464.h264ref",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0733
+   "ir": 1.0339,
+   "cycles": 1.0733
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "464.h264ref",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.069
+   "ir": 1.0287,
+   "cycles": 1.069
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "471.omnetpp",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "471.omnetpp",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0738
+   "ir": 1.0369,
+   "cycles": 1.0738
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "471.omnetpp",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.1092
+   "ir": 1.0386,
+   "cycles": 1.1092
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "473.astar",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "473.astar",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0462
+   "ir": 1.0301,
+   "cycles": 1.0462
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "473.astar",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0657
+   "ir": 1.0322,
+   "cycles": 1.0657
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "483.xalancbmk",
    "compiler": "BarCC",
    "variant": "base",
-   "speedup": 1.0
+   "ir": 1.0,
+   "cycles": 1.0
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "483.xalancbmk",
    "compiler": "BarCC",
    "variant": "LTO+PGO",
-   "speedup": 1.0441
+   "ir": 1.0254,
+   "cycles": 1.0441
   },
   {
    "suite": "SPEC 2006",
    "benchmark": "483.xalancbmk",
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
-   "speedup": 1.0876
+   "ir": 1.0222,
+   "cycles": 1.0876
   }
  ]
 }

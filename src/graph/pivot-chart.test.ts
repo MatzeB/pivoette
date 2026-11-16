@@ -184,3 +184,53 @@ describe('colours', () => {
     );
   });
 });
+
+describe('panels', () => {
+  const twoFields = fromRows(ROWS.map((r) => ({ ...r, ir: r.speedup * 0.9 })));
+  const VIEW2: ViewSpec = {
+    ...VIEW,
+    columns: [
+      { id: 'speedup', agg: 'mean', label: 'cycles' },
+      { id: 'ir', agg: 'mean', label: 'ir' },
+      { id: 'irMin', source: 'ir', agg: 'min', label: 'ir min' },
+      { id: 'irMax', source: 'ir', agg: 'max', label: 'ir max' },
+    ],
+  };
+  const drawTwo = (chart?: ChartDisplay) =>
+    graphFromView(computeView(twoFields, VIEW2), VIEW2, chart);
+
+  it('gives each field’s first measure a bar of its own', () => {
+    expect(VIEW2.columns.map((_c, i) => markOf(VIEW2, undefined, i))).toEqual([
+      'bar',
+      'bar',
+      'range',
+      'range',
+    ]);
+  });
+
+  it('splits into a panel per field, each with its own spread', () => {
+    const { panels } = drawTwo();
+    expect(panels.map((p) => p.key)).toEqual(['speedup', 'ir']);
+    // The whisker went with its own field's bars.
+    expect(panels[0]!.graph.series[0]!.points[0]!.range).toBeUndefined();
+    expect(panels[1]!.graph.series[0]!.points[0]!.range).toBeDefined();
+  });
+
+  it('puts panels in one unit on one scale', () => {
+    const { panels } = drawTwo();
+    expect(panels[0]!.graph.yExtent).toEqual(panels[1]!.graph.yExtent);
+    const apart = drawTwo({ sharedScale: false }).panels;
+    expect(apart[0]!.graph.yExtent).not.toEqual(apart[1]!.graph.yExtent);
+  });
+
+  it('draws them on one axis when not split', () => {
+    const { panels } = drawTwo({ split: false });
+    expect(panels).toHaveLength(1);
+    expect(panels[0]!.graph.series.map((s) => s.key)).toEqual([
+      'base · cycles',
+      'base · ir',
+      'pgo · cycles',
+      'pgo · ir',
+    ]);
+  });
+});

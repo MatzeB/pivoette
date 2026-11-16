@@ -177,6 +177,18 @@ describe('example: compiler (a pivot view drawn as a chart)', () => {
     compilerDisplay.chart,
   );
 
+  it('splits into a panel per measured field, on one scale', () => {
+    const panels = graphFromView(
+      computeView(frame, compilerView),
+      compilerView,
+      compilerDisplay.chart,
+    ).panels;
+    expect(panels.map((p) => p.key)).toEqual(['ir', 'cycles']);
+    // Both are speedups, so they share an extent: a bar as long in one
+    // panel as in the other means the same.
+    expect(panels[0]!.graph.yExtent).toEqual(panels[1]!.graph.yExtent);
+  });
+
   it('draws without complaint', () => {
     expect(problems).toEqual([]);
     expect(notes).toEqual([]);
@@ -249,8 +261,8 @@ describe('example: compiler (a pivot view drawn as a chart)', () => {
         />,
       );
     });
-    // Six bars for each of four suites.
-    expect(host.querySelectorAll('g[data-series] path')).toHaveLength(24);
+    // Six bars for each of four suites, in each of two panels.
+    expect(host.querySelectorAll('g[data-series] path')).toHaveLength(48);
     await act(async () => root.unmount());
     host.remove();
   });

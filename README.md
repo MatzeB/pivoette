@@ -434,17 +434,24 @@ each category, and each measure is drawn as one of:
 | `dot`   | A marker on the bar, such as a median.                         |
 | `none`  | Nothing drawn; listed in the hover readout only.               |
 
-`min`, `max`, `p25` and `p75` default to `range`; other measures after the
-first default to `dot`.
+The first measure of each field defaults to `bar`; after it, `min`, `max`,
+`p25` and `p75` default to `range`, and other measures to `dot`.
+
+Bars that measure different fields, such as instructions and cycles, get a
+panel each, side by side. The categories are named once, on the left, and
+the rows line up across the panels. Panels that measure in the same unit
+share one scale, so equal values draw at equal lengths. `chart.split: false`
+puts every bar on one axis instead, and `chart.sharedScale: false` gives
+each panel its own.
 
 ```tsx
 const view: ViewSpec = {
   pivotRows: [{ field: 'suite' }],
   pivotColumns: [{ field: 'variant' }],
   columns: [
-    { id: 'speedup', agg: 'geomean' },
-    { id: 'min', source: 'speedup', agg: 'min' },
-    { id: 'max', source: 'speedup', agg: 'max' },
+    { id: 'cycles', agg: 'geomean' },
+    { id: 'min', source: 'cycles', agg: 'min' },
+    { id: 'max', source: 'cycles', agg: 'max' },
   ],
 };
 const display: DataTableDisplay = {

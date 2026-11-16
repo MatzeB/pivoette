@@ -82,3 +82,22 @@ export function newFrom(
   const level = path.findIndex((part, i) => part !== above[i]);
   return level === -1 ? path.length : level;
 }
+
+/** The narrowest left margin a chart gets, labels or not. */
+export const MIN_LEFT = 48;
+
+/**
+ * The left margin a horizontal chart's categories need: their columns when
+ * they have several levels, else the longest joined label.
+ *
+ * Exported because a chart split into side-by-side panels draws the labels
+ * once, on the first, and has to size that panel's share to match.
+ */
+export function categoryMargin(
+  categories: readonly string[],
+  paths: readonly (readonly string[])[] | undefined,
+): number {
+  if (paths) return Math.ceil(2 + LEVEL_INSET + levelsWidth(paths));
+  const widest = categories.reduce((m, l) => Math.max(m, l.length), 0);
+  return Math.max(MIN_LEFT, Math.ceil(10 + widest * CHAR_W));
+}

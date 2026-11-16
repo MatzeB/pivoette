@@ -285,3 +285,16 @@
 .legendSteps .block {
   border-radius: 2px;
 }
+
+/* --- side-by-side panels ------------------------------------------------- */
+
+.panels {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Allowed to shrink below its content, or a long axis title would hold the
+ * row wider than the page. */
+.panel {
+  min-width: 0;
+}

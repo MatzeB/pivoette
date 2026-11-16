@@ -1,4 +1,26 @@
-import type { DataTableDisplay, ViewSpec } from '../../../src';
+import type { ColumnDef, DataTableDisplay, ViewSpec } from '../../../src';
+
+/** A field's geomean — the bar — and its min and max, the whisker across it. */
+function measured(field: string, name: string): ColumnDef[] {
+  const format = { options: { decimals: 2 } };
+  return [
+    { id: field, agg: 'geomean', label: name, format },
+    {
+      id: `${field}Min`,
+      source: field,
+      agg: 'min',
+      label: `${name} min`,
+      format,
+    },
+    {
+      id: `${field}Max`,
+      source: field,
+      agg: 'max',
+      label: `${name} max`,
+      format,
+    },
+  ];
+}
 
 /**
  * FooCC and BarCC, each built three ways, against BarCC at -O2: a pivot view
@@ -6,7 +28,8 @@ import type { DataTableDisplay, ViewSpec } from '../../../src';
  *
  * The view is an ordinary pivot, the same one a table would be computed from:
  * suites down the rows, compilers and their builds across the columns, and
- * three measures of the per-benchmark speedups in each cell. Switch the display to a table in the
+ * three measures each of two per-benchmark speedups in every cell: in
+ * instructions retired (`ir`) and in cycles. Switch the display to a table in the
  * editor and that is exactly what it shows.
  *
  * - `geomean` is each suite's average speedup — the right average for ratios,
@@ -21,28 +44,10 @@ export const view: ViewSpec = {
     { field: 'compiler', label: 'Compiler' },
     { field: 'variant', label: 'Build' },
   ],
-  columns: [
-    {
-      id: 'speedup',
-      agg: 'geomean',
-      label: 'geomean',
-      format: { options: { decimals: 2 } },
-    },
-    {
-      id: 'min',
-      source: 'speedup',
-      agg: 'min',
-      label: 'min',
-      format: { options: { decimals: 2 } },
-    },
-    {
-      id: 'max',
-      source: 'speedup',
-      agg: 'max',
-      label: 'max',
-      format: { options: { decimals: 2 } },
-    },
-  ],
+  // Each field measured three ways. Two fields under bars split the chart
+  // into a panel each, side by side; the min and max go with their own
+  // field's bar as its whisker.
+  columns: [...measured('ir', 'ir'), ...measured('cycles', 'cycles')],
 };
 
 /**

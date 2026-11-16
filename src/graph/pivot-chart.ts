@@ -15,9 +15,10 @@
  *
  * Pure and React-free: `PivotChart` renders what this returns.
  */
+import { unitLabels } from '../data/meta';
 import type { ColumnMeta } from '../data/meta';
 import type { ViewResult } from '../pivot/result';
-import type { ViewSpec } from '../pivot/spec';
+import type { ColumnDef, ViewSpec } from '../pivot/spec';
 import { asNumber } from '../util';
 import type { GraphOrientation } from './context';
 import type { GraphData, GraphPoint, PointExtra, Series } from './series';
@@ -92,6 +93,18 @@ export interface ChartDisplay {
    * fields whose innermost has at most `MAX_SHADES` members, else `series`.
    */
   colors?: ChartColors;
+  /**
+   * Give each measured field its own panel, side by side, sharing the
+   * categories on the left. Default true; it only applies when bars measure
+   * more than one field — `ir` and `cycles` — and false draws them all
+   * against one axis.
+   */
+  split?: boolean;
+  /**
+   * Put side-by-side panels on one value scale when they measure in the same
+   * unit, so equal values draw at equal lengths across them. Default true.
+   */
+  sharedScale?: boolean;
 }
 
 /** Aggregations that describe a spread rather than a centre. */
@@ -101,10 +114,12 @@ const RANGE_AGGS = new Set(['min', 'max', 'p25', 'p75']);
  * How the measure at `index` in `view.columns` is drawn: what the display
  * says, else a default read off the measure.
  *
- * The first measure is the bar — it is the one the view leads with. After
- * that, a measure of spread (`min`, `max`, a quartile) joins the whisker,
- * which is the reading the aggregation itself suggests, and anything else is
- * a marker on the bar.
+ * The first measure of each field is that field's bar — it is the one the
+ * view leads with, and a second field measured after it (`cycles` after
+ * `ir`) is a second quantity, which gets bars, and a panel, of its own.
+ * After that, a measure of spread (`min`, `max`, a quartile) joins the
+ * whisker, which is the reading the aggregation itself suggests, and
+ * anything else is a marker on the bar.
  */
 export function markOf(
   view: ViewSpec,
@@ -115,13 +130,30 @@ export function markOf(
   if (!column) return 'none';
   const set = chart?.marks?.[column.id];
   if (set) return set;
-  if (index === 0) return 'bar';
+  const field = (c: ColumnDef) => c.source ?? c.id;
+  const firstOfField =
+    view.columns.findIndex((c) => field(c) === field(column)) === index;
+  if (firstOfField) return 'bar';
   return column.agg && RANGE_AGGS.has(column.agg) ? 'range' : 'dot';
 }
 
+/** One of the side-by-side charts a view is split into, per measured field. */
+export interface PivotPanel {
+  /** The field its bars measure; empty when the view is not split. */
+  key: string;
+  /** What its bars measure, as a heading; empty when not split. */
+  title: string;
+  graph: GraphData;
+}
+
 export interface PivotGraph {
-  /** Null when there is nothing that can be drawn; `problems` says why. */
+  /**
+   * The first panel's chart: the whole chart, unless it is split. Null when
+   * there is nothing that can be drawn; `problems` says why.
+   */
   graph: GraphData | null;
+  /** Every panel, left to right. Empty when there is nothing to draw. */
+  panels: PivotPanel[];
   /** Why there is no chart. Shown in place of one. */
   problems: string[];
   /** Things drawn, but probably not as meant. Shown under the chart. */
@@ -134,6 +166,8 @@ export const PATH_SEPARATOR = ' · ';
 interface Measure {
   /** Index into `result.leaves`. */
   leaf: number;
+  /** The field it aggregates, which decides its panel. */
+  source: string;
   label: string;
   mark: ChartMark;
 }
@@ -159,6 +193,7 @@ export function graphFromView(
   const notes: string[] = [];
   const none = (why: string): PivotGraph => ({
     graph: null,
+    panels: [],
     problems: [...problems, why],
     notes,
   });
@@ -192,7 +227,9 @@ export function graphFromView(
       byKey.set(key, member);
       members.push(member);
     }
-    member.measures.push({ leaf: i, label: leaf.column.label, mark });
+    const def = index >= 0 ? view.columns[index] : undefined;
+    const source = def?.source ?? def?.id ?? id;
+    member.measures.push({ leaf: i, source, label: leaf.column.label, mark });
   });
 
   if (!members.some((m) => m.measures.some((x) => x.mark === 'bar'))) {
@@ -208,57 +245,24 @@ export function graphFromView(
     );
   }
 
-  // --- series: one per bar measure of each member ----------------------------
+  // --- panels: one per measured field, when there are several ---------------
 
-  interface Draft {
-    key: string;
-    label: string;
-    member: Member;
-    bar: Measure;
-  }
-  const drafts: Draft[] = [];
-  for (const member of members) {
-    const bars = member.measures.filter((x) => x.mark === 'bar');
-    for (const bar of bars) {
-      // Name the measure only when the member alone would not tell two bars
-      // apart, or when there is no member at all.
-      const label =
-        depth === 0
-          ? bar.label
-          : bars.length > 1
-            ? `${member.key}${PATH_SEPARATOR}${bar.label}`
-            : member.key;
-      drafts.push({ key: label, label, member, bar });
+  // A bar measure's field decides its panel: `ir` and `cycles` are different
+  // quantities, and two of them on one axis would be read against each other
+  // bar by bar. A range or dot goes with the bars of its own field, or the
+  // first panel when no bar measures that field.
+  const barSources: string[] = [];
+  for (const m of members) {
+    for (const x of m.measures) {
+      if (x.mark === 'bar' && !barSources.includes(x.source)) {
+        barSources.push(x.source);
+      }
     }
   }
-
-  // Colour follows the engine's order, which is the axis's own sort; drawing
-  // follows `barOrder`. The same split as `Series.slot` and `Series.index`.
-  const rank = new Map((chart.barOrder ?? []).map((key, i) => [key, i]));
-  const unlisted = rank.size;
-  const ordered = drafts
-    .map((draft, slot) => ({ draft, slot }))
-    .sort(
-      (a, b) =>
-        (rank.get(a.draft.member.key) ?? unlisted) -
-        (rank.get(b.draft.member.key) ?? unlisted),
-    );
-
-  const paints = paint(
-    ordered.map((o) => o.draft),
-    drafts,
-    depth,
-    chart.colors,
-    notes,
-  );
-
-  // --- points ----------------------------------------------------------------
-
-  const valueAt = (row: number, leaf: number): number | null => {
-    const n = asNumber(result.rows[row]!.cells[leaf]?.value);
-    if (n === null) return null;
-    return n * (result.leaves[leaf]!.displayFactor ?? 1);
-  };
+  const split = (chart.split ?? true) && barSources.length > 1;
+  const panelOf = (x: Measure) =>
+    !split ? 0 : Math.max(0, barSources.indexOf(x.source));
+  const count = split ? barSources.length : 1;
 
   // Each level labelled the way the table labels it, then joined for the
   // readout and for a vertical chart, which has no room for columns.
@@ -268,66 +272,156 @@ export function graphFromView(
     ),
   );
   const categories = paths.map((p) => p.join(PATH_SEPARATOR));
-
-  let min = Infinity;
-  let max = -Infinity;
-  const see = (v: number | null) => {
-    if (v === null) return;
-    if (v < min) min = v;
-    if (v > max) max = v;
-  };
-
-  const series: Series[] = ordered.map(({ draft, slot }, index) => {
-    const others = draft.member.measures.filter((x) => x.mark !== 'bar');
-    const ranged = others.filter((x) => x.mark === 'range');
-    const leaf = result.leaves[draft.bar.leaf]!;
-    const points: GraphPoint[] = result.rows.map((_row, r) => {
-      const y = valueAt(r, draft.bar.leaf);
-      see(y);
-      const extras: PointExtra[] = others.map((x) => ({
-        label: x.label,
-        value: valueAt(r, x.leaf),
-        as: x.mark === 'dot' ? 'dot' : x.mark === 'range' ? 'range' : 'none',
-      }));
-      const spread = ranged
-        .map((x) => valueAt(r, x.leaf))
-        .filter((v): v is number => v !== null);
-      const range: [number, number] | undefined =
-        spread.length >= 2
-          ? [Math.min(...spread), Math.max(...spread)]
-          : undefined;
-      if (range) {
-        see(range[0]);
-        see(range[1]);
-      }
-      for (const e of extras) if (e.as === 'dot') see(e.value);
-      return {
-        x: r,
-        y,
-        raw: categories[r]!,
-        ...(range ? { range } : {}),
-        ...(extras.length > 0 ? { extras } : {}),
-      };
-    });
-    return {
-      key: draft.key,
-      label: draft.label,
-      meta: leaf.column.meta ?? fallbackMeta(draft.label),
-      index,
-      slot,
-      points,
-      ...paints[index],
-    };
-  });
-
-  const firstBar = result.leaves[ordered[0]!.draft.bar.leaf]!;
-  const yMeta = firstBar.column.meta ?? fallbackMeta(firstBar.column.label);
   const rowField = view.pivotRows![0]!.field;
   const xMeta =
     result.frame.columnByName.get(rowField)?.meta ?? fallbackMeta(rowField);
 
+  const valueAt = (row: number, leaf: number): number | null => {
+    const n = asNumber(result.rows[row]!.cells[leaf]?.value);
+    if (n === null) return null;
+    return n * (result.leaves[leaf]!.displayFactor ?? 1);
+  };
+
+  const panels: PivotPanel[] = [];
+  for (let p = 0; p < count; p++) {
+    const own = members.map((m) => ({
+      ...m,
+      measures: m.measures.filter((x) => panelOf(x) === p),
+    }));
+    const graph = buildPanel(own);
+    if (graph) {
+      panels.push({
+        key: split ? barSources[p]! : '',
+        title: split ? graph.yMeta.displayName : '',
+        graph,
+      });
+    }
+  }
+
+  // One scale for panels that measure in one unit, so a bar is as long in
+  // one panel as an equal bar in the next. Each panel's own extent would put
+  // a 1.1 at a different length in each, which is exactly the comparison
+  // the reader is making across them.
+  const units = new Set(panels.map((x) => unitLabels(x.graph.yMeta).full));
+  if (panels.length > 1 && units.size === 1 && chart.sharedScale !== false) {
+    const lo = Math.min(...panels.map((x) => x.graph.yExtent[0]));
+    const hi = Math.max(...panels.map((x) => x.graph.yExtent[1]));
+    for (const x of panels) x.graph.yExtent = [lo, hi];
+  }
+
   return {
-    graph: {
+    graph: panels[0]?.graph ?? null,
+    panels,
+    problems,
+    // Each panel paints on its own, so the same note can arrive twice.
+    notes: [...new Set(notes)],
+  };
+
+  /** One panel's chart, from the members' measures that belong to it. */
+  function buildPanel(members: Member[]): GraphData | null {
+    if (!members.some((m) => m.measures.some((x) => x.mark === 'bar'))) {
+      return null;
+    }
+
+    interface Draft {
+      key: string;
+      label: string;
+      member: Member;
+      bar: Measure;
+    }
+    const drafts: Draft[] = [];
+    for (const member of members) {
+      const bars = member.measures.filter((x) => x.mark === 'bar');
+      for (const bar of bars) {
+        // Name the measure only when the member alone would not tell two bars
+        // apart, or when there is no member at all.
+        const label =
+          depth === 0
+            ? bar.label
+            : bars.length > 1
+              ? `${member.key}${PATH_SEPARATOR}${bar.label}`
+              : member.key;
+        drafts.push({ key: label, label, member, bar });
+      }
+    }
+
+    // Colour follows the engine's order, which is the axis's own sort; drawing
+    // follows `barOrder`. The same split as `Series.slot` and `Series.index`.
+    const rank = new Map((chart.barOrder ?? []).map((key, i) => [key, i]));
+    const unlisted = rank.size;
+    const ordered = drafts
+      .map((draft, slot) => ({ draft, slot }))
+      .sort(
+        (a, b) =>
+          (rank.get(a.draft.member.key) ?? unlisted) -
+          (rank.get(b.draft.member.key) ?? unlisted),
+      );
+
+    const paints = paint(
+      ordered.map((o) => o.draft),
+      drafts,
+      depth,
+      chart.colors,
+      notes,
+    );
+
+    // --- points ----------------------------------------------------------------
+
+    let min = Infinity;
+    let max = -Infinity;
+    const see = (v: number | null) => {
+      if (v === null) return;
+      if (v < min) min = v;
+      if (v > max) max = v;
+    };
+
+    const series: Series[] = ordered.map(({ draft, slot }, index) => {
+      const others = draft.member.measures.filter((x) => x.mark !== 'bar');
+      const ranged = others.filter((x) => x.mark === 'range');
+      const leaf = result.leaves[draft.bar.leaf]!;
+      const points: GraphPoint[] = result.rows.map((_row, r) => {
+        const y = valueAt(r, draft.bar.leaf);
+        see(y);
+        const extras: PointExtra[] = others.map((x) => ({
+          label: x.label,
+          value: valueAt(r, x.leaf),
+          as: x.mark === 'dot' ? 'dot' : x.mark === 'range' ? 'range' : 'none',
+        }));
+        const spread = ranged
+          .map((x) => valueAt(r, x.leaf))
+          .filter((v): v is number => v !== null);
+        const range: [number, number] | undefined =
+          spread.length >= 2
+            ? [Math.min(...spread), Math.max(...spread)]
+            : undefined;
+        if (range) {
+          see(range[0]);
+          see(range[1]);
+        }
+        for (const e of extras) if (e.as === 'dot') see(e.value);
+        return {
+          x: r,
+          y,
+          raw: categories[r]!,
+          ...(range ? { range } : {}),
+          ...(extras.length > 0 ? { extras } : {}),
+        };
+      });
+      return {
+        key: draft.key,
+        label: draft.label,
+        meta: leaf.column.meta ?? fallbackMeta(draft.label),
+        index,
+        slot,
+        points,
+        ...paints[index],
+      };
+    });
+
+    const firstBar = result.leaves[ordered[0]!.draft.bar.leaf]!;
+    const yMeta = firstBar.column.meta ?? fallbackMeta(firstBar.column.label);
+
+    return {
       series,
       xKind: 'band',
       xs: categories.map((_c, i) => i),
@@ -339,10 +433,8 @@ export function graphFromView(
       yFactor: 1,
       yExtent: min <= max ? [min, max] : [0, 1],
       frame: result.frame,
-    },
-    problems,
-    notes,
-  };
+    };
+  }
 }
 
 /** What `paint` decides for one series. */

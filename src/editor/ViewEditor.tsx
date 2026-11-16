@@ -757,6 +757,8 @@ export function ViewEditor({
   );
 
   const chart = display?.chart ?? {};
+  const fieldsMeasured = new Set(view.columns.map((c) => c.source ?? c.id))
+    .size;
   const chartSection = asChart && onDisplayChange && (
     <>
       <Section title="Chart" empty={false}>
@@ -848,6 +850,31 @@ export function ViewEditor({
             onDisplayChange(setChart(shown, { hover: on ? undefined : false }))
           }
         />
+        {/* Only worth offering when the values measure several fields. */}
+        {fieldsMeasured > 1 && (
+          <>
+            <Check
+              label="A panel per measured field"
+              checked={chart.split ?? true}
+              onChange={(on) =>
+                onDisplayChange(
+                  setChart(shown, { split: on ? undefined : false }),
+                )
+              }
+            />
+            {(chart.split ?? true) && (
+              <Check
+                label="Panels share a scale"
+                checked={chart.sharedScale ?? true}
+                onChange={(on) =>
+                  onDisplayChange(
+                    setChart(shown, { sharedScale: on ? undefined : false }),
+                  )
+                }
+              />
+            )}
+          </>
+        )}
       </Section>
       {bars.length > 1 && (
         <Section title="Bar order" empty={false}>

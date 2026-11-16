@@ -981,3 +981,39 @@ describe('whisker', () => {
     expect(host.querySelectorAll('g[class*="whisker"]')).toHaveLength(1);
   });
 });
+
+describe('side-by-side panels', () => {
+  it('names the categories once and lines the rows up across panels', async () => {
+    const host = await render(
+      <PivotChart
+        data={[
+          { g: 'alpha', cycles: 1.1, ir: 1.05 },
+          { g: 'beta', cycles: 0.9, ir: 0.95 },
+        ]}
+        view={{
+          pivotRows: [{ field: 'g' }],
+          columns: [
+            { id: 'cycles', agg: 'mean' },
+            { id: 'ir', agg: 'mean' },
+          ],
+        }}
+        display={{ chart: { labels: false, hover: false } }}
+        width={800}
+      />,
+    );
+    const svgs = [...host.querySelectorAll('svg')];
+    expect(svgs).toHaveLength(2);
+    const texts = [...host.querySelectorAll('text')].map((t) => t.textContent);
+    expect(texts.filter((t) => t === 'alpha')).toHaveLength(1);
+    // The same rows in both: each bar's top edge at the same height.
+    const tops = (svg: SVGSVGElement) =>
+      [...svg.querySelectorAll('g[data-series] path')].map(
+        (p) => p.getAttribute('d')!.split('L')[0]!.split(',')[1],
+      );
+    expect(tops(svgs[0]!)).toEqual(tops(svgs[1]!));
+    // The first panel carries the labels, and the two plots share the rest.
+    const widths = svgs.map((s) => Number(s.getAttribute('width')));
+    expect(widths[0]).toBeGreaterThan(widths[1]!);
+    expect(widths[0]! + widths[1]!).toBeLessThanOrEqual(800);
+  });
+});
