@@ -45,7 +45,7 @@ export interface LineSeriesProps {
   /**
    * Fill between the line and the baseline, as a 10% wash. Suits one or two
    * series; past that the washes overlap into mud and the lines read better
-   * bare.
+   * bare. Ignored on a horizontal chart.
    */
   area?: boolean;
   /** Draw a dot on each point. Cheaper than a `<Dot/>` child, and capped. */
@@ -63,7 +63,7 @@ export function LineSeries({
   maxMarkers = DEFAULT_MAX_MARKERS,
   children,
 }: LineSeriesProps) {
-  const { x, y, data, colorOf, baseline } = useGraph();
+  const { data, seriesColor, baseline, place, orientation } = useGraph();
   // Memoised because it feeds the geometry memo below: `only` returns a fresh
   // array each render, which would miss the memo in exactly the case it exists
   // for.
@@ -76,12 +76,13 @@ export function LineSeries({
     () =>
       list.map((series) => ({
         series,
-        points: series.points.map<PlotPoint>((p) => ({
-          x: x.at(p.x),
-          y: p.y === null ? null : y.at(p.y),
-        })),
+        points: series.points.map<PlotPoint>((p) => {
+          if (p.y === null) return { x: 0, y: null };
+          const { cx, cy } = place(p.x, p.y);
+          return { x: cx, y: cy };
+        }),
       })),
-    [list, x, y],
+    [list, place],
   );
 
   const showMarkers = markers && data.xs.length <= maxMarkers;
@@ -90,11 +91,13 @@ export function LineSeries({
   return (
     <>
       {geometry.map(({ series, points }) => {
-        const color = colorOf(series.slot);
+        const color = seriesColor(series);
         return (
           <SeriesContext.Provider key={series.key} value={{ series, color }}>
             <g data-series={series.key}>
-              {area && (
+              {/* The wash fills down to a baseline *row*, so it has no
+                  meaning for a line running down the page. */}
+              {area && orientation === 'vertical' && (
                 <path
                   className={styles.area}
                   d={areaPath(points, baseline)}

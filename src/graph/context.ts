@@ -44,20 +44,53 @@ import type { GraphData, GraphPoint, Series } from './series';
  */
 export type GraphUnitPlacement = 'axis' | 'value' | 'off';
 
+/**
+ * Which way the value axis runs.
+ *
+ * `'vertical'` is the usual chart: positions along the bottom, values up the
+ * side. `'horizontal'` turns it on its side, categories down the left and
+ * values along the bottom, which is what a list of named things wants: the
+ * names are read in a column instead of squeezed under bars.
+ */
+export type GraphOrientation = 'vertical' | 'horizontal';
+
 export interface GraphGeometry {
+  /**
+   * The position scale: time, a number, or the band of categories. Its range
+   * runs along the bottom of a vertical chart and down the left of a
+   * horizontal one, so read pixels through `place` rather than assuming which
+   * coordinate this is.
+   */
   x: Scale;
+  /** The value scale. Vertical in a vertical chart, horizontal otherwise. */
   y: Scale;
+  orientation: GraphOrientation;
+  /**
+   * The SVG point for a position along `x` and a value along `y`.
+   *
+   * The one place that knows which of the two is the horizontal coordinate, so
+   * a mark that plots through it draws the same way in either orientation.
+   */
+  place: (position: number, value: number) => { cx: number; cy: number };
   /** The plot area, inside the margins, in SVG user units (= CSS pixels). */
   plot: { left: number; top: number; width: number; height: number };
   data: GraphData;
   /** The CSS colour for a series slot, as a `var()` reference. */
   colorOf: (index: number) => string;
+  /** A series' colour: its own if it has one, else its palette slot's. */
+  seriesColor: (series: Series) => string;
   /** Where the unit is stated. Every mark that could state it reads this. */
   unitPlacement: GraphUnitPlacement;
   /** Ticks each axis aims for, so an axis and the margin estimate agree. */
   ticks: number;
   /**
-   * Pixel row the value axis calls zero, clamped into the plot.
+   * The value bars grow from, in display units: 0 unless the box was given a
+   * `baseline`. A `<ReferenceLine>` with no value of its own draws here.
+   */
+  reference: number;
+  /**
+   * Pixel the value axis puts `reference` at, clamped into the plot: a row in
+   * a vertical chart, a column in a horizontal one.
    *
    * One definition for the three marks that need it: a bar grows from it, an
    * area fills to it, and an outside `<PointLabel>` picks its side against it.

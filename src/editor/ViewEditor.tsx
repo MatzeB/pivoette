@@ -15,7 +15,14 @@ import { isFlat } from '../pivot/spec';
 import type { AxisField, ViewSpec } from '../pivot/spec';
 import type { DataTableDisplay } from '../components/DataTable';
 import type { CellValue, DataColumn, DataFrame } from '../data/types';
-import { fieldMembers } from '../pivot/engine';
+import { computeView, fieldMembers } from '../pivot/engine';
+import {
+  CHART_COLORS,
+  CHART_MARKS,
+  PATH_SEPARATOR,
+  markOf,
+} from '../graph/pivot-chart';
+import type { ChartColors, ChartMark } from '../graph/pivot-chart';
 import { isTimestamp } from '../data/temporal';
 import { Format } from '../format/builtins';
 import {
@@ -23,12 +30,16 @@ import {
   addField,
   addFooterRow,
   applyDrop,
+  moveBar,
   removeColumn,
   removeField,
   removeFilter,
   removeFooterRow,
+  setChart,
   setColumnAgg,
   setExcluded,
+  setMark,
+  setShowAs,
   setShowSummary,
 } from './ops';
 import type { DragRef, FieldZone, RemovalRef } from './ops';
@@ -222,6 +233,45 @@ function AddMenu({
       {options(first)}
       {more.length > 0 && <optgroup label="More">{options(more)}</optgroup>}
     </select>
+  );
+}
+
+/** What each way of drawing a measure is called in the menu. */
+const MARK_LABELS: Record<ChartMark, string> = {
+  bar: 'Bar',
+  range: 'Range',
+  dot: 'Dot',
+  none: 'Readout only',
+};
+
+/** What each colour scheme is called in the menu. */
+const COLOR_LABELS: Record<ChartColors, string> = {
+  series: 'a colour per bar',
+  shades: 'shades of one colour',
+  nested: 'colour by first field, shade by second',
+};
+
+/** A labelled on/off setting, as one row of a list. */
+function Check({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (on: boolean) => void;
+}) {
+  return (
+    <li className={styles.row}>
+      <label className={styles.check}>
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        {label}
+      </label>
+    </li>
   );
 }
 
@@ -576,6 +626,8 @@ export function ViewEditor({
 
   const flat = isFlat(view);
   const footer = display?.footer ?? [];
+  /** Drawn as a chart: the same lists, under the names a chart gives them. */
+  const asChart = !flat && display?.as === 'chart';
   // A bundle need not carry a display at all; its footer starts empty.
   const shown = display ?? {};
   // The grand total is a property of a pivot view; a flat one has no groups
@@ -588,7 +640,8 @@ export function ViewEditor({
    * source rows. Only the first kind can be reordered — the total always
    * comes last.
    */
-  const totals = onDisplayChange && (
+  // A chart draws no footer, so there is nothing for its rows to edit.
+  const totals = onDisplayChange && !asChart && (
     <Section
       title="Totals"
       empty={footer.length === 0 && !summary}
@@ -651,6 +704,182 @@ export function ViewEditor({
 
   const reset = onReset && <ResetButton onReset={onReset} enabled={canReset} />;
 
+  /**
+   * The bars within a category, in the order they are drawn: the column
+   * fields' members, which only the computed view knows — a member that
+   * exists in the data but is filtered out is not a bar.
+   */
+  const bars = useMemo(() => {
+    if (!asChart || !frame) return [];
+    let keys: string[];
+    try {
+      const depth = (view.pivotColumns ?? []).length;
+      keys = [
+        ...new Set(
+          computeView(frame, view).leaves.map((l) =>
+            l.colPath.slice(0, depth).join(PATH_SEPARATOR),
+          ),
+        ),
+      ].filter((k) => k !== '');
+    } catch {
+      // The chart says what is wrong with the view; the list just goes empty.
+      return [];
+    }
+    const order = display?.chart?.barOrder ?? [];
+    const rank = new Map(order.map((k, i) => [k, i]));
+    return keys
+      .map((key, i) => ({ key, i }))
+      .sort(
+        (a, b) =>
+          (rank.get(a.key) ?? order.length + a.i) -
+          (rank.get(b.key) ?? order.length + b.i),
+      )
+      .map((e) => e.key);
+  }, [asChart, frame, view, display?.chart?.barOrder]);
+
+  const showAs = onDisplayChange && !flat && (
+    <Section title="Show as" empty={false}>
+      <li className={styles.toggle} role="radiogroup" aria-label="Show as">
+        {(['table', 'chart'] as const).map((as) => (
+          <button
+            key={as}
+            type="button"
+            role="radio"
+            aria-checked={(display?.as ?? 'table') === as}
+            className={styles.toggleButton}
+            onClick={() => onDisplayChange(setShowAs(shown, as))}
+          >
+            {as === 'table' ? 'Table' : 'Chart'}
+          </button>
+        ))}
+      </li>
+    </Section>
+  );
+
+  const chart = display?.chart ?? {};
+  const chartSection = asChart && onDisplayChange && (
+    <>
+      <Section title="Chart" empty={false}>
+        <li className={styles.row}>
+          <span className={styles.label}>Orientation</span>
+          <select
+            className={styles.agg}
+            value={chart.orientation ?? 'horizontal'}
+            onChange={(e) =>
+              onDisplayChange(
+                setChart(shown, {
+                  orientation: e.target.value as 'horizontal' | 'vertical',
+                }),
+              )
+            }
+          >
+            <option value="horizontal">horizontal</option>
+            <option value="vertical">vertical</option>
+          </select>
+        </li>
+        <li className={styles.row}>
+          <span className={styles.label}>Colours</span>
+          <select
+            className={styles.agg}
+            value={chart.colors ?? ''}
+            title="What a bar's colour says"
+            onChange={(e) =>
+              onDisplayChange(
+                setChart(shown, {
+                  colors: (e.target.value || undefined) as
+                    ChartColors | undefined,
+                }),
+              )
+            }
+          >
+            <option value="">automatic</option>
+            {CHART_COLORS.map((c) => (
+              <option
+                key={c}
+                value={c}
+                // Nesting needs a field to pick the hue and one to shade it.
+                disabled={
+                  c === 'nested' && (view.pivotColumns ?? []).length < 2
+                }
+              >
+                {COLOR_LABELS[c]}
+              </option>
+            ))}
+          </select>
+        </li>
+        <li className={styles.row}>
+          <span className={styles.label}>Baseline</span>
+          <input
+            className={styles.number}
+            type="number"
+            step="any"
+            placeholder="0"
+            title="The value bars grow from. Empty is zero."
+            // Keyed on the stored value, so an outside change shows through
+            // while a half-typed `1.` is left alone.
+            key={String(chart.baseline)}
+            defaultValue={chart.baseline ?? ''}
+            onChange={(e) => {
+              const text = e.target.value.trim();
+              const value = text === '' ? undefined : Number(text);
+              if (value !== undefined && !Number.isFinite(value)) return;
+              onDisplayChange(setChart(shown, { baseline: value }));
+            }}
+          />
+        </li>
+        <Check
+          label="Baseline in the middle"
+          checked={!!chart.symmetric}
+          onChange={(on) =>
+            onDisplayChange(setChart(shown, { symmetric: on || undefined }))
+          }
+        />
+        <Check
+          label="Values at the bar ends"
+          checked={chart.labels ?? true}
+          onChange={(on) =>
+            onDisplayChange(setChart(shown, { labels: on ? undefined : false }))
+          }
+        />
+        <Check
+          label="Read out on hover"
+          checked={chart.hover ?? true}
+          onChange={(on) =>
+            onDisplayChange(setChart(shown, { hover: on ? undefined : false }))
+          }
+        />
+      </Section>
+      {bars.length > 1 && (
+        <Section title="Bar order" empty={false}>
+          {bars.map((key, i) => (
+            <Row key={key} label={key}>
+              <button
+                type="button"
+                className={styles.step}
+                title="Draw earlier"
+                aria-label={`Move ${key} earlier`}
+                disabled={i === 0}
+                onClick={() => onDisplayChange(moveBar(shown, bars, i, i - 1))}
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                className={styles.step}
+                title="Draw later"
+                aria-label={`Move ${key} later`}
+                disabled={i === bars.length - 1}
+                onClick={() => onDisplayChange(moveBar(shown, bars, i, i + 1))}
+              >
+                ↓
+              </button>
+            </Row>
+          ))}
+        </Section>
+      )}
+    </>
+  );
+
   if (flat) {
     return (
       <div
@@ -678,11 +907,12 @@ export function ViewEditor({
       className={`${styles.root} ${className ?? ''}`}
       data-theme={paletteFor}
     >
-      {zone('Pivot rows', 'pivotRows')}
-      {zone('Pivot columns', 'pivotColumns')}
+      {showAs}
+      {zone(asChart ? 'Categories' : 'Pivot rows', 'pivotRows')}
+      {zone(asChart ? 'Bars' : 'Pivot columns', 'pivotColumns')}
 
       <Section
-        title="Columns"
+        title={asChart ? 'Values' : 'Columns'}
         empty={view.columns.length === 0}
         {...appendTo('columns', view.columns.length)}
         after={
@@ -739,10 +969,29 @@ export function ViewEditor({
                 ))}
               </select>
             )}
+            {asChart && onDisplayChange && (
+              <select
+                className={styles.agg}
+                value={markOf(view, display?.chart, i)}
+                title="Draw as"
+                onChange={(e) =>
+                  onDisplayChange(
+                    setMark(shown, column.id, e.target.value as ChartMark),
+                  )
+                }
+              >
+                {CHART_MARKS.map((mark) => (
+                  <option key={mark} value={mark}>
+                    {MARK_LABELS[mark]}
+                  </option>
+                ))}
+              </select>
+            )}
           </Row>
         ))}
       </Section>
 
+      {chartSection}
       {filters}
       {totals}
       {reset}

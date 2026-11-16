@@ -94,7 +94,7 @@ export type Scale = ContinuousScale | BandScale;
  * digits is one below the ~15.95 a double actually carries, so this rounds off
  * the representation error and nothing else.
  */
-function clean(value: number): number {
+export function clean(value: number): number {
   return Number(value.toPrecision(15));
 }
 
@@ -170,8 +170,10 @@ export const MAX_TICKS = 200;
 
 /** Every multiple of `step` inside `[lo, hi]`, inclusive. */
 function linearTicks(lo: number, hi: number, step: number): number[] {
-  const first = Math.ceil(lo / step);
-  const last = Math.floor(hi / step);
+  // With a little slack: `1.4 / 0.2` is `6.999…` in binary, and flooring it
+  // drops the tick that sits exactly on the domain's end.
+  const first = Math.ceil(lo / step - 1e-9);
+  const last = Math.floor(hi / step + 1e-9);
   if (!Number.isFinite(first) || !Number.isFinite(last)) return [];
   const out: number[] = [];
   for (let i = first; i <= last && out.length < MAX_TICKS; i++) {

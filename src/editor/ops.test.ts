@@ -10,8 +10,12 @@ import {
   removeField,
   removeFilter,
   removeFooterRow,
+  moveBar,
+  setChart,
   setColumnAgg,
   setExcluded,
+  setMark,
+  setShowAs,
 } from './ops';
 import type { ViewSpec } from '../pivot/spec';
 
@@ -285,5 +289,35 @@ describe('filters', () => {
     expect(removeFilter(one, 'p')).toEqual(flat);
     expect(removeFilter(flat, 'p')).toBe(flat);
     expect(flat.filter).toBeUndefined();
+  });
+});
+
+describe('chart display', () => {
+  it('switches between table and chart, leaving table as the absence', () => {
+    const chart = setShowAs({ zebra: true }, 'chart');
+    expect(chart).toEqual({ zebra: true, as: 'chart' });
+    expect(setShowAs(chart, 'table')).toEqual({ zebra: true });
+  });
+
+  it('merges settings and drops the ones cleared', () => {
+    const one = setChart({}, { baseline: 1, symmetric: true });
+    expect(one.chart).toEqual({ baseline: 1, symmetric: true });
+    expect(setChart(one, { baseline: undefined }).chart).toEqual({
+      symmetric: true,
+    });
+  });
+
+  it('sets one measure’s mark without touching the others', () => {
+    const one = setMark({}, 'lo', 'range');
+    expect(setMark(one, 'hi', 'dot').chart!.marks).toEqual({
+      lo: 'range',
+      hi: 'dot',
+    });
+  });
+
+  it('moves a bar and stores the whole order', () => {
+    const next = moveBar({}, ['base', 'pgo', 'bolt'], 2, 0);
+    expect(next.chart!.barOrder).toEqual(['bolt', 'base', 'pgo']);
+    expect(moveBar({}, ['base'], 5, 0)).toEqual({});
   });
 });

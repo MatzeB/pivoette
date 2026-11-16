@@ -38,6 +38,13 @@ import { view as commits } from '../demo/examples/commits/view';
 import commitsData from '../demo/examples/commits/data.json';
 import { Chart as NetworthChart } from '../demo/examples/networth/view';
 import networthData from '../demo/examples/networth/data.json';
+import {
+  view as compilerView,
+  display as compilerDisplay,
+} from '../demo/examples/compiler/view';
+import { PivotChart } from './graph/PivotChart';
+import { graphFromView } from './graph/pivot-chart';
+import compilerData from '../demo/examples/compiler/data.json';
 import { buildGraphData } from './graph/series';
 import { unitLabels } from './data/meta';
 
@@ -157,6 +164,93 @@ describe('example: networth (chart)', () => {
     // Both boxes render, though only the sized one draws: jsdom reports zero
     // width, so the responsive charts fall back to their placeholder.
     expect(host.querySelectorAll('div[class]').length).toBeGreaterThan(0);
+    await act(async () => root.unmount());
+    host.remove();
+  });
+});
+
+describe('example: compiler (a pivot view drawn as a chart)', () => {
+  const frame = frameOf(compilerData as Dataset);
+  const { graph, problems, notes } = graphFromView(
+    computeView(frame, compilerView),
+    compilerView,
+    compilerDisplay.chart,
+  );
+
+  it('draws without complaint', () => {
+    expect(problems).toEqual([]);
+    expect(notes).toEqual([]);
+    expect(graph).not.toBeNull();
+  });
+
+  it('gives each suite a bar per compiler and build, in build order', () => {
+    // In the pivot engine's own order for the row field.
+    expect([...graph!.categories].sort()).toEqual([
+      'CPython',
+      'SPEC 2006',
+      'bzip2',
+      'zstd',
+    ]);
+    expect(graph!.series.map((s) => s.key)).toEqual([
+      'FooCC · base',
+      'FooCC · LTO+PGO',
+      'FooCC · LTO+PGO+Bolt',
+      'BarCC · base',
+      'BarCC · LTO+PGO',
+      'BarCC · LTO+PGO+Bolt',
+    ]);
+  });
+
+  it('colours by compiler and shades by build', () => {
+    const groups = graph!.series.map((s) => s.group);
+    expect(groups.map((g) => g!.label)).toEqual([
+      'FooCC',
+      'FooCC',
+      'FooCC',
+      'BarCC',
+      'BarCC',
+      'BarCC',
+    ]);
+    // A hue per compiler, the full colour on the last build.
+    expect(graph!.series[2]!.color).toBe('var(--pv-series-0)');
+    expect(graph!.series[5]!.color).toBe('var(--pv-series-1)');
+    expect(graph!.series[0]!.color).toContain('color-mix');
+  });
+
+  it('spans each bar with its suite’s min and max', () => {
+    for (const series of graph!.series) {
+      for (const point of series.points) {
+        const [lo, hi] = point.range!;
+        expect(lo).toBeLessThanOrEqual(point.y!);
+        expect(hi).toBeGreaterThanOrEqual(point.y!);
+      }
+    }
+  });
+
+  it('has a bar on each side of 1.0', () => {
+    // The point of the baseline: bzip2 regresses at -O2.
+    const bars = graph!.series.flatMap((s) => s.points.map((p) => p.y!));
+    expect(Math.min(...bars)).toBeLessThan(1);
+    expect(Math.max(...bars)).toBeGreaterThan(1);
+  });
+
+  it('renders to real DOM', async () => {
+    const host = document.createElement('div');
+    document.body.append(host);
+    const root = createRoot(host);
+    await act(async () => {
+      root.render(
+        <PivotChart
+          data={frame}
+          view={compilerView}
+          display={compilerDisplay}
+          width={600}
+          locale="en-US"
+        />,
+      );
+    });
+    // Six bars for each of four suites.
+    expect(host.querySelectorAll('g[data-series] path')).toHaveLength(24);
     await act(async () => root.unmount());
     host.remove();
   });

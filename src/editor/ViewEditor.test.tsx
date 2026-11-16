@@ -610,3 +610,96 @@ describe('<ViewEditor> filters', () => {
     expect(section().textContent).toContain('region');
   });
 });
+
+describe('as a chart', () => {
+  const chartView: ViewSpec = {
+    pivotRows: [{ field: 'suite' }],
+    pivotColumns: [{ field: 'build' }],
+    columns: [
+      { id: 'avg', source: 'speedup', agg: 'geomean', label: 'geomean' },
+      { id: 'lo', source: 'speedup', agg: 'min', label: 'min' },
+    ],
+  };
+  const chartFrame = fromRows([
+    { suite: 'zstd', build: 'base', speedup: 1.1 },
+    { suite: 'zstd', build: 'pgo', speedup: 1.2 },
+  ]);
+
+  async function mountChart(display: DataTableDisplay) {
+    const changes: DataTableDisplay[] = [];
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    await act(async () => {
+      createRoot(container!).render(
+        <ViewEditor
+          view={chartView}
+          onViewChange={() => {}}
+          display={display}
+          onDisplayChange={(next) => changes.push(next)}
+          frame={chartFrame}
+        />,
+      );
+    });
+    return changes;
+  }
+
+  const headings = () =>
+    [...container!.querySelectorAll('h4')].map((h) => h.textContent);
+
+  it('names the lists for what they are in a chart', async () => {
+    await mountChart({ as: 'chart' });
+    expect(headings()).toEqual(
+      expect.arrayContaining([
+        'Show as',
+        'Categories',
+        'Bars',
+        'Values',
+        'Chart',
+        'Bar order',
+      ]),
+    );
+    // A chart draws no footer.
+    expect(headings()).not.toContain('Totals');
+  });
+
+  it('keeps the table’s names, and its totals, for a table', async () => {
+    await mountChart({});
+    expect(headings()).toEqual(
+      expect.arrayContaining(['Show as', 'Pivot rows', 'Pivot columns']),
+    );
+    expect(headings()).not.toContain('Chart');
+  });
+
+  it('offers how each value is drawn, defaulting from its aggregation', async () => {
+    const changes = await mountChart({ as: 'chart' });
+    const draws = [
+      ...container!.querySelectorAll<HTMLSelectElement>(
+        'select[title="Draw as"]',
+      ),
+    ];
+    expect(draws.map((s) => s.value)).toEqual(['bar', 'range']);
+    await act(async () => {
+      draws[1]!.value = 'dot';
+      draws[1]!.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect(changes.at(-1)!.chart!.marks).toEqual({ lo: 'dot' });
+  });
+
+  it('switches between table and chart', async () => {
+    const changes = await mountChart({});
+    const chartButton = [
+      ...container!.querySelectorAll<HTMLButtonElement>('[role="radio"]'),
+    ].find((b) => b.textContent === 'Chart')!;
+    await act(async () => chartButton.click());
+    expect(changes.at(-1)!.as).toBe('chart');
+  });
+
+  it('moves a bar earlier', async () => {
+    const changes = await mountChart({ as: 'chart' });
+    const later = container!.querySelector<HTMLButtonElement>(
+      'button[aria-label="Move pgo earlier"]',
+    )!;
+    await act(async () => later.click());
+    expect(changes.at(-1)!.chart!.barOrder).toEqual(['pgo', 'base']);
+  });
+});

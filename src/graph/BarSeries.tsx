@@ -9,11 +9,15 @@
  * Only grouping, not stacking. Stacked bars need a second pass to accumulate
  * and a rule for what a negative segment means inside a positive stack; that is
  * a decision worth making with a real use in front of it.
+ *
+ * Bars grow from the box's `baseline`, which is zero unless it says otherwise,
+ * and lie down when the box is `orientation="horizontal"`: each group then
+ * stacks top to bottom in series order, inside its category's row.
  */
 import { useMemo } from 'react';
 import { DatumContext, SeriesContext, renderDatum, useGraph } from './context';
 import type { DatumChildren, GraphDatum } from './context';
-import { barPath } from './shape';
+import { barPath, hbarPath } from './shape';
 import { selectSeries } from './series';
 import styles from './Graph.module.css';
 
@@ -62,7 +66,9 @@ export function BarSeries({
   colorBy = 'series',
   children,
 }: BarSeriesProps) {
-  const { x, y, plot, data, colorOf, baseline } = useGraph();
+  const { x, plot, data, colorOf, seriesColor, baseline, orientation, place } =
+    useGraph();
+  const horizontal = orientation === 'horizontal';
 
   const all = data.series;
   const list = useMemo(() => selectSeries(all, only), [all, only]);
@@ -72,7 +78,7 @@ export function BarSeries({
   const slot =
     x.kind === 'band'
       ? x.bandwidth()
-      : plot.width / Math.max(data.xs.length, 1);
+      : (horizontal ? plot.height : plot.width) / Math.max(data.xs.length, 1);
   const share = slot / Math.max(all.length, 1);
   const width = Math.max(1, Math.min(maxWidth, share - GAP));
 
@@ -86,16 +92,20 @@ export function BarSeries({
           <g key={series.key} data-series={series.key}>
             {series.points.map((point, index) => {
               if (point.y === null) return null;
+              // Across the band, the bar's centre; along the value axis, its
+              // tip. `place` knows which of the two is horizontal.
               const centre = x.at(point.x) + offset;
-              const top = y.at(point.y);
+              const { cx, cy } = place(point.x, point.y);
+              const tip = horizontal ? cx : cy;
               // Both are canonical slots, not drawn positions: re-sorting
               // the axis must not repaint anything.
-              const color = colorOf(
+              const color =
                 colorBy === 'category'
-                  ? (data.categorySlots[index] ?? index)
-                  : series.slot,
-              );
-              const datum: GraphDatum = { point, index, cx: centre, cy: top };
+                  ? colorOf(data.categorySlots[index] ?? index)
+                  : seriesColor(series);
+              const datum: GraphDatum = horizontal
+                ? { point, index, cx, cy: centre }
+                : { point, index, cx: centre, cy };
               return (
                 // The series context is mounted per bar rather than per series
                 // so that `colorBy` reaches the children too: a `<Dot/>` or a
@@ -107,10 +117,10 @@ export function BarSeries({
                   <DatumContext.Provider value={datum}>
                     <path
                       className={styles.bar}
-                      d={barPath(
+                      d={(horizontal ? hbarPath : barPath)(
                         centre - width / 2,
                         baseline,
-                        top,
+                        tip,
                         width,
                         RADIUS,
                       )}

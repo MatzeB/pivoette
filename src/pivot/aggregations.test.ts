@@ -28,6 +28,15 @@ describe('aggregations', () => {
     expect(reduce('p75', [1, 2, 3, 4, 5])).toBe(4);
   });
 
+  it('geomean averages ratios so opposite factors cancel', () => {
+    expect(reduce('geomean', [2, 0.5])).toBeCloseTo(1, 12);
+    expect(reduce('geomean', [1, 4, null, 'x'])).toBeCloseTo(2, 12);
+    expect(reduce('geomean', [])).toBeNull();
+    // Undefined for non-positive values, rather than quietly skipping them.
+    expect(reduce('geomean', [1.1, 0])).toBeNull();
+    expect(reduce('geomean', [1.1, -1])).toBeNull();
+  });
+
   it('population variance and std', () => {
     // values 2,4,4,4,5,5,7,9 -> mean 5, variance 4, std 2
     const v = [2, 4, 4, 4, 5, 5, 7, 9];

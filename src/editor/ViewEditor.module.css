@@ -268,3 +268,81 @@
   opacity: 0.45;
   cursor: default;
 }
+
+/* --- chart settings ------------------------------------------------------ */
+
+/* Table | Chart: two buttons that read as one control. */
+.toggle {
+  display: inline-flex;
+  border: 1px solid var(--pv-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.toggleButton {
+  padding: 2px 10px;
+  border: none;
+  background: transparent;
+  color: var(--pv-muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.toggleButton + .toggleButton {
+  border-left: 1px solid var(--pv-border);
+}
+
+.toggleButton[aria-checked='true'] {
+  background: var(--pv-hover);
+  color: inherit;
+  font-weight: 600;
+}
+
+.number {
+  width: 64px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1px solid var(--pv-border);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 11px;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.check input {
+  margin: 0;
+}
+
+/* The bar-order arrows: quiet until pointed at, like the remove button. */
+.step {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  line-height: 1;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  font-size: 11px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.step:hover:not(:disabled) {
+  opacity: 1;
+  background: var(--pv-hover);
+}
+
+.step:disabled {
+  opacity: 0.2;
+  cursor: default;
+}

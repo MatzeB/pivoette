@@ -134,3 +134,41 @@ export function barPath(
     `L${x1},${base}Z`
   );
 }
+
+/**
+ * `barPath` turned on its side: a bar from a baseline *column* to a value
+ * column, `thickness` tall from `y` down, rounded at the data end only.
+ *
+ * A separate function rather than a flag on `barPath`, because every
+ * coordinate swaps and a flag would turn each line of that one into a ternary.
+ * The rules are the same: the rounded corners are the ones the data reached,
+ * and degenerate sizes clamp rather than cross into a bow tie.
+ */
+export function hbarPath(
+  y: number,
+  baseline: number,
+  value: number,
+  thickness: number,
+  radius = 4,
+): string {
+  const h = Math.max(thickness, 0);
+  const length = Math.abs(value - baseline);
+  const left = value < baseline;
+  const rad = Math.max(0, Math.min(radius, h / 2, length));
+  const y0 = r(y);
+  const y1 = r(y + h);
+  const base = r(baseline);
+  const tip = r(value);
+  if (h === 0 || length === 0) return `M${base},${y0}L${base},${y1}`;
+  // Growing right, the path runs clockwise and the arcs sweep positively.
+  const sweep = left ? 0 : 1;
+  const inset = left ? rad : -rad;
+  return (
+    `M${base},${y0}` +
+    `L${r(value + inset)},${y0}` +
+    `A${r(rad)},${r(rad)} 0 0 ${sweep} ${tip},${r(y + rad)}` +
+    `L${tip},${r(y + h - rad)}` +
+    `A${r(rad)},${r(rad)} 0 0 ${sweep} ${r(value + inset)},${y1}` +
+    `L${base},${y1}Z`
+  );
+}

@@ -270,6 +270,21 @@ describe('ordering', () => {
     expect(data.series.map((s) => s.index)).toEqual([0, 1, 2]);
   });
 
+  it('draws series in an explicit order, unlisted ones after', () => {
+    const data = buildGraphData(frameOf(series), {
+      x: 'm',
+      y: 'v',
+      series: 'who',
+      order: 'value',
+      seriesOrder: ['gamma', 'nobody', 'alpha'],
+    });
+    // `beta` is unlisted, so it trails the listed two.
+    expect(data.series.map((s) => s.key)).toEqual(['gamma', 'alpha', 'beta']);
+    expect(data.series.map((s) => s.index)).toEqual([0, 1, 2]);
+    // Colours still come from the name order.
+    expect(data.series.map((s) => s.slot)).toEqual([2, 0, 1]);
+  });
+
   it('sorts signed, so a debt files below a small holding', () => {
     const debt: Row[] = [
       { g: 'small', v: 5 },

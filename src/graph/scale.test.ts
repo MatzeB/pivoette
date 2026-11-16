@@ -99,6 +99,16 @@ describe('linearScale', () => {
     expect(y.invert(300)).toBeCloseTo(0, 10);
   });
 
+  it('keeps a tick on each end even when the division is inexact', () => {
+    // `1.4 / 0.2` is `6.999…` in binary; flooring it lost the 1.4.
+    const t = linearScale({
+      domain: [0.6, 1.4],
+      range: [0, 100],
+      nice: false,
+    }).ticks(5);
+    expect(t.ticks.map((x) => x.value)).toEqual([0.6, 0.8, 1, 1.2, 1.4]);
+  });
+
   it('produces ticks with no float noise in them', () => {
     const t = linearScale({ domain: [0, 1], range: [0, 100] }).ticks(5);
     expect(t.ticks.map((x) => x.value)).toEqual([0, 0.2, 0.4, 0.6, 0.8, 1]);

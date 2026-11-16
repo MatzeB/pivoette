@@ -14,6 +14,7 @@ import { isFlat } from '../pivot/spec';
 import { clampIndex } from '../util';
 import type { AxisField, ColumnDef, ViewSpec } from '../pivot/spec';
 import type { CellValue } from '../data/types';
+import type { ChartDisplay, ChartMark } from '../graph/pivot-chart';
 
 /** The two axes a grouping field can live on. */
 export type FieldZone = 'pivotRows' | 'pivotColumns';
@@ -295,4 +296,57 @@ export function removeFooterRow(
   const footer = display.footer ?? [];
   if (index < 0 || index >= footer.length) return display;
   return { ...display, footer: removeAt(footer, index) };
+}
+
+// --- chart ------------------------------------------------------------------
+
+/** Draw the view as a table or a chart. The view itself is untouched. */
+export function setShowAs(
+  display: DataTableDisplay,
+  as: 'table' | 'chart',
+): DataTableDisplay {
+  // `table` is the default; leaving it out keeps a saved bundle as it was.
+  const { as: _previous, ...rest } = display;
+  return as === 'table' ? rest : { ...rest, as };
+}
+
+/**
+ * Change some of the chart settings. A key set to `undefined` is removed, so
+ * clearing a field returns it to its default rather than storing the clear.
+ */
+export function setChart(
+  display: DataTableDisplay,
+  patch: Partial<ChartDisplay>,
+): DataTableDisplay {
+  const chart: Record<string, unknown> = { ...display.chart, ...patch };
+  for (const key of Object.keys(chart)) {
+    if (chart[key] === undefined) delete chart[key];
+  }
+  return { ...display, chart: chart as ChartDisplay };
+}
+
+/** How the measure with this column id is drawn. */
+export function setMark(
+  display: DataTableDisplay,
+  columnId: string,
+  mark: ChartMark,
+): DataTableDisplay {
+  return setChart(display, {
+    marks: { ...display.chart?.marks, [columnId]: mark },
+  });
+}
+
+/**
+ * Move one bar within each category. `members` is the order they are drawn in
+ * now — the display's `barOrder` only lists what was ever moved, so the
+ * caller, which can see the bars, supplies the rest.
+ */
+export function moveBar(
+  display: DataTableDisplay,
+  members: readonly string[],
+  from: number,
+  to: number,
+): DataTableDisplay {
+  if (from < 0 || from >= members.length) return display;
+  return setChart(display, { barOrder: reorder([...members], from, to) });
 }

@@ -10,7 +10,7 @@
  *
  * The readout is HTML rather than SVG text: see `Graph.module.css`.
  */
-import { useMemo, useRef } from 'react';
+import { Fragment, useMemo, useRef } from 'react';
 import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useGraph, useLayers, usePointer, useSetPointer } from './context';
@@ -30,6 +30,8 @@ export interface ScrubEntry {
   y: number | null;
   /** The value as text, with its unit. Empty for a hole. */
   label: string;
+  /** The point's extra values, named and formatted: `min 1.25`. */
+  details: string[];
 }
 
 export interface ScrubHit {
@@ -43,7 +45,15 @@ export interface ScrubHit {
 export interface ScrubberProps {
   /** Replace the readout, or `false` to suppress it. */
   readout?: ((hit: ScrubHit) => ReactNode) | false;
-  /** Vertical rule at the hovered position. Default true. */
+  /**
+   * Mark the hovered position across the plot. Default true.
+   *
+   * A hairline on a continuous axis. On a band axis it shades the whole
+   * band instead: a line through the middle of a group of bars would cut
+   * the middle one in half, and the shading says "these bars are one
+   * category", which is the question a hover over bars is asking. Put the
+   * `<Scrubber>` before the bars so the shading paints behind them.
+   */
   rule?: boolean;
   /** A dot on each series at the hovered position. Default true. */
   dots?: boolean;
@@ -70,15 +80,48 @@ function useHovered(): { index: number; px: number } | null {
 }
 
 function ScrubRule() {
-  const { x, plot, data } = useGraph();
+  const { x, plot, data, orientation } = useGraph();
   const hover = useHovered();
   if (!hover) return null;
-  const px = x.at(data.xs[hover.index]!);
-  return (
+  const at = x.at(data.xs[hover.index]!);
+  const horizontal = orientation === 'horizontal';
+  if (x.kind === 'band') {
+    // The full step, padding included, so neighbouring bands' shading would
+    // tile without a gap.
+    const from = at - x.step() / 2;
+    return horizontal ? (
+      <rect
+        className={styles.band}
+        x={plot.left}
+        y={from}
+        width={plot.width}
+        height={x.step()}
+      />
+    ) : (
+      <rect
+        className={styles.band}
+        x={from}
+        y={plot.top}
+        width={x.step()}
+        height={plot.height}
+      />
+    );
+  }
+  // Across the plot at the hovered position: a column in a vertical chart, a
+  // row in a horizontal one.
+  return horizontal ? (
     <line
       className={styles.rule}
-      x1={px}
-      x2={px}
+      x1={plot.left}
+      x2={plot.left + plot.width}
+      y1={at}
+      y2={at}
+    />
+  ) : (
+    <line
+      className={styles.rule}
+      x1={at}
+      x2={at}
       y1={plot.top}
       y2={plot.top + plot.height}
     />
@@ -86,23 +129,24 @@ function ScrubRule() {
 }
 
 function ScrubDots() {
-  const { x, y, data, colorOf } = useGraph();
+  const { data, seriesColor, place } = useGraph();
   const hover = useHovered();
   if (!hover) return null;
-  const px = x.at(data.xs[hover.index]!);
+  const position = data.xs[hover.index]!;
   return (
     <>
       {data.series.map((series) => {
         const point = series.points[hover.index];
         if (!point || point.y === null) return null;
+        const { cx, cy } = place(position, point.y);
         return (
           <circle
             key={series.key}
             className={styles.dot}
-            cx={px}
-            cy={y.at(point.y)}
+            cx={cx}
+            cy={cy}
             r={4}
-            style={{ fill: colorOf(series.slot) }}
+            style={{ fill: seriesColor(series) }}
           />
         );
       })}
@@ -119,9 +163,10 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
     data,
     locale,
     timeZone,
-    colorOf,
+    seriesColor,
     formatValue,
     valueDecimals,
+    orientation,
   } = useGraph();
 
   // Built once and reused, because each of these constructs an `Intl`
@@ -160,27 +205,54 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
       x: value,
       xLabel,
       entries: data.series.map((series) => {
-        const y = series.points[hover.index]?.y ?? null;
+        const point = series.points[hover.index];
+        const y = point?.y ?? null;
+        const digits = valueDecimals + 1;
         return {
           series,
-          color: colorOf(series.slot),
+          color: seriesColor(series),
           y,
           // The box's formatter, so a value reads the same here as it does on
           // the axis — including whether it carries the unit at all.
           // One digit past the axis step — the same rule a `<PointLabel>`
           // follows, so the two never name one point differently.
-          label: y === null ? '' : formatValue(y, valueDecimals + 1),
+          label: y === null ? '' : formatValue(y, digits),
+          details: (point?.extras ?? [])
+            .filter((e) => e.value !== null)
+            .map((e) => `${e.label} ${formatValue(e.value!, digits)}`),
         };
       }),
     };
-  }, [hover, data, timeText, colorOf, formatValue, valueDecimals]);
+  }, [hover, data, timeText, seriesColor, formatValue, valueDecimals]);
 
   if (!overlay || !hit) return null;
 
-  // Flip to the other side of the rule near the right edge, so the readout
-  // never leaves the plot.
-  const px = x.at(hit.x);
-  const flip = px > plot.left + plot.width * 0.6;
+  // Flip to the other side of the rule near the far edge, so the readout
+  // never leaves the plot. Lying down, the rule is a row, so the readout sits
+  // below or above it, against the right edge where the bars are shortest.
+  const at = x.at(hit.x);
+  const horizontal = orientation === 'horizontal';
+  const flip = horizontal
+    ? at > plot.top + plot.height * 0.6
+    : at > plot.left + plot.width * 0.6;
+  // Clear of the whole band, not just its centre: measured from the centre,
+  // a readout beside a group of bars covers half of the very bars it names.
+  const reach = x.kind === 'band' ? x.step() / 2 : 0;
+  const position = horizontal
+    ? {
+        left: plot.left + plot.width,
+        top: flip ? at - reach - GAP : at + reach + GAP,
+        transform: flip ? 'translate(-100%, -100%)' : 'translateX(-100%)',
+      }
+    : {
+        // Always `left` plus a translate, never `right`. The overlay spans
+        // the whole box, so a `right` measured from the plot's edge is short
+        // by the right margin — which ate the gap and let the box touch the
+        // rule.
+        left: flip ? at - reach - GAP : at + reach + GAP,
+        top: plot.top,
+        transform: flip ? 'translateX(-100%)' : undefined,
+      };
 
   return createPortal(
     <div
@@ -189,14 +261,7 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
       // that actually knows the value, and it already re-renders per move.
       role="status"
       aria-live="polite"
-      style={{
-        // Always `left` plus a translate, never `right`. The overlay spans the
-        // whole box, so a `right` measured from the plot's edge is short by the
-        // right margin — which ate the gap and let the box touch the rule.
-        left: flip ? px - GAP : px + GAP,
-        top: plot.top,
-        transform: flip ? 'translateX(-100%)' : undefined,
-      }}
+      style={position}
     >
       {render ? (
         render(hit)
@@ -204,14 +269,24 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
         <>
           <div className={styles.readoutHead}>{hit.xLabel}</div>
           {hit.entries.map((entry) => (
-            <div key={entry.series.key} className={styles.readoutRow}>
-              <span
-                className={styles.swatch}
-                style={{ background: entry.color }}
-              />
-              {entry.series.label}
-              <span className={styles.readoutValue}>{entry.label || '—'}</span>
-            </div>
+            <Fragment key={entry.series.key}>
+              <div className={styles.readoutRow}>
+                <span
+                  className={styles.swatch}
+                  style={{ background: entry.color }}
+                />
+                {entry.series.label}
+                <span className={styles.readoutValue}>
+                  {entry.label || '—'}
+                </span>
+              </div>
+              {/* Under the row it qualifies, indented past the swatch. */}
+              {entry.details.length > 0 && (
+                <div className={styles.readoutDetail}>
+                  {entry.details.join(' · ')}
+                </div>
+              )}
+            </Fragment>
           ))}
         </>
       )}
@@ -229,17 +304,22 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
  * state changes, and React bails out on the rest.
  */
 function ScrubHitArea() {
-  const { x, plot, data } = useGraph();
+  const { x, plot, data, orientation } = useGraph();
+  const horizontal = orientation === 'horizontal';
   const setHover = useSetPointer();
   const ref = useRef<SVGRectElement>(null);
   const dragging = useRef(false);
 
-  const locate = (clientX: number) => {
+  /** Where the pointer is along the position axis, in user units. */
+  const locate = (e: { clientX: number; clientY: number }) => {
     const host = ref.current;
     if (!host) return;
     // User units are CSS pixels — no `viewBox` scaling — so this is a
     // subtraction rather than a `getScreenCTM` matrix.
-    const px = clientX - host.getBoundingClientRect().left + plot.left;
+    const box = host.getBoundingClientRect();
+    const px = horizontal
+      ? e.clientY - box.top + plot.top
+      : e.clientX - box.left + plot.left;
     const index =
       x.kind === 'band'
         ? Math.min(Math.max(Math.round(x.invert(px)), 0), data.xs.length - 1)
@@ -268,7 +348,7 @@ function ScrubHitArea() {
     // still scrubs — it just stops when the pointer leaves the plot.
     ref.current?.setPointerCapture?.(e.pointerId);
     // Touch has no hover, so the press itself has to place the scrubber.
-    locate(e.clientX);
+    locate(e);
   };
 
   const onUp = (e: ReactPointerEvent<SVGRectElement>) => {
@@ -292,7 +372,7 @@ function ScrubHitArea() {
       // one thing this component is arranged to avoid. The readout carries the
       // value instead, as a live region, which is what actually gets spoken.
       aria-label="Scrub the chart with the arrow keys"
-      onPointerMove={(e) => locate(e.clientX)}
+      onPointerMove={(e) => locate(e)}
       onPointerDown={onDown}
       onPointerUp={onUp}
       onPointerCancel={onUp}
@@ -300,11 +380,16 @@ function ScrubHitArea() {
         if (!dragging.current) setHover(null);
       }}
       onBlur={() => setHover(null)}
+      // Lying down, a drag along the bands is vertical, so it is the
+      // horizontal swipe that has to be left to the page.
+      style={horizontal ? { touchAction: 'pan-x' } : undefined}
       onKeyDown={(e) => {
-        if (e.key === 'ArrowRight') {
+        // Along the bands, whichever way they run. Down a horizontal chart
+        // the first category is at the top, so Down is forward.
+        if (e.key === (horizontal ? 'ArrowDown' : 'ArrowRight')) {
           e.preventDefault();
           stepBy(1);
-        } else if (e.key === 'ArrowLeft') {
+        } else if (e.key === (horizontal ? 'ArrowUp' : 'ArrowLeft')) {
           e.preventDefault();
           stepBy(-1);
         } else if (e.key === 'Escape') {

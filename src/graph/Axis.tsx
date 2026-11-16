@@ -19,14 +19,18 @@ import {
   withUnit,
 } from './axis-format';
 import type { TimeUnit } from './time';
+import { levelStarts, newFrom } from './levels';
 import styles from './Graph.module.css';
 
 export interface AxisProps {
-  /** Which edge. `left` is the value axis; `bottom` is the x axis. */
+  /**
+   * Which edge. In a vertical chart `left` is the value axis and `bottom` the
+   * x axis; a horizontal chart swaps them, so `left` names the categories.
+   */
   side: 'left' | 'bottom';
   /** Draw a hairline across the plot at each tick. */
   grid?: boolean;
-  /** Show the field's name beside the axis. Default true for `left`. */
+  /** Show the field's name beside the axis. Default true for the value axis. */
   label?: boolean;
   /** Ticks to aim for. Defaults to the box's own setting. */
   ticks?: number;
@@ -70,11 +74,15 @@ export function Axis({ side, grid = false, label, ticks: count }: AxisProps) {
     ticks,
     formatValue,
     xTicks,
+    orientation,
   } = useGraph();
+  /** How it is drawn: up the left edge, or along the bottom. */
   const vertical = side === 'left';
-  const scale = vertical ? y : x;
-  const meta = vertical ? data.yMeta : data.xMeta;
-  const showTitle = label ?? vertical;
+  /** What it shows. The two agree unless the chart is lying on its side. */
+  const isValue = vertical === (orientation === 'vertical');
+  const scale = isValue ? y : x;
+  const meta = isValue ? data.yMeta : data.xMeta;
+  const showTitle = label ?? isValue;
 
   // The x set is generated once on the geometry, because `Scrubber` reads the
   // calendar interval off it too; only an axis asking for its own tick count
@@ -82,22 +90,22 @@ export function Axis({ side, grid = false, label, ticks: count }: AxisProps) {
   // reaches the axis that draws them.
   const set = useMemo(
     () =>
-      !vertical && count === undefined ? xTicks : scale.ticks(count ?? ticks),
-    [vertical, scale, count, ticks, xTicks],
+      !isValue && count === undefined ? xTicks : scale.ticks(count ?? ticks),
+    [isValue, scale, count, ticks, xTicks],
   );
 
   const labels = useMemo(() => unitLabels(meta, locale), [meta, locale]);
 
   /** Only the value axis is ever rescaled; x carries positions, not measures. */
-  const rescaled = vertical && data.yFactor !== 1;
+  const rescaled = isValue && data.yFactor !== 1;
 
   const text = useMemo(() => {
     // Categorical: the labels are the categories, already strings.
-    if (!vertical && data.xKind === 'band') {
+    if (!isValue && data.xKind === 'band') {
       return (index: number) => data.categories[index] ?? '';
     }
     // Time: dates, with a coarser label wherever the period rolls over.
-    if (!vertical && data.xKind === 'time' && set.interval) {
+    if (!isValue && data.xKind === 'time' && set.interval) {
       const unit = set.interval.unit;
       const fmt = timeTickFormat(unit, locale, timeZone);
       const key = rolloverOf(unit);
@@ -117,7 +125,7 @@ export function Axis({ side, grid = false, label, ticks: count }: AxisProps) {
     // The value axis goes through the box's shared formatter, so the room the
     // margin reserved for this text and the text itself cannot disagree. An x
     // axis has its own metadata and formats itself.
-    if (vertical) {
+    if (isValue) {
       return (_i: number, value: number) => formatValue(value, set.decimals);
     }
     const format = tickFormatter(
@@ -130,7 +138,7 @@ export function Axis({ side, grid = false, label, ticks: count }: AxisProps) {
         ? withUnit(format(value), labels)
         : format(value);
   }, [
-    vertical,
+    isValue,
     data,
     set,
     meta,
@@ -151,6 +159,12 @@ export function Axis({ side, grid = false, label, ticks: count }: AxisProps) {
 
   const right = plot.left + plot.width;
   const bottom = plot.top + plot.height;
+
+  // Categories down the left with several levels: a column per level, like
+  // the table's row index, instead of one joined label per row.
+  const paths =
+    vertical && !isValue && x.kind === 'band' ? data.categoryPaths : undefined;
+  const starts = paths ? levelStarts(paths, plot.left) : [];
 
   return (
     <g aria-hidden="true">
@@ -174,18 +188,61 @@ export function Axis({ side, grid = false, label, ticks: count }: AxisProps) {
         y2={bottom}
       />
 
-      {set.ticks.map((t, i) => (
-        <text
-          key={t.value}
-          className={styles.tickText}
-          x={vertical ? plot.left - 8 : t.pos}
-          y={vertical ? t.pos : bottom + 16}
-          textAnchor={vertical ? 'end' : 'middle'}
-          dominantBaseline={vertical ? 'middle' : 'auto'}
-        >
-          {text(i, t.value)}
-        </text>
-      ))}
+      {paths &&
+        set.ticks.map((t, i) => {
+          const from = newFrom(paths, i);
+          const path = paths[i]!;
+          const innermost = path.length - 1;
+          // Halfway between this band and the one above.
+          const edge = t.pos - (x.kind === 'band' ? x.step() / 2 : 0);
+          return (
+            <g key={t.value}>
+              {/* A rule where an outer group ends, from that level's column
+                  across the plot: the deeper the change, the shorter the
+                  rule, so the outermost groups read as the strongest. */}
+              {i > 0 && from < innermost && (
+                <line
+                  className={styles.grid}
+                  x1={starts[from]}
+                  x2={right}
+                  y1={edge}
+                  y2={edge}
+                />
+              )}
+              {path.map((part, level) =>
+                // An outer label once, on its group's first row; the
+                // innermost on every row, since it is what the row is.
+                level < from && level < innermost ? null : (
+                  <text
+                    key={level}
+                    className={
+                      level < innermost ? styles.levelText : styles.tickText
+                    }
+                    x={starts[level]}
+                    y={t.pos}
+                    dominantBaseline="middle"
+                  >
+                    {part}
+                  </text>
+                ),
+              )}
+            </g>
+          );
+        })}
+
+      {!paths &&
+        set.ticks.map((t, i) => (
+          <text
+            key={t.value}
+            className={styles.tickText}
+            x={vertical ? plot.left - 8 : t.pos}
+            y={vertical ? t.pos : bottom + 16}
+            textAnchor={vertical ? 'end' : 'middle'}
+            dominantBaseline={vertical ? 'middle' : 'auto'}
+          >
+            {text(i, t.value)}
+          </text>
+        ))}
 
       {title &&
         (vertical ? (

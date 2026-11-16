@@ -28,6 +28,7 @@ import {
   setShowSummary,
 } from '../editor/ops';
 import type { DragRef, RemovalRef } from '../editor/ops';
+import type { ChartDisplay } from '../graph/pivot-chart';
 import styles from './DataTable.module.css';
 
 export interface DataTableDisplay {
@@ -53,6 +54,17 @@ export interface DataTableDisplay {
   highlightHeaders?: boolean;
   /** Extra footer rows summarizing each column's displayed values. */
   footer?: { label: string; agg: string }[];
+  /**
+   * Draw the view as a chart instead of a table. Default `'table'`.
+   *
+   * The same view either way: its row fields become the chart's categories,
+   * its column fields the bars within each, and its measures what the bars
+   * show. `DataTable` itself always draws the table; `<PivotChart>` and the
+   * `<pivoette-table>` element read this to choose.
+   */
+  as?: 'table' | 'chart';
+  /** How the view is drawn when it is a chart. */
+  chart?: ChartDisplay;
   /** Where a column's unit label appears (default 'off'). */
   unitPlacement?: UnitPlacement;
   /** Where a column's scale label appears (default 'off'). Honored only for

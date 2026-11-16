@@ -11,16 +11,41 @@ export type {
 // Charts — composed rather than configured: `GraphBox` resolves the scales and
 // every mark nested inside reads them from context.
 export { GraphBox, SERIES_SLOTS } from './graph/GraphBox';
-export type { GraphBoxProps, GraphMargin } from './graph/GraphBox';
+export type {
+  GraphBoxOptions,
+  GraphBoxProps,
+  GraphMargin,
+  GraphSource,
+} from './graph/GraphBox';
 export { Axis } from './graph/Axis';
 export type { AxisProps } from './graph/Axis';
 export { LineSeries, DEFAULT_MAX_MARKERS } from './graph/LineSeries';
 export type { LineSeriesProps } from './graph/LineSeries';
 export { BarSeries, MAX_BAR_WIDTH } from './graph/BarSeries';
 export type { BarSeriesProps } from './graph/BarSeries';
-export { Dot, PointLabel } from './graph/marks';
-export type { DotProps, PointLabelProps } from './graph/marks';
+export { Dot, Marker, PointLabel, ReferenceLine, Whisker } from './graph/marks';
+export type {
+  DotProps,
+  PointLabelProps,
+  ReferenceLineProps,
+  WhiskerProps,
+} from './graph/marks';
 export { Legend } from './graph/Legend';
+export { PivotChart } from './graph/PivotChart';
+export type { PivotChartProps } from './graph/PivotChart';
+export {
+  CHART_COLORS,
+  CHART_MARKS,
+  graphFromView,
+  markOf,
+} from './graph/pivot-chart';
+export type {
+  ChartColors,
+  ChartDisplay,
+  ChartMark,
+  PivotGraph,
+} from './graph/pivot-chart';
+export { MAX_SHADES, shade } from './graph/shade';
 export type { LegendProps } from './graph/Legend';
 export { Scrubber } from './graph/Scrubber';
 export type { ScrubberProps, ScrubEntry, ScrubHit } from './graph/Scrubber';
@@ -38,6 +63,7 @@ export type {
   GraphDatum,
   GraphGeometry,
   GraphLayers,
+  GraphOrientation,
   GraphPointer,
   GraphSeriesCtx,
   GraphUnitPlacement,
@@ -69,7 +95,7 @@ export type {
 // stay internal rather than becoming a second way to ask the same question.
 export { addTime, chooseInterval, floorTime, timeScale } from './graph/time';
 export type { TimeInterval, TimeUnit } from './graph/time';
-export { areaPath, barPath, linePath, runs } from './graph/shape';
+export { areaPath, barPath, hbarPath, linePath, runs } from './graph/shape';
 export type { PlotPoint } from './graph/shape';
 // `withUnit` is not here: it is `attachUnit(body, affixOf(labels))`, and two
 // public names for one operation is how callers end up disagreeing.

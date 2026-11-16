@@ -19,8 +19,9 @@ import { GraphBox } from './GraphBox';
 import { Legend } from './Legend';
 import { LineSeries } from './LineSeries';
 import { BarSeries } from './BarSeries';
-import { Dot, PointLabel } from './marks';
+import { Dot, PointLabel, ReferenceLine } from './marks';
 import { Scrubber } from './Scrubber';
+import { PivotChart } from './PivotChart';
 
 installTestDom();
 
@@ -693,6 +694,193 @@ describe('scrubber', () => {
   });
 });
 
+describe('lying down, around a baseline', () => {
+  // Speedups against a reference build: 1.0 is "the same", and one result is
+  // slower than it.
+  const RATIOS: Row[] = [
+    { suite: 'zstd', variant: 'base', ratio: 1.02 },
+    { suite: 'zstd', variant: 'pgo', ratio: 1.15 },
+    { suite: 'bzip2', variant: 'base', ratio: 0.97 },
+    { suite: 'bzip2', variant: 'pgo', ratio: 1.01 },
+  ];
+  const sideways = (
+    children: ReactElement | ReactElement[],
+    props: object = {},
+  ) => (
+    <GraphBox
+      data={RATIOS}
+      x="suite"
+      y="ratio"
+      series="variant"
+      orientation="horizontal"
+      baseline={1}
+      width={600}
+      height={300}
+      {...props}
+    >
+      {children}
+    </GraphBox>
+  );
+
+  /** The `M` point a bar path starts from: its root on the baseline. */
+  const rootOf = (d: string) =>
+    d.slice(1).split('L')[0]!.split(',').map(Number);
+  /** The column a horizontal bar's data end reaches. */
+  const tipOf = (d: string) => {
+    const xs = [...d.matchAll(/[ML](-?[\d.]+),/g)].map((m) => Number(m[1]));
+    const root = rootOf(d)[0]!;
+    return xs.reduce((far, x) =>
+      Math.abs(x - root) > Math.abs(far - root) ? x : far,
+    );
+  };
+  const plotEdges = (host: HTMLElement) => {
+    // The bottom axis line spans the plot from left to right.
+    const line = [...host.querySelectorAll('line')].find(
+      (l) => l.getAttribute('y1') === l.getAttribute('y2'),
+    )!;
+    return [Number(line.getAttribute('x1')), Number(line.getAttribute('x2'))];
+  };
+
+  it('grows every bar from the baseline, right for a gain and left for a loss', async () => {
+    const host = await render(sideways(<BarSeries />));
+    const ds = [...host.querySelectorAll('path')].map((p) =>
+      p.getAttribute('d')!,
+    );
+    expect(ds).toHaveLength(4);
+    const roots = new Set(ds.map((d) => rootOf(d)[0]));
+    // One column for every root: they all start at 1.0.
+    expect(roots.size).toBe(1);
+    const root = [...roots][0]!;
+    const slow = host.querySelector('g[data-series="base"] path')!;
+    // Name order puts bzip2 first, and its base build is the slow one.
+    expect(tipOf(slow.getAttribute('d')!)).toBeLessThan(root);
+    const fast = host.querySelectorAll('g[data-series="pgo"] path')[1]!;
+    expect(tipOf(fast.getAttribute('d')!)).toBeGreaterThan(root);
+  });
+
+  it('stacks a group top to bottom in series order', async () => {
+    const host = await render(
+      sideways(<BarSeries />, { seriesOrder: ['pgo', 'base'] }),
+    );
+    const topOf = (sel: string) =>
+      rootOf(host.querySelector(sel)!.getAttribute('d')!)[1]!;
+    expect(topOf('g[data-series="pgo"] path')).toBeLessThan(
+      topOf('g[data-series="base"] path'),
+    );
+  });
+
+  it('names the categories on the left and puts the values along the bottom', async () => {
+    const host = await render(
+      sideways([<Axis key="l" side="left" />, <Axis key="b" side="bottom" />]),
+    );
+    const texts = [...host.querySelectorAll('text')];
+    const left = texts.filter((t) => t.getAttribute('text-anchor') === 'end');
+    expect(left.map((t) => t.textContent)).toEqual(['bzip2', 'zstd']);
+    const bottom = texts.filter(
+      (t) => t.getAttribute('text-anchor') === 'middle',
+    );
+    expect(bottom.map((t) => t.textContent)).toContain('1.00');
+  });
+
+  it('centres the baseline when asked to be symmetric', async () => {
+    const host = await render(
+      sideways([<Axis key="b" side="bottom" />, <ReferenceLine key="r" />], {
+        symmetric: true,
+      }),
+    );
+    const [left, right] = plotEdges(host);
+    const rule = host.querySelector('line[class*="reference"]')!;
+    expect(Number(rule.getAttribute('x1'))).toBeCloseTo(
+      (left! + right!) / 2,
+      1,
+    );
+    // Running the full height of the plot.
+    expect(rule.getAttribute('x1')).toBe(rule.getAttribute('x2'));
+  });
+
+  it('writes each label past its bar’s end, on the side it grew to', async () => {
+    const host = await render(
+      sideways(
+        <BarSeries>
+          <PointLabel at="all" side="outside" />
+        </BarSeries>,
+      ),
+    );
+    const labels = [...host.querySelectorAll('text')];
+    expect(labels).toHaveLength(4);
+    // One digit past the axis step, as every label is.
+    const slow = labels.find((l) => l.textContent === '0.970')!;
+    const fast = labels.find((l) => l.textContent === '1.150')!;
+    expect(slow.getAttribute('text-anchor')).toBe('end');
+    expect(fast.getAttribute('text-anchor')).toBe('start');
+    const bars = [...host.querySelectorAll('path')].map((p) =>
+      tipOf(p.getAttribute('d')!),
+    );
+    expect(Number(slow.getAttribute('x'))).toBeLessThan(Math.min(...bars));
+    expect(Number(fast.getAttribute('x'))).toBeGreaterThan(Math.max(...bars));
+  });
+
+  it('keeps room past the longest bar for its label', async () => {
+    const host = await render(
+      sideways([<Axis key="b" side="bottom" />, <BarSeries key="s" />], {
+        symmetric: true,
+        headroom: 40,
+      }),
+    );
+    const [left, right] = plotEdges(host);
+    const tips = [...host.querySelectorAll('path')].map((p) =>
+      tipOf(p.getAttribute('d')!),
+    );
+    expect(right! - Math.max(...tips)).toBeGreaterThanOrEqual(40);
+    expect(Math.min(...tips) - left!).toBeGreaterThanOrEqual(40);
+  });
+
+  it('scrubs down the categories with the arrow keys', async () => {
+    const host = await render(
+      sideways([<BarSeries key="s" />, <Scrubber key="c" />]),
+    );
+    const hit = host.querySelector('rect')!;
+    await act(async () => {
+      hit.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+      );
+    });
+    const readout = host.querySelector('[class*="readout"]')!;
+    expect(readout.textContent).toContain('bzip2');
+    // Bars get the whole band shaded rather than a line through the middle
+    // one: a row across the plot, as tall as the category's step.
+    expect(host.querySelector('line[class*="rule"]')).toBeNull();
+    const band = host.querySelector('rect[class*="band"]')!;
+    expect(Number(band.getAttribute('width'))).toBeGreaterThan(
+      Number(band.getAttribute('height')),
+    );
+    // Two categories over the plot's height: each band is half of it.
+    const bars = [...host.querySelectorAll('g[data-series] path')];
+    const firstTop = Math.min(
+      ...bars.map((p) => rootOf(p.getAttribute('d')!)[1]!),
+    );
+    expect(Number(band.getAttribute('y'))).toBeLessThan(firstTop);
+  });
+
+  it('keeps the readout clear of the band it names', async () => {
+    const host = await render(
+      sideways([<BarSeries key="s" />, <Scrubber key="c" />]),
+    );
+    const hit = host.querySelector('rect')!;
+    await act(async () => {
+      hit.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+      );
+    });
+    const band = host.querySelector('rect[class*="band"]')!;
+    const readout = host.querySelector<HTMLElement>('[class*="readout"]')!;
+    const bandBottom =
+      Number(band.getAttribute('y')) + Number(band.getAttribute('height'));
+    // The first band is near the top, so the readout hangs below it.
+    expect(parseFloat(readout.style.top)).toBeGreaterThan(bandBottom);
+  });
+});
+
 describe('sizing', () => {
   it('renders a placeholder rather than an Infinity transform', async () => {
     // No width given and no ResizeObserver measurement: the box has no size.
@@ -708,5 +896,88 @@ describe('sizing', () => {
     );
     expect(host.querySelector('svg')).toBeNull();
     expect(host.querySelector('path')).toBeNull();
+  });
+});
+
+describe('categories with several levels', () => {
+  const rows: Row[] = [
+    { suite: 'CPython', bench: 'richards', build: 'base', v: 1.02 },
+    { suite: 'CPython', bench: 'nbody', build: 'base', v: 1.05 },
+    { suite: 'zstd', bench: 'compress', build: 'base', v: 0.98 },
+    { suite: 'zstd', bench: 'decompress', build: 'base', v: 1.01 },
+  ];
+  const twoLevels = (orientation: 'horizontal' | 'vertical') => (
+    <PivotChart
+      data={rows}
+      view={{
+        pivotRows: [{ field: 'suite' }, { field: 'bench' }],
+        pivotColumns: [{ field: 'build' }],
+        columns: [{ id: 'v', agg: 'mean' }],
+      }}
+      display={{ chart: { orientation, labels: false, hover: false } }}
+      width={600}
+    />
+  );
+
+  it('writes an outer label once per group, in a column of its own', async () => {
+    const host = await render(twoLevels('horizontal'));
+    const texts = [...host.querySelectorAll('text')];
+    const named = (label: string) =>
+      texts.filter((t) => t.textContent === label);
+    // Once each, not on every row of the group.
+    expect(named('CPython')).toHaveLength(1);
+    expect(named('zstd')).toHaveLength(1);
+    // Every inner label, each on its own row.
+    for (const bench of ['richards', 'nbody', 'compress', 'decompress']) {
+      expect(named(bench)).toHaveLength(1);
+    }
+    // Two columns: the outer level starts left of the inner one.
+    const outerX = Number(named('CPython')[0]!.getAttribute('x'));
+    const innerX = Number(named('richards')[0]!.getAttribute('x'));
+    expect(outerX).toBeLessThan(innerX);
+    // The column is as wide as its longest label: `CPython`, not `zstd`.
+    expect(Number(named('zstd')[0]!.getAttribute('x'))).toBe(outerX);
+    // Never past the left edge: the margin made room for both columns.
+    expect(outerX).toBeGreaterThanOrEqual(0);
+  });
+
+  it('rules off each outer group but not the first', async () => {
+    const host = await render(twoLevels('horizontal'));
+    const rules = [...host.querySelectorAll('line[class*="grid"]')].filter(
+      (l) => l.getAttribute('y1') === l.getAttribute('y2'),
+    );
+    expect(rules).toHaveLength(1);
+  });
+
+  it('joins the levels on a vertical chart, which has no room for columns', async () => {
+    const host = await render(twoLevels('vertical'));
+    const texts = [...host.querySelectorAll('text')].map((t) => t.textContent);
+    expect(texts).toContain('CPython · richards');
+  });
+});
+
+describe('whisker', () => {
+  it('draws nothing for a range with no spread', async () => {
+    const host = await render(
+      <PivotChart
+        data={[
+          { g: 'a', v: 1.1 },
+          { g: 'b', v: 1.2 },
+          { g: 'b', v: 1.3 },
+        ]}
+        view={{
+          pivotRows: [{ field: 'g' }],
+          columns: [
+            { id: 'v', agg: 'mean' },
+            { id: 'lo', source: 'v', agg: 'min' },
+            { id: 'hi', source: 'v', agg: 'max' },
+          ],
+        }}
+        display={{ chart: { labels: false, hover: false } }}
+        width={600}
+      />,
+    );
+    // `a` has one value, so only `b` has a spread to show.
+    expect(host.querySelectorAll('g[class*="whisker"]')).toHaveLength(1);
   });
 });

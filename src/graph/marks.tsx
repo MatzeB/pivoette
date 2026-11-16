@@ -6,7 +6,8 @@
  * are — so a host writing its own can copy one and change the shape.
  */
 import { useDatum, useGraph, useSeries } from './context';
-import type { Series } from './series';
+import type { GraphPoint, Series } from './series';
+import type { Scale } from './scale';
 import styles from './Graph.module.css';
 
 export interface DotProps {
@@ -48,12 +49,17 @@ export interface PointLabelProps {
   at?: 'last' | 'first' | 'min' | 'max' | 'all';
   /**
    * Which way the label sits from its point. Default `'above'`, which suits a
-   * line. `'outside'` puts it past the *data end*, away from the axis zero —
+   * line. `'outside'` puts it past the *data end*, away from the baseline —
    * what a bar wants, since a negative bar's cap is below the baseline and a
-   * label above it would land inside the fill.
+   * label above it would land inside the fill. On a horizontal chart that is
+   * to the right of a bar that grew right and to the left of one that grew
+   * left.
    */
   side?: 'above' | 'outside';
-  /** Clearance between the point and the label, in pixels. */
+  /**
+   * Clearance between the point and the label, in pixels. Default 10, or 6
+   * beside a horizontal bar, where the text's own height is not in the gap.
+   */
   gap?: number;
   /** Override the text. Given the display value, which may be null. */
   format?: (value: number | null) => string;
@@ -106,6 +112,25 @@ function pickedIndex(
 const LABEL_REACH = 44;
 
 /**
+ * The pixel a point's ink reaches along the value axis, past the tip when a
+ * whisker sticks out beyond it, so an outside label clears both.
+ *
+ * `lower` says which way is outwards in pixels: a bar growing left, or up the
+ * page, has its far end at the smaller coordinate.
+ */
+function outerEnd(
+  point: GraphPoint,
+  tip: number,
+  lower: boolean,
+  y: Scale,
+): number {
+  if (!point.range) return tip;
+  const a = y.at(point.range[0]);
+  const b = y.at(point.range[1]);
+  return lower ? Math.min(tip, a, b) : Math.max(tip, a, b);
+}
+
+/**
  * A value printed beside one point of its series.
  *
  * In ink, never in the series colour: three of the light-mode slots are below
@@ -115,12 +140,13 @@ const LABEL_REACH = 44;
 export function PointLabel({
   at = 'last',
   side = 'above',
-  gap = 10,
+  gap,
   format,
 }: PointLabelProps) {
   const { point, index, cx, cy } = useDatum();
   const { series } = useSeries();
-  const { plot, baseline, formatValue, valueDecimals } = useGraph();
+  const { y, plot, baseline, formatValue, valueDecimals, orientation } =
+    useGraph();
 
   const picked = pickedIndex(series, at);
   if (picked !== -1 && picked !== index) return null;
@@ -135,6 +161,26 @@ export function PointLabel({
 
   if (!text) return null;
 
+  if (side === 'outside' && orientation === 'horizontal') {
+    // Past the tip along the row, on whichever side the bar grew towards,
+    // and centred on the bar's thickness.
+    const left = cx < baseline;
+    const clear = gap ?? 6;
+    const end = outerEnd(point, cx, left, y);
+    return (
+      <text
+        className={styles.pointLabel}
+        x={left ? end - clear : end + clear}
+        y={cy}
+        textAnchor={left ? 'end' : 'start'}
+        dominantBaseline="middle"
+      >
+        {text}
+      </text>
+    );
+  }
+  const clear = gap ?? 10;
+
   // Turn back towards the plot near an edge. A label at the end of a line is
   // exactly where a centred anchor overflows the frame, and a clipped number
   // is worse than no number — the mark spec's one hard rule about labels.
@@ -148,12 +194,13 @@ export function PointLabel({
   // A mark that grew downwards from the baseline carries its label below, so
   // the number always sits past the data end rather than on top of the fill.
   const below = side === 'outside' && cy > baseline;
+  const end = side === 'outside' ? outerEnd(point, cy, !below, y) : cy;
 
   return (
     <text
       className={styles.pointLabel}
       x={cx}
-      y={below ? cy + gap : cy - gap}
+      y={below ? end + clear : end - clear}
       textAnchor={anchor}
       // `hanging` measures from the top of the glyphs, so the gap below a mark
       // is the same visual distance as the gap above one.
@@ -161,5 +208,129 @@ export function PointLabel({
     >
       {text}
     </text>
+  );
+}
+
+export interface ReferenceLineProps {
+  /** Where, in display units. Default: the box's `baseline`, or 0. */
+  value?: number;
+  /**
+   * Text at the line's far end: the top of a vertical chart's rule, or the
+   * right of a horizontal one. Omitted, the line carries no label.
+   */
+  label?: string;
+}
+
+/**
+ * A rule across the plot at one value: the "no change" line a ratio chart
+ * measures everything against.
+ *
+ * Paint it after the bars, so it runs over their roots; a bar grows from the
+ * baseline, and the line is what says where that was. In ink rather than the
+ * gridline colour, since it means something the gridlines do not.
+ */
+export function ReferenceLine({ value, label }: ReferenceLineProps) {
+  const { y, plot, reference, orientation } = useGraph();
+  const at = y.at(value ?? reference);
+  const horizontal = orientation === 'horizontal';
+  const lo = horizontal ? plot.left : plot.top;
+  const hi = horizontal ? plot.left + plot.width : plot.top + plot.height;
+  // Off the plot is off the chart: a rule pinned to the edge would claim a
+  // value the axis does not show.
+  if (!(at >= lo - 0.5 && at <= hi + 0.5)) return null;
+  const right = plot.left + plot.width;
+  const bottom = plot.top + plot.height;
+  return (
+    <g aria-hidden="true">
+      <line
+        className={styles.reference}
+        x1={horizontal ? at : plot.left}
+        x2={horizontal ? at : right}
+        y1={horizontal ? plot.top : at}
+        y2={horizontal ? bottom : at}
+      />
+      {label && (
+        <text
+          className={styles.referenceLabel}
+          x={horizontal ? at : right}
+          y={horizontal ? plot.top - 2 : at - 4}
+          textAnchor={horizontal ? 'middle' : 'end'}
+        >
+          {label}
+        </text>
+      )}
+    </g>
+  );
+}
+
+export interface WhiskerProps {
+  /** Length of the end caps, across the bar. Default 8. */
+  cap?: number;
+}
+
+/**
+ * A line across a point's `range`, low to high, with a cap at each end: the
+ * spread a bar's value came from — a min-to-max, or an interquartile range.
+ *
+ * Drawn over the bar in ink, not in the series colour: it has to stay visible
+ * where it crosses its own fill, and the bar under it already says whose it is.
+ */
+export function Whisker({ cap = 8 }: WhiskerProps) {
+  const { point, cx, cy } = useDatum();
+  const { y, orientation } = useGraph();
+  if (!point.range) return null;
+  const lo = y.at(point.range[0]);
+  const hi = y.at(point.range[1]);
+  // A range of one value — min and max of a single benchmark — has no
+  // spread to show, and its caps would read as a stray tick on the bar.
+  if (Math.abs(hi - lo) < 1) return null;
+  const half = cap / 2;
+  if (orientation === 'horizontal') {
+    return (
+      <g className={styles.whisker}>
+        <line x1={lo} x2={hi} y1={cy} y2={cy} />
+        <line x1={lo} x2={lo} y1={cy - half} y2={cy + half} />
+        <line x1={hi} x2={hi} y1={cy - half} y2={cy + half} />
+      </g>
+    );
+  }
+  return (
+    <g className={styles.whisker}>
+      <line x1={cx} x2={cx} y1={lo} y2={hi} />
+      <line x1={cx - half} x2={cx + half} y1={lo} y2={lo} />
+      <line x1={cx - half} x2={cx + half} y1={hi} y2={hi} />
+    </g>
+  );
+}
+
+/**
+ * A marker for each of a point's extra values drawn as dots — a median on a
+ * mean's bar — on the bar's centre line.
+ *
+ * A diamond rather than a circle, so it does not read as the `<Dot>` that marks
+ * a point's own value; ringed in the surface colour, like a dot, to stay
+ * visible on the fill.
+ */
+export function Marker({ size = 5 }: { size?: number }) {
+  const { point, cx, cy } = useDatum();
+  const { y, orientation } = useGraph();
+  const dots = point.extras?.filter((e) => e.as === 'dot' && e.value !== null);
+  if (!dots?.length) return null;
+  return (
+    <>
+      {dots.map((extra) => {
+        const at = y.at(extra.value!);
+        const [mx, my] = orientation === 'horizontal' ? [at, cy] : [cx, at];
+        return (
+          <path
+            key={extra.label}
+            className={styles.marker}
+            d={`M${mx},${my - size}L${mx + size},${my}L${mx},${my + size}L${mx - size},${my}Z`}
+          >
+            <title>{extra.label}</title>
+          </path>
+        );
+      })}
+    </>
   );
 }

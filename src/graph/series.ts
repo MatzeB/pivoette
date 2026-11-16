@@ -47,6 +47,18 @@ export interface GraphFields {
    * Ordering never moves a colour — see `Series.slot`.
    */
   order?: 'name' | 'value';
+  /**
+   * Series keys in the order to draw them, overriding `order` for the series
+   * (a band x axis still follows `order`). Keys it leaves out come after the
+   * listed ones, in the order `order` gives them.
+   *
+   * For series whose order is a fact about the data rather than about their
+   * names or values: build variants that each add a step to the last, where
+   * the alphabet would put `LTO+PGO` before `base`.
+   *
+   * Like `order`, it never moves a colour.
+   */
+  seriesOrder?: readonly string[];
 }
 
 export type XKind = 'time' | 'linear' | 'band';
@@ -58,6 +70,26 @@ export interface GraphPoint {
   y: number | null;
   /** The x value as it came out of the frame, for readouts and labels. */
   raw: CellValue;
+  /**
+   * The span a whisker draws across, low to high, in display units. Set by a
+   * pivot-backed chart when values are drawn as a range; read by `<Whisker>`.
+   */
+  range?: [number, number];
+  /** Further values at this point, each with what it is. */
+  extras?: PointExtra[];
+}
+
+/**
+ * A value shown alongside a point's own: a median as a marker on its bar, or
+ * one listed in the hover readout only.
+ */
+export interface PointExtra {
+  /** What it is, as the readout names it: `median`, `max`. */
+  label: string;
+  /** In display units. */
+  value: number | null;
+  /** Drawn as a marker on the bar, or only listed in the readout. */
+  as: 'dot' | 'range' | 'none';
 }
 
 export interface Series {
@@ -79,6 +111,19 @@ export interface Series {
    * the survivors.
    */
   slot: number;
+  /**
+   * A colour of its own, overriding the palette slot's: a CSS colour. Set
+   * when colour means more than identity — a shade within a hue, where the
+   * hue says which group a series belongs to and the shade where in an
+   * ordered progression it sits. Read through `GraphGeometry.seriesColor`.
+   */
+  color?: string;
+  /**
+   * The group a shaded series belongs to, which shares its hue, and its own
+   * name within it. Both set or neither; a legend that finds them lists each
+   * group once with its shades, and names the shades once.
+   */
+  group?: { label: string; shade: string };
   /** One entry per x in the shared domain, ascending. */
   points: GraphPoint[];
 }
@@ -90,6 +135,13 @@ export interface GraphData {
   xs: number[];
   /** Band labels, index-aligned with `xs`. Empty unless `xKind` is `'band'`. */
   categories: string[];
+  /**
+   * Each category's label split into its levels, outermost first, when it
+   * has more than one — a pivot with two row fields. Index-aligned with
+   * `categories`, which holds the same labels joined. A horizontal chart's
+   * category axis draws a column per level from these.
+   */
+  categoryPaths?: string[][];
   /**
    * Palette slot per band category, index-aligned with `categories`. The same
    * name-order rule as `Series.slot`, and for the same reason: a bar keeps its
@@ -371,9 +423,19 @@ export function buildGraphData(
       ? [...entries].sort((a, b) => b.total - a.total || a.slot - b.slot)
       : entries;
 
-  const seriesEntries = arrange(
+  let seriesEntries = arrange(
     keys.map((_k, slot) => ({ slot, total: totalOf(reduced[slot]!) })),
   );
+  if (fields.seriesOrder && fields.seriesOrder.length > 0) {
+    const rank = new Map(fields.seriesOrder.map((key, i) => [key, i]));
+    const unlisted = fields.seriesOrder.length;
+    // A stable sort, so the unlisted keep the order `arrange` gave them.
+    seriesEntries = [...seriesEntries].sort(
+      (a, b) =>
+        (rank.get(keys[a.slot]!.key) ?? unlisted) -
+        (rank.get(keys[b.slot]!.key) ?? unlisted),
+    );
+  }
   // A continuous axis is never re-ordered — its positions are numbers, not
   // categories — so it skips the entries, the totals, and the sort entirely
   // rather than paying them to produce the identity permutation.

@@ -63,6 +63,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* An outer category level, written once per group: in ink and bold, as the
+ * table sets its outer row-index levels, so the hierarchy reads at a glance. */
+.levelText {
+  fill: var(--pv-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
 .axisTitle {
   fill: var(--pv-text);
   font-size: 11px;
@@ -97,6 +105,32 @@
 .pointLabel {
   fill: var(--pv-text);
   font-size: 11px;
+  /* Bar-end labels stack in a column; the digits should line up. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ink, not the gridline grey: it marks the value everything is measured
+ * against, and it has to stay visible where it crosses the bars' roots. */
+.reference {
+  stroke: var(--pv-text);
+  stroke-width: 1;
+}
+
+.whisker line {
+  stroke: var(--pv-text);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.marker {
+  fill: var(--pv-text);
+  stroke: var(--pv-bg);
+  stroke-width: 1.5;
+}
+
+.referenceLabel {
+  fill: var(--pv-muted);
+  font-size: 11px;
 }
 
 /* --- overlay -------------------------------------------------------------- */
@@ -118,6 +152,12 @@
 .rule {
   stroke: var(--pv-border);
   stroke-width: 1;
+}
+
+/* The hovered category, behind its bars: the table's own row-hover colour,
+ * so a chart and a table beside it answer a hover the same way. */
+.band {
+  fill: var(--pv-hover);
 }
 
 .readout {
@@ -143,6 +183,13 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.readoutDetail {
+  color: var(--pv-muted);
+  /* The swatch's 12px and the row's 6px gap: aligned under the name. */
+  padding-left: 18px;
+  font-variant-numeric: tabular-nums;
 }
 
 .readoutValue {
@@ -180,4 +227,61 @@
   height: 3px;
   border-radius: 2px;
   flex: none;
+}
+
+/* --- a view that cannot be drawn ----------------------------------------- */
+
+/* In place of the chart, so an edit that breaks it says why rather than
+ * leaving an empty box. */
+.problems {
+  padding: 16px;
+  border: 1px dashed var(--pv-border);
+  border-radius: 6px;
+  color: var(--pv-muted);
+  background: var(--pv-bg);
+}
+
+.problems p,
+.notes p {
+  margin: 0;
+}
+
+.notes {
+  padding-top: 6px;
+  font-size: 11px;
+  color: var(--pv-muted);
+}
+
+/* --- shaded legend -------------------------------------------------------- */
+
+/* A group's shades side by side, touching, so they read as one ramp. */
+.ramp {
+  display: inline-flex;
+}
+
+/* Square rather than a line-key: a shade needs area to be told apart. */
+.block {
+  width: 10px;
+  height: 10px;
+  flex: none;
+}
+
+.ramp .block:first-child {
+  border-radius: 2px 0 0 2px;
+}
+
+.ramp .block:last-child {
+  border-radius: 0 2px 2px 0;
+}
+
+.legendSteps {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  padding-left: 14px;
+  border-left: 1px solid var(--pv-border);
+}
+
+.legendSteps .block {
+  border-radius: 2px;
 }

@@ -27,6 +27,7 @@ import type { Root } from 'react-dom/client';
 import { DataTable } from './components/DataTable';
 import type { DataTableDisplay } from './components/DataTable';
 import { ViewEditor } from './editor/ViewEditor';
+import { PivotChart } from './graph/PivotChart';
 import { loadBundle, validateBundle } from './bundle';
 import type { PivoetteBundle } from './bundle';
 import type { DataFrame } from './data/types';
@@ -367,6 +368,21 @@ export class PivoetteTableElement extends HTMLElement {
   #render() {
     const loaded = this.#loaded;
     if (!loaded) return;
+    // The same view, drawn: an editor attached to this element edits either,
+    // and switching between them is one display setting.
+    if (loaded.display?.as === 'chart') {
+      this.#show(
+        <PivotChart
+          key={loaded.generation}
+          data={loaded.frame}
+          view={loaded.view}
+          display={loaded.display}
+          theme={this.theme}
+          locale={loaded.view.locale}
+        />,
+      );
+      return;
+    }
     this.#show(
       <DataTable
         key={loaded.generation}

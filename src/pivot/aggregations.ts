@@ -96,6 +96,27 @@ register('std', 'Std dev', (v) => {
   const va = variance(numbers(v));
   return va === null ? null : Math.sqrt(va);
 });
+/**
+ * The geometric mean: the nth root of the product, taken through logs so a
+ * long run of ratios cannot overflow or underflow on the way.
+ *
+ * The right mean for ratios. Speedups of 2× and 0.5× cancel to 1×, which is
+ * what they do, where the arithmetic mean reports a 1.25× gain that no
+ * benchmark showed. It is how SPEC and most compiler suites summarise.
+ *
+ * Null when any value is zero or negative: the log is undefined there, and a
+ * mean that silently skipped them would summarise a different set of rows.
+ */
+register('geomean', 'Geomean', (v) => {
+  const ns = numbers(v);
+  if (ns.length === 0) return null;
+  let logs = 0;
+  for (const n of ns) {
+    if (!(n > 0)) return null;
+    logs += Math.log(n);
+  }
+  return Math.exp(logs / ns.length);
+});
 register('median', 'Median', percentile(0.5));
 register('p25', 'P25', percentile(0.25));
 register('p50', 'P50', percentile(0.5)); // an alias for median

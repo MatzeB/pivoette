@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { areaPath, barPath, linePath, runs } from './shape';
+import { areaPath, barPath, hbarPath, linePath, runs } from './shape';
 
 /** How many separate subpaths a `d` string contains. */
 const moves = (d: string) => (d.match(/M/g) ?? []).length;
@@ -120,5 +120,31 @@ describe('barPath', () => {
   it('degrades to a line when there is nothing to draw', () => {
     expect(barPath(0, 300, 300, 20, 4)).toBe('M0,300L20,300');
     expect(barPath(0, 300, 100, 0, 4)).toBe('M0,300L0,300');
+  });
+});
+
+describe('hbarPath', () => {
+  it('rounds the right end of a bar that grows right', () => {
+    const d = hbarPath(0, 100, 300, 20, 4);
+    expect(d).toBe(
+      'M100,0L296,0A4,4 0 0 1 300,4L300,16A4,4 0 0 1 296,20L100,20Z',
+    );
+  });
+
+  it('rounds the left end of a bar that grows left', () => {
+    const d = hbarPath(0, 300, 100, 20, 4);
+    expect(d).toBe(
+      'M300,0L104,0A4,4 0 0 0 100,4L100,16A4,4 0 0 0 104,20L300,20Z',
+    );
+  });
+
+  it('clamps the radius on a bar shorter than it', () => {
+    const d = hbarPath(0, 100, 102, 20, 4);
+    expect(d).toContain('A2,2');
+    expect(d).not.toContain('A4,4');
+  });
+
+  it('collapses to a tick at the baseline for a zero-length bar', () => {
+    expect(hbarPath(0, 100, 100, 20)).toBe('M100,0L100,20');
   });
 });

@@ -54,6 +54,11 @@ import {
 import commitsData from './examples/commits/data.json';
 import { Chart as networthChart } from './examples/networth/view';
 import networthData from './examples/networth/data.json';
+import {
+  view as compilerView,
+  display as compilerDisplay,
+} from './examples/compiler/view';
+import compilerData from './examples/compiler/data.json';
 import type { ChartExample } from './examples/chart';
 
 import tickerSrc from './examples/ticker/view?raw';
@@ -63,6 +68,7 @@ import tokensSrc from './examples/tokens/view?raw';
 import metricsSrc from './examples/metrics/view?raw';
 import commitsSrc from './examples/commits/view?raw';
 import networthSrc from './examples/networth/view?raw';
+import compilerSrc from './examples/compiler/view?raw';
 
 type Row = Record<string, unknown>;
 
@@ -165,6 +171,17 @@ const EXAMPLES: Example[] = [
     Chart: networthChart,
     source: networthSrc,
     data: networthData as DatasetJson,
+  },
+  {
+    kind: 'table',
+    id: 'compiler',
+    title: '8 · Performance FooCC / BarCC',
+    blurb:
+      'Speedups of two compilers, FooCC and BarCC, each built three ways, over BarCC at -O2, so the neutral value is 1.0, not zero. It is an ordinary pivot view — suites down the rows, compilers and their builds across the columns, and the geomean, min and max of the per-benchmark speedups — drawn as a chart because the display says `as: "chart"`. Rows become categories, columns become the bars in each, and each value is drawn as a bar, a range, a dot, or only read out on hover: here the geomean is the bar and min–max the whisker across it. Open the editor to change any of it, or switch to Table to see the same numbers as cells. `baseline: 1` grows each bar from 1.0, right for faster and left for slower, and `symmetric` keeps 1.0 in the middle while the axis still fits the data. `colors: "nested"` lets the compiler pick the hue and the build its shade, pale to full in the order the builds add their steps; the editor’s Colours menu switches to one colour per bar, or shades of one. bzip2 is where FooCC loses to BarCC at -O2, and the whiskers show SPEC 2006 hides a regression inside its average.',
+    view: compilerView,
+    display: compilerDisplay,
+    source: compilerSrc,
+    data: compilerData as DatasetJson,
   },
 ];
 
@@ -646,7 +663,7 @@ export function App() {
             textDecoration: 'none',
           }}
         >
-          8 · Web component (plain HTML) ↗
+          9 · Web component (plain HTML) ↗
         </a>
       </div>
 

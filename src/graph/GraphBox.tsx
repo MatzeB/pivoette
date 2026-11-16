@@ -25,19 +25,29 @@ import {
 import type {
   GraphGeometry,
   GraphLayers,
+  GraphOrientation,
   GraphPointer,
   GraphUnitPlacement,
 } from './context';
-import { bandScale, linearScale, DEFAULT_TICKS } from './scale';
+import {
+  bandScale,
+  clean,
+  linearScale,
+  tickStep,
+  DEFAULT_TICKS,
+} from './scale';
 import type { Scale } from './scale';
 import { timeScale } from './time';
-import { tickFormatter, tickSpec, withUnit } from './axis-format';
+import { axisTitle, tickFormatter, tickSpec, withUnit } from './axis-format';
 import { buildGraphData } from './series';
 import type { GraphData, GraphFields } from './series';
+import { SERIES_SLOTS } from './palette';
+import { CHAR_W, LEVEL_INSET, levelsWidth } from './levels';
 import styles from './Graph.module.css';
 
-/** How many categorical slots `theme.module.css` defines. */
-export const SERIES_SLOTS = 8;
+// Its own module so the pure chart code can read it without importing this
+// component; re-exported here, where hosts have always found it.
+export { SERIES_SLOTS };
 
 /**
  * What a series past the last slot gets.
@@ -58,8 +68,30 @@ export interface GraphMargin {
   left: number;
 }
 
-export interface GraphBoxProps extends GraphFields {
-  data: Record<string, unknown>[] | DatasetJson | DataFrame;
+/**
+ * Where the box's data comes from: rows and the fields to plot from them, or a
+ * `GraphData` built already — which is how a chart driven by a pivot view
+ * hands over what the pivot engine computed (see `pivot-chart.ts`).
+ */
+export type GraphSource =
+  | (GraphFields & {
+      data: Record<string, unknown>[] | DatasetJson | DataFrame;
+      graph?: undefined;
+    })
+  | {
+      graph: GraphData;
+      data?: undefined;
+      x?: undefined;
+      y?: undefined;
+      series?: undefined;
+      agg?: undefined;
+      order?: undefined;
+      seriesOrder?: undefined;
+    };
+
+export type GraphBoxProps = GraphSource & GraphBoxOptions;
+
+export interface GraphBoxOptions {
   /** A chart has no intrinsic height, so this one is required. */
   height: number;
   /** Fixed width. Omitted, the box fills its container and measures itself. */
@@ -75,6 +107,40 @@ export interface GraphBoxProps extends GraphFields {
   ticks?: number;
   /** Start the value axis at zero even when the data does not reach it. */
   includeZero?: boolean;
+  /**
+   * Which way the value axis runs. Default `'vertical'`.
+   *
+   * `'horizontal'` puts the positions down the left, first at the top, and the
+   * values along the bottom. An `<Axis side="left">` then names the
+   * categories and `<Axis side="bottom">` carries the values: the side is
+   * where the axis is drawn, and the orientation decides which scale it shows.
+   */
+  orientation?: GraphOrientation;
+  /**
+   * The value bars grow from, in display units. Default 0.
+   *
+   * For a measure whose neutral point is not zero: a ratio against a
+   * reference, where 1.0 means "the same" and a bar should say how far each
+   * result moved from it, in which direction. Giving one also keeps it on the
+   * axis, as `includeZero` does for zero.
+   */
+  baseline?: number;
+  /**
+   * Make the value axis reach equally far either side of the baseline, so a
+   * gain and a loss of the same size draw at the same length and the baseline
+   * sits in the middle of the plot.
+   */
+  symmetric?: boolean;
+  /**
+   * Pixels kept clear past the data's ends along the value axis, for labels.
+   * Default 0.
+   *
+   * The domain otherwise ends at the next round tick, which can be a hair past
+   * the longest bar, and an outside `<PointLabel>` there runs off the plot.
+   * Widening the domain rather than the margin keeps the axis honest about
+   * where the room went: the gridlines carry on through it.
+   */
+  headroom?: number;
   /** Fraction of each band left as air. Ignored unless x is categorical. */
   bandPadding?: number;
   /**
@@ -102,16 +168,10 @@ const DEFAULT_MARGIN: GraphMargin = {
   left: 48,
 };
 
-/**
- * Roughly one character's width in the UI sans at tick size.
- *
- * Deliberately an estimate. The exact answer needs `getBBox`, which jsdom does
- * not implement, or a canvas `measureText`, which is not available under the
- * test environment either — so reaching for one would make every chart with a
- * left axis untestable here. A margin only has to be close, and `margin` is
- * there for the case where close is not close enough.
- */
-const CHAR_W = 6.6;
+/** A bottom margin with room for an axis title under the tick row. */
+const TITLED_BOTTOM = 46;
+
+// `CHAR_W` lives in `./levels`, which lays out the category columns too.
 
 function estimateLeft(labels: string[], hasTitle: boolean): number {
   const widest = labels.reduce((m, l) => Math.max(m, l.length), 0);
@@ -142,17 +202,23 @@ function PointerProvider({ children }: { children: ReactNode }) {
 
 export function GraphBox({
   data,
+  graph: given,
   x,
   y,
   series,
   agg,
   order,
+  seriesOrder,
   height,
   width,
   margin,
   ladder,
   ticks = DEFAULT_TICKS,
   includeZero = false,
+  orientation = 'vertical',
+  baseline,
+  symmetric = false,
+  headroom = 0,
   bandPadding,
   unitPlacement = 'axis',
   locale,
@@ -162,7 +228,8 @@ export function GraphBox({
   children,
 }: GraphBoxProps) {
   const frame = useMemo(
-    () => (isFrame(data) ? data : fromDataset(data)),
+    () =>
+      data === undefined ? null : isFrame(data) ? data : fromDataset(data),
     [data],
   );
 
@@ -171,11 +238,26 @@ export function GraphBox({
   // mints a fresh `ColumnMeta` each time and `unitLabels` memoises against
   // object identity, so the label cache would churn on every mouse move.
   const yKey = Array.isArray(y) ? y.join('\u0000') : y;
-  const graph: GraphData = useMemo(
-    () => buildGraphData(frame, { x, y, series, agg, order }, { ladder }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- yKey stands in for y
-    [frame, x, yKey, series, agg, order, ladder],
+  // The same trap again for an inline `seriesOrder={['a', 'b']}`.
+  const seriesOrderKey = seriesOrder?.join('\u0000');
+  const built: GraphData | null = useMemo(
+    () =>
+      frame && x !== undefined && y !== undefined
+        ? buildGraphData(
+            frame,
+            { x, y, series, agg, order, seriesOrder },
+            { ladder },
+          )
+        : null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the keys stand in for y and seriesOrder
+    [frame, x, yKey, series, agg, order, seriesOrderKey, ladder],
   );
+  const graph = given ?? built;
+  if (!graph) {
+    throw new Error(
+      '<GraphBox> needs either `data` with `x` and `y`, or `graph`.',
+    );
+  }
 
   // --- size -----------------------------------------------------------------
 
@@ -209,9 +291,20 @@ export function GraphBox({
     const tz = resolveTimeZone(timeZone);
     const weekStart = firstDayOfWeek(locale);
 
+    const horizontal = orientation === 'horizontal';
+    const anchor = baseline ?? 0;
+    const keep = includeZero || baseline !== undefined;
+
+    // --- value domain, before it knows how long its axis is ------------------
+
     const [dataLo, dataHi] = graph.yExtent;
-    const lo = includeZero ? Math.min(0, dataLo) : dataLo;
-    const hi = includeZero ? Math.max(0, dataHi) : dataHi;
+    let lo = keep ? Math.min(anchor, dataLo) : dataLo;
+    let hi = keep ? Math.max(anchor, dataHi) : dataHi;
+    if (symmetric) {
+      const half = Math.max(hi - anchor, anchor - lo);
+      lo = anchor - half;
+      hi = anchor + half;
+    }
 
     // The left margin depends on the tick labels, which depend on the value
     // scale, which depends on the left margin only through the *range* — so a
@@ -225,18 +318,37 @@ export function GraphBox({
     const labels = unitLabels(graph.yMeta, locale);
     const probe = linearScale({ domain: [lo, hi], range: [0, 1], ticks });
     const probeTicks = probe.ticks(ticks);
-    const formatValue = (value: number, decimals = probeTicks.decimals) => {
-      const text = tickFormatter(
-        graph.yMeta,
-        graph.frame,
-        tickSpec(graph.yMeta, rescaled, decimals, locale),
-      )(value);
-      return unitPlacement === 'value' ? withUnit(text, labels) : text;
-    };
-    const sample = probeTicks.ticks.map((t) => formatValue(t.value));
+    const format = tickFormatter(
+      graph.yMeta,
+      graph.frame,
+      tickSpec(graph.yMeta, rescaled, probeTicks.decimals, locale),
+    );
+    // Rebuilt below once the final domain is known; this one only measures.
+    const probeText = (value: number) =>
+      unitPlacement === 'value'
+        ? withUnit(format(value), labels)
+        : format(value);
+
+    // Lying down, the left edge holds the category names instead of values,
+    // and the value axis's title moves under its ticks — where `Axis` would
+    // otherwise ask the host for `margin={{ bottom: 46 }}`.
+    const leftText = horizontal
+      ? graph.categories
+      : probeTicks.ticks.map((t) => probeText(t.value));
+    const leftTitled = !horizontal && !!labels.full;
+    // Categories with several levels take a column each, like a table's
+    // row index, rather than one joined label.
+    const levels = horizontal && graph.categoryPaths;
+    const leftNeeded = levels
+      ? Math.ceil(2 + LEVEL_INSET + levelsWidth(levels))
+      : estimateLeft(leftText, leftTitled);
     const auto: GraphMargin = {
       ...DEFAULT_MARGIN,
-      left: Math.max(DEFAULT_MARGIN.left, estimateLeft(sample, !!labels.full)),
+      left: Math.max(DEFAULT_MARGIN.left, leftNeeded),
+      bottom:
+        horizontal && axisTitle(graph.yMeta, locale)
+          ? TITLED_BOTTOM
+          : DEFAULT_MARGIN.bottom,
     };
     const m: GraphMargin = { ...auto, ...margin };
 
@@ -247,7 +359,55 @@ export function GraphBox({
       height: Math.max(0, height - m.top - m.bottom),
     };
 
-    const xRange: [number, number] = [plot.left, plot.left + plot.width];
+    // --- value domain, now that it does -------------------------------------
+
+    const valueLength = horizontal ? plot.width : plot.height;
+    if (headroom > 0 && valueLength > 2 * headroom) {
+      // Widen by the fraction of the axis the room takes, so `headroom`
+      // pixels are left at each end that has data running towards it. An end
+      // that only reaches the baseline has no label to make room for.
+      const pad = ((hi - lo) * headroom) / (valueLength - 2 * headroom);
+      if (symmetric || !keep || dataLo < anchor) lo -= pad;
+      if (symmetric || !keep || dataHi > anchor) hi += pad;
+    }
+
+    const valueRange: [number, number] = horizontal
+      ? [plot.left, plot.left + plot.width]
+      : // Reversed, because SVG y grows downwards and a value axis does not.
+        [plot.top + plot.height, plot.top];
+    let yScale: Scale;
+    if (symmetric) {
+      // Niced as a half-span, not as two ends: rounding each end out on its
+      // own lands them on different ticks unless the baseline is a multiple
+      // of the step, and the middle would no longer be the middle.
+      const step = tickStep(hi - lo, ticks);
+      const half = Math.ceil((hi - anchor) / step - 1e-9) * step;
+      yScale = linearScale({
+        domain: [clean(anchor - half), clean(anchor + half)],
+        range: valueRange,
+        nice: false,
+        ticks,
+      });
+    } else {
+      yScale = linearScale({ domain: [lo, hi], range: valueRange, ticks });
+    }
+
+    const valueDecimals = yScale.ticks(ticks).decimals;
+    const formatValue = (value: number, decimals = valueDecimals) => {
+      const text = tickFormatter(
+        graph.yMeta,
+        graph.frame,
+        tickSpec(graph.yMeta, rescaled, decimals, locale),
+      )(value);
+      return unitPlacement === 'value' ? withUnit(text, labels) : text;
+    };
+
+    // --- positions ----------------------------------------------------------
+
+    // Down the left, first at the top: the order a list is read in.
+    const xRange: [number, number] = horizontal
+      ? [plot.top, plot.top + plot.height]
+      : [plot.left, plot.left + plot.width];
     const xDomain: [number, number] = [
       graph.xs[0] ?? 0,
       graph.xs[graph.xs.length - 1] ?? 1,
@@ -280,30 +440,42 @@ export function GraphBox({
       });
     }
 
-    // Range reversed, because SVG y grows downwards and a value axis does not.
-    const yScale = linearScale({
-      domain: [lo, hi],
-      range: [plot.top + plot.height, plot.top],
-      ticks,
-    });
+    const [v0, v1] = valueRange;
+    const place = horizontal
+      ? (position: number, value: number) => ({
+          cx: yScale.at(value),
+          cy: xScale.at(position),
+        })
+      : (position: number, value: number) => ({
+          cx: xScale.at(position),
+          cy: yScale.at(value),
+        });
 
     return {
       x: xScale,
       y: yScale,
+      orientation,
+      place,
       plot,
       data: graph,
+      seriesColor: (series) =>
+        series.color ??
+        (series.slot < SERIES_SLOTS
+          ? `var(--pv-series-${series.slot})`
+          : OVERFLOW_COLOR),
       colorOf: (index) =>
         index < SERIES_SLOTS ? `var(--pv-series-${index})` : OVERFLOW_COLOR,
       unitPlacement,
       ticks,
-      // Clamped into the plot: a zero that is off-screen still has to give the
-      // marks a row to grow from, and all of them must pick the same one.
+      reference: anchor,
+      // Clamped into the plot: a baseline that is off-screen still has to give
+      // the marks a line to grow from, and all of them must pick the same one.
       baseline: Math.min(
-        Math.max(yScale.at(0), plot.top),
-        plot.top + plot.height,
+        Math.max(yScale.at(anchor), Math.min(v0, v1)),
+        Math.max(v0, v1),
       ),
       formatValue,
-      valueDecimals: probeTicks.decimals,
+      valueDecimals,
       xTicks: xScale.ticks(ticks),
       locale,
       timeZone: tz,
@@ -323,6 +495,10 @@ export function GraphBox({
     margin?.left,
     ticks,
     includeZero,
+    orientation,
+    baseline,
+    symmetric,
+    headroom,
     bandPadding,
     unitPlacement,
     locale,

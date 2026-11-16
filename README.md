@@ -383,6 +383,103 @@ without extra configuration.
 `BarSeries`, `Scrubber` (a hover readout), point marks and labels are
 included too. Custom marks can read `useGraph()` and `useDatum()`.
 
+For results measured against a reference, where 1.0 means "no change", bars
+can grow from a baseline other than zero and lie on their side:
+
+```tsx
+<GraphBox
+  data={rows}
+  x="suite"
+  y="speedup"
+  series="variant"
+  agg="geomean"
+  orientation="horizontal"
+  baseline={1}
+  symmetric
+  headroom={44}
+  height={380}
+>
+  <Axis side="bottom" grid />
+  <Axis side="left" />
+  <BarSeries>
+    <PointLabel at="all" side="outside" />
+  </BarSeries>
+  <ReferenceLine />
+  <Legend />
+</GraphBox>
+```
+
+- **`orientation="horizontal"`** lists the categories down the left. An
+  axis's `side` says where it is drawn, and the orientation decides which
+  scale it shows, so `side="left"` names the categories here.
+- **`baseline`** is the value bars grow from: right for a gain, left for a
+  loss. **`symmetric`** keeps it in the middle of the axis, which otherwise
+  fits the data.
+- **`headroom`** keeps pixels free past the longest bars, so the values
+  printed at their ends stay on the plot.
+- **`agg: 'geomean'`** is the usual way to average ratios: 2× and 0.5× come
+  out at 1×.
+- **`seriesOrder`** draws series in a given order instead of by name.
+
+### Charts from a view
+
+A pivot view can also be drawn as grouped bars, which is how the editor edits
+a chart. The row fields become the categories, the column fields the bars in
+each category, and each measure is drawn as one of:
+
+| Draw as | Shows                                                          |
+| ------- | -------------------------------------------------------------- |
+| `bar`   | The bar's length. The first measure, by default.               |
+| `range` | A whisker across the bar, lowest to highest: `min` with `max`. |
+| `dot`   | A marker on the bar, such as a median.                         |
+| `none`  | Nothing drawn; listed in the hover readout only.               |
+
+`min`, `max`, `p25` and `p75` default to `range`; other measures after the
+first default to `dot`.
+
+```tsx
+const view: ViewSpec = {
+  pivotRows: [{ field: 'suite' }],
+  pivotColumns: [{ field: 'variant' }],
+  columns: [
+    { id: 'speedup', agg: 'geomean' },
+    { id: 'min', source: 'speedup', agg: 'min' },
+    { id: 'max', source: 'speedup', agg: 'max' },
+  ],
+};
+const display: DataTableDisplay = {
+  as: 'chart',
+  chart: { baseline: 1, symmetric: true, barOrder: ['base', 'LTO+PGO'] },
+};
+
+<PivotChart data={rows} view={view} display={display} />;
+```
+
+With several fields under Categories, a horizontal chart lays them out like
+the table's row index: a column per field, each as wide as its longest label,
+with an outer label such as the suite written once per group and a rule where
+each group ends. A vertical chart, which writes its categories along the
+bottom, joins them instead: `CPython · richards`.
+
+A bar's colour can say more than which bar it is. `chart.colors` picks:
+
+| `colors` | Colour says                                                  | Suits                             |
+| -------- | ------------------------------------------------------------ | --------------------------------- |
+| `series` | Which bar: each its own hue                                  | Bars with no order                |
+| `shades` | Where in a progression: one hue, palest first                | One ordered field, like builds    |
+| `nested` | Both: the first Bars field picks the hue, the second a shade | Two fields, the inner one ordered |
+
+With two fields under Bars, `nested` is the default when the inner one has at
+most four members; past that, shades stop being told apart and each bar keeps
+its own colour. Shades are mixed towards the page background, so they work in
+both themes, and the legend lists each hue once with its shades.
+
+`<pivoette-table>` draws the chart whenever the bundle's display says
+`as: 'chart'`, and `<pivoette-editor>` switches between Table and Chart. In
+chart mode the editor's lists become Categories, Bars and Values, each value
+gets a _Draw as_ menu, and a Chart section sets the orientation, baseline,
+labels, hover readout and bar order.
+
 ## Web component
 
 For pages that don't use React, one self-contained script defines
@@ -444,9 +541,9 @@ button. [Try it live](https://matzeb.github.io/pivoette/demo/element.html).
 
 [`demo/examples`](demo/examples) contains worked examples: a stock ticker,
 kernel benchmarks, a before/after regression, AI token spend, fleet metrics,
-commit history and a net-worth chart. Each example has a seeded `generate.py`
-that regenerates its data. Run `pnpm dev` to browse them with each example's
-source shown next to it.
+commit history, a net-worth chart and compiler speedups against a baseline.
+Each example has a seeded `generate.py` that regenerates its data. Run
+`pnpm dev` to browse them with each example's source shown next to it.
 
 ## Development
 
