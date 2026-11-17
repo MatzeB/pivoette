@@ -868,7 +868,7 @@ export function App() {
       </Panel>
 
       {datasetMeta && (
-        <Panel title="Column metadata — shipped alongside the rows in data.json">
+        <Panel title="Column metadata">
           {() => <Source text={JSON.stringify(datasetMeta, null, 2)} />}
         </Panel>
       )}
