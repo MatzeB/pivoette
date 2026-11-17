@@ -173,14 +173,17 @@ export const detailView: ViewSpec = {
 };
 
 /**
- * Suite, benchmark and build are the index: tinted, and a suite or benchmark
+ * Suite, benchmark and build are the index: a suite or benchmark
  * the row above already named is left blank, as a pivot's row index would.
  *
  * No zebra stripes: the row under the pointer is highlighted instead, which
  * does the striping's job — keeping a row's cells together — where the reader
- * is actually looking.
+ * is actually looking. And a plain header: the most minimal style among the
+ * demos, to compare against the others.
  */
 export const detailDisplay: DataTableDisplay = {
   indexColumns: 3,
   frameless: true,
+  // No shaded header band either: air, and one rule under the value columns.
+  header: 'plain',
 };

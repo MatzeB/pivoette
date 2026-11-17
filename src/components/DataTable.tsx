@@ -58,6 +58,14 @@ export interface DataTableDisplay {
   zebra?: boolean;
   /** Remove the header rule and footer double line (rely on spacing/shading). */
   hideRules?: boolean;
+  /**
+   * How the column headers set themselves apart from the body. Default
+   * `'tinted'`: a shaded band with a rule under all of it. `'plain'` drops the
+   * shading for air: the headers sit on the table's own background, a little
+   * apart from the first row, with one rule under the value columns only — the
+   * index columns are labels for the rows, not a column of values to head.
+   */
+  header?: 'tinted' | 'plain';
   /** Highlight the hovered cell's column header + ancestors (default true). */
   highlightHeaders?: boolean;
   /** Extra footer rows summarizing each column's displayed values. */
@@ -385,6 +393,7 @@ export function DataTable({
     indexColumns = 0,
     zebra = false,
     hideRules = false,
+    header = 'tinted',
     highlightHeaders = true,
     footer = NO_FOOTER,
     unitPlacement = 'off',
@@ -798,7 +807,17 @@ export function DataTable({
   }, [removeHover, leaves, view]);
 
   const totalCols = rowLevels.length + leaves.length + editCols;
-  const frameCls = cls(styles.frame, frameless && styles.frameless, className);
+  const frameCls = cls(
+    styles.frame,
+    frameless && styles.frameless,
+    header === 'plain' && styles.plainHeader,
+    className,
+  );
+  /** The leading columns a plain header's rule leaves out: the row index. */
+  const indexSpan =
+    rowLevels.length +
+    editCols +
+    (rowLevels.length === 0 ? Math.min(indexColumns, leaves.length) : 0);
 
   // Nothing to show, typically because a filter excludes everything. The body
   // says so; the footer is dropped, since a total over no rows reads as a real
@@ -1085,15 +1104,31 @@ export function DataTable({
               </tr>
             ))}
             {/* One contiguous rule under the whole header (spans the gaps). */}
-            {!hideRules && (
-              <tr aria-hidden="true">
-                <td
-                  colSpan={totalCols}
-                  className={styles.headerRule}
-                  style={{ top: depth * HEADER_H }}
-                />
-              </tr>
-            )}
+            {!hideRules &&
+              (header === 'plain' ? (
+                <tr aria-hidden="true">
+                  {indexSpan > 0 && (
+                    <td
+                      colSpan={indexSpan}
+                      className={styles.headerGap}
+                      style={{ top: depth * HEADER_H }}
+                    />
+                  )}
+                  <td
+                    colSpan={totalCols - indexSpan}
+                    className={cls(styles.headerGap, styles.headerGapRule)}
+                    style={{ top: depth * HEADER_H }}
+                  />
+                </tr>
+              ) : (
+                <tr aria-hidden="true">
+                  <td
+                    colSpan={totalCols}
+                    className={styles.headerRule}
+                    style={{ top: depth * HEADER_H }}
+                  />
+                </tr>
+              ))}
           </thead>
 
           <tbody className={styles.body}>

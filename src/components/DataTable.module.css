@@ -52,6 +52,31 @@
   z-index: 3;
 }
 
+/* `header: 'plain'`: no shaded band — the header sits on the background,
+   index headers included, and air plus one rule under the value columns do
+   the separating. */
+.plainHeader .table thead th,
+.plainHeader .table thead th.indexTint {
+  background: var(--pv-bg);
+}
+
+/* Under a plain header: 6px of air, the rule, then 4px before the first row.
+   Drawn as a background so the row keeps one sticky cell per part. */
+.headerGap {
+  position: sticky;
+  height: 11px;
+  padding: 0 !important;
+  border: none !important;
+  background: var(--pv-bg);
+  z-index: 3;
+}
+.headerGapRule {
+  background:
+    linear-gradient(var(--pv-border), var(--pv-border)) no-repeat 0 6px / 100%
+      1px,
+    var(--pv-bg);
+}
+
 /* The scroll area. Kept separate from `.frame` so overlays can sit at the
    frame's corner rather than scrolling away with the content. */
 .wrapper {

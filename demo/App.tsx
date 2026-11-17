@@ -817,11 +817,15 @@ export function App() {
           >
             {example.detail.note}
           </p>
+          {/* More air above and below than the other tables get: with no
+              frame, no stripes and no header band, spacing is what sets it
+              apart from the prose around it. */}
           <pivoette-table
             key={example.id + '-detail'}
             id="detail-table"
             ref={detailRef}
             theme={theme}
+            style={{ display: 'block', margin: '22px 0 26px' }}
           />
           <pivoette-editor for="detail-table" style={{ marginTop: 10 }} />
         </section>

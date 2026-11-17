@@ -9,24 +9,34 @@
  * A palette is claimed with `composes: palette from '../theme.module.css'`.
  * `data-theme` on the same element pins it; without the attribute it follows
  * the system.
+ *
+ * Every token reads a public input first: `--pv-bg` is `--pivoette-bg` when a
+ * page sets it. The tokens themselves are declared on the frame inside the
+ * element's shadow root, where a page's CSS cannot reach them, but custom
+ * properties inherit through it, so
+ *
+ *     pivoette-table { --pivoette-bg: transparent; }
+ *
+ * restyles a table from outside. An input wins in both themes: a page that
+ * sets one and also offers dark mode sets it under its own media query.
  */
 .palette {
   /* Light palette (default). */
-  --pv-bg: #ffffff;
-  --pv-border: #e2e2e5;
-  --pv-header-bg: #f5f5f7;
-  --pv-summary-bg: #fafafa;
-  --pv-hover: #f0f7ff;
-  --pv-text: #1d1d1f;
-  --pv-muted: #6e6e73;
-  --pv-index-bg: #eeeef1;
-  --pv-hi: #dcebff;
-  --pv-zebra: #f7f7f9;
+  --pv-bg: var(--pivoette-bg, #ffffff);
+  --pv-border: var(--pivoette-border, #e2e2e5);
+  --pv-header-bg: var(--pivoette-header-bg, #f5f5f7);
+  --pv-summary-bg: var(--pivoette-summary-bg, #fafafa);
+  --pv-hover: var(--pivoette-hover, #f0f7ff);
+  --pv-text: var(--pivoette-text, #1d1d1f);
+  --pv-muted: var(--pivoette-muted, #6e6e73);
+  --pv-index-bg: var(--pivoette-index-bg, #eeeef1);
+  --pv-hi: var(--pivoette-hi, #dcebff);
+  --pv-zebra: var(--pivoette-zebra, #f7f7f9);
   /* Reads on either palette without needing a per-theme override. */
-  --pv-remove: light-dark(#c5221f, #ff6b64);
-  --pv-remove-bg: light-dark(
-    rgba(197, 34, 31, 0.12),
-    rgba(255, 107, 100, 0.18)
+  --pv-remove: var(--pivoette-remove, light-dark(#c5221f, #ff6b64));
+  --pv-remove-bg: var(
+    --pivoette-remove-bg,
+    light-dark(rgba(197, 34, 31, 0.12), rgba(255, 107, 100, 0.18))
   );
 
   /*
@@ -36,14 +46,14 @@
    * a bar's side and a flag's word carry the meaning too, so neither rests
    * on hue alone. Each has a tint for chip and cell backgrounds.
    */
-  --pv-better: light-dark(#1f7a5a, #5fd1a2);
-  --pv-better-bg: light-dark(#e3f3ec, #16362b);
-  --pv-worse: light-dark(#b4471f, #f2946b);
-  --pv-worse-bg: light-dark(#fbe9e1, #3d241a);
-  --pv-warn: light-dark(#8a5a00, #f1c463);
-  --pv-warn-bg: light-dark(#fdf1d6, #3a2f14);
-  --pv-accent: light-dark(#6a4c93, #c6a8e6);
-  --pv-info: light-dark(#2f5d9e, #8db4ec);
+  --pv-better: var(--pivoette-better, light-dark(#1f7a5a, #5fd1a2));
+  --pv-better-bg: var(--pivoette-better-bg, light-dark(#e3f3ec, #16362b));
+  --pv-worse: var(--pivoette-worse, light-dark(#b4471f, #f2946b));
+  --pv-worse-bg: var(--pivoette-worse-bg, light-dark(#fbe9e1, #3d241a));
+  --pv-warn: var(--pivoette-warn, light-dark(#8a5a00, #f1c463));
+  --pv-warn-bg: var(--pivoette-warn-bg, light-dark(#fdf1d6, #3a2f14));
+  --pv-accent: var(--pivoette-accent, light-dark(#6a4c93, #c6a8e6));
+  --pv-info: var(--pivoette-info, light-dark(#2f5d9e, #8db4ec));
 
   /*
    * Categorical series colours, for charts. Unlike the chrome above these are
@@ -64,44 +74,44 @@
    * Past the eighth slot `GraphBox` falls back to muted grey rather than
    * wrapping — see `OVERFLOW_COLOR`.
    */
-  --pv-series-0: light-dark(#2a78d6, #3987e5);
-  --pv-series-1: light-dark(#eb6834, #d95926);
-  --pv-series-2: light-dark(#1baf7a, #199e70);
-  --pv-series-3: light-dark(#eda100, #c98500);
-  --pv-series-4: light-dark(#e87ba4, #d55181);
-  --pv-series-5: light-dark(#008300, #008300);
-  --pv-series-6: light-dark(#4a3aa7, #9085e9);
-  --pv-series-7: light-dark(#e34948, #e66767);
+  --pv-series-0: var(--pivoette-series-0, light-dark(#2a78d6, #3987e5));
+  --pv-series-1: var(--pivoette-series-1, light-dark(#eb6834, #d95926));
+  --pv-series-2: var(--pivoette-series-2, light-dark(#1baf7a, #199e70));
+  --pv-series-3: var(--pivoette-series-3, light-dark(#eda100, #c98500));
+  --pv-series-4: var(--pivoette-series-4, light-dark(#e87ba4, #d55181));
+  --pv-series-5: var(--pivoette-series-5, light-dark(#008300, #008300));
+  --pv-series-6: var(--pivoette-series-6, light-dark(#4a3aa7, #9085e9));
+  --pv-series-7: var(--pivoette-series-7, light-dark(#e34948, #e66767));
 
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
   .palette:not([data-theme='light']) {
-    --pv-bg: #161618;
-    --pv-border: #3a3a3d;
-    --pv-header-bg: #232326;
-    --pv-summary-bg: #1d1d20;
-    --pv-hover: #1c2733;
-    --pv-text: #f2f2f7;
-    --pv-muted: #a1a1a6;
-    --pv-index-bg: #0f0f11;
-    --pv-hi: #2a3d54;
-    --pv-zebra: #1c1c1f;
+    --pv-bg: var(--pivoette-bg, #161618);
+    --pv-border: var(--pivoette-border, #3a3a3d);
+    --pv-header-bg: var(--pivoette-header-bg, #232326);
+    --pv-summary-bg: var(--pivoette-summary-bg, #1d1d20);
+    --pv-hover: var(--pivoette-hover, #1c2733);
+    --pv-text: var(--pivoette-text, #f2f2f7);
+    --pv-muted: var(--pivoette-muted, #a1a1a6);
+    --pv-index-bg: var(--pivoette-index-bg, #0f0f11);
+    --pv-hi: var(--pivoette-hi, #2a3d54);
+    --pv-zebra: var(--pivoette-zebra, #1c1c1f);
   }
 }
 
 .palette[data-theme='dark'] {
-  --pv-bg: #161618;
-  --pv-border: #3a3a3d;
-  --pv-header-bg: #232326;
-  --pv-summary-bg: #1d1d20;
-  --pv-hover: #1c2733;
-  --pv-text: #f2f2f7;
-  --pv-muted: #a1a1a6;
-  --pv-index-bg: #0f0f11;
-  --pv-hi: #2a3d54;
-  --pv-zebra: #1c1c1f;
+  --pv-bg: var(--pivoette-bg, #161618);
+  --pv-border: var(--pivoette-border, #3a3a3d);
+  --pv-header-bg: var(--pivoette-header-bg, #232326);
+  --pv-summary-bg: var(--pivoette-summary-bg, #1d1d20);
+  --pv-hover: var(--pivoette-hover, #1c2733);
+  --pv-text: var(--pivoette-text, #f2f2f7);
+  --pv-muted: var(--pivoette-muted, #a1a1a6);
+  --pv-index-bg: var(--pivoette-index-bg, #0f0f11);
+  --pv-hi: var(--pivoette-hi, #2a3d54);
+  --pv-zebra: var(--pivoette-zebra, #1c1c1f);
   color-scheme: dark;
 }
 

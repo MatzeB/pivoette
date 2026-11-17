@@ -50,3 +50,12 @@ body {
     background 0.15s ease,
     color 0.15s ease;
 }
+
+/* The compiler example's per-benchmark table, styled from the page alone:
+   it takes the page's own background, and its index columns go unshaded, so
+   nothing is tinted but the hover. */
+#detail-table {
+  --pivoette-bg: var(--page-bg);
+  --pivoette-index-bg: var(--page-bg);
+  --pivoette-header-bg: var(--page-bg);
+}
