@@ -57,6 +57,8 @@ import networthData from './examples/networth/data.json';
 import {
   view as compilerView,
   display as compilerDisplay,
+  detailView as compilerDetailView,
+  detailDisplay as compilerDetailDisplay,
 } from './examples/compiler/view';
 import compilerData from './examples/compiler/data.json';
 import type { ChartExample } from './examples/chart';
@@ -80,6 +82,16 @@ interface Common {
   data: Row[] | DatasetJson;
   /** The example's own `view` file, shown verbatim in the panels below. */
   source: string;
+  /**
+   * A second table over the same data, under the first: the rows behind an
+   * aggregate, say. Rendered as it is configured, without an editor.
+   */
+  detail?: {
+    heading: string;
+    note: string;
+    view: ViewSpec;
+    display?: DataTableDisplay;
+  };
 }
 
 /**
@@ -180,6 +192,12 @@ const EXAMPLES: Example[] = [
       'Speedups of two compilers, FooCC and BarCC, each built three ways, over BarCC at -O2, so the neutral value is 1.0, not zero. It is an ordinary pivot view — suites down the rows, compilers and their builds across the columns, and the geomean, min and max of two per-benchmark speedups, in instructions retired and in cycles — drawn as a chart because the display says `as: "chart"`. Rows become categories, columns become the bars in each, and each value is drawn as a bar, a range, a dot, or only read out on hover: here the geomean is the bar and min–max the whisker across it. Open the editor to change any of it, or switch to Table to see the same numbers as cells. `baseline: 1` grows each bar from 1.0, right for faster and left for slower, and `symmetric` keeps 1.0 in the middle while the axis still fits the data. `colors: "nested"` lets the compiler pick the hue and the build its shade, pale to full in the order the builds add their steps; the editor’s Colours menu switches to one colour per bar, or shades of one. The two speedups measure different fields, so each gets a panel, side by side on one scale: BOLT, which only moves code, barely moves the instruction bars and clearly lengthens the cycle bars. bzip2 is where FooCC loses to BarCC at -O2, and the whiskers show SPEC 2006 hides a regression inside its average.',
     view: compilerView,
     display: compilerDisplay,
+    detail: {
+      heading: 'Per benchmark, FooCC',
+      note: 'Every benchmark and build behind the bars above, unaggregated. Each speedup carries a mini-bar from 1.0 (`Render.Bar`), and the last column raises a flag per condition the row meets (`Render.Flags`): hover a flag for what raised it. Click a header to sort.',
+      view: compilerDetailView,
+      display: compilerDetailDisplay,
+    },
     source: compilerSrc,
     data: compilerData as DatasetJson,
   },
@@ -529,6 +547,24 @@ export function App() {
   // than discarding it — possible because a bundle over the same data swaps
   // in at once. A layout effect, so the table never paints the old example.
   const tableRef = useRef<PivoetteTableElement>(null);
+
+  // The detail table below, if the example has one: its own element and its
+  // own editor, over the same rows. Only handed a new bundle when the example
+  // or the data changes, so the reader's edits to it survive everything else.
+  const detail = example.detail;
+  const detailRef = useRef<PivoetteTableElement>(null);
+  useLayoutEffect(() => {
+    const table = detailRef.current;
+    if (!table || !detail) return;
+    table.bundle = {
+      data: bundleData,
+      meta: datasetMeta,
+      view: detail.view,
+      display: detail.display,
+      height: 420,
+    };
+  }, [bundleData, datasetMeta, detail]);
+
   useLayoutEffect(() => {
     const table = tableRef.current;
     if (!table) return;
@@ -765,6 +801,30 @@ export function App() {
               it is what turns on the table's own + buttons and drag handles. */}
           <pivoette-editor for="example-table" style={{ marginTop: 10 }} />
         </>
+      )}
+
+      {example.detail && (
+        <section style={{ marginTop: 24 }}>
+          <h3 style={{ margin: '0 0 4px', fontSize: 15 }}>
+            {example.detail.heading}
+          </h3>
+          <p
+            style={{
+              color: 'var(--page-muted)',
+              fontSize: 13,
+              margin: '0 0 10px',
+            }}
+          >
+            {example.detail.note}
+          </p>
+          <pivoette-table
+            key={example.id + '-detail'}
+            id="detail-table"
+            ref={detailRef}
+            theme={theme}
+          />
+          <pivoette-editor for="detail-table" style={{ marginTop: 10 }} />
+        </section>
       )}
 
       <p style={{ color: 'var(--page-muted)', fontSize: 12, margin: '10px 0' }}>

@@ -322,6 +322,48 @@ expression string. Every hook receives the same cell context: value, inputs,
 row and column path, and the source frame. Register your own with
 `registerFormat`, `registerStyle` and `registerRender`.
 
+Two built-in renderers suit results tables:
+
+- **`bar`** draws the cell's number with a mini-bar beside it, growing from a
+  tick at `center`: towards the good side in green, the other in orange,
+  clamped at `span` from the centre. Within `threshold` of the centre the
+  number keeps the ink colour. `better: 'lower'` flips the sides for times
+  and costs.
+- **`flags`** draws a chip for each condition the row meets. A flag is a
+  label, a `when` expression over the row's fields, a `tone` (`good`, `bad`,
+  `warn`, `accent`, `info`, `strong`) and a tooltip saying why, with an
+  optional `detail` expression that adds the row's own numbers.
+
+```ts
+columns: [
+  {
+    id: 'cycles',
+    render: {
+      fnName: 'bar',
+      options: { center: 1, span: 0.25, threshold: 0.02 },
+    },
+  },
+  {
+    id: 'flags',
+    render: {
+      fnName: 'flags',
+      options: {
+        flags: [
+          { label: 'slower', when: 'cycles < 0.98', tone: 'bad' },
+          {
+            label: 'provisional',
+            when: 'runs < 5',
+            tone: 'warn',
+            title: 'Not every run completed',
+            detail: "runs + ' of 5 runs'",
+          },
+        ],
+      },
+    },
+  },
+];
+```
+
 ### Interactive editing
 
 Pass `editing` and own the view in state, and users can build the table in

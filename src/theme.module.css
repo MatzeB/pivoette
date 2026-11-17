@@ -30,6 +30,22 @@
   );
 
   /*
+   * Judgement colours, for cells that say whether a value is good news: the
+   * mini-bars and flags of `render.tsx`. Green and orange rather than green
+   * and red, which the commonest colour-vision deficiency cannot tell apart;
+   * a bar's side and a flag's word carry the meaning too, so neither rests
+   * on hue alone. Each has a tint for chip and cell backgrounds.
+   */
+  --pv-better: light-dark(#1f7a5a, #5fd1a2);
+  --pv-better-bg: light-dark(#e3f3ec, #16362b);
+  --pv-worse: light-dark(#b4471f, #f2946b);
+  --pv-worse-bg: light-dark(#fbe9e1, #3d241a);
+  --pv-warn: light-dark(#8a5a00, #f1c463);
+  --pv-warn-bg: light-dark(#fdf1d6, #3a2f14);
+  --pv-accent: light-dark(#6a4c93, #c6a8e6);
+  --pv-info: light-dark(#2f5d9e, #8db4ec);
+
+  /*
    * Categorical series colours, for charts. Unlike the chrome above these are
    * *data* — a series keeps its slot no matter how many other series are on
    * screen, so filtering one out must never repaint the survivors.

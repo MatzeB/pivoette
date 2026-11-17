@@ -229,6 +229,7 @@ export { affixOf, attachUnit } from './format/label';
 export type { UnitAffix } from './format/label';
 export { registerStyle, resolveStyle } from './format/style';
 export { registerRender, resolveRender } from './format/render';
+export type { FlagSpec } from './format/render';
 export {
   chooseStep,
   defaultLadder,

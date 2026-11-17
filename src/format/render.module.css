@@ -1,0 +1,119 @@
+/*
+ * Cells that draw rather than print: the mini-bar beside a number, and a row
+ * of flags. Colours are palette tokens, so both follow the table's theme.
+ */
+
+/* --- mini-bar ------------------------------------------------------------- */
+
+.barCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.barText {
+  font-variant-numeric: tabular-nums;
+}
+
+.better {
+  color: var(--pv-better);
+}
+
+.worse {
+  color: var(--pv-worse);
+}
+
+/* The track runs either side of a tick at the centre value; the bar grows
+ * from the tick towards the side the value is on. */
+.track {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  height: 8px;
+  background: var(--pv-border);
+  border-radius: 2px;
+}
+
+.track::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--pv-muted);
+}
+
+.fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 2px;
+}
+
+.fill.better {
+  background: var(--pv-better);
+}
+
+.fill.worse {
+  background: var(--pv-worse);
+}
+
+/* Past the end of the track: the bar is clamped, and says so with a hard
+ * edge rather than letting a huge value look like a merely large one. */
+.fill.clamped {
+  border-radius: 0;
+}
+
+/* --- flags ---------------------------------------------------------------- */
+
+.flags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.flag {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid var(--pv-border);
+  border-radius: 3px;
+  color: var(--pv-muted);
+  font-size: 0.85em;
+  line-height: 1.5;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.flag[data-tone='good'] {
+  background: var(--pv-better-bg);
+  border-color: transparent;
+  color: var(--pv-better);
+}
+
+.flag[data-tone='bad'] {
+  background: var(--pv-worse-bg);
+  border-color: transparent;
+  color: var(--pv-worse);
+}
+
+.flag[data-tone='warn'] {
+  background: var(--pv-warn-bg);
+  border-color: transparent;
+  color: var(--pv-warn);
+}
+
+.flag[data-tone='accent'] {
+  border-color: var(--pv-accent);
+  color: var(--pv-accent);
+}
+
+.flag[data-tone='info'] {
+  border-color: var(--pv-info);
+  color: var(--pv-info);
+}
+
+.flag[data-tone='strong'] {
+  border-color: var(--pv-muted);
+  color: var(--pv-text);
+}

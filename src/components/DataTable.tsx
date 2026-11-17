@@ -44,7 +44,15 @@ export interface DataTableDisplay {
   /** Px vertical gap between higher-level row-index blocks (0 = off).
    * Shallower (outer) levels get a proportionally larger gap. */
   rowGroupSpacing?: number;
-  /** Flat mode: number of leading columns to tint as an index (default 0). */
+  /**
+   * Flat mode: number of leading columns to treat as an index (default 0).
+   *
+   * They are tinted, and — as a pivot's row index does — a value the row
+   * above already showed is left blank, so `suite, benchmark` reads as groups
+   * rather than the same suite name forty times. Blanking goes left to right:
+   * a column is blank only while every column before it is too, so a new
+   * suite repeats its first benchmark's name in full.
+   */
   indexColumns?: number;
   /** Alternate (even/odd) row background shading. */
   zebra?: boolean;
@@ -453,11 +461,18 @@ export function DataTable({
   const { indexW, leafW, gapAfter, leftOffset } = useMemo(() => {
     const sample = result.rows.slice(0, 200);
     const leafW = leaves.map((leaf, li) => {
-      if (leaf.render) return 200;
+      const measure = leaf.render?.measure;
+      if (leaf.render && !measure) return 200;
       let w = widthOf(leaf.column.label + (headerSuffix[li] ?? ''));
       for (const r of sample) {
-        const text = leaf.format(makeCtx(leaf, r.cells[li]!, r.path, frame));
-        w = Math.max(w, widthOf(text));
+        const ctx = makeCtx(leaf, r.cells[li]!, r.path, frame);
+        const text = leaf.format(ctx);
+        w = Math.max(
+          w,
+          measure
+            ? measure({ ...ctx, text }, (t) => widthOf(t))
+            : widthOf(text),
+        );
       }
       // Footer/summary render bold — measure with the bold face.
       if (summary) {
@@ -1081,6 +1096,8 @@ export function DataTable({
                   row={row}
                   prevPath={grouped ? prev?.path : undefined}
                   nextPath={grouped ? next?.path : undefined}
+                  prevCells={prev?.cells}
+                  nextCells={next?.cells}
                   rowLevels={rowLevels}
                   memberFormats={rowMemberFormats}
                   leaves={leaves}
@@ -1204,12 +1221,21 @@ function prefixEqual(a: unknown[], b: unknown[], n: number): boolean {
   return true;
 }
 
+/** `prefixEqual` over cell values. */
+function sameCells(a: Cell[], b: Cell[], n: number): boolean {
+  for (let i = 0; i < n; i++) if (a[i]?.value !== b[i]?.value) return false;
+  return true;
+}
+
 interface RowProps {
   rowIndex: number;
   row: ResultRow;
   /** Undefined when an index sort has flattened the grouping. */
   prevPath: unknown[] | undefined;
   nextPath: unknown[] | undefined;
+  /** Flat mode: the neighbours' cells, to blank repeated index values. */
+  prevCells?: Cell[];
+  nextCells?: Cell[];
   rowLevels: string[];
   memberFormats: MemberFormat[];
   leaves: ResolvedLeaf[];
@@ -1238,6 +1264,8 @@ function Row({
   row,
   prevPath,
   nextPath,
+  prevCells,
+  nextCells,
   rowLevels,
   memberFormats,
   leaves,
@@ -1332,9 +1360,16 @@ function Row({
         const leaf = leaves[i]!;
         const ctx = makeCtx(leaf, cell, row.path, frame);
         const node: ReactNode = leaf.render
-          ? leaf.render(ctx)
+          ? leaf.render({ ...ctx, text: leaf.format(ctx) })
           : leaf.format(ctx);
         const isIndex = rowLevels.length === 0 && i < indexColumns;
+        // As the pivot's row index does: blank while the row above shows the
+        // same values up to and including this column, and drop the rule
+        // under a cell whose value carries on below.
+        const repeated =
+          isIndex && !!prevCells && sameCells(prevCells, row.cells, i + 1);
+        const continues =
+          isIndex && !!nextCells && sameCells(nextCells, row.cells, i + 1);
         const cellHovered = hoveredRow && hover?.leaf === i;
         return (
           <td
@@ -1352,10 +1387,11 @@ function Row({
               ...leaf.style(ctx),
               ...cellGap[i],
               ...gapTop,
+              ...(continues ? { borderBottom: 'none' } : {}),
             }}
             onMouseEnter={() => onHover({ row: rowIndex, leaf: i })}
           >
-            {node}
+            {repeated ? null : node}
           </td>
         );
       })}
@@ -1567,7 +1603,7 @@ function FooterRow({
         const leaf = leaves[i]!;
         const ctx = makeCtx(leaf, cell, [], frame);
         const node: ReactNode = leaf.render
-          ? leaf.render(ctx)
+          ? leaf.render({ ...ctx, text: leaf.format(ctx) })
           : leaf.format(ctx);
         return (
           <td

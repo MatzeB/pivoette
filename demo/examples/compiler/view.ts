@@ -1,4 +1,9 @@
-import type { ColumnDef, DataTableDisplay, ViewSpec } from '../../../src';
+import type {
+  ColumnDef,
+  DataTableDisplay,
+  FlagSpec,
+  ViewSpec,
+} from '../../../src';
 
 /** A field's geomean — the bar — and its min and max, the whisker across it. */
 function measured(field: string, name: string): ColumnDef[] {
@@ -70,4 +75,112 @@ export const display: DataTableDisplay = {
   },
   frameless: true,
   zebra: true,
+};
+
+/**
+ * The benchmarks behind each bar: one row per benchmark and build, FooCC only,
+ * flat rather than pivoted — nothing is aggregated, so every number is one
+ * measurement.
+ *
+ * Two cell renderers do the work a chart would:
+ *
+ * - `Render.Bar` draws each speedup's mini-bar beside it, growing from a tick
+ *   at 1.0: right and green for faster than BarCC -O2, left and orange for
+ *   slower, full at ±25%. The number keeps the ink colour inside ±2%, where a
+ *   difference is real but not worth shouting about.
+ * - `Render.Flags` is a column of chips, one per condition the row meets. A
+ *   flag is data — a label, a condition over the row's fields, a tone, and a
+ *   tooltip saying why — so hovering a chip says what raised it.
+ */
+const bar = {
+  fnName: 'bar',
+  options: { center: 1, span: 0.25, threshold: 0.02 },
+};
+const pct = (field: string) => `((${field} - 1) * 100).toFixed(1) + '%'`;
+
+/**
+ * What the Flags column raises, in the order its chips appear. Each `when` is
+ * an expression over the row's fields; `detail` adds the row's own numbers to
+ * the chip's tooltip.
+ */
+const flags: FlagSpec[] = [
+  {
+    label: 'slower',
+    when: 'cycles < 0.98',
+    tone: 'bad',
+    title: 'More than 2% slower in cycles than BarCC -O2',
+    detail: `'cycles ' + ${pct('cycles')}`,
+  },
+  {
+    label: 'opposite signs',
+    when: '(cycles - 1) * (ir - 1) < 0 && Math.abs(cycles - 1) > 0.003 && Math.abs(ir - 1) > 0.003',
+    tone: 'accent',
+    title: 'Cycles and instructions moved in opposite directions',
+    detail: `'cycles ' + ${pct('cycles')} + ', ir ' + ${pct('ir')}`,
+  },
+  {
+    label: 'layout win',
+    when: 'cycles / ir > 1.12',
+    tone: 'info',
+    title:
+      'Cycles improved 12% more than instructions: the gain is in layout or latency, not less work',
+    detail: `'cycles ' + ${pct('cycles')} + ', ir ' + ${pct('ir')}`,
+  },
+  {
+    label: 'provisional',
+    when: 'runs < 5',
+    tone: 'warn',
+    title: 'Not every run completed, so the timing is provisional',
+    detail: "runs + ' of 5 runs'",
+  },
+];
+
+export const detailView: ViewSpec = {
+  // Left in the order the rows arrive — suite, then benchmark, then build —
+  // so each benchmark's three builds sit together. Click Cycles to put the
+  // slowest on top.
+  filter: { compiler: { exclude: ['BarCC'] } },
+  columns: [
+    { id: 'suite', label: 'Suite' },
+    { id: 'benchmark', label: 'Benchmark' },
+    { id: 'variant', label: 'Build' },
+    {
+      id: 'cycles',
+      label: 'Cycles',
+      format: { options: { decimals: 3 } },
+      render: bar,
+    },
+    {
+      id: 'ir',
+      label: 'Ir',
+      format: { options: { decimals: 3 } },
+      render: bar,
+    },
+    {
+      id: 'flags',
+      label: 'Flags',
+      // No field of its own, so it computes one: how many flags the row
+      // raises. That is what clicking the header sorts by.
+      compute: flags.map((f) => `(${f.when} ? 1 : 0)`).join(' + '),
+      render: {
+        fnName: 'flags',
+        options: {
+          flags,
+        },
+      },
+    },
+  ],
+};
+
+/**
+ * Suite, benchmark and build are the index: tinted, and a suite or benchmark
+ * the row above already named is left blank, as a pivot's row index would.
+ *
+ * No zebra stripes: the row under the pointer is highlighted instead, which
+ * does the striping's job — keeping a row's cells together — where the reader
+ * is actually looking.
+ */
+export const detailDisplay: DataTableDisplay = {
+  indexColumns: 3,
+  frameless: true,
 };

@@ -29,4 +29,8 @@ export const Style = {
 
 export const Render = {
   ImageText: 'imageText',
+  /** The number with a mini-bar growing from a centre value. */
+  Bar: 'bar',
+  /** Labelled chips, one per condition the row meets. */
+  Flags: 'flags',
 } as const;

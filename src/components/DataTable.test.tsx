@@ -1421,3 +1421,42 @@ describe('<DataTable> with every row filtered out', () => {
     expect(el.querySelector('tfoot')).toBeNull();
   });
 });
+
+describe('<DataTable> flat index columns', () => {
+  const rows = [
+    { suite: 'A', bench: 'x', build: 'base', t: 1 },
+    { suite: 'A', bench: 'x', build: 'pgo', t: 2 },
+    { suite: 'A', bench: 'y', build: 'base', t: 3 },
+    { suite: 'B', bench: 'y', build: 'base', t: 4 },
+  ];
+  const view: ViewSpec = {
+    columns: [{ id: 'suite' }, { id: 'bench' }, { id: 'build' }, { id: 't' }],
+  };
+
+  it('blanks a value the row above already showed, left to right', async () => {
+    // The body is virtualised: give it a box to lay rows out in.
+    const proto = HTMLElement.prototype;
+    const saved = ['offsetWidth', 'offsetHeight'].map(
+      (k) => [k, Object.getOwnPropertyDescriptor(proto, k)!] as const,
+    );
+    for (const [k] of saved)
+      Object.defineProperty(proto, k, { configurable: true, get: () => 600 });
+    try {
+      const el = await render(
+        <DataTable data={rows} view={view} display={{ indexColumns: 3 }} />,
+      );
+      const body = [...el.querySelectorAll('tbody tr')]
+        .map((tr) => [...tr.children].map((td) => td.textContent))
+        .filter((cells) => cells.length === 4);
+      expect(body).toEqual([
+        ['A', 'x', 'base', '1'],
+        ['', '', 'pgo', '2'],
+        ['', 'y', 'base', '3'],
+        // A new suite names its benchmark again, though it is the same one.
+        ['B', 'y', 'base', '4'],
+      ]);
+    } finally {
+      for (const [k, d] of saved) Object.defineProperty(proto, k, d);
+    }
+  });
+});

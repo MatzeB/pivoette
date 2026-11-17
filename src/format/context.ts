@@ -43,8 +43,21 @@ export interface CellCtx {
   column: ResolvedColumn;
   /** Escape hatch to the source data. */
   frame: DataFrame;
+  /**
+   * The cell as its format would write it. Set for a renderer, which replaces
+   * the formatted text and may want to show it — a number beside its bar —
+   * without rebuilding the column's format, scale, and unit itself.
+   */
+  text?: string;
 }
 
 export type FormatFn = (ctx: CellCtx) => string;
 export type StyleFn = (ctx: CellCtx) => CSSProperties;
-export type CellRender = (ctx: CellCtx) => ReactNode;
+export type CellRender = ((ctx: CellCtx) => ReactNode) & {
+  /**
+   * How wide the cell draws, in pixels, given a way to measure text. Without
+   * it a rendered column is given a fixed width, since what it draws cannot
+   * be measured before it is drawn.
+   */
+  measure?: (ctx: CellCtx, widthOf: (text: string) => number) => number;
+};

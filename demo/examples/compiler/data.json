@@ -17,6 +17,9 @@
   },
   "cycles": {
    "displayName": "Cycles: speedup over BarCC -O2"
+  },
+  "runs": {
+   "displayName": "Runs"
   }
  },
  "rows": [
@@ -26,7 +29,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.007,
-   "cycles": 1.0108
+   "cycles": 1.0108,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -34,7 +38,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.086,
-   "cycles": 1.1888
+   "cycles": 1.1888,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -42,7 +47,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0899,
-   "cycles": 1.284
+   "cycles": 1.284,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -50,7 +56,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0085,
-   "cycles": 1.0081
+   "cycles": 1.0081,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -58,7 +65,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0849,
-   "cycles": 1.1791
+   "cycles": 1.1791,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -66,7 +74,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0821,
-   "cycles": 1.2594
+   "cycles": 1.2594,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -74,7 +83,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0158,
-   "cycles": 1.0206
+   "cycles": 1.0206,
+   "runs": 4
   },
   {
    "suite": "CPython",
@@ -82,7 +92,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.1115,
-   "cycles": 1.2369
+   "cycles": 1.2369,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -90,7 +101,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.1147,
-   "cycles": 1.3313
+   "cycles": 1.3313,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -98,7 +110,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0358,
-   "cycles": 1.0505
+   "cycles": 1.0505,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -106,7 +119,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.1224,
-   "cycles": 1.2432
+   "cycles": 1.2432,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -114,7 +128,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.131,
-   "cycles": 1.3192
+   "cycles": 1.3192,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -122,7 +137,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0116,
-   "cycles": 1.0128
+   "cycles": 1.0128,
+   "runs": 4
   },
   {
    "suite": "CPython",
@@ -130,7 +146,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0856,
-   "cycles": 1.1763
+   "cycles": 1.1763,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -138,7 +155,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0859,
-   "cycles": 1.2525
+   "cycles": 1.2525,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -146,7 +164,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0253,
-   "cycles": 1.0422
+   "cycles": 1.0422,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -154,7 +173,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.1062,
-   "cycles": 1.2224
+   "cycles": 1.2224,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -162,7 +182,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.1167,
-   "cycles": 1.3258
+   "cycles": 1.3258,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -170,7 +191,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 0.9746,
-   "cycles": 0.9635
+   "cycles": 0.9635,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -178,7 +200,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 0.9955,
-   "cycles": 1.0103
+   "cycles": 1.0103,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -186,7 +209,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 0.9979,
-   "cycles": 1.017
+   "cycles": 1.017,
+   "runs": 2
   },
   {
    "suite": "bzip2",
@@ -194,7 +218,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 0.9838,
-   "cycles": 0.9851
+   "cycles": 0.9851,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -202,7 +227,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0005,
-   "cycles": 1.0249
+   "cycles": 1.0249,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -210,7 +236,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0023,
-   "cycles": 1.0229
+   "cycles": 1.0229,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -218,7 +245,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 0.9829,
-   "cycles": 0.9707
+   "cycles": 0.9707,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -226,7 +254,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 0.9983,
-   "cycles": 1.0065
+   "cycles": 1.0065,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -234,7 +263,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0001,
-   "cycles": 1.0121
+   "cycles": 1.0121,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -242,7 +272,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 0.985,
-   "cycles": 0.9772
+   "cycles": 0.9772,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -250,7 +281,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0013,
-   "cycles": 1.0063
+   "cycles": 1.0063,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -258,7 +290,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 0.9971,
-   "cycles": 1.0111
+   "cycles": 1.0111,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -266,7 +299,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.014,
-   "cycles": 1.0167
+   "cycles": 1.0167,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -274,7 +308,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0445,
-   "cycles": 1.0989
+   "cycles": 1.0989,
+   "runs": 2
   },
   {
    "suite": "zstd",
@@ -282,7 +317,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0342,
-   "cycles": 1.1119
+   "cycles": 1.1119,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -290,7 +326,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0154,
-   "cycles": 1.0255
+   "cycles": 1.0255,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -298,7 +335,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0406,
-   "cycles": 1.0907
+   "cycles": 1.0907,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -306,7 +344,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0452,
-   "cycles": 1.1114
+   "cycles": 1.1114,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -314,7 +353,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0141,
-   "cycles": 1.0163
+   "cycles": 1.0163,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -322,7 +362,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.036,
-   "cycles": 1.0764
+   "cycles": 1.0764,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -330,7 +371,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0401,
-   "cycles": 1.0883
+   "cycles": 1.0883,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -338,7 +380,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0193,
-   "cycles": 1.0334
+   "cycles": 1.0334,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -346,7 +389,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.056,
-   "cycles": 1.117
+   "cycles": 1.117,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -354,7 +398,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.057,
-   "cycles": 1.1641
+   "cycles": 1.1641,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -362,7 +407,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 0.9964,
-   "cycles": 0.9942
+   "cycles": 0.9942,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -370,7 +416,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.029,
-   "cycles": 1.0591
+   "cycles": 1.0591,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -378,7 +425,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0328,
-   "cycles": 1.0817
+   "cycles": 1.0817,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -386,7 +434,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0116,
-   "cycles": 1.0145
+   "cycles": 1.0145,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -394,7 +443,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0541,
-   "cycles": 1.1032
+   "cycles": 1.1032,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -402,7 +452,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0567,
-   "cycles": 1.1153
+   "cycles": 1.1153,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -410,7 +461,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0127,
-   "cycles": 1.0217
+   "cycles": 1.0217,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -418,7 +470,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0435,
-   "cycles": 1.0976
+   "cycles": 1.0976,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -426,7 +479,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0426,
-   "cycles": 1.1192
+   "cycles": 1.1192,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -434,7 +488,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0032,
-   "cycles": 0.9316
+   "cycles": 0.9316,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -442,7 +497,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0345,
-   "cycles": 0.9984
+   "cycles": 0.9984,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -450,7 +506,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0456,
-   "cycles": 1.0257
+   "cycles": 1.0257,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -458,7 +515,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 0.9926,
-   "cycles": 0.9941
+   "cycles": 0.9941,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -466,7 +524,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0113,
-   "cycles": 1.0456
+   "cycles": 1.0456,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -474,7 +533,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0148,
-   "cycles": 1.0547
+   "cycles": 1.0547,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -482,7 +542,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0097,
-   "cycles": 1.0057
+   "cycles": 1.0057,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -490,7 +551,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0438,
-   "cycles": 1.0764
+   "cycles": 1.0764,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -498,7 +560,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.049,
-   "cycles": 1.1128
+   "cycles": 1.1128,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -506,7 +569,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0421,
-   "cycles": 1.0518
+   "cycles": 1.0518,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -514,7 +578,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0469,
-   "cycles": 1.0634
+   "cycles": 1.0634,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -522,7 +587,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0423,
-   "cycles": 1.0895
+   "cycles": 1.0895,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -530,7 +596,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0125,
-   "cycles": 1.0209
+   "cycles": 1.0209,
+   "runs": 2
   },
   {
    "suite": "SPEC 2006",
@@ -538,7 +605,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0466,
-   "cycles": 1.0884
+   "cycles": 1.0884,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -546,7 +614,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0414,
-   "cycles": 1.106
+   "cycles": 1.106,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -554,7 +623,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.029,
-   "cycles": 1.0412
+   "cycles": 1.0412,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -562,7 +632,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0531,
-   "cycles": 1.093
+   "cycles": 1.093,
+   "runs": 4
   },
   {
    "suite": "SPEC 2006",
@@ -570,7 +641,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0526,
-   "cycles": 1.1101
+   "cycles": 1.1101,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -578,7 +650,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0145,
-   "cycles": 1.0166
+   "cycles": 1.0166,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -586,7 +659,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0596,
-   "cycles": 1.1114
+   "cycles": 1.1114,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -594,7 +668,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0705,
-   "cycles": 1.1343
+   "cycles": 1.1343,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -602,7 +677,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 0.9957,
-   "cycles": 0.9903
+   "cycles": 0.9903,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -610,7 +686,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0228,
-   "cycles": 1.0557
+   "cycles": 1.0557,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -618,7 +695,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0206,
-   "cycles": 1.0578
+   "cycles": 1.0578,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -626,7 +704,8 @@
    "compiler": "FooCC",
    "variant": "base",
    "ir": 1.0035,
-   "cycles": 1.0097
+   "cycles": 1.0097,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -634,7 +713,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO",
    "ir": 1.0333,
-   "cycles": 1.0676
+   "cycles": 1.0676,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -642,7 +722,8 @@
    "compiler": "FooCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0312,
-   "cycles": 1.0739
+   "cycles": 1.0739,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -650,7 +731,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -658,7 +740,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0492,
-   "cycles": 1.1101
+   "cycles": 1.1101,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -666,7 +749,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0558,
-   "cycles": 1.1813
+   "cycles": 1.1813,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -674,7 +758,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -682,7 +767,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0513,
-   "cycles": 1.1208
+   "cycles": 1.1208,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -690,7 +776,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0519,
-   "cycles": 1.1597
+   "cycles": 1.1597,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -698,7 +785,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -706,7 +794,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0604,
-   "cycles": 1.1518
+   "cycles": 1.1518,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -714,7 +803,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0577,
-   "cycles": 1.1926
+   "cycles": 1.1926,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -722,7 +812,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -730,7 +821,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0756,
-   "cycles": 1.1734
+   "cycles": 1.1734,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -738,7 +830,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0803,
-   "cycles": 1.2364
+   "cycles": 1.2364,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -746,7 +839,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -754,7 +848,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0937,
-   "cycles": 1.1968
+   "cycles": 1.1968,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -762,7 +857,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0976,
-   "cycles": 1.283
+   "cycles": 1.283,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -770,7 +866,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -778,7 +875,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0714,
-   "cycles": 1.1562
+   "cycles": 1.1562,
+   "runs": 5
   },
   {
    "suite": "CPython",
@@ -786,7 +884,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0756,
-   "cycles": 1.2309
+   "cycles": 1.2309,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -794,7 +893,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -802,7 +902,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0228,
-   "cycles": 1.0409
+   "cycles": 1.0409,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -810,7 +911,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0264,
-   "cycles": 1.0388
+   "cycles": 1.0388,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -818,7 +920,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 4
   },
   {
    "suite": "bzip2",
@@ -826,7 +929,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0174,
-   "cycles": 1.0363
+   "cycles": 1.0363,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -834,7 +938,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0134,
-   "cycles": 1.0369
+   "cycles": 1.0369,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -842,7 +947,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -850,7 +956,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0182,
-   "cycles": 1.0323
+   "cycles": 1.0323,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -858,7 +965,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0203,
-   "cycles": 1.0435
+   "cycles": 1.0435,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -866,7 +974,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -874,7 +983,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0189,
-   "cycles": 1.031
+   "cycles": 1.031,
+   "runs": 5
   },
   {
    "suite": "bzip2",
@@ -882,7 +992,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0187,
-   "cycles": 1.029
+   "cycles": 1.029,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -890,7 +1001,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -898,7 +1010,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0256,
-   "cycles": 1.0393
+   "cycles": 1.0393,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -906,7 +1019,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0246,
-   "cycles": 1.0479
+   "cycles": 1.0479,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -914,7 +1028,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -922,7 +1037,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.035,
-   "cycles": 1.0632
+   "cycles": 1.0632,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -930,7 +1046,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0369,
-   "cycles": 1.0929
+   "cycles": 1.0929,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -938,7 +1055,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -946,7 +1064,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0133,
-   "cycles": 1.0342
+   "cycles": 1.0342,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -954,7 +1073,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0099,
-   "cycles": 1.0585
+   "cycles": 1.0585,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -962,7 +1082,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -970,7 +1091,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0068,
-   "cycles": 1.0164
+   "cycles": 1.0164,
+   "runs": 5
   },
   {
    "suite": "zstd",
@@ -978,7 +1100,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0136,
-   "cycles": 1.0389
+   "cycles": 1.0389,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -986,7 +1109,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -994,7 +1118,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0298,
-   "cycles": 1.0587
+   "cycles": 1.0587,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1002,7 +1127,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0328,
-   "cycles": 1.0622
+   "cycles": 1.0622,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1010,7 +1136,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1018,7 +1145,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0125,
-   "cycles": 1.0494
+   "cycles": 1.0494,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1026,7 +1154,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0163,
-   "cycles": 1.0687
+   "cycles": 1.0687,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1034,7 +1163,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1042,7 +1172,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0331,
-   "cycles": 1.0685
+   "cycles": 1.0685,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1050,7 +1181,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0319,
-   "cycles": 1.0905
+   "cycles": 1.0905,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1058,7 +1190,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1066,7 +1199,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0247,
-   "cycles": 1.0605
+   "cycles": 1.0605,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1074,7 +1208,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0245,
-   "cycles": 1.0575
+   "cycles": 1.0575,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1082,7 +1217,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1090,7 +1226,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0324,
-   "cycles": 1.0563
+   "cycles": 1.0563,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1098,7 +1235,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0291,
-   "cycles": 1.0789
+   "cycles": 1.0789,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1106,7 +1244,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1114,7 +1253,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0201,
-   "cycles": 1.0485
+   "cycles": 1.0485,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1122,7 +1262,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0261,
-   "cycles": 1.057
+   "cycles": 1.057,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1130,7 +1271,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1138,7 +1280,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0335,
-   "cycles": 1.0786
+   "cycles": 1.0786,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1146,7 +1289,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0331,
-   "cycles": 1.1022
+   "cycles": 1.1022,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1154,7 +1298,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1162,7 +1307,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0225,
-   "cycles": 1.0492
+   "cycles": 1.0492,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1170,7 +1316,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0185,
-   "cycles": 1.0713
+   "cycles": 1.0713,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1178,7 +1325,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1186,7 +1334,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0339,
-   "cycles": 1.0733
+   "cycles": 1.0733,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1194,7 +1343,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0287,
-   "cycles": 1.069
+   "cycles": 1.069,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1202,7 +1352,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1210,7 +1361,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0369,
-   "cycles": 1.0738
+   "cycles": 1.0738,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1218,7 +1370,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0386,
-   "cycles": 1.1092
+   "cycles": 1.1092,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1226,7 +1379,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1234,7 +1388,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0301,
-   "cycles": 1.0462
+   "cycles": 1.0462,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1242,7 +1397,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0322,
-   "cycles": 1.0657
+   "cycles": 1.0657,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1250,7 +1406,8 @@
    "compiler": "BarCC",
    "variant": "base",
    "ir": 1.0,
-   "cycles": 1.0
+   "cycles": 1.0,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1258,7 +1415,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO",
    "ir": 1.0254,
-   "cycles": 1.0441
+   "cycles": 1.0441,
+   "runs": 5
   },
   {
    "suite": "SPEC 2006",
@@ -1266,7 +1424,8 @@
    "compiler": "BarCC",
    "variant": "LTO+PGO+Bolt",
    "ir": 1.0222,
-   "cycles": 1.0876
+   "cycles": 1.0876,
+   "runs": 5
   }
  ]
 }

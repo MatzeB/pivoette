@@ -41,6 +41,7 @@ import networthData from '../demo/examples/networth/data.json';
 import {
   view as compilerView,
   display as compilerDisplay,
+  detailView as compilerDetailView,
 } from '../demo/examples/compiler/view';
 import { PivotChart } from './graph/PivotChart';
 import { graphFromView } from './graph/pivot-chart';
@@ -265,6 +266,60 @@ describe('example: compiler (a pivot view drawn as a chart)', () => {
     expect(host.querySelectorAll('g[data-series] path')).toHaveLength(48);
     await act(async () => root.unmount());
     host.remove();
+  });
+});
+
+describe('example: compiler, per benchmark', () => {
+  const frame = frameOf(compilerData as Dataset);
+  const result = computeView(frame, compilerDetailView);
+
+  it('validates against its own data, as the web component checks it', () => {
+    const { problems } = validateBundle(
+      { data: { rows: [] }, view: compilerDetailView },
+      frame,
+    );
+    expect(problems).toEqual([]);
+  });
+
+  it('counts the flags each row raises, so the column sorts by them', () => {
+    const at = result.leaves.findIndex((l) => l.id === 'flags');
+    const counts = result.rows.map((r) => r.cells[at]!.value);
+    expect(counts.every((c) => typeof c === 'number')).toBe(true);
+    expect(Math.max(...(counts as number[]))).toBeGreaterThanOrEqual(2);
+  });
+
+  it('lists FooCC’s benchmarks, each with its three builds together', () => {
+    expect(result.rows).toHaveLength(78);
+    const head = result.rows.slice(0, 3).map((r) => r.cells.slice(0, 3));
+    expect(head.map((c) => c.map((x) => x.value))).toEqual([
+      ['CPython', 'richards', 'base'],
+      ['CPython', 'richards', 'LTO+PGO'],
+      ['CPython', 'richards', 'LTO+PGO+Bolt'],
+    ]);
+  });
+
+  it('flags the regression whose instructions went the other way', () => {
+    // The flags column's renderer, asked which chips each row raises. The
+    // table itself is virtualised, and draws no rows without a layout.
+    const leaf = result.leaves.find((l) => l.id === 'flags')!;
+    const raised = result.rows.map((row) => {
+      const cell = row.cells[result.leaves.indexOf(leaf)]!;
+      const node = leaf.render!({
+        value: cell.value,
+        inputs: cell.inputs ?? {},
+        rowPath: row.path,
+        colPath: leaf.colPath,
+        column: leaf.column,
+        frame: result.frame,
+      }) as { props?: { children?: { key: string }[] } } | null;
+      return (node?.props?.children ?? []).map((c) => c.key);
+    });
+    // 429.mcf at -O2: 7% slower in cycles, yet no more instructions.
+    const mcf = result.rows.findIndex(
+      (r) => r.cells[1]!.value === '429.mcf' && r.cells[2]!.value === 'base',
+    );
+    expect(raised[mcf]).toEqual(['slower', 'opposite signs']);
+    expect(raised.flat()).toContain('provisional');
   });
 });
 

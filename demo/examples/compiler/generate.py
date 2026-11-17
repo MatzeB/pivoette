@@ -58,6 +58,7 @@ META = {
     "variant": {"displayName": "Build"},
     "ir": {"displayName": "Instructions: speedup over BarCC -O2"},
     "cycles": {"displayName": "Cycles: speedup over BarCC -O2"},
+    "runs": {"displayName": "Runs"},
 }
 
 VARIANTS = ["base", "LTO+PGO", "LTO+PGO+Bolt"]
@@ -68,6 +69,12 @@ IR_SHARE = [0.7, 0.45, 0.05]
 
 # Its own generator, so adding `ir` leaves every `cycles` number as it was.
 ir_random = random.Random(42)
+
+# Each timing is the median of five runs, and now and then a run is lost — a
+# machine reboots, a job times out. Fewer than five makes the number
+# provisional, which the per-benchmark table flags. Its own generator again.
+RUNS = 5
+runs_random = random.Random(7)
 
 # suite -> (benchmarks, base gain, PGO gain, BOLT gain, per-benchmark spread)
 # Gains are multiplicative factors on top of the variant before.
@@ -152,6 +159,9 @@ def main() -> None:
                     "variant": variant,
                     "ir": round(ir, 4),
                     "cycles": round(cycles, 4),
+                    "runs": RUNS
+                    if runs_random.random() > 0.07
+                    else runs_random.randint(2, RUNS - 1),
                 }
             )
 
