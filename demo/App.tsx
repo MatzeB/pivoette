@@ -835,13 +835,7 @@ export function App() {
         {rowCount.toLocaleString()} source rows
       </p>
 
-      <Panel
-        title={
-          isChart
-            ? 'Example source — the component that produces the charts above'
-            : 'Example config — the view spec and display that produce the table above'
-        }
-      >
+      <Panel title={isChart ? 'Example source' : 'Example config'}>
         {() => <Source text={example.source} />}
       </Panel>
 
@@ -851,7 +845,7 @@ export function App() {
         </Panel>
       )}
 
-      <Panel title="Source data — the rows as given, before any of the above">
+      <Panel title="Source data">
         {/* Mounted only while open: the stress fixture is 10k rows. */}
         {() => (
           <DataTable
