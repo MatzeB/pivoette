@@ -447,6 +447,30 @@ function Select<T extends string>({
   );
 }
 
+/** Below the table: the Edit button, with the example's settings beside it. */
+const SETTINGS_ROW: React.CSSProperties = {
+  position: 'relative',
+  marginTop: 10,
+};
+/**
+ * On the Edit button's line, at the table's right edge. Laid over the row
+ * rather than beside the editor, so an open editor keeps the full width and
+ * grows below them.
+ */
+const SETTINGS: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: 12,
+  minHeight: 26,
+};
+const PINNED: React.CSSProperties = {
+  ...SETTINGS,
+  position: 'absolute',
+  top: 0,
+  right: 0,
+};
+
 export function App() {
   const [selected, setSelected] = useState(initialExample);
   const [stress, setStress] = useState(false);
@@ -596,6 +620,82 @@ export function App() {
     setScalePlacement(v);
   }
 
+  // The example's own settings, which act on the table above them: they sit
+  // under it, beside the Edit button, rather than between the blurb and it.
+  const settings = (
+    <>
+      {isRegression && (
+        <label
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 13,
+            color: 'var(--page-muted)',
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={stress}
+            onChange={(e) => setStress(e.target.checked)}
+          />
+          Stress mode — 10k apps (
+          {stress && !stressData ? 'loading…' : 'row virtualization'})
+        </label>
+      )}
+
+      {/* The chart's own placement control. One setting for the whole chart,
+              so the axis title, the tick labels, the end labels, and the scrubber
+              readout move together rather than each stating the unit. */}
+      {isChart && (
+        <div style={{ display: 'flex', gap: 12 }}>
+          <Select
+            label="units"
+            value={graphPlacement}
+            options={GRAPH_PLACEMENT_OPTIONS}
+            onChange={setGraphPlacement}
+          />
+        </div>
+      )}
+
+      {!isChart && hasUnits && (
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          {hasSplit ? (
+            <>
+              <Select
+                label="unit"
+                value={unitPlacement}
+                options={PLACEMENT_OPTIONS}
+                onChange={setUnitPlacement}
+              />
+              <Select
+                label="scale"
+                value={scalePlacement}
+                options={PLACEMENT_OPTIONS}
+                onChange={setScalePlacement}
+              />
+            </>
+          ) : (
+            <Select
+              label="units"
+              value={unitPlacement}
+              options={PLACEMENT_OPTIONS}
+              onChange={setBoth}
+            />
+          )}
+          {hasAutoScale && (
+            <Select
+              label="scaling"
+              value={scalePer}
+              options={SCALE_PER_OPTIONS}
+              onChange={setScalePer}
+            />
+          )}
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div
       style={{
@@ -707,84 +807,6 @@ export function App() {
         {example.blurb}
       </p>
 
-      {isRegression && (
-        <label
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 13,
-            marginBottom: 10,
-            color: 'var(--page-muted)',
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={stress}
-            onChange={(e) => setStress(e.target.checked)}
-          />
-          Stress mode — 10k apps (
-          {stress && !stressData ? 'loading…' : 'row virtualization'})
-        </label>
-      )}
-
-      {/* The chart's own placement control. One setting for the whole chart,
-          so the axis title, the tick labels, the end labels, and the scrubber
-          readout move together rather than each stating the unit. */}
-      {isChart && (
-        <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
-          <Select
-            label="units"
-            value={graphPlacement}
-            options={GRAPH_PLACEMENT_OPTIONS}
-            onChange={setGraphPlacement}
-          />
-        </div>
-      )}
-
-      {!isChart && hasUnits && (
-        <div
-          style={{
-            display: 'flex',
-            gap: 12,
-            alignItems: 'center',
-            marginBottom: 10,
-          }}
-        >
-          {hasSplit ? (
-            <>
-              <Select
-                label="unit"
-                value={unitPlacement}
-                options={PLACEMENT_OPTIONS}
-                onChange={setUnitPlacement}
-              />
-              <Select
-                label="scale"
-                value={scalePlacement}
-                options={PLACEMENT_OPTIONS}
-                onChange={setScalePlacement}
-              />
-            </>
-          ) : (
-            <Select
-              label="units"
-              value={unitPlacement}
-              options={PLACEMENT_OPTIONS}
-              onChange={setBoth}
-            />
-          )}
-          {hasAutoScale && (
-            <Select
-              label="scaling"
-              value={scalePer}
-              options={SCALE_PER_OPTIONS}
-              onChange={setScalePer}
-            />
-          )}
-        </div>
-      )}
-
       {example.kind === 'chart' ? (
         <example.Chart
           data={data}
@@ -799,8 +821,14 @@ export function App() {
           {/* Below the table rather than beside it: a panel beside it would
               take its width out of the table, the thing being edited. Opening
               it is what turns on the table's own + buttons and drag handles. */}
-          <pivoette-editor for="example-table" style={{ marginTop: 10 }} />
+          <div style={SETTINGS_ROW}>
+            <pivoette-editor for="example-table" />
+            <div style={PINNED}>{settings}</div>
+          </div>
         </>
+      )}
+      {example.kind === 'chart' && (
+        <div style={{ ...SETTINGS, marginTop: 10 }}>{settings}</div>
       )}
 
       {example.detail && (
