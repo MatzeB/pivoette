@@ -10,8 +10,8 @@ The shape is chosen to exercise the chart rather than to look tidy:
   * The mortgage is negative, so the value axis has to straddle zero.
   * The brokerage account opens 30 months in — its rows are simply absent, so
     the line has a real gap rather than a run of zeroes.
-  * Balances run from a few thousand to the high hundreds of thousands, which
-    puts the shared scale ladder on the k$ rung.
+  * Balances run from a few thousand to a little over 150k, which puts the
+    shared scale ladder on the k$ rung.
   * `contribution` is the money moved into the account that month — for the
     mortgage, the principal repaid. Summed over the decade it is what each
     account cost, which is the only reading the demo puts on screen.
@@ -49,10 +49,10 @@ META = {
 
 # name -> (opening balance, monthly drift, volatility, month it opens)
 ACCOUNTS = {
-    "Checking": (4_200, 60, 900, 0),
-    "Retirement": (18_000, 1_450, 2_600, 0),
-    "Brokerage": (25_000, 2_100, 7_500, 30),
-    "Mortgage": (-286_000, 1_150, 0, 0),
+    "Checking": (1_700, 25, 370, 0),
+    "Retirement": (7_400, 600, 1_070, 0),
+    "Brokerage": (10_300, 860, 3_080, 30),
+    "Mortgage": (-117_000, 470, 0, 0),
 }
 
 
@@ -79,7 +79,7 @@ def main() -> None:
                 balance = min(balance, 0.0)
             # Signed, and positive for every account including the mortgage:
             # money paid in raises that account's balance, and the mortgage's
-            # rises from -286k towards zero as the principal is repaid. Taking
+            # rises from -117k towards zero as the principal is repaid. Taking
             # an absolute value here would not *establish* that — it would hide
             # a withdrawal by reporting it as a deposit.
             contribution = drift + random.gauss(0, drift * 0.25)
