@@ -18,6 +18,9 @@ import type {
   ViewSpec,
 } from '../src';
 // Registers <pivoette-table> and <pivoette-editor>.
+import hljs from 'highlight.js/lib/core';
+import typescript from 'highlight.js/lib/languages/typescript';
+import json from 'highlight.js/lib/languages/json';
 import '../src/element';
 import type { PivoetteTableElement } from '../src/element';
 
@@ -71,6 +74,9 @@ import metricsSrc from './examples/metrics/view?raw';
 import commitsSrc from './examples/commits/view?raw';
 import networthSrc from './examples/networth/view?raw';
 import compilerSrc from './examples/compiler/view?raw';
+
+hljs.registerLanguage('typescript', typescript);
+hljs.registerLanguage('json', json);
 
 type Row = Record<string, unknown>;
 
@@ -372,9 +378,19 @@ function Panel({
 }
 
 /** Monospaced source listing, scrollable rather than page-widening. */
-function Source({ text }: { text: string }) {
+/**
+ * A code panel. Highlighted with highlight.js — the core and just the two
+ * grammars the panels need — into token classes that `demo.css` colours from
+ * the page's own palette, so the light/dark toggle restyles it too.
+ */
+function Source({ text, lang }: { text: string; lang: 'typescript' | 'json' }) {
+  const html = useMemo(
+    () => hljs.highlight(text, { language: lang }).value,
+    [text, lang],
+  );
   return (
     <pre
+      className="hljs"
       style={{
         margin: 0,
         padding: '12px 14px',
@@ -387,9 +403,9 @@ function Source({ text }: { text: string }) {
         maxHeight: 420,
         overflow: 'auto',
       }}
-    >
-      {text}
-    </pre>
+      // highlight.js escapes the source; the markup is only its spans.
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   );
 }
 
@@ -864,12 +880,14 @@ export function App() {
       </p>
 
       <Panel title={isChart ? 'Example source' : 'Example config'}>
-        {() => <Source text={example.source} />}
+        {() => <Source text={example.source} lang="typescript" />}
       </Panel>
 
       {datasetMeta && (
         <Panel title="Column metadata">
-          {() => <Source text={JSON.stringify(datasetMeta, null, 2)} />}
+          {() => (
+            <Source text={JSON.stringify(datasetMeta, null, 2)} lang="json" />
+          )}
         </Panel>
       )}
 
