@@ -21,6 +21,15 @@ import type { AutoScaleSpec, ColumnDef, ViewSpec } from './pivot/spec';
 import type { DataTableDisplay } from './components/DataTable';
 
 /** Aggregations that mean something over points in time. */
+/** Aggregations that take any type of value, not only numbers. */
+const ANY_TYPE_AGGS = new Set([
+  'count',
+  'countDistinct',
+  'only',
+  'first',
+  'last',
+]);
+
 const INSTANT_AGGS = new Set([
   'min',
   'max',
@@ -299,8 +308,9 @@ export function validateBundle(
         add(`${at}: unknown agg "${def.agg}". Available: ${aggs.join(', ')}`);
       }
       const column = source ? frame?.columnByName.get(source) : undefined;
-      // A non-numeric column can still be counted, just not summed.
-      const counts = def.agg === 'count' || def.agg === 'countDistinct';
+      // A non-numeric column can still be counted, or shown as the value its
+      // group has, just not summed.
+      const counts = ANY_TYPE_AGGS.has(def.agg);
       // A declared timestamp aggregates as instants (see `measureValues`):
       // the latest or middle one means something, their sum does not.
       const instants =

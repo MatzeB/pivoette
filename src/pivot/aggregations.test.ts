@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getAggregation } from './aggregations';
+import { SEVERAL, getAggregation } from './aggregations';
 
 const reduce = (id: string, values: unknown[]) =>
   getAggregation(id).reduce(values as never);
@@ -53,5 +53,15 @@ describe('aggregations', () => {
   it('returns null for empty numeric groups, 0 for counts', () => {
     expect(reduce('mean', [null, null])).toBeNull();
     expect(reduce('count', [null, null])).toBe(0);
+  });
+});
+
+describe('only', () => {
+  const only = getAggregation('only').reduce;
+  it('passes one value through, and flags disagreement', () => {
+    expect(only([3])).toBe(3);
+    expect(only(['a', null, 'a'])).toBe('a');
+    expect(only([])).toBeNull();
+    expect(only([1, 2])).toBe(SEVERAL);
   });
 });

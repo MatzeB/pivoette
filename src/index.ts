@@ -221,6 +221,7 @@ export {
   aggregationIds,
   getAggregation,
   registerAggregation,
+  SEVERAL,
 } from './pivot/aggregations';
 export type { Aggregation, Reducer } from './pivot/aggregations';
 export { deduceFormat } from './format/deduce';

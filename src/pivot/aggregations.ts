@@ -121,6 +121,27 @@ register('median', 'Median', percentile(0.5));
 register('p25', 'P25', percentile(0.25));
 register('p50', 'P50', percentile(0.5)); // an alias for median
 register('p75', 'P75', percentile(0.75));
+/**
+ * What `only` shows when its group disagrees: visibly not a value, rather than
+ * one of them picked at random or an average nobody asked for.
+ */
+export const SEVERAL = '(several)';
+
+/**
+ * The group's one value: the value itself when every row in the group has
+ * the same one (or there is a single row), and `SEVERAL` when they differ.
+ *
+ * What a flat table's columns become when it is pivoted. A pivot keyed so
+ * that each group is one source row then shows exactly what the flat table
+ * did, and a key that turns out not to be unique says so in the cell.
+ */
+register('only', 'Only', (v) => {
+  const nn = nonNull(v);
+  if (nn.length === 0) return null;
+  const first = nn[0]!;
+  for (let i = 1; i < nn.length; i++) if (nn[i] !== first) return SEVERAL;
+  return first;
+});
 register('first', 'First', (v) => {
   const nn = nonNull(v);
   return nn.length === 0 ? null : nn[0]!;

@@ -41,6 +41,8 @@ import {
   setMark,
   setShowAs,
   setShowSummary,
+  toFlat,
+  toPivot,
 } from './ops';
 import type { DragRef, FieldZone, RemovalRef } from './ops';
 import styles from './ViewEditor.module.css';
@@ -71,6 +73,13 @@ export interface ViewEditorProps {
    * `removing` prop and the table shows it in red, as its own controls do.
    */
   onRemovePreview?: (ref: RemovalRef | null) => void;
+  /**
+   * The same, for an entry merely pointed at: called with it while the
+   * pointer is over its row, and with `null` once it is not. Pass it on to
+   * the table's `locating` prop and the table shows where that entry is, in
+   * blue — which column a measure is, which index level a row field.
+   */
+  onLocatePreview?: (ref: RemovalRef | null) => void;
 }
 
 function ResetButton({
@@ -81,17 +90,15 @@ function ResetButton({
   enabled: boolean;
 }) {
   return (
-    <div className={styles.actions}>
-      <button
-        type="button"
-        className={styles.reset}
-        disabled={!enabled}
-        title="Restore the view as it was loaded"
-        onClick={onReset}
-      >
-        Reset
-      </button>
-    </div>
+    <button
+      type="button"
+      className={styles.reset}
+      disabled={!enabled}
+      title="Restore the view as it was loaded"
+      onClick={onReset}
+    >
+      Reset
+    </button>
   );
 }
 
@@ -99,6 +106,7 @@ function Row({
   label,
   onRemove,
   onPreview,
+  onLocate,
   drag,
   over,
   children,
@@ -107,6 +115,8 @@ function Row({
   onRemove?: () => void;
   /** The remove button is pointed at (true), or no longer is (false). */
   onPreview?: (on: boolean) => void;
+  /** The row itself is pointed at (true), or no longer is (false). */
+  onLocate?: (on: boolean) => void;
   /** Absent for a list that cannot be reordered. */
   drag?: React.HTMLAttributes<HTMLLIElement> & { draggable: true };
   over?: boolean;
@@ -118,6 +128,8 @@ function Row({
         over ? styles.over : ''
       }`}
       {...drag}
+      onMouseEnter={() => onLocate?.(true)}
+      onMouseLeave={() => onLocate?.(false)}
     >
       <span className={styles.label} title={label}>
         {label}
@@ -135,6 +147,7 @@ function Row({
           onClick={() => {
             // The row goes with the click, and takes its mouseleave with it.
             onPreview?.(false);
+            onLocate?.(false);
             onRemove();
           }}
         >
@@ -430,6 +443,7 @@ export function ViewEditor({
   onReset,
   canReset = true,
   onRemovePreview,
+  onLocatePreview,
 }: ViewEditorProps) {
   const dragged = useRef<DragRef | null>(null);
   const [over, setOver] = useState<DragRef | null>(null);
@@ -439,6 +453,8 @@ export function ViewEditor({
   /** Report `ref` to the host while its remove button is pointed at. */
   const preview = (ref: RemovalRef) =>
     onRemovePreview && ((on: boolean) => onRemovePreview(on ? ref : null));
+  const locate = (ref: RemovalRef) =>
+    onLocatePreview && ((on: boolean) => onLocatePreview(on ? ref : null));
 
   const name = (field: string) =>
     frame?.columnByName.get(field)?.meta.displayName ?? field;
@@ -600,13 +616,23 @@ export function ViewEditor({
       <Section
         title={title}
         empty={fields.length === 0}
-        {...appendTo(key, fields.length)}
+        // A flat table draws no + of its own and takes no drop; the menu
+        // below is the way in.
+        {...(flat ? { emptyText: 'none' } : appendTo(key, fields.length))}
         after={
           <AddMenu
             title={`Add a field to ${title.toLowerCase()}`}
             prompt="+ add a field…"
             first={groupable}
-            onPick={(field) => onViewChange(addField(view, key, field))}
+            onPick={(field) =>
+              onViewChange(
+                // A flat table becomes the pivot that shows the same rows,
+                // its index columns as the row levels, before the field joins.
+                flat
+                  ? toPivot(view, display?.indexColumns ?? 0, key, field)
+                  : addField(view, key, field),
+              )
+            }
           />
         }
       >
@@ -618,6 +644,7 @@ export function ViewEditor({
             over={isOver({ zone: key, index: i })}
             onRemove={() => onViewChange(removeField(view, key, i))}
             onPreview={preview({ zone: key, index: i })}
+            onLocate={locate({ zone: key, index: i })}
           />
         ))}
       </Section>
@@ -676,6 +703,7 @@ export function ViewEditor({
           over={isOver({ zone: 'footer', index: i })}
           onRemove={() => onDisplayChange(removeFooterRow(shown, i))}
           onPreview={preview({ zone: 'footer', index: i })}
+          onLocate={locate({ zone: 'footer', index: i })}
         />
       ))}
       {summary && (
@@ -684,6 +712,7 @@ export function ViewEditor({
           label="Total"
           onRemove={() => onViewChange(setShowSummary(view, false))}
           onPreview={preview({ zone: 'summary' })}
+          onLocate={locate({ zone: 'summary' })}
         />
       )}
     </Section>
@@ -702,7 +731,12 @@ export function ViewEditor({
       )
       .map((c) => ({ value: c.name, label: name(c.name) }));
 
-  const reset = onReset && <ResetButton onReset={onReset} enabled={canReset} />;
+  const resetButton = onReset && (
+    <ResetButton onReset={onReset} enabled={canReset} />
+  );
+  const reset = resetButton && (
+    <div className={styles.actions}>{resetButton}</div>
+  );
 
   /**
    * The bars within a category, in the order they are drawn: the column
@@ -913,21 +947,50 @@ export function ViewEditor({
         className={`${styles.root} ${className ?? ''}`}
         data-theme={paletteFor}
       >
+        {zone('Pivot rows', 'pivotRows')}
+        {zone('Pivot columns', 'pivotColumns')}
         <Section title="Columns" empty={view.columns.length === 0}>
-          {view.columns.map((def) => (
-            <Row key={def.id} label={def.label ?? def.id} />
+          {view.columns.map((def, i) => (
+            <Row
+              key={def.id}
+              label={def.label ?? def.id}
+              onLocate={locate({ zone: 'columns', index: i })}
+            />
           ))}
         </Section>
         {filters}
         {totals}
         <p className={styles.note}>
-          A flat table has no axes to pivot; only its filters and totals can be
-          edited.
+          One row per source row. Add a field to pivot rows or columns to group
+          them: the index columns become row levels, and every other column
+          shows its group’s value, or “(several)” where the group’s rows differ.
         </p>
         {reset}
       </div>
     );
   }
+
+  /**
+   * Back to one row per source row. Its own action, not what removing the
+   * last axis field does: it drops whatever only means something over a
+   * group, so it should be asked for.
+   */
+  const listRows = onDisplayChange && (
+    <button
+      type="button"
+      className={styles.reset}
+      title="Show the source rows instead: one row each, aggregations and grand total dropped"
+      onClick={() => {
+        const { view: next, indexColumns } = toFlat(view);
+        // The display first: a flat view cannot be drawn as a chart, and
+        // the table should never get the one without the other.
+        onDisplayChange({ ...shown, as: undefined, indexColumns });
+        onViewChange(next);
+      }}
+    >
+      List source rows
+    </button>
+  );
 
   return (
     <div
@@ -978,6 +1041,7 @@ export function ViewEditor({
                 : () => onViewChange(removeColumn(view, i))
             }
             onPreview={preview({ zone: 'columns', index: i })}
+            onLocate={locate({ zone: 'columns', index: i })}
           >
             {/* Only a measure has an aggregation to choose. */}
             {column.agg !== undefined && (
@@ -1021,7 +1085,12 @@ export function ViewEditor({
       {chartSection}
       {filters}
       {totals}
-      {reset}
+      {(listRows || resetButton) && (
+        <div className={styles.actions}>
+          {listRows}
+          {resetButton}
+        </div>
+      )}
     </div>
   );
 }

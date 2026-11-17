@@ -97,6 +97,13 @@ export interface DataTableProps {
    * `onRemovePreview`. Shown whether or not the table is editing.
    */
   removing?: RemovalRef | null;
+  /**
+   * Show where this is, in blue: what `ViewEditor`'s `onLocatePreview` reports
+   * while the pointer is over one of its entries. The same cells a removal
+   * would tint, for orientation rather than warning. `removing` wins when both
+   * are set.
+   */
+  locating?: RemovalRef | null;
   height?: number | string;
   theme?: 'auto' | 'light' | 'dark';
   display?: DataTableDisplay;
@@ -363,6 +370,7 @@ export function DataTable({
   onViewChange,
   onDisplayChange,
   removing,
+  locating,
   height = 480,
   theme = 'auto',
   display = {},
@@ -678,9 +686,16 @@ export function DataTable({
    * can be tinted — and so a measure's controls, which repeat per column
    * group, all light together. */
   const [ownRemoveHover, setRemoveHover] = useState<RemoveHover | null>(null);
-  const pointedAt = useMemo(() => hoverOf(removing), [removing]);
+  // A panel points at something either to remove it or only to find it.
+  const remote = removing ?? locating ?? null;
+  const pointedAt = useMemo(() => hoverOf(remote), [remote]);
   // The table's own controls first; otherwise whatever a panel points at.
   const removeHover = ownRemoveHover ?? pointedAt;
+  /** Red for what would go, blue for what is only being looked for. */
+  const locatingOnly = !ownRemoveHover && !removing;
+  const tint = locatingOnly ? styles.locateTint : styles.removeTint;
+  /** Remove controls light with what they would take — not with a lookup. */
+  const linkHover = locatingOnly ? null : removeHover;
 
   /**
    * What the opened column offers, one entry per body row: the groupable
@@ -772,14 +787,15 @@ export function DataTable({
   const tintLeaves = useMemo(() => {
     if (removeHover?.kind !== 'column') return undefined;
     // A measure repeats once per column group, so tint every leaf it produced.
-    const id = spec?.columns[removeHover.index]?.id;
+    // Read off the view, not `spec`: a flat table's columns can be located.
+    const id = view.columns[removeHover.index]?.id;
     if (id === undefined) return undefined;
     const set = new Set<number>();
     leaves.forEach((leaf, i) => {
       if (leaf.column.def?.id === id) set.add(i);
     });
     return set;
-  }, [removeHover, leaves, spec]);
+  }, [removeHover, leaves, view]);
 
   const totalCols = rowLevels.length + leaves.length + editCols;
   const frameCls = cls(styles.frame, frameless && styles.frameless, className);
@@ -845,7 +861,9 @@ export function DataTable({
               key={axisField.field}
               title={`Remove the ${axisField.field} column field`}
               style={{ top: level * HEADER_H + 5 }}
-              linked={tintHeaderRow === level}
+              linked={
+                linkHover?.kind === 'pivotColumn' && linkHover.level === level
+              }
               onLink={(on) =>
                 setRemoveHover(on ? { kind: 'pivotColumn', level } : null)
               }
@@ -910,7 +928,7 @@ export function DataTable({
                             styles.rowHeaderCell,
                             styles.indexTint,
                             sortable && styles.sortable,
-                            tintLevel === i && styles.removeTint,
+                            tintLevel === i && tint,
                           )}
                           style={{
                             top: 0,
@@ -998,7 +1016,7 @@ export function DataTable({
                         leafHeaderCls(hc, isLeafCol),
                         ((isLeafCol && tintLeaves?.has(hc.leafStart)) ||
                           tintHeaderRow === level) &&
-                          styles.removeTint,
+                          tint,
                       )}
                       style={{
                         top: level * HEADER_H,
@@ -1046,8 +1064,8 @@ export function DataTable({
                         <RemoveField
                           title={`Remove the ${hc.specLabel} ${removable.noun}`}
                           linked={
-                            removeHover?.kind === 'column' &&
-                            removeHover.index === removable.index
+                            linkHover?.kind === 'column' &&
+                            linkHover.index === removable.index
                           }
                           onLink={(on) =>
                             setRemoveHover(
@@ -1110,6 +1128,7 @@ export function DataTable({
                   pendingAt={pendingAt}
                   tintLevel={tintLevel}
                   tintLeaves={tintLeaves}
+                  tint={tint}
                   addEntry={adding ? addEntries[item.index] : undefined}
                   onAdd={commitAdd}
                   hover={hover}
@@ -1163,10 +1182,11 @@ export function DataTable({
                   extraIndexCols={editCols}
                   indexColumns={indexColumns}
                   tintLeaves={tintLeaves}
+                  tint={tint}
                   tinted={
                     fi < footerRows.length
-                      ? removing?.zone === 'footer' && removing.index === fi
-                      : removing?.zone === 'summary'
+                      ? remote?.zone === 'footer' && remote.index === fi
+                      : remote?.zone === 'summary'
                   }
                   drag={
                     // The grand total is not part of `display.footer`, so it
@@ -1251,6 +1271,8 @@ interface RowProps {
   /** Cells a pending removal would take: an index level, and/or leaf columns. */
   tintLevel?: number;
   tintLeaves?: Set<number>;
+  /** The class those cells get: red for a removal, blue for a lookup. */
+  tint?: string;
   /** The entry this row shows while the pending column is open. */
   addEntry?: AddEntry;
   onAdd?: (field: string) => void;
@@ -1278,6 +1300,7 @@ function Row({
   pendingAt,
   tintLevel,
   tintLeaves,
+  tint,
   addEntry,
   onAdd,
   hover,
@@ -1313,7 +1336,7 @@ function Row({
                 styles.indexTint,
                 styles.left,
                 lit && styles.rowHover,
-                tintLevel === level && styles.removeTint,
+                tintLevel === level && tint,
               )}
               style={{
                 left: leftOffset[level],
@@ -1381,7 +1404,7 @@ function Row({
               zebra && rowIndex % 2 === 1 && styles.zebra,
               hoveredRow && styles.rowHover,
               cellHovered && styles.cellHover,
-              tintLeaves?.has(i) && styles.removeTint,
+              tintLeaves?.has(i) && tint,
             )}
             style={{
               ...leaf.style(ctx),
@@ -1520,7 +1543,9 @@ interface FooterRowProps {
   /** A flat table's leading identifier columns; see `FooterRow`. */
   indexColumns: number;
   tintLeaves?: Set<number>;
-  /** Pointed at from outside the table: shown as about to go. */
+  /** The class tinted cells get: red for a removal, blue for a lookup. */
+  tint?: string;
+  /** Pointed at from outside the table: the whole row is tinted. */
   tinted?: boolean;
   /** Drag handle props; absent for the grand total, which is not in the list. */
   drag?: React.HTMLAttributes<HTMLTableRowElement> & { draggable?: boolean };
@@ -1541,6 +1566,7 @@ function FooterRow({
   extraIndexCols,
   indexColumns,
   tintLeaves,
+  tint,
   tinted,
   drag,
   onRemove,
@@ -1559,6 +1585,7 @@ function FooterRow({
   // state is local rather than shared with the column tints.
   const [ownRemoving, setRemoving] = useState(false);
   const removing = ownRemoving || !!tinted;
+  const rowTint = ownRemoving ? styles.removeTint : tint;
 
   const rowDrag = drag && {
     ...drag,
@@ -1578,7 +1605,7 @@ function FooterRow({
           className={cls(
             styles.summaryLabel,
             styles.indexTint,
-            removing && styles.removeTint,
+            removing && rowTint,
           )}
           colSpan={pivot ? rowLevels.length + extraIndexCols : covered}
           style={
@@ -1611,7 +1638,7 @@ function FooterRow({
             data-leaf={i}
             className={cls(
               alignClass(leaf.column.align),
-              (removing || tintLeaves?.has(i)) && styles.removeTint,
+              (removing || tintLeaves?.has(i)) && rowTint,
             )}
             style={{
               ...leaf.style(ctx),

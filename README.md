@@ -193,7 +193,18 @@ const flat: ViewSpec = {
 ### Aggregations
 
 `sum` · `count` · `countDistinct` · `min` · `max` · `mean` (`avg`) ·
-`variance` · `std` · `median` · `p25` · `p50` · `p75` · `first` · `last`
+`variance` · `std` · `median` · `p25` · `p50` · `p75` · `geomean` · `first` ·
+`last` · `only`
+
+`only` shows the group's value when all its rows agree, and `(several)` when
+they do not. It is what a flat table's columns become when the editor pivots
+it: grouped so each group is one source row, the pivot shows exactly what the
+flat table did, and a key that turns out not to be unique says so in the cell.
+The editor's **List source rows** goes the other way.
+
+A renderer or style on a pivot column sees more than its cell's value: every
+field its group's rows agree on, and the other measures of its column group by
+id. So a `flags` column keeps working in a pivot, per column group.
 
 Nulls are skipped, as in pandas. `summaryAgg` lets the total row use a
 different aggregation than the cells. Add your own with

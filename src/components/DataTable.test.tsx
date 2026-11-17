@@ -843,6 +843,27 @@ describe('<DataTable> footer row tint', () => {
       rowField.querySelector('thead th')!.className.includes('removeTint'),
     ).toBe(true);
   });
+
+  it('shows in blue what a panel only points at, red winning', async () => {
+    const show = (locating: RemovalRef, removing?: RemovalRef) =>
+      render(
+        <DataTable
+          data={data}
+          view={view}
+          display={{ footer: [{ label: 'med', agg: 'median' }] }}
+          locating={locating}
+          removing={removing}
+        />,
+      );
+    const located = await show({ zone: 'columns', index: 0 });
+    const blue = [...located.querySelectorAll('[class*="locateTint"]')];
+    expect(blue.length).toBeGreaterThan(0);
+    expect(located.querySelectorAll('[class*="removeTint"]')).toHaveLength(0);
+
+    const both = await show({ zone: 'columns', index: 0 }, { zone: 'summary' });
+    expect(map(both)).toEqual(['.', '...', 'TTT']);
+    expect(both.querySelectorAll('[class*="locateTint"]')).toHaveLength(0);
+  });
 });
 
 describe('<DataTable> measure drag', () => {

@@ -188,6 +188,12 @@ let previewRemoval: (
   ref: RemovalRef | null,
 ) => void;
 
+/** How an editor shows, in its table, where a hovered list entry is. */
+let previewLocate: (
+  table: PivoetteTableElement,
+  ref: RemovalRef | null,
+) => void;
+
 export class PivoetteTableElement extends HTMLElement {
   static observedAttributes = ['src', 'height', 'theme', 'editable'];
 
@@ -202,6 +208,8 @@ export class PivoetteTableElement extends HTMLElement {
   #editors = new Map<PivoetteEditorElement, boolean>();
   /** What an editor's hovered remove button points at, shown in red. */
   #removing: RemovalRef | null = null;
+  /** What the pointer is over in an editor's lists, shown in blue. */
+  #locating: RemovalRef | null = null;
 
   static {
     holdEditing = (table, editor, open) => {
@@ -213,6 +221,11 @@ export class PivoetteTableElement extends HTMLElement {
     previewRemoval = (table, ref) => {
       if (ref === table.#removing) return;
       table.#removing = ref;
+      table.#render();
+    };
+    previewLocate = (table, ref) => {
+      if (ref === table.#locating) return;
+      table.#locating = ref;
       table.#render();
     };
   }
@@ -393,6 +406,7 @@ export class PivoetteTableElement extends HTMLElement {
         onViewChange={(view) => (this.view = view)}
         onDisplayChange={(display) => (this.display = display)}
         removing={this.#removing}
+        locating={this.#locating}
         height={
           heightOf(this.getAttribute('height')) ?? loaded.bundle.height ?? 420
         }
@@ -551,12 +565,16 @@ export class PivoetteEditorElement extends HTMLElement {
     const table = this.#table;
     if (this.#holding && this.#holding !== table) {
       previewRemoval(this.#holding, null);
+      previewLocate(this.#holding, null);
       holdEditing(this.#holding, this, null);
     }
     this.#holding = table;
     if (!table) return;
     // A panel that closes under the pointer gets no mouseleave.
-    if (!this.open) previewRemoval(table, null);
+    if (!this.open) {
+      previewRemoval(table, null);
+      previewLocate(table, null);
+    }
     holdEditing(table, this, this.open);
   }
 
@@ -617,6 +635,7 @@ export class PivoetteEditorElement extends HTMLElement {
         }
         canReset={table.edited}
         onRemovePreview={(ref) => previewRemoval(table, ref)}
+        onLocatePreview={(ref) => previewLocate(table, ref)}
       />
     );
   }

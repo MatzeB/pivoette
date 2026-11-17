@@ -350,3 +350,191 @@ export function moveBar(
   if (from < 0 || from >= members.length) return display;
   return setChart(display, { barOrder: reorder([...members], from, to) });
 }
+
+// --- between flat and pivot ------------------------------------------------
+
+/**
+ * A flat column that only shows a field: no expression, no composite. These
+ * are the ones that can become an axis level, since a level is a field.
+ */
+function isProjection(def: ColumnDef): boolean {
+  return !def.compute && !def.composite && def.agg === undefined;
+}
+
+/**
+ * Turn a flat view into the pivot that shows the same thing, with `field`
+ * added to `zone`: what dropping a field on an axis of a flat table means.
+ *
+ * A flat table is a pivot whose groups are each one source row. So:
+ *
+ * - The first `keys` columns — the table's index columns, as many of them as
+ *   are plain projections — become the row levels, in order.
+ * - Every other column becomes a measure with `agg: 'only'`, which shows the
+ *   group's value as it is while each group is one row, and says so in the
+ *   cell when it is not. Format, style and render carry over unchanged.
+ * - A computed column computes per source row, before anything is grouped,
+ *   which is what `derive` does: it becomes a derived field of the same name,
+ *   shown through `only` like the rest.
+ * - A sort on a column that became a level becomes that level's sort; any
+ *   other sort is dropped — a pivot sorts per level, and its headers still
+ *   sort by any column with a click.
+ *
+ * A pivot with only axes has nothing to show, so if no column is left to be
+ * a measure, a count of the group's rows is added.
+ */
+export function toPivot(
+  spec: ViewSpec,
+  keys: number,
+  zone: FieldZone,
+  field: string,
+  at?: number,
+): ViewSpec {
+  if (!isFlat(spec)) return addField(spec, zone, field, at);
+
+  const leading: ColumnDef[] = [];
+  for (const def of spec.columns.slice(0, Math.max(0, keys))) {
+    if (!isProjection(def)) break;
+    leading.push(def);
+  }
+  const sourceOf = (def: ColumnDef) => def.source ?? def.id;
+  const rows: AxisField[] = leading.map((def) => ({
+    field: sourceOf(def),
+    ...(def.label !== undefined ? { label: def.label } : {}),
+  }));
+
+  // The new field leaves the rows if it was there, and joins its axis.
+  const rowsLeft = rows.filter((a) => a.field !== field);
+  const moved = rows.find((a) => a.field === field) ?? { field };
+  const pivotRows =
+    zone === 'pivotRows'
+      ? insertAt(
+          rowsLeft,
+          clampIndex(at ?? rowsLeft.length, rowsLeft.length),
+          moved,
+        )
+      : rowsLeft;
+  const pivotColumns = zone === 'pivotColumns' ? [moved] : [];
+  const onAxis = new Set([...pivotRows, ...pivotColumns].map((a) => a.field));
+
+  const derive = { ...spec.derive };
+  const columns: ColumnDef[] = [];
+  for (const def of spec.columns.slice(leading.length)) {
+    // A plain column of a field that is now a level would repeat the level.
+    if (isProjection(def) && onAxis.has(sourceOf(def))) continue;
+    if (def.compute) {
+      derive[def.id] = { compute: perRow(def) };
+      const { compute: _c, inputs: _i, ...rest } = def;
+      columns.push({ ...rest, source: def.id, agg: 'only' });
+    } else if (def.composite) {
+      // Grouped by what it sorts by; drawn from the group's own fields.
+      columns.push({ ...def, source: def.composite.sortKey, agg: 'only' });
+    } else {
+      columns.push({ ...def, agg: 'only' });
+    }
+  }
+  if (columns.length === 0) {
+    columns.push({
+      id: 'count',
+      source: [...onAxis][0],
+      agg: 'count',
+      label: 'Rows',
+    });
+  }
+
+  const sortOf = new Map(
+    (spec.sort ?? []).map((s) => [s.field, s.direction ?? 'asc'] as const),
+  );
+  const withSort = (a: AxisField): AxisField => {
+    const def = leading.find((d) => sourceOf(d) === a.field);
+    const direction = def && sortOf.get(def.id);
+    return direction ? { ...a, sort: direction } : a;
+  };
+
+  const { sort: _sort, ...rest } = spec;
+  return {
+    ...rest,
+    ...(Object.keys(derive).length > 0 ? { derive } : {}),
+    pivotRows: pivotRows.map(withSort),
+    ...(pivotColumns.length > 0 ? { pivotColumns } : {}),
+    columns,
+  };
+}
+
+/**
+ * A flat column's expression as a `derive` expression. A flat `compute` may
+ * rename fields through string `inputs`; a derived field sees the fields
+ * under their own names, so the renaming is wrapped around it.
+ */
+function perRow(def: ColumnDef): string {
+  const aliases = Object.entries(def.inputs ?? {}).filter(
+    (e): e is [string, string] => typeof e[1] === 'string',
+  );
+  if (aliases.length === 0) return def.compute!;
+  const names = aliases.map(([alias]) => alias).join(', ');
+  const fields = aliases.map(([, f]) => f).join(', ');
+  return `((${names}) => (${def.compute}))(${fields})`;
+}
+
+/**
+ * The flat table of the rows behind a pivot: "list the source rows". Not the
+ * inverse of `toPivot` in general, and it cannot be — a mean has no one
+ * source row to show — so it is a separate, explicit action.
+ *
+ * - Every axis field, rows then columns, becomes a leading column; the
+ *   returned `indexColumns` is how many, for the display.
+ * - Each measure becomes a plain column of its source field, keeping its
+ *   label, format, style and render. Several measures of one field (a min,
+ *   a mean, a max) would be three copies of the same value: the first stays.
+ * - What only means something over groups goes: computed columns that read
+ *   other cells, an axis level's computed members, the grand total, and the
+ *   measures-on-rows layout. Level sorts become the flat sort.
+ */
+export function toFlat(spec: ViewSpec): {
+  view: ViewSpec;
+  indexColumns: number;
+} {
+  if (isFlat(spec)) return { view: spec, indexColumns: 0 };
+  const axes = [...(spec.pivotRows ?? []), ...(spec.pivotColumns ?? [])];
+  const leading: ColumnDef[] = axes.map((a) => ({
+    id: a.field,
+    ...(a.label !== undefined ? { label: a.label } : {}),
+  }));
+  const seen = new Set(axes.map((a) => a.field));
+  const columns: ColumnDef[] = [];
+  for (const def of spec.columns) {
+    if (def.agg === undefined) continue;
+    const source = def.source ?? def.id;
+    if (seen.has(source)) continue;
+    seen.add(source);
+    const {
+      agg: _agg,
+      expression: _e,
+      summaryAgg: _s,
+      place: _p,
+      compute: _c,
+      inputs: _i,
+      ...rest
+    } = def;
+    // `id` names the column, and in a flat view also the field it shows
+    // unless `source` says otherwise.
+    columns.push(rest.id === source ? rest : { ...rest, source });
+  }
+  const sort = axes
+    .filter((a) => a.sort)
+    .map((a) => ({ field: a.field, direction: a.sort! }));
+  const {
+    pivotRows: _r,
+    pivotColumns: _c,
+    columnAxis: _a,
+    showSummary: _s,
+    ...rest
+  } = spec;
+  return {
+    view: {
+      ...rest,
+      columns: [...leading, ...columns],
+      ...(sort.length > 0 ? { sort } : {}),
+    },
+    indexColumns: leading.length,
+  };
+}

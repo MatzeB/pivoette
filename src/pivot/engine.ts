@@ -463,6 +463,9 @@ function convert(n: number, factor: number): number {
   return Number((n * factor).toPrecision(15));
 }
 
+/** Aggregations whose result is one of the values they were given. */
+const PASS_THROUGH = new Set(['only', 'first', 'last']);
+
 function aggregate(measure: MeasureColumn, values: CellValue[]): CellValue {
   if (measure.expression) {
     return evalExpression(measure.expression, { values }) as CellValue;
@@ -697,10 +700,17 @@ function computePivot(
       // `meta` rather than being stuck with the source field's.
       const meta = columnMeta(frame, d.measure, measureSource(d.measure));
       const format = columnFormat(d.measure, meta, spec.locale);
+      // Most aggregates are numbers whatever they reduce; these pass one of
+      // the group's own values through, so they align as the field does.
+      const passes = PASS_THROUGH.has(d.measure.agg);
+      const source = measureSource(d.measure);
+      const type = passes
+        ? (frame.columnByName.get(source ?? '')?.type ?? 'float')
+        : 'float';
       const column: ResolvedColumn = {
         id: d.baseKey,
         label: measureLabel.get(d.measure.id)!,
-        align: alignFor('float', format),
+        align: alignFor(type, format),
         def: d.measure,
         meta,
       };
@@ -710,6 +720,7 @@ function computePivot(
         column,
         format,
         style: d.measure.style,
+        render: measureRender(d.measure),
         emptyDisplay,
       });
     }
@@ -734,6 +745,13 @@ function computePivot(
     });
   });
 
+  // A renderer or style reads more than its cell's value: a flag checks two
+  // fields, a composite draws an image beside a name. Only built when some
+  // measure has one, since it costs a pass over every field.
+  const scopes = measures.some((m) => m.render || m.style || m.composite)
+    ? groupScopes(frame)
+    : undefined;
+
   // Rows.
   const rows: ResultRow[] = rowKeys.map((rowKey) => {
     const rk = keyOf(rowKey);
@@ -741,6 +759,8 @@ function computePivot(
     // First pass: base measure values into a per-row lookup.
     const baseValues = new Map<string, CellValue>();
     const cells: Cell[] = new Array(descs.length);
+    // One scope per column group, shared by its measures' cells.
+    const scopeOf = new Map<string, Record<string, unknown>>();
     descs.forEach((d, i) => {
       if (d.kind === 'measure') {
         const idxs = byCol?.get(d.colKeyStr);
@@ -750,7 +770,16 @@ function computePivot(
           ? scaled(aggregate(d.measure, vals), d.measure.factor)
           : null;
         baseValues.set(d.baseKey, value);
-        cells[i] = { value };
+        if (scopes && idxs) {
+          let scope = scopeOf.get(d.colKeyStr);
+          if (!scope) scopeOf.set(d.colKeyStr, (scope = scopes(idxs)));
+          // Filled in as the group's measures are computed; every cell holds
+          // the same object, so each ends up seeing all of them.
+          scope[d.measure.id] = value;
+          cells[i] = { value, inputs: scope };
+        } else {
+          cells[i] = { value };
+        }
       }
     });
     // Second pass: derived cells from base lookup.
@@ -803,6 +832,43 @@ function computePivot(
     rows,
     summary,
     frame,
+  };
+}
+
+/**
+ * What a measure's cell draws with. A composite shows its image and text
+ * fields, read from the cell's scope under their own names.
+ */
+function measureRender(def: MeasureColumn): ColumnDef['render'] {
+  if (!def.composite) return def.render;
+  const [imageKey, textKey] = def.composite.fields;
+  return { fnName: Render.ImageText, options: { imageKey, textKey } };
+}
+
+/**
+ * A pivot cell's scope, for its renderer and style: every source field, as
+ * `only` reduces it over the cell's group. So a field all of the group's rows
+ * agree on — every field, when each group is one source row — reads as its
+ * value, and one they differ on reads as `SEVERAL`. The cell's measures are
+ * added on top by the caller, under their ids, so `cycles` in a pivot of
+ * suites is the suite's aggregate, not a mix of its benchmarks.
+ */
+function groupScopes(
+  frame: DataFrame,
+): (rows: number[]) => Record<string, unknown> {
+  const only = getAggregation('only').reduce;
+  const names = frame.columns.map((c) => c.name);
+  const values = frame.columns.map((c) => c.values);
+  return (rows) => {
+    const scope: Record<string, unknown> = {};
+    for (let f = 0; f < names.length; f++) {
+      const col = values[f]!;
+      scope[names[f]!] =
+        rows.length === 1
+          ? (col[rows[0]!] ?? null)
+          : only(rows.map((r) => col[r] ?? null));
+    }
+    return scope;
   };
 }
 

@@ -16,7 +16,13 @@ import {
   setExcluded,
   setMark,
   setShowAs,
+  toFlat,
+  toPivot,
 } from './ops';
+import { computeView } from '../pivot/engine';
+import { fromRows } from '../data/import';
+import { validateBundle } from '../bundle';
+import { SEVERAL } from '../pivot/aggregations';
 import type { ViewSpec } from '../pivot/spec';
 
 const base: ViewSpec = {
@@ -319,5 +325,141 @@ describe('chart display', () => {
     const next = moveBar({}, ['base', 'pgo', 'bolt'], 2, 0);
     expect(next.chart!.barOrder).toEqual(['bolt', 'base', 'pgo']);
     expect(moveBar({}, ['base'], 5, 0)).toEqual({});
+  });
+});
+
+describe('toPivot / toFlat', () => {
+  const rows = [
+    { suite: 'A', bench: 'x', build: 'base', t: 1.1, runs: 5 },
+    { suite: 'A', bench: 'x', build: 'pgo', t: 1.3, runs: 4 },
+    { suite: 'A', bench: 'y', build: 'base', t: 0.9, runs: 5 },
+    { suite: 'B', bench: 'z', build: 'base', t: 1.0, runs: 5 },
+  ];
+  const frame = fromRows(rows);
+  const flat: ViewSpec = {
+    filter: { suite: { exclude: ['C'] } },
+    sort: [{ field: 'suite', direction: 'desc' }],
+    columns: [
+      { id: 'suite', label: 'Suite' },
+      { id: 'bench' },
+      { id: 'build' },
+      { id: 't', label: 'Time', format: { options: { decimals: 2 } } },
+      { id: 'slow', compute: 't < 1 || runs < 5' },
+    ],
+  };
+
+  it('makes the index columns row levels and the rest `only` measures', () => {
+    const next = toPivot(flat, 3, 'pivotRows', 'build');
+    expect(next.pivotRows).toEqual([
+      { field: 'suite', label: 'Suite', sort: 'desc' },
+      { field: 'bench' },
+      { field: 'build' },
+    ]);
+    expect(next.sort).toBeUndefined();
+    expect(next.filter).toEqual(flat.filter);
+    expect(next.derive).toEqual({ slow: { compute: 't < 1 || runs < 5' } });
+    expect(next.columns).toEqual([
+      {
+        id: 't',
+        label: 'Time',
+        format: { options: { decimals: 2 } },
+        agg: 'only',
+      },
+      { id: 'slow', source: 'slow', agg: 'only' },
+    ]);
+    expect(
+      validateBundle({ data: { rows: [] }, view: next }, frame).problems,
+    ).toEqual([]);
+    // Each group is one source row, so the values are the flat table's.
+    const res = computeView(frame, next);
+    expect(res.rows.map((r) => r.cells.map((c) => c.value))).toEqual([
+      [1.0, false],
+      [1.1, false],
+      [1.3, true],
+      [0.9, true],
+    ]);
+  });
+
+  it('pivots a field to the columns, out of the row levels', () => {
+    const next = toPivot(flat, 3, 'pivotColumns', 'build');
+    expect(next.pivotRows!.map((a) => a.field)).toEqual(['suite', 'bench']);
+    expect(next.pivotColumns).toEqual([{ field: 'build' }]);
+    const res = computeView(frame, next);
+    // x has both builds; y only base.
+    expect(res.rows).toHaveLength(3);
+  });
+
+  it('says so in the cell when a group is not one row', () => {
+    const next = toPivot(flat, 1, 'pivotRows', 'suite');
+    const res = computeView(frame, next);
+    // bench and build are no index here, so they are `only` measures too.
+    const a = res.rows.find((r) => r.path[0] === 'A')!;
+    expect(a.cells.map((c) => c.value)).toEqual([
+      SEVERAL,
+      SEVERAL,
+      SEVERAL,
+      SEVERAL,
+    ]);
+    const b = res.rows.find((r) => r.path[0] === 'B')!;
+    expect(b.cells.map((c) => c.value)).toEqual(['z', 'base', 1.0, false]);
+  });
+
+  it('gives a measure cell its group’s fields and measures to render with', () => {
+    const next = toPivot(
+      {
+        ...flat,
+        columns: flat.columns.map((c) =>
+          c.id === 't' ? { ...c, render: { fnName: 'bar' } } : c,
+        ),
+      },
+      3,
+      'pivotRows',
+      'build',
+    );
+    const res = computeView(frame, next);
+    const cell = res.rows[0]!.cells[0]!;
+    expect(cell.inputs).toMatchObject({ suite: 'B', runs: 5, t: 1.0 });
+  });
+
+  it('lists the source rows again, keeping the derived columns', () => {
+    const pivot = toPivot(flat, 3, 'pivotColumns', 'build');
+    const { view, indexColumns } = toFlat(pivot);
+    expect(indexColumns).toBe(3);
+    expect(view.pivotRows).toBeUndefined();
+    expect(view.pivotColumns).toBeUndefined();
+    expect(view.columns).toEqual([
+      { id: 'suite', label: 'Suite' },
+      { id: 'bench' },
+      { id: 'build' },
+      { id: 't', label: 'Time', format: { options: { decimals: 2 } } },
+      { id: 'slow', source: 'slow' },
+    ]);
+    expect(view.sort).toEqual([{ field: 'suite', direction: 'desc' }]);
+    expect(computeView(frame, view).rows).toHaveLength(4);
+  });
+
+  it('keeps one column per field when several measures read it', () => {
+    const { view } = toFlat({
+      pivotRows: [{ field: 'suite' }],
+      showSummary: true,
+      columns: [
+        { id: 't', agg: 'mean' },
+        { id: 'tMin', source: 't', agg: 'min' },
+      ],
+    });
+    expect(view.columns).toEqual([{ id: 'suite' }, { id: 't' }]);
+    expect(view.showSummary).toBeUndefined();
+  });
+
+  it('counts the rows when every column became a level', () => {
+    const next = toPivot(
+      { columns: [{ id: 'suite' }] },
+      1,
+      'pivotRows',
+      'bench',
+    );
+    expect(next.columns).toEqual([
+      { id: 'count', source: 'suite', agg: 'count', label: 'Rows' },
+    ]);
   });
 });
