@@ -39,12 +39,19 @@ def make_symbol(i: int) -> str:
 def main() -> None:
     rows = []
     used = set()
+    names = set()
+    rename = random.Random(7)
     for i in range(64):
         sym = make_symbol(i)
         while sym in used:
             sym = make_symbol(i)
         used.add(sym)
+        # One name per company. A clash is redrawn from its own generator, so
+        # every other row keeps the numbers it always had.
         name = f"{random.choice(WORDS)} {random.choice(SUFFIX)}"
+        while name in names:
+            name = f"{rename.choice(WORDS)} {rename.choice(SUFFIX)}"
+        names.add(name)
         base = round(random.uniform(12, 480), 2)
         price = round(base * (1 + random.gauss(0.0, 0.13)), 2)
         rows.append(
