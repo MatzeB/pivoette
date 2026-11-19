@@ -185,6 +185,11 @@ describe('example: compiler (a pivot view drawn as a chart)', () => {
       compilerDisplay.chart,
     ).panels;
     expect(panels.map((p) => p.key)).toEqual(['ir', 'cycles']);
+    // Named in each panel's hover readout, which the title is far from.
+    expect(panels.map((p) => p.graph.measure)).toEqual([
+      'Instructions',
+      'Cycles',
+    ]);
     // Both are speedups, so they share an extent: a bar as long in one
     // panel as in the other means the same.
     expect(panels[0]!.graph.yExtent).toEqual(panels[1]!.graph.yExtent);
@@ -230,10 +235,29 @@ describe('example: compiler (a pivot view drawn as a chart)', () => {
     expect(graph!.series[0]!.color).toContain('color-mix');
   });
 
-  it('spans each bar with its suite’s min and max', () => {
-    for (const series of graph!.series) {
+  it('reads the spread out as bars, and draws it as a box plot', () => {
+    // As bars, only the hover readout lists the five numbers.
+    const bar = graph!.series[0]!.points[0]!;
+    expect(bar.range).toBeUndefined();
+    expect(bar.extras!.map((e) => e.as)).toEqual(Array(5).fill('none'));
+
+    const boxed = graphFromView(
+      computeView(frame, compilerView),
+      compilerView,
+      {
+        ...compilerDisplay.chart,
+        plot: 'boxes',
+        marks: undefined,
+      },
+    ).graph!;
+    for (const series of boxed.series) {
       for (const point of series.points) {
         const [lo, hi] = point.range!;
+        const [q1, q3] = point.box!;
+        // min ≤ p25 ≤ median ≤ p75 ≤ max, with the geomean inside the range.
+        expect([lo, q1, point.median!, q3, hi]).toEqual(
+          [lo, q1, point.median!, q3, hi].sort((a, b) => a - b),
+        );
         expect(lo).toBeLessThanOrEqual(point.y!);
         expect(hi).toBeGreaterThanOrEqual(point.y!);
       }

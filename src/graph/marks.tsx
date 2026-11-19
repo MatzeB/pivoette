@@ -124,10 +124,10 @@ function outerEnd(
   lower: boolean,
   y: Scale,
 ): number {
-  if (!point.range) return tip;
-  const a = y.at(point.range[0]);
-  const b = y.at(point.range[1]);
-  return lower ? Math.min(tip, a, b) : Math.max(tip, a, b);
+  const ends = [tip, ...(point.range ?? []), ...(point.box ?? [])].map(
+    (v, i) => (i === 0 ? v : y.at(v)),
+  );
+  return lower ? Math.min(...ends) : Math.max(...ends);
 }
 
 /**
@@ -303,6 +303,65 @@ export function Whisker({ cap = 8 }: WhiskerProps) {
   );
 }
 
+export interface BoxProps {
+  /** Thickness across the band. Default: the bar's own, or 12. */
+  thickness?: number;
+}
+
+/**
+ * A box plot's box: a point's `box`, low to high, filled in the series
+ * colour, with its `median` as a line across it. Paint it after the
+ * `<Whisker>`, so the whisker shows only where it runs out past the box.
+ *
+ * The median line is drawn in the surface colour with an ink core, so it
+ * reads on a pale fill and a full one alike.
+ */
+export function Box({ thickness }: BoxProps) {
+  const { point, cx, cy, thickness: own } = useDatum();
+  const { color } = useSeries();
+  const { y, orientation } = useGraph();
+  if (!point.box) return null;
+  const across = thickness ?? own ?? 12;
+  const a = y.at(point.box[0]);
+  const b = y.at(point.box[1]);
+  const lo = Math.min(a, b);
+  const len = Math.max(Math.abs(b - a), 1);
+  const m = point.median === undefined ? null : y.at(point.median);
+  const half = across / 2;
+  const horizontal = orientation === 'horizontal';
+  return (
+    <g>
+      <rect
+        className={styles.box}
+        x={horizontal ? lo : cx - half}
+        y={horizontal ? cy - half : lo}
+        width={horizontal ? len : across}
+        height={horizontal ? across : len}
+        rx={2}
+        style={{ fill: color }}
+      />
+      {m !== null && (
+        <line
+          className={styles.median}
+          x1={horizontal ? m : cx - half}
+          x2={horizontal ? m : cx + half}
+          y1={horizontal ? cy - half : m}
+          y2={horizontal ? cy + half : m}
+        />
+      )}
+    </g>
+  );
+}
+
+export interface MarkerProps {
+  size?: number;
+  /**
+   * Mark the point's own value too — what a box plot does with the value a
+   * bar chart would draw as the bar, such as a geomean.
+   */
+  own?: boolean;
+}
+
 /**
  * A marker for each of a point's extra values drawn as dots — a median on a
  * mean's bar — on the bar's centre line.
@@ -311,11 +370,17 @@ export function Whisker({ cap = 8 }: WhiskerProps) {
  * a point's own value; ringed in the surface colour, like a dot, to stay
  * visible on the fill.
  */
-export function Marker({ size = 5 }: { size?: number }) {
+export function Marker({ size = 5, own = false }: MarkerProps) {
   const { point, cx, cy } = useDatum();
+  const { series } = useSeries();
   const { y, orientation } = useGraph();
-  const dots = point.extras?.filter((e) => e.as === 'dot' && e.value !== null);
-  if (!dots?.length) return null;
+  const dots = [
+    ...(own && point.y !== null
+      ? [{ label: series.label, value: point.y }]
+      : []),
+    ...(point.extras ?? []).filter((e) => e.as === 'dot' && e.value !== null),
+  ];
+  if (!dots.length) return null;
   return (
     <>
       {dots.map((extra) => {

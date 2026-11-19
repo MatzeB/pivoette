@@ -13,10 +13,10 @@
    "displayName": "Build"
   },
   "ir": {
-   "displayName": "Instructions: speedup over BarCC -O2"
+   "displayName": "Instructions"
   },
   "cycles": {
-   "displayName": "Cycles: speedup over BarCC -O2"
+   "displayName": "Cycles"
   },
   "runs": {
    "displayName": "Runs"

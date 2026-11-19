@@ -56,8 +56,8 @@ META = {
     "benchmark": {"displayName": "Benchmark"},
     "compiler": {"displayName": "Compiler"},
     "variant": {"displayName": "Build"},
-    "ir": {"displayName": "Instructions: speedup over BarCC -O2"},
-    "cycles": {"displayName": "Cycles: speedup over BarCC -O2"},
+    "ir": {"displayName": "Instructions"},
+    "cycles": {"displayName": "Cycles"},
     "runs": {"displayName": "Runs"},
 }
 

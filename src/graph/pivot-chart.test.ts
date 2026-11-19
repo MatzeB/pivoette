@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { fromRows } from '../data/import';
 import { computeView } from '../pivot/engine';
 import type { ViewSpec } from '../pivot/spec';
-import { graphFromView, markOf } from './pivot-chart';
+import { graphFromView, markOf, shortLabel } from './pivot-chart';
 import type { ChartDisplay } from './pivot-chart';
 
 // Two suites, two builds, two workloads each: enough for a spread.
@@ -38,7 +38,7 @@ describe('markOf', () => {
       'bar',
       'range',
       'range',
-      'dot',
+      'median',
     ]);
   });
 
@@ -46,6 +46,43 @@ describe('markOf', () => {
     const chart: ChartDisplay = { marks: { avg: 'none', mid: 'bar' } };
     expect(markOf(VIEW, chart, 0)).toBe('none');
     expect(markOf(VIEW, chart, 3)).toBe('bar');
+  });
+});
+
+describe('shortLabel', () => {
+  it('drops the bar’s own name from a value beside it', () => {
+    expect(shortLabel('cycles min', 'cycles')).toBe('min');
+    expect(shortLabel('cycles', 'cycles')).toBe('cycles');
+    expect(shortLabel('cyclesMin', 'cycles')).toBe('cyclesMin');
+    expect(shortLabel('ir max', 'cycles')).toBe('ir max');
+  });
+});
+
+describe('box plot', () => {
+  const BOXED: ViewSpec = {
+    ...VIEW,
+    columns: [
+      ...VIEW.columns,
+      { id: 'q1', source: 'speedup', agg: 'p25', label: 'p25' },
+      { id: 'q3', source: 'speedup', agg: 'p75', label: 'p75' },
+    ],
+  };
+
+  it('draws quartiles as the box and the median across it', () => {
+    const { graph } = draw(BOXED, { plot: 'boxes' });
+    const point = graph!.series[0]!.points[0]!; // zstd base: 1.0, 1.2
+    expect(point.range).toEqual([1.0, 1.2]);
+    expect(point.box![0]).toBeCloseTo(1.05, 10);
+    expect(point.box![1]).toBeCloseTo(1.15, 10);
+    expect(point.median).toBeCloseTo(1.1, 10);
+  });
+
+  it('widens the whisker with the quartiles, and dots the median, as bars', () => {
+    const point = draw(BOXED).graph!.series[0]!.points[0]!;
+    expect(point.box).toBeUndefined();
+    expect(point.median).toBeUndefined();
+    expect(point.range).toEqual([1.0, 1.2]);
+    expect(point.extras!.find((e) => e.label === 'median')!.as).toBe('dot');
   });
 });
 

@@ -39,6 +39,8 @@ export interface ScrubHit {
   index: number;
   x: number;
   xLabel: string;
+  /** What the bars measure, when the chart names it: `GraphData.measure`. */
+  measure?: string;
   entries: ScrubEntry[];
 }
 
@@ -204,6 +206,7 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
       index: hover.index,
       x: value,
       xLabel,
+      ...(data.measure ? { measure: data.measure } : {}),
       entries: data.series.map((series) => {
         const point = series.points[hover.index];
         const y = point?.y ?? null;
@@ -267,7 +270,9 @@ function ScrubReadout({ render }: { render?: (hit: ScrubHit) => ReactNode }) {
         render(hit)
       ) : (
         <>
-          <div className={styles.readoutHead}>{hit.xLabel}</div>
+          <div className={styles.readoutHead}>
+            {hit.measure ? `${hit.xLabel} · ${hit.measure}` : hit.xLabel}
+          </div>
           {hit.entries.map((entry) => (
             <Fragment key={entry.series.key}>
               <div className={styles.readoutRow}>

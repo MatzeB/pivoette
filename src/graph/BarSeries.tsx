@@ -56,6 +56,12 @@ export interface BarSeriesProps {
    * each colour their bars the same way and lose their own identity.
    */
   colorBy?: 'series' | 'category';
+  /**
+   * Draw the bar itself (default), or leave only its children: a box plot
+   * keeps the bar's place in the band and draws `<Whisker>` and `<Box>` there
+   * instead.
+   */
+  body?: 'bar' | 'none';
   /** Rendered once per bar, inside that bar's context. */
   children?: DatumChildren;
 }
@@ -64,6 +70,7 @@ export function BarSeries({
   only,
   maxWidth = MAX_BAR_WIDTH,
   colorBy = 'series',
+  body = 'bar',
   children,
 }: BarSeriesProps) {
   const { x, plot, data, colorOf, seriesColor, baseline, orientation, place } =
@@ -104,8 +111,8 @@ export function BarSeries({
                   ? colorOf(data.categorySlots[index] ?? index)
                   : seriesColor(series);
               const datum: GraphDatum = horizontal
-                ? { point, index, cx, cy: centre }
-                : { point, index, cx: centre, cy };
+                ? { point, index, cx, cy: centre, thickness: width }
+                : { point, index, cx: centre, cy, thickness: width };
               return (
                 // The series context is mounted per bar rather than per series
                 // so that `colorBy` reaches the children too: a `<Dot/>` or a
@@ -115,17 +122,19 @@ export function BarSeries({
                 // nothing worth measuring.
                 <SeriesContext.Provider key={point.x} value={{ series, color }}>
                   <DatumContext.Provider value={datum}>
-                    <path
-                      className={styles.bar}
-                      d={(horizontal ? hbarPath : barPath)(
-                        centre - width / 2,
-                        baseline,
-                        tip,
-                        width,
-                        RADIUS,
-                      )}
-                      style={{ fill: color }}
-                    />
+                    {body === 'bar' && (
+                      <path
+                        className={styles.bar}
+                        d={(horizontal ? hbarPath : barPath)(
+                          centre - width / 2,
+                          baseline,
+                          tip,
+                          width,
+                          RADIUS,
+                        )}
+                        style={{ fill: color }}
+                      />
+                    )}
                     {renderDatum(children, datum, index)}
                   </DatumContext.Provider>
                 </SeriesContext.Provider>

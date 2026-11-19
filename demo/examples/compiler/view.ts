@@ -5,27 +5,31 @@ import type {
   ViewSpec,
 } from '../../../src';
 
-/** A field's geomean — the bar — and its min and max, the whisker across it. */
+/**
+ * A field's geomean — the bar — and the five numbers of its box plot: min,
+ * the quartiles, the median, and max.
+ */
 function measured(field: string, name: string): ColumnDef[] {
   const format = { options: { decimals: 2 } };
+  const spread = (suffix: string, agg: string, what: string): ColumnDef => ({
+    id: `${field}${suffix}`,
+    source: field,
+    agg,
+    label: `${name} ${what}`,
+    format,
+  });
   return [
     { id: field, agg: 'geomean', label: name, format },
-    {
-      id: `${field}Min`,
-      source: field,
-      agg: 'min',
-      label: `${name} min`,
-      format,
-    },
-    {
-      id: `${field}Max`,
-      source: field,
-      agg: 'max',
-      label: `${name} max`,
-      format,
-    },
+    spread('Min', 'min', 'min'),
+    spread('P25', 'p25', 'p25'),
+    spread('Median', 'median', 'median'),
+    spread('P75', 'p75', 'p75'),
+    spread('Max', 'max', 'max'),
   ];
 }
+
+/** The spread measures, which only a box plot draws. */
+const SPREAD = ['Min', 'P25', 'Median', 'P75', 'Max'];
 
 /**
  * FooCC and BarCC, each built three ways, against BarCC at -O2: a pivot view
@@ -33,15 +37,17 @@ function measured(field: string, name: string): ColumnDef[] {
  *
  * The view is an ordinary pivot, the same one a table would be computed from:
  * suites down the rows, compilers and their builds across the columns, and
- * three measures each of two per-benchmark speedups in every cell: in
+ * six measures each of two per-benchmark speedups in every cell: in
  * instructions retired (`ir`) and in cycles. Switch the display to a table in the
  * editor and that is exactly what it shows.
  *
  * - `geomean` is each suite's average speedup — the right average for ratios,
  *   where 2× and 0.5× come out at 1×. It is drawn as the bar.
- * - `min` and `max` are the slowest and fastest benchmark in the suite. As
- *   measures of spread they default to a whisker across the bar, so a suite
- *   whose average hides a regression shows it.
+ * - `min`, `p25`, `median`, `p75` and `max` are the five numbers of a box
+ *   plot: the slowest and fastest benchmark in the suite, and the quartiles
+ *   and median between them. The bar chart only reads them out on hover; the
+ *   box plot draws them, so a suite whose average hides a regression shows
+ *   it.
  */
 export const view: ViewSpec = {
   pivotRows: [{ field: 'suite', label: 'Suite' }],
@@ -49,10 +55,10 @@ export const view: ViewSpec = {
     { field: 'compiler', label: 'Compiler' },
     { field: 'variant', label: 'Build' },
   ],
-  // Each field measured three ways. Two fields under bars split the chart
-  // into a panel each, side by side; the min and max go with their own
-  // field's bar as its whisker.
-  columns: [...measured('ir', 'ir'), ...measured('cycles', 'cycles')],
+  // Each field measured six ways. Two fields under bars split the chart
+  // into a panel each, side by side; the spread goes with its own field's
+  // bar.
+  columns: [...measured('ir', 'Instructions'), ...measured('cycles', 'Cycles')],
 };
 
 /**
@@ -72,6 +78,11 @@ export const display: DataTableDisplay = {
     baseline: 1,
     symmetric: true,
     colors: 'nested',
+    // As bars, the spread is only read out on hover. `plot: 'boxes'` draws
+    // it, and the demo's box plot checkbox sets that and drops these.
+    marks: Object.fromEntries(
+      ['ir', 'cycles'].flatMap((f) => SPREAD.map((s) => [f + s, 'none'])),
+    ),
   },
   frameless: true,
   zebra: true,
@@ -116,7 +127,7 @@ const flags: FlagSpec[] = [
     when: '(cycles - 1) * (ir - 1) < 0 && Math.abs(cycles - 1) > 0.003 && Math.abs(ir - 1) > 0.003',
     tone: 'accent',
     title: 'Cycles and instructions moved in opposite directions',
-    detail: `'cycles ' + ${pct('cycles')} + ', ir ' + ${pct('ir')}`,
+    detail: `'cycles ' + ${pct('cycles')} + ', instructions ' + ${pct('ir')}`,
   },
   {
     label: 'layout win',
@@ -124,7 +135,7 @@ const flags: FlagSpec[] = [
     tone: 'info',
     title:
       'Cycles improved 12% more than instructions: the gain is in layout or latency, not less work',
-    detail: `'cycles ' + ${pct('cycles')} + ', ir ' + ${pct('ir')}`,
+    detail: `'cycles ' + ${pct('cycles')} + ', instructions ' + ${pct('ir')}`,
   },
   {
     label: 'provisional',
@@ -152,7 +163,7 @@ export const detailView: ViewSpec = {
     },
     {
       id: 'ir',
-      label: 'Ir',
+      label: 'Instructions',
       format: { options: { decimals: 3 } },
       render: bar,
     },

@@ -23,7 +23,14 @@ export { LineSeries, DEFAULT_MAX_MARKERS } from './graph/LineSeries';
 export type { LineSeriesProps } from './graph/LineSeries';
 export { BarSeries, MAX_BAR_WIDTH } from './graph/BarSeries';
 export type { BarSeriesProps } from './graph/BarSeries';
-export { Dot, Marker, PointLabel, ReferenceLine, Whisker } from './graph/marks';
+export {
+  Box,
+  Dot,
+  Marker,
+  PointLabel,
+  ReferenceLine,
+  Whisker,
+} from './graph/marks';
 export type {
   DotProps,
   PointLabelProps,
@@ -36,6 +43,7 @@ export type { PivotChartProps } from './graph/PivotChart';
 export {
   CHART_COLORS,
   CHART_MARKS,
+  CHART_PLOTS,
   graphFromView,
   markOf,
 } from './graph/pivot-chart';
@@ -43,6 +51,7 @@ export type {
   ChartColors,
   ChartDisplay,
   ChartMark,
+  ChartPlot,
   PivotGraph,
 } from './graph/pivot-chart';
 export { MAX_SHADES, shade } from './graph/shade';

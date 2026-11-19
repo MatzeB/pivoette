@@ -480,15 +480,25 @@ A pivot view can also be drawn as grouped bars, which is how the editor edits
 a chart. The row fields become the categories, the column fields the bars in
 each category, and each measure is drawn as one of:
 
-| Draw as | Shows                                                          |
-| ------- | -------------------------------------------------------------- |
-| `bar`   | The bar's length. The first measure, by default.               |
-| `range` | A whisker across the bar, lowest to highest: `min` with `max`. |
-| `dot`   | A marker on the bar, such as a median.                         |
-| `none`  | Nothing drawn; listed in the hover readout only.               |
+| Draw as  | Shows                                                          |
+| -------- | -------------------------------------------------------------- |
+| `bar`    | The bar's length. The first measure, by default.               |
+| `range`  | A whisker across the bar, lowest to highest: `min` with `max`. |
+| `box`    | In a box plot, an edge of the box: `p25` and `p75`.            |
+| `median` | In a box plot, the line across the box.                        |
+| `dot`    | A marker on the bar.                                           |
+| `none`   | Nothing drawn; listed in the hover readout only.               |
 
-The first measure of each field defaults to `bar`; after it, `min`, `max`,
-`p25` and `p75` default to `range`, and other measures to `dot`.
+The first measure of each field defaults to `bar`; after it, `min` and `max`
+default to `range`, `p25` and `p75` to `box`, `median` to `median`, and other
+measures to `dot`.
+
+`chart.plot: 'boxes'` draws a box plot, also called box and whiskers, instead
+of bars. The box spans the interquartile range, with a line at the median,
+and the whisker runs out to the min and max. The `bar` measure, a geomean
+say, becomes a diamond, so it still shows where it sits in the spread. In a
+bar chart, which has no box, `box` measures widen the whisker and a `median`
+is drawn as a dot.
 
 Bars that measure different fields, such as instructions and cycles, get a
 panel each, side by side. The categories are named once, on the left, and

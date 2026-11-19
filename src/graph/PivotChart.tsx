@@ -18,7 +18,7 @@ import { Axis } from './Axis';
 import { BarSeries } from './BarSeries';
 import { GraphBox } from './GraphBox';
 import { Legend } from './Legend';
-import { Marker, PointLabel, ReferenceLine, Whisker } from './marks';
+import { Box, Marker, PointLabel, ReferenceLine, Whisker } from './marks';
 import { Scrubber } from './Scrubber';
 import { graphFromView } from './pivot-chart';
 import type { PivotGraph } from './pivot-chart';
@@ -99,6 +99,7 @@ export function PivotChart({
 
   const horizontal = (chart?.orientation ?? 'horizontal') === 'horizontal';
   const labels = chart?.labels ?? true;
+  const boxes = chart?.plot === 'boxes';
   const hover = chart?.hover ?? true;
   const first = panels[0]!.graph;
   // Lying down, the chart is as tall as its bars need: a list grows with its
@@ -179,9 +180,12 @@ export function PivotChart({
                 <Axis side={horizontal ? 'left' : 'bottom'} />
               )}
               {hover && <Scrubber dots={false} />}
-              <BarSeries>
+              <BarSeries body={boxes ? 'none' : 'bar'}>
                 <Whisker />
-                <Marker />
+                {boxes && <Box />}
+                {/* Smaller in a box plot: there it sits on a box, not a bar,
+                    and must not hide the median line beside it. */}
+                <Marker own={boxes} size={boxes ? 3.5 : undefined} />
                 {labels && <PointLabel at="all" side="outside" />}
               </BarSeries>
               {chart?.baseline !== undefined && <ReferenceLine />}

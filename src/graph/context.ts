@@ -148,6 +148,8 @@ export interface GraphDatum {
   /** Where the point sits, in the SVG's user coordinates. */
   cx: number;
   cy: number;
+  /** A bar's thickness across its band, when the point is a bar's. */
+  thickness?: number;
 }
 
 /**

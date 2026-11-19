@@ -32,9 +32,26 @@ import { SERIES_SLOTS } from './palette';
  * - `range`: a whisker from the lowest to the highest of a bar's range values
  *   — `min` with `max`, or `p25` with `p75`.
  * - `dot`: a marker on the bar's centre line, such as a median.
+ * - `box`: in a box plot, an edge of the box — `p25` and `p75`, the
+ *   interquartile range. In a bar chart it joins the range instead.
+ * - `median`: in a box plot, the line across the box. In a bar chart it is a
+ *   dot.
  * - `none`: not drawn, but listed in the hover readout.
  */
-export type ChartMark = 'bar' | 'range' | 'dot' | 'none';
+export type ChartMark = 'bar' | 'range' | 'box' | 'median' | 'dot' | 'none';
+
+/**
+ * How each bar position is drawn.
+ *
+ * - `bars`: a bar to the value, with any range as a whisker across it.
+ * - `boxes`: a box plot (box and whiskers). The box spans the `box` values,
+ *   a line across it marks the `median`, and the whisker runs out to the
+ *   `range` values; the bar value itself becomes a diamond, so a geomean or
+ *   mean still shows where it sits within the spread.
+ */
+export type ChartPlot = 'bars' | 'boxes';
+
+export const CHART_PLOTS: readonly ChartPlot[] = ['bars', 'boxes'];
 
 /**
  * What a bar's colour says.
@@ -62,6 +79,8 @@ export const CHART_COLORS: readonly ChartColors[] = [
 export const CHART_MARKS: readonly ChartMark[] = [
   'bar',
   'range',
+  'box',
+  'median',
   'dot',
   'none',
 ];
@@ -70,6 +89,8 @@ export const CHART_MARKS: readonly ChartMark[] = [
 export interface ChartDisplay {
   /** Default `'horizontal'`: categories are names, read best in a column. */
   orientation?: GraphOrientation;
+  /** Bars, or a box plot. Default `'bars'`. */
+  plot?: ChartPlot;
   /** The value bars grow from. Default 0. */
   baseline?: number;
   /** Keep the baseline in the middle of the value axis. */
@@ -108,7 +129,10 @@ export interface ChartDisplay {
 }
 
 /** Aggregations that describe a spread rather than a centre. */
-const RANGE_AGGS = new Set(['min', 'max', 'p25', 'p75']);
+const RANGE_AGGS = new Set(['min', 'max']);
+/** The quartiles: a box plot's box, a bar chart's range. */
+const BOX_AGGS = new Set(['p25', 'p75']);
+const MEDIAN_AGGS = new Set(['median', 'p50']);
 
 /**
  * How the measure at `index` in `view.columns` is drawn: what the display
@@ -117,9 +141,9 @@ const RANGE_AGGS = new Set(['min', 'max', 'p25', 'p75']);
  * The first measure of each field is that field's bar — it is the one the
  * view leads with, and a second field measured after it (`cycles` after
  * `ir`) is a second quantity, which gets bars, and a panel, of its own.
- * After that, a measure of spread (`min`, `max`, a quartile) joins the
- * whisker, which is the reading the aggregation itself suggests, and
- * anything else is a marker on the bar.
+ * After that, a measure of spread (`min`, `max`) joins the whisker, the
+ * quartiles the box and a median its line, which is the reading the
+ * aggregation itself suggests, and anything else is a marker on the bar.
  */
 export function markOf(
   view: ViewSpec,
@@ -134,7 +158,32 @@ export function markOf(
   const firstOfField =
     view.columns.findIndex((c) => field(c) === field(column)) === index;
   if (firstOfField) return 'bar';
-  return column.agg && RANGE_AGGS.has(column.agg) ? 'range' : 'dot';
+  const agg = column.agg ?? '';
+  if (RANGE_AGGS.has(agg)) return 'range';
+  if (BOX_AGGS.has(agg)) return 'box';
+  if (MEDIAN_AGGS.has(agg)) return 'median';
+  return 'dot';
+}
+
+/**
+ * A value's label beside its bar's: `cycles min` next to the `cycles` bar is
+ * just `min`. The readout lists a bar's values after its own, so the shared
+ * name says nothing a second time — five times, for a box plot's numbers.
+ */
+export function shortLabel(label: string, bar: string): string {
+  const prefix = `${bar} `;
+  return label.startsWith(prefix) && label.length > prefix.length
+    ? label.slice(prefix.length)
+    : label;
+}
+
+/**
+ * What a mark comes to under `plot`. A bar chart has no box to draw, so its
+ * edges widen the whisker and a median is marked like any other value.
+ */
+function drawnAs(mark: ChartMark, plot: ChartPlot): ChartMark {
+  if (plot === 'boxes') return mark;
+  return mark === 'box' ? 'range' : mark === 'median' ? 'dot' : mark;
 }
 
 /** One of the side-by-side charts a view is split into, per measured field. */
@@ -217,8 +266,10 @@ export function graphFromView(
   result.leaves.forEach((leaf, i) => {
     const id = leaf.column.def?.id ?? leaf.column.id;
     const index = view.columns.findIndex((c) => c.id === id);
-    const mark =
-      index >= 0 ? markOf(view, chart, index) : (chart.marks?.[id] ?? 'none');
+    const mark = drawnAs(
+      index >= 0 ? markOf(view, chart, index) : (chart.marks?.[id] ?? 'none'),
+      chart.plot ?? 'bars',
+    );
     const parts = leaf.colPath.slice(0, depth);
     const key = parts.join(PATH_SEPARATOR);
     let member = byKey.get(key);
@@ -242,6 +293,13 @@ export function graphFromView(
   ) {
     notes.push(
       'A range needs two values, such as min and max; with one it draws nothing.',
+    );
+  }
+  if (
+    members.some((m) => m.measures.filter((x) => x.mark === 'box').length === 1)
+  ) {
+    notes.push(
+      'A box needs two values, such as p25 and p75; with one it draws nothing.',
     );
   }
 
@@ -289,6 +347,11 @@ export function graphFromView(
       measures: m.measures.filter((x) => panelOf(x) === p),
     }));
     const graph = buildPanel(own);
+    if (graph && split) {
+      graph.measure = own
+        .flatMap((m) => m.measures)
+        .find((x) => x.mark === 'bar')?.label;
+    }
     if (graph) {
       panels.push({
         key: split ? barSources[p]! : '',
@@ -378,32 +441,39 @@ export function graphFromView(
     const series: Series[] = ordered.map(({ draft, slot }, index) => {
       const others = draft.member.measures.filter((x) => x.mark !== 'bar');
       const ranged = others.filter((x) => x.mark === 'range');
+      const boxed = others.filter((x) => x.mark === 'box');
+      const median = others.find((x) => x.mark === 'median');
       const leaf = result.leaves[draft.bar.leaf]!;
       const points: GraphPoint[] = result.rows.map((_row, r) => {
         const y = valueAt(r, draft.bar.leaf);
         see(y);
         const extras: PointExtra[] = others.map((x) => ({
-          label: x.label,
+          label: shortLabel(x.label, draft.bar.label),
           value: valueAt(r, x.leaf),
-          as: x.mark === 'dot' ? 'dot' : x.mark === 'range' ? 'range' : 'none',
+          as: x.mark === 'bar' ? 'none' : x.mark,
         }));
-        const spread = ranged
-          .map((x) => valueAt(r, x.leaf))
-          .filter((v): v is number => v !== null);
-        const range: [number, number] | undefined =
-          spread.length >= 2
-            ? [Math.min(...spread), Math.max(...spread)]
-            : undefined;
-        if (range) {
-          see(range[0]);
-          see(range[1]);
-        }
+        /** The lowest and highest of some measures, if two are present. */
+        const span = (of: Measure[]): [number, number] | undefined => {
+          const values = of
+            .map((x) => valueAt(r, x.leaf))
+            .filter((v): v is number => v !== null);
+          if (values.length < 2) return undefined;
+          see(Math.min(...values));
+          see(Math.max(...values));
+          return [Math.min(...values), Math.max(...values)];
+        };
+        const range = span(ranged);
+        const box = span(boxed);
+        const mid = median ? valueAt(r, median.leaf) : null;
+        see(mid);
         for (const e of extras) if (e.as === 'dot') see(e.value);
         return {
           x: r,
           y,
           raw: categories[r]!,
           ...(range ? { range } : {}),
+          ...(box ? { box } : {}),
+          ...(mid !== null ? { median: mid } : {}),
           ...(extras.length > 0 ? { extras } : {}),
         };
       });

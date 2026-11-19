@@ -75,6 +75,10 @@ export interface GraphPoint {
    * pivot-backed chart when values are drawn as a range; read by `<Whisker>`.
    */
   range?: [number, number];
+  /** A box plot's box, low to high — the interquartile range. */
+  box?: [number, number];
+  /** A box plot's median, drawn as the line across its box. */
+  median?: number;
   /** Further values at this point, each with what it is. */
   extras?: PointExtra[];
 }
@@ -88,8 +92,8 @@ export interface PointExtra {
   label: string;
   /** In display units. */
   value: number | null;
-  /** Drawn as a marker on the bar, or only listed in the readout. */
-  as: 'dot' | 'range' | 'none';
+  /** How it is drawn: a marker, part of a whisker or box, or readout only. */
+  as: 'dot' | 'range' | 'box' | 'median' | 'none';
 }
 
 export interface Series {
@@ -151,6 +155,12 @@ export interface GraphData {
   xMeta: ColumnMeta;
   /** Metadata for the shared value axis, at the chosen ladder step. */
   yMeta: ColumnMeta;
+  /**
+   * What the bars measure, named in the hover readout's heading. Set on each
+   * panel of a split chart, where the readout would otherwise not say which
+   * panel it belongs to.
+   */
+  measure?: string;
   /** Stored → display multiplier. 1 when nothing was rescaled. */
   yFactor: number;
   /** Extent of the plotted values, in display units. Niceing is the scale's

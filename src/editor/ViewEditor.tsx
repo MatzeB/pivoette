@@ -253,6 +253,8 @@ function AddMenu({
 const MARK_LABELS: Record<ChartMark, string> = {
   bar: 'Bar',
   range: 'Range',
+  box: 'Box',
+  median: 'Median',
   dot: 'Dot',
   none: 'Readout only',
 };
@@ -811,6 +813,25 @@ export function ViewEditor({
           >
             <option value="horizontal">horizontal</option>
             <option value="vertical">vertical</option>
+          </select>
+        </li>
+        <li className={styles.row}>
+          <span className={styles.label}>Plot</span>
+          <select
+            className={styles.agg}
+            value={chart.plot ?? 'bars'}
+            title="Bars, or box and whiskers"
+            onChange={(e) =>
+              onDisplayChange(
+                setChart(shown, {
+                  plot:
+                    e.target.value === 'boxes' ? ('boxes' as const) : undefined,
+                }),
+              )
+            }
+          >
+            <option value="bars">bars</option>
+            <option value="boxes">box plot</option>
           </select>
         </li>
         <li className={styles.row}>

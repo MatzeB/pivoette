@@ -122,6 +122,19 @@
   stroke-linecap: round;
 }
 
+.box {
+  stroke: none;
+}
+
+/* Two strokes in one: the surface colour as a halo, so the ink line reads
+   on a pale box and a full one alike. */
+.median {
+  stroke: var(--pv-text);
+  stroke-width: 2;
+  paint-order: stroke;
+  filter: drop-shadow(0 0 1px var(--pv-bg)) drop-shadow(0 0 1px var(--pv-bg));
+}
+
 .marker {
   fill: var(--pv-text);
   stroke: var(--pv-bg);

@@ -195,7 +195,7 @@ const EXAMPLES: Example[] = [
     id: 'compiler',
     title: '8 · Performance FooCC / BarCC',
     blurb:
-      'Speedups of two compilers, FooCC and BarCC, each built three ways, over BarCC at -O2, so the neutral value is 1.0, not zero. It is an ordinary pivot view — suites down the rows, compilers and their builds across the columns, and the geomean, min and max of two per-benchmark speedups, in instructions retired and in cycles — drawn as a chart because the display says `as: "chart"`. Rows become categories, columns become the bars in each, and each value is drawn as a bar, a range, a dot, or only read out on hover: here the geomean is the bar and min–max the whisker across it. Open the editor to change any of it, or switch to Table to see the same numbers as cells. `baseline: 1` grows each bar from 1.0, right for faster and left for slower, and `symmetric` keeps 1.0 in the middle while the axis still fits the data. `colors: "nested"` lets the compiler pick the hue and the build its shade, pale to full in the order the builds add their steps; the editor’s Colours menu switches to one colour per bar, or shades of one. The two speedups measure different fields, so each gets a panel, side by side on one scale: BOLT, which only moves code, barely moves the instruction bars and clearly lengthens the cycle bars. bzip2 is where FooCC loses to BarCC at -O2, and the whiskers show SPEC 2006 hides a regression inside its average.',
+      'Speedups of two compilers, FooCC and BarCC, each built three ways, over BarCC at -O2, so the neutral value is 1.0, not zero. It is an ordinary pivot view — suites down the rows, compilers and their builds across the columns, and the geomean and spread of two per-benchmark speedups, in instructions retired and in cycles — drawn as a chart because the display says `as: "chart"`. Rows become categories, columns become the bars in each, and each value is drawn as a bar, a range, a dot, or only read out on hover: here the geomean is the bar, and the spread behind it, min, quartiles, median and max, is read out on hover. Tick box plot above the chart to draw that spread instead, as box and whiskers (`plot: "boxes"`). Open the editor to change any of it, or switch to Table to see the same numbers as cells. `baseline: 1` grows each bar from 1.0, right for faster and left for slower, and `symmetric` keeps 1.0 in the middle while the axis still fits the data. `colors: "nested"` lets the compiler pick the hue and the build its shade, pale to full in the order the builds add their steps; the editor’s Colours menu switches to one colour per bar, or shades of one. The two speedups measure different fields, so each gets a panel, side by side on one scale: BOLT, which only moves code, barely moves the instruction bars and clearly lengthens the cycle bars. bzip2 is where FooCC loses to BarCC at -O2, and the box plot shows SPEC 2006 hides a regression inside its average.',
     view: compilerView,
     display: compilerDisplay,
     detail: {
@@ -300,6 +300,22 @@ function rawView(rows: Row[]): ViewSpec {
       label: c.name,
       inheritUnitFormat: false,
     })),
+  };
+}
+
+/**
+ * A chart display as a box plot, or as it was. The box plot draws what the
+ * bars only read out, so it also drops the marks that hid the spread.
+ */
+function withPlot(
+  display: DataTableDisplay | undefined,
+  boxes: boolean,
+): DataTableDisplay | undefined {
+  if (!display?.chart) return display;
+  if (!boxes) return display;
+  return {
+    ...display,
+    chart: { ...display.chart, plot: 'boxes', marks: undefined },
   };
 }
 
@@ -480,6 +496,14 @@ const SETTINGS: React.CSSProperties = {
   gap: 12,
   minHeight: 26,
 };
+/** A checkbox among the settings. */
+const CHECK: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  fontSize: 13,
+  color: 'var(--page-muted)',
+};
 const PINNED: React.CSSProperties = {
   ...SETTINGS,
   position: 'absolute',
@@ -490,6 +514,8 @@ const PINNED: React.CSSProperties = {
 export function App() {
   const [selected, setSelected] = useState(initialExample);
   const [stress, setStress] = useState(false);
+  // The compiler chart as a box plot rather than bars.
+  const [boxes, setBoxes] = useState(false);
   const [stressData, setStressData] = useState<Row[] | null>(null);
   const [theme, setTheme] = useState<Theme>(initialTheme);
   // The library defaults to 'off' (units are opt-in); the demo starts them in
@@ -523,7 +549,11 @@ export function App() {
     () => present(exampleView, exampleView, { scalePer, locale, timeZone }),
     [exampleView, locale, timeZone, scalePer],
   );
-  const display = example.kind === 'table' ? example.display : undefined;
+  const exampleDisplay = example.kind === 'table' ? example.display : undefined;
+  const display = useMemo(
+    () => withPlot(exampleDisplay, boxes),
+    [exampleDisplay, boxes],
+  );
 
   // Only a view that derives something can be affected by the zone — but a
   // time axis always is, since the zone decides where a day boundary falls.
@@ -619,7 +649,11 @@ export function App() {
         locale,
         timeZone,
       });
-      table.display = { ...carried.display, unitPlacement, scalePlacement };
+      table.display = {
+        ...withPlot(carried.display, boxes),
+        unitPlacement,
+        scalePlacement,
+      };
     }
   }, [
     bundle,
@@ -629,6 +663,7 @@ export function App() {
     timeZone,
     unitPlacement,
     scalePlacement,
+    boxes,
   ]);
 
   function setBoth(v: UnitPlacement) {
@@ -641,15 +676,7 @@ export function App() {
   const settings = (
     <>
       {isRegression && (
-        <label
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 13,
-            color: 'var(--page-muted)',
-          }}
-        >
+        <label style={CHECK}>
           <input
             type="checkbox"
             checked={stress}
@@ -833,6 +860,18 @@ export function App() {
         />
       ) : (
         <>
+          {/* Above the chart rather than with the settings under it: it
+              changes what the chart is, so it is read before the chart. */}
+          {example.id === 'compiler' && (
+            <label style={{ ...CHECK, marginBottom: 10 }}>
+              <input
+                type="checkbox"
+                checked={boxes}
+                onChange={(e) => setBoxes(e.target.checked)}
+              />
+              box plot
+            </label>
+          )}
           <pivoette-table id="example-table" ref={tableRef} theme={theme} />
           {/* Below the table rather than beside it: a panel beside it would
               take its width out of the table, the thing being edited. Opening
